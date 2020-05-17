@@ -17,7 +17,7 @@ jobs:
           java-version: 1.11
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
-      - uses: ButterCam/prepare-sisyphus-build@master
+      - uses: ButterCam/prepare-sisyphus-build@3fb753b
         with:
           snapshot: snapshot,mavenSnapshot
           release: release,mavenRelease
