@@ -19,7 +19,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("protobuf") {
-            id = "sisyphus.protobuf"
+            id = "com.bybutter.sisyphus.protobuf"
             implementationClass = "com.bybutter.sisyphus.protobuf.gradle.ProtobufPlugin"
         }
     }

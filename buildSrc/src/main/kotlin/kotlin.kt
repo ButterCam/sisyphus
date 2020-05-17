@@ -8,7 +8,6 @@ val Project.kotlin: Project
         apply {
             plugin("kotlin")
             plugin("kotlin-spring")
-            plugin("io.gitlab.arturbosch.detekt")
             plugin("org.jlleitschuh.gradle.ktlint")
         }
 

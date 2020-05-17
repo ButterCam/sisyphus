@@ -2,9 +2,6 @@ package com.bybutter.sisyphus.middleware.grpc.test
 
 import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
 import com.bybutter.sisyphus.middleware.grpc.SisyphusGrpcClientAutoConfiguration
-import com.bybutter.sisyphus.middleware.grpc.test.Request
-import com.bybutter.sisyphus.middleware.grpc.test.Response
-import com.bybutter.sisyphus.middleware.grpc.test.RpcService
 import com.bybutter.sisyphus.rpc.GrpcContextCoroutineContextElement
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.ReceiveChannel

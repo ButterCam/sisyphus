@@ -1,7 +1,7 @@
 plugins {
     `java-platform`
     id("nebula.maven-publish")
-    id("sisyphus.project")
+    sisyphus
 }
 
 group = "com.bybutter.sisyphus"

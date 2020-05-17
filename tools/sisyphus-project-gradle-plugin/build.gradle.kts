@@ -16,7 +16,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("sisyphus") {
-            id = "sisyphus.project"
+            id = "com.bybutter.sisyphus.project"
             displayName = "Plugin for developing project based on sisyphus framework."
             description = "Easy configuare develop environment for project based on sisyphus framework."
             implementationClass = "com.bybutter.sisyphus.project.gradle.SisyphusProjectPlugin"
