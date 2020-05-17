@@ -3,6 +3,7 @@ tools
 plugins {
     `java-library`
     `java-gradle-plugin`
+    id("com.gradle.plugin-publish") version "0.10.1"
 }
 
 dependencies {
