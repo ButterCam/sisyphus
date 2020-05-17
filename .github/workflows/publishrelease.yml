@@ -20,7 +20,7 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
       - uses: ButterCam/prepare-sisyphus-build@master
         with:
-          snapshot: snapshot,mavensSnapshot
+          snapshot: snapshot,mavenSnapshot
           release: release,mavenRelease
           snapshot-url: ${{ secrets.NEXUS_SNAPSHOT_URL }}
           snapshot-username: ${{ secrets.NEXUS_USERNAME }}
