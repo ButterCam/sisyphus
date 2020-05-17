@@ -21,7 +21,10 @@ jobs:
         with:
           snapshot: snapshot,mavenSnapshot
           release: release,mavenRelease
-          dependency: central,jcenter,mavenSnapshot
+          dependency: nexus
+          nexus-url: ${{ secrets.NEXUS_PUBLIC_URL }}
+          nexus-username: ${{ secrets.NEXUS_USERNAME }}
+          nexus-password: ${{ secrets.NEXUS_PASSWORD }}
           snapshot-url: ${{ secrets.NEXUS_SNAPSHOT_URL }}
           snapshot-username: ${{ secrets.NEXUS_USERNAME }}
           snapshot-password: ${{ secrets.NEXUS_PASSWORD }}
