@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package bybutter.api;
+
+import "google/protobuf/descriptor.proto";
+
+option java_package = "com.bybutter.sisyphus.api";
+option objc_class_prefix = "SIS";
+
+message ServiceMetadata {
+    string name = 1;
+    repeated string hosts = 2;
+}
+
+extend google.protobuf.ServiceOptions {
+    ServiceMetadata metadata = 26051;
+}

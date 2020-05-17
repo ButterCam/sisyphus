@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "google/protobuf/descriptor.proto";
+
+package sisyphus.protobuf;
+
+option java_package = "com.bybutter.sisyphus.protobuf";
+option objc_class_prefix = "SIS";
+
+extend google.protobuf.EnumValueOptions {
+    string string = 26051;
+}
