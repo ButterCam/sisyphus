@@ -18,9 +18,21 @@ gradlePlugin {
     plugins {
         create("sisyphus") {
             id = "com.bybutter.sisyphus.project"
-            displayName = "Plugin for developing project based on sisyphus framework."
-            description = "Easy configuare develop environment for project based on sisyphus framework."
             implementationClass = "com.bybutter.sisyphus.project.gradle.SisyphusProjectPlugin"
+        }
+    }
+}
+
+pluginBundle {
+    website = "https://github.com/ButterCam/sisyphus"
+    vcsUrl = "https://github.com/ButterCam/sisyphus"
+    description = "Easy configure develop environment for project based on sisyphus framework."
+
+    (plugins) {
+        "sisyphus" {
+            displayName = "Sisyphus Project Plugin"
+            description = "Plugin for developing project based on sisyphus framework."
+            tags = listOf("sisyphus", "project")
         }
     }
 }

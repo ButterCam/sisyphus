@@ -25,3 +25,17 @@ gradlePlugin {
         }
     }
 }
+
+pluginBundle {
+    website = "https://github.com/ButterCam/sisyphus"
+    vcsUrl = "https://github.com/ButterCam/sisyphus"
+    description = "Protobuf compiler plugin for sisyphus framework."
+
+    (plugins) {
+        "protobuf" {
+            displayName = "Sisyphus Protobuf Plugin"
+            description = "Plugin for compiling proto files in project which based on sisyphus framework."
+            tags = listOf("sisyphus", "protobuf", "grpc")
+        }
+    }
+}

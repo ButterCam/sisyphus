@@ -26,8 +26,3 @@ class CelEngine(global: Map<String, Any?>, val runtime: CelRuntime = CelRuntime(
         }
     }
 }
-
-fun main() {
-    val engine = CelEngine(mapOf("intValue" to 1L, "test" to 1))
-    engine
-}

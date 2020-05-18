@@ -1,9 +1,10 @@
-name: Publish Release
+name: Publish
 
 on:
+  push:
+    branches: [ master ]
   release:
-    types: # This configuration does not affect the page_build event above
-      - created
+    types: [ created ]
 
 jobs:
   build:
@@ -38,5 +39,9 @@ jobs:
           mavenRelease-url: https://oss.sonatype.org/service/local/staging/deploy/maven2
           mavenRelease-username: ${{ secrets.OSSRH_USERNAME }}
           mavenRelease-password: ${{ secrets.OSSRH_PASSWORD }}
-      - name: Build with Gradle
+          gradle-portal-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          gradle-portal-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+      - name: Publish with Gradle
         run: gradle publish
+      - name: Publish plugins to Gradle Portal
+        run: gradle publishPlugins

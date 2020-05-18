@@ -1,23 +1,29 @@
-name: Build
+name: Publish Plugins
 
 on:
-  pull_request:
-    branches: [ master ]
+  release:
+    types: [ created ]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 1.11
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
+          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
       - uses: ButterCam/prepare-sisyphus-build@f91a284
         with:
           dependency: nexus
           nexus-url: ${{ secrets.NEXUS_PUBLIC_URL }}
           nexus-username: ${{ secrets.NEXUS_USERNAME }}
           nexus-password: ${{ secrets.NEXUS_PASSWORD }}
-      - name: Build with Gradle
-        run: gradle build
+          gradle-portal-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          gradle-portal-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+      - name: Publish plugins to Gradle Portal
+        run: gradle publishPlugins
