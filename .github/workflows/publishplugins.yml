@@ -17,7 +17,11 @@ jobs:
           java-version: 1.11
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
-      - uses: ButterCam/prepare-sisyphus-build@a8be3cf
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v2
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      - uses: ButterCam/prepare-sisyphus-build@306bc1d
         with:
           dependency: nexus
           nexus-url: ${{ secrets.NEXUS_PUBLIC_URL }}
@@ -25,5 +29,6 @@ jobs:
           nexus-password: ${{ secrets.NEXUS_PASSWORD }}
           gradle-portal-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
           gradle-portal-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+          gpg-key-name: ${{ secrets.GPG_KEY_NAME }}
       - name: Publish plugins to Gradle Portal
         run: gradle publishPlugins

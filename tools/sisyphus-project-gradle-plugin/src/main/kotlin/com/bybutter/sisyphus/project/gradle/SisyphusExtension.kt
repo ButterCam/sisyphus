@@ -29,6 +29,8 @@ open class SisyphusExtension(val project: Project) {
 
     var externalGroups: MutableSet<String> = hashSetOf()
 
+    val signKeyName: String?
+
     init {
         val developer: String? = project.findProperty("sisyphus.developer") as? String
         isDevelop = developer != null
@@ -63,6 +65,8 @@ open class SisyphusExtension(val project: Project) {
             ?: internalGroupPrefix
         externalGroups = (project.findProperty("sisyphus.externalGroups") as? String)?.split(',')?.toMutableSet()
             ?: externalGroups
+
+        signKeyName = project.findProperty("signing.gnupg.keyName") as? String
     }
 
     companion object {

@@ -11,6 +11,8 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.plugins.signing.SigningExtension
+import org.gradle.plugins.signing.SigningPlugin
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
@@ -92,6 +94,17 @@ class SisyphusProjectPlugin : Plugin<Project> {
 
         val extension = target.extensions.getByType(SisyphusExtension::class.java)
         val publishingExtension = target.extensions.getByType(PublishingExtension::class.java)
+
+        if(!extension.signKeyName.isNullOrEmpty()) {
+            target.pluginManager.apply(SigningPlugin::class.java)
+            val signing = target.extensions.getByType(SigningExtension::class.java)
+            signing.useGpgCmd()
+            target.afterEvaluate {
+                publishingExtension.publications.all {
+                    signing.sign(it)
+                }
+            }
+        }
 
         if (extension.isRelease) {
             publishingExtension.repositories.applyFromRepositoryKeys(extension.repositories, extension.releaseRepositories)
