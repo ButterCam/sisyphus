@@ -43,5 +43,3 @@ jobs:
           gradle-portal-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
       - name: Publish with Gradle
         run: gradle publish
-      - name: Publish plugins to Gradle Portal
-        run: gradle publishPlugins
