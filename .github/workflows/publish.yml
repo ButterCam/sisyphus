@@ -23,7 +23,7 @@ jobs:
         uses: crazy-max/ghaction-import-gpg@v2
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      - uses: ButterCam/prepare-sisyphus-build@306bc1d
+      - uses: ButterCam/prepare-sisyphus-build@bc33e0b
         with:
           snapshot: snapshot,mavenSnapshot
           release: release,mavenRelease
