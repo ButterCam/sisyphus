@@ -15,5 +15,7 @@ dependencies {
     implementation("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
     implementation("com.github.ben-manes:gradle-versions-plugin:0.27.0")
     implementation("com.netflix.nebula:nebula-publishing-plugin:17.2.1")
+    implementation("com.netflix.nebula:gradle-info-plugin:7.1.4")
     implementation("org.gradle.kotlin:plugins:1.2.11")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.7.0.202003110725-r")
 }
