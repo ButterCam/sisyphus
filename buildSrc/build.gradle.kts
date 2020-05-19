@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `kotlin-dsl`
     id("idea")
-    id("com.bybutter.sisyphus.project") version "higan-SNAPSHOT"
+    id("com.bybutter.sisyphus.project") version "0.0.1-M5"
 }
 
 dependencies {

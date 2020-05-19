@@ -12,10 +12,10 @@ dependencies {
     implementation(Dependencies.Kotlin.reflect)
     implementation(Dependencies.Kotlin.plugin)
 
-    compileOnly("com.netflix.nebula:nebula-publishing-plugin:17.2.1")
-    compileOnly("com.netflix.nebula:gradle-info-plugin:7.1.4")
-    compileOnly("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
-    compileOnly("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
+    compileOnly("com.netflix.nebula:nebula-publishing-plugin")
+    compileOnly("com.netflix.nebula:gradle-info-plugin")
+    compileOnly("com.netflix.nebula:gradle-contacts-plugin")
+    compileOnly("org.jlleitschuh.gradle:ktlint-gradle")
 }
 
 gradlePlugin {
