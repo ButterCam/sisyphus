@@ -5,6 +5,8 @@ plugins {
 }
 
 group = "com.bybutter.sisyphus"
+description = "Sisyphus Project (Bill of Materials)"
+
 
 dependencies {
     constraints {

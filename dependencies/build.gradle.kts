@@ -5,6 +5,7 @@ plugins {
 }
 
 group = "com.bybutter.sisyphus"
+description = "Dependencies of Sisyphus Project (Bill of Materials)"
 
 javaPlatform {
     allowDependencies()

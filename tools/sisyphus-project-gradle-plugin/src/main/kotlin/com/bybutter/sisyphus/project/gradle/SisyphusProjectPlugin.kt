@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.project.gradle
 import java.io.File
 import java.net.URI
 import nebula.plugin.publishing.maven.MavenPublishPlugin
+import nebula.plugin.publishing.publications.JavadocJarPlugin
 import nebula.plugin.publishing.publications.SourceJarPlugin
 import org.gradle.api.Action
 import org.gradle.api.Plugin
@@ -55,6 +56,7 @@ class SisyphusProjectPlugin : Plugin<Project> {
         try {
             target.pluginManager.apply(MavenPublishPlugin::class.java)
             target.pluginManager.apply(SourceJarPlugin::class.java)
+            target.pluginManager.apply(JavadocJarPlugin::class.java)
         } catch (exception: NoClassDefFoundError) {
             target.logger.debug("Skip apply library plugin due to java library plugins not existed.")
             return
@@ -91,11 +93,24 @@ class SisyphusProjectPlugin : Plugin<Project> {
             }
             return
         }
+        target.pluginManager.apply("nebula.info")
 
         val extension = target.extensions.getByType(SisyphusExtension::class.java)
         val publishingExtension = target.extensions.getByType(PublishingExtension::class.java)
 
-        if(!extension.signKeyName.isNullOrEmpty()) {
+        publishingExtension.publications.withType(MavenPublication::class.java) {
+            it.pom {
+                it.licenses {
+                    it.license {
+                        it.name.set("MIT License")
+                        it.url.set("https://github.com/ButterCam/sisyphus/blob/master/LICENSE")
+                        it.distribution.set("repo")
+                    }
+                }
+            }
+        }
+
+        if (!extension.signKeyName.isNullOrEmpty()) {
             target.pluginManager.apply(SigningPlugin::class.java)
             val signing = target.extensions.getByType(SigningExtension::class.java)
             signing.useGpgCmd()

@@ -6,12 +6,15 @@ plugins {
     id("com.gradle.plugin-publish") version "0.11.0"
 }
 
+description = "Plugin for easy configuring Gradle and plugins in Sisyphus Framework"
+
 dependencies {
     implementation(Dependencies.Kotlin.reflect)
     implementation(Dependencies.Kotlin.plugin)
 
     compileOnly("com.netflix.nebula:nebula-publishing-plugin:17.2.1")
     compileOnly("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
+    compileOnly("com.netflix.nebula:gradle-info-plugin:7.1.4")
 }
 
 gradlePlugin {
