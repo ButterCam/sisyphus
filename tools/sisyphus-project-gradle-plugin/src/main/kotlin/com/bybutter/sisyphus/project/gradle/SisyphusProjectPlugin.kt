@@ -203,6 +203,10 @@ class SisyphusProjectPlugin : Plugin<Project> {
                     this.jcenter()
                     null
                 }
+                "portal" -> repositories[repositoryKey] ?: run {
+                    this.gradlePluginPortal()
+                    null
+                }
                 else -> repositories[repositoryKey]
             }
 
@@ -211,8 +215,8 @@ class SisyphusProjectPlugin : Plugin<Project> {
             this.maven {
                 it.name = repositoryKey
                 it.url = URI.create(repository.url)
-                it.credentials.username = repository.username
-                it.credentials.password = repository.password
+                it.credentials.username = repository.username ?: ""
+                it.credentials.password = repository.password ?: ""
             }
         }
     }

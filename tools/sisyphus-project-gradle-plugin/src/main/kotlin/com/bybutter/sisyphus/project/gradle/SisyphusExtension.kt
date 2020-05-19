@@ -19,15 +19,11 @@ open class SisyphusExtension(val project: Project) {
 
     var repositories: MutableMap<String, Repository> = hashMapOf()
 
-    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "jcenter")
+    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "jcenter", "portal")
 
     var releaseRepositories: MutableList<String> = mutableListOf("release")
 
     var snapshotRepositories: MutableList<String> = mutableListOf("snapshot")
-
-    var internalGroupPrefix: MutableList<String> = mutableListOf()
-
-    var externalGroups: MutableSet<String> = hashSetOf()
 
     val signKeyName: String?
 
@@ -61,10 +57,6 @@ open class SisyphusExtension(val project: Project) {
             ?: releaseRepositories
         snapshotRepositories = (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
             ?: snapshotRepositories
-        internalGroupPrefix = (project.findProperty("sisyphus.internalGroupPrefix") as? String)?.split(',')?.toMutableList()
-            ?: internalGroupPrefix
-        externalGroups = (project.findProperty("sisyphus.externalGroups") as? String)?.split(',')?.toMutableSet()
-            ?: externalGroups
 
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
     }

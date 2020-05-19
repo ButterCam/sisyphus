@@ -37,5 +37,16 @@ dependencies {
         api("io.swagger.core.v3:swagger-core:2.1.1")
         api("org.jooq:jooq:3.13.1")
         api("com.google.api.grpc:proto-google-common-protos:1.18.0")
+        api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.70")
+        api("org.jetbrains.kotlin:kotlin-allopen:1.3.70")
+        api("org.springframework.boot:spring-boot-gradle-plugin:2.2.7.RELEASE")
+        api("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
+        api("com.github.ben-manes:gradle-versions-plugin:0.27.0")
+        api("com.netflix.nebula:nebula-publishing-plugin:17.2.1")
+        api("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
+        api("com.netflix.nebula:gradle-info-plugin:7.1.4")
+        api("org.gradle.kotlin:plugins:1.2.11")
+        api("com.gradle.publish:plugin-publish-plugin:0.11.0")
+        api("org.eclipse.jgit:org.eclipse.jgit:5.7.0.202003110725-r")
     }
 }
