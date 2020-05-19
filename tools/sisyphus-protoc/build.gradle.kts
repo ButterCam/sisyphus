@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+description = "Protoc plugin for Sisyphus customized Protobuf runtime"
+
 dependencies {
     implementation(project(":lib:sisyphus-protobuf"))
     implementation(project(":lib:sisyphus-grpc"))

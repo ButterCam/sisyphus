@@ -6,6 +6,8 @@ plugins {
     protobuf
 }
 
+description = "Sisyphus customized gRPC runtime for Kotlin coroutine"
+
 dependencies {
     implementation(project(":lib:sisyphus-jackson"))
     api(project(":lib:sisyphus-protobuf"))

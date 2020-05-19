@@ -6,6 +6,8 @@ plugins {
     id("com.gradle.plugin-publish") version "0.11.0"
 }
 
+description = "Plugin for easy configuring Gradle and plugins in Sisyphus Framework"
+
 dependencies {
     implementation(Dependencies.Kotlin.reflect)
     implementation(Dependencies.Kotlin.plugin)

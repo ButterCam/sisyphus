@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.project.gradle
 
 import java.io.File
 import java.net.URI
-import nebula.plugin.info.InfoPlugin
 import nebula.plugin.publishing.maven.MavenPublishPlugin
 import nebula.plugin.publishing.publications.JavadocJarPlugin
 import nebula.plugin.publishing.publications.SourceJarPlugin
@@ -94,7 +93,7 @@ class SisyphusProjectPlugin : Plugin<Project> {
             }
             return
         }
-        target.pluginManager.apply(InfoPlugin::class.java)
+        target.pluginManager.apply("nebula.info")
 
         val extension = target.extensions.getByType(SisyphusExtension::class.java)
         val publishingExtension = target.extensions.getByType(PublishingExtension::class.java)

@@ -6,6 +6,8 @@ plugins {
     id("com.gradle.plugin-publish") version "0.11.0"
 }
 
+description = "Plugin for compiling proto files with Gradle in Sisyphus Framework"
+
 dependencies {
     implementation(project(":lib:sisyphus-common"))
     implementation(project(":lib:sisyphus-grpc"))
