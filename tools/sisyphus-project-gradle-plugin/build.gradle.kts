@@ -3,7 +3,7 @@ tools
 plugins {
     `java-library`
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "0.11.0"
+    id("com.gradle.plugin-publish")
 }
 
 description = "Plugin for easy configuring Gradle and plugins in Sisyphus Framework"
@@ -22,6 +22,8 @@ gradlePlugin {
     plugins {
         create("sisyphus") {
             id = "com.bybutter.sisyphus.project"
+            displayName = "Sisyphus Project Plugin"
+            description = "Easy configure develop environment for project based on sisyphus framework."
             implementationClass = "com.bybutter.sisyphus.project.gradle.SisyphusProjectPlugin"
         }
     }
@@ -34,8 +36,6 @@ pluginBundle {
 
     (plugins) {
         "sisyphus" {
-            displayName = "Sisyphus Project Plugin"
-            description = "Plugin for developing project based on sisyphus framework."
             tags = listOf("sisyphus", "project")
         }
     }

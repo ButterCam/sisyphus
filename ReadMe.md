@@ -8,7 +8,7 @@ Sisyphus is the way how we provide backend services. It integrates all tools and
 
 Due to we can analyze product documents completely, it is not particularly difficult to write an exquisite and easy-to-use API at the beginning for most APIs.
 
-But many people will break the initial design of the API in the endless update of products.
+However, many people will break the initial design of the API in the endless update of products.
 
 It's hard to create a strong and extensible API in the whole project lifetime, just like roll a huge boulder endlessly up a steep hill.
 

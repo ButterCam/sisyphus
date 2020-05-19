@@ -18,5 +18,6 @@ dependencies {
     implementation("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
     implementation("com.netflix.nebula:gradle-info-plugin:7.1.4")
     implementation("org.gradle.kotlin:plugins:1.2.11")
+    implementation("com.gradle.publish:plugin-publish-plugin:0.11.0")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.7.0.202003110725-r")
 }

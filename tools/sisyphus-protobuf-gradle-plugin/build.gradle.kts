@@ -3,7 +3,7 @@ tools
 plugins {
     `java-library`
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "0.11.0"
+    id("com.gradle.plugin-publish")
 }
 
 description = "Plugin for compiling proto files with Gradle in Sisyphus Framework"
@@ -23,6 +23,8 @@ gradlePlugin {
     plugins {
         create("protobuf") {
             id = "com.bybutter.sisyphus.protobuf"
+            displayName = "Sisyphus Protobuf Plugin"
+            description = "Protobuf compiler plugin for sisyphus framework."
             implementationClass = "com.bybutter.sisyphus.protobuf.gradle.ProtobufPlugin"
         }
     }
@@ -35,8 +37,6 @@ pluginBundle {
 
     (plugins) {
         "protobuf" {
-            displayName = "Sisyphus Protobuf Plugin"
-            description = "Plugin for compiling proto files in project which based on sisyphus framework."
             tags = listOf("sisyphus", "protobuf", "grpc")
         }
     }
