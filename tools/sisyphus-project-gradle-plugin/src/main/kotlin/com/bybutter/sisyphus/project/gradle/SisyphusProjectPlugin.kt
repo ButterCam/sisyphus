@@ -2,6 +2,7 @@ package com.bybutter.sisyphus.project.gradle
 
 import java.io.File
 import java.net.URI
+import nebula.plugin.contacts.ContactsExtension
 import nebula.plugin.publishing.maven.MavenPublishPlugin
 import nebula.plugin.publishing.publications.JavadocJarPlugin
 import nebula.plugin.publishing.publications.SourceJarPlugin
@@ -93,7 +94,22 @@ class SisyphusProjectPlugin : Plugin<Project> {
             }
             return
         }
-        target.pluginManager.apply("nebula.info")
+
+        target.tryApplyPluginClass("nebula.plugin.info.InfoPlugin")
+        if (target.tryApplyPluginClass("nebula.plugin.contacts.ContactsPlugin")) {
+            if (target != target.rootProject) {
+                val rootContacts = target.rootProject.extensions.findByType(ContactsExtension::class.java)
+                if (rootContacts != null) {
+                    val currentContacts = target.extensions.getByType(ContactsExtension::class.java)
+
+                    for ((email, person) in rootContacts.people) {
+                        if (!currentContacts.people.containsKey(email)) {
+                            currentContacts.people[email] = person
+                        }
+                    }
+                }
+            }
+        }
 
         val extension = target.extensions.getByType(SisyphusExtension::class.java)
         val publishingExtension = target.extensions.getByType(PublishingExtension::class.java)
@@ -198,6 +214,16 @@ class SisyphusProjectPlugin : Plugin<Project> {
                 it.credentials.username = repository.username
                 it.credentials.password = repository.password
             }
+        }
+    }
+
+    private fun Project.tryApplyPluginClass(className: String): Boolean {
+        return try {
+            val plugin = Class.forName(className)
+            this.pluginManager.apply(plugin)
+            true
+        } catch (ex: ClassNotFoundException) {
+            false
         }
     }
 }

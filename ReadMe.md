@@ -6,7 +6,7 @@ Sisyphus is the way how we provide backend services. It integrates all tools and
 
 ## We are rolling a huge boulder
 
-Due to we can analyzing product documents completely, it is not particularly difficult to write an exquisite and easy-to-use API at the beginning for most APIs.
+Due to we can analyze product documents completely, it is not particularly difficult to write an exquisite and easy-to-use API at the beginning for most APIs.
 
 But many people will break the initial design of the API in the endless update of products.
 
@@ -26,11 +26,11 @@ Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sis
 
 [**gRPC**](https://grpc.io/) is our target API framework, and Sisyphus also provides the [HTTP and gRPC Transcoding](https://aip.bybutter.com/127) component for the environment which not compatible with gRPC.
 
-[**Sisyphus Protobuf**](/lib/sisyphus-protobuf) is our customized protobuf runtime, it design for Kotlin.
+[**Sisyphus Protobuf**](/lib/sisyphus-protobuf) is our customized protobuf runtime, it designed for Kotlin.
 
-[**Sisyphus gRPC**](/lib/sisyphus-grpc) is our customized gRPC runtime, it design for Kotlin coroutine.
+[**Sisyphus gRPC**](/lib/sisyphus-grpc) is our customized gRPC runtime, it designed for Kotlin coroutine.
 
-[**Sisyphus DTO**](/lib/sisyphus-dto) is our way to create structs without protobuf.
+[**Sisyphus DTO**](/lib/sisyphus-dto) is our way to create struct without protobuf.
 
 [**Sisyphus Middleware**](/middleware) is our way to connect Sisyphus and other system.
 
@@ -38,7 +38,7 @@ Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sis
 
 [**Sisyphus Protobuf Compiler**](/tools/sisyphus-protoc) is our way to generate Kotlin codes by `.proto` files.
 
-[**Sisyphus Project Plugin**](/tools/sisyphus-project-gradle-plugin) is our way to manage project and configurating Gradle.
+[**Sisyphus Project Plugin**](/tools/sisyphus-project-gradle-plugin) is our way to manage project and configuring Gradle.
 
 [**Sisyphus Protobuf Plugin**](/tools/sisyphus-protobuf-gradle-plugin) is our way to generate code by `.proto` files in Gradle.
 
