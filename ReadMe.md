@@ -44,3 +44,42 @@ Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sis
 
 **And More** tools like [CEL(Common Expression Language)](https://github.com/google/cel-spec), [Filtering](https://aip.bybutter.com/160) and [Ordering](https://aip.bybutter.com/132#ordering) Script will help you to design APIs follow Google AIP.
 
+## Rolling with Sisyphus
+
+Ready to rolling boulder with Sisyphus yet? Hold on! We need to plan our route first.
+
+1. **Configure Sisyphus with gradle.properties**
+
+   We use [gradle.properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) to configure global settings of Sisyphus and all Sisyphus Projects.
+
+   ```properties
+   # Set developer name for developing environment. If be set
+   sisyphus.developer=higan
+   
+   # Use 'sisyphus.repository.<name>.url' Register maven repository for Sisyphus usage.
+   # Url of repository named 'snapshot'.
+   sisyphus.repositories.snapshot.url=https://repo1.maven.org/maven2/
+   # Optional, user name of repository.
+   sisyphus.repositories.snapshot.username=
+   # Optional, password of repository.
+   sisyphus.repositories.snapshot.password=
+   
+   # Repositories for different usage, there are 4 embeded repositories.
+   # 'local'(maven local), 'central'(maven central), 'jcenter', 'portal'(gradle portal).
+   
+   # Repositories for resolving dependencies, default value is 'local,central,jcenter,portal'.
+   sisyphus.dependency.repositories=local,central,jcenter,portal
+   # Repositories for resolving configuration artifact, default value is 'local,central,jcenter,portal'. It will be used in next chapters.
+   sisyphus.config.repositories=local,central,jcenter,portal
+   # Repositories for snapshot publishing, default value is 'snapshot'.
+   sisyphus.snapshot.repositories=snapshot
+   # Repositories for release publishing, default value is 'release'.
+   sisyphus.release.repositories=release
+   
+   # Configuration artifacts, it will be resolved in runtime.
+   sisyphus.config.artifacts=com.bybutter.config:incubator:higan-SNAPSHOT
+   ```
+
+   `gradle.properties` are shared between Gradle and Spring. Sisyphus Project Plugin will load it and configure Gradle, Sisyphus Configuration Artifact will load it for Spring Framework.
+
+2. **Write protobuf schema**
