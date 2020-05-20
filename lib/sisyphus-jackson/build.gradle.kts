@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+description = "Jackson utils for Sisyphus"
+
 dependencies {
     api(project(":lib:sisyphus-common"))
     api(Dependencies.Jackson.Module.kotlin)

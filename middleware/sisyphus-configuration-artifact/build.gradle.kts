@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+description = "Middleware for manage configuration of Sisyphus Project"
+
 dependencies {
     implementation(project(":lib:sisyphus-common"))
     implementation(Dependencies.Maven.resolver)

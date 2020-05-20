@@ -5,6 +5,8 @@ plugins {
     protobuf
 }
 
+description = "Starter for building gRPC server in Sisyphus Framework"
+
 dependencies {
     api(project(":lib:sisyphus-protobuf"))
     api(project(":middleware:sisyphus-grpc-client"))

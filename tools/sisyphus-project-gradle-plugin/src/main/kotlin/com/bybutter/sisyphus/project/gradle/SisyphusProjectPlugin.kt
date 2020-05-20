@@ -2,7 +2,9 @@ package com.bybutter.sisyphus.project.gradle
 
 import java.io.File
 import java.net.URI
+import nebula.plugin.contacts.ContactsExtension
 import nebula.plugin.publishing.maven.MavenPublishPlugin
+import nebula.plugin.publishing.publications.JavadocJarPlugin
 import nebula.plugin.publishing.publications.SourceJarPlugin
 import org.gradle.api.Action
 import org.gradle.api.Plugin
@@ -11,6 +13,8 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.plugins.signing.SigningExtension
+import org.gradle.plugins.signing.SigningPlugin
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
@@ -53,6 +57,7 @@ class SisyphusProjectPlugin : Plugin<Project> {
         try {
             target.pluginManager.apply(MavenPublishPlugin::class.java)
             target.pluginManager.apply(SourceJarPlugin::class.java)
+            target.pluginManager.apply(JavadocJarPlugin::class.java)
         } catch (exception: NoClassDefFoundError) {
             target.logger.debug("Skip apply library plugin due to java library plugins not existed.")
             return
@@ -90,8 +95,47 @@ class SisyphusProjectPlugin : Plugin<Project> {
             return
         }
 
+        target.tryApplyPluginClass("nebula.plugin.info.InfoPlugin")
+        if (target.tryApplyPluginClass("nebula.plugin.contacts.ContactsPlugin")) {
+            if (target != target.rootProject) {
+                val rootContacts = target.rootProject.extensions.findByType(ContactsExtension::class.java)
+                if (rootContacts != null) {
+                    val currentContacts = target.extensions.getByType(ContactsExtension::class.java)
+
+                    for ((email, person) in rootContacts.people) {
+                        if (!currentContacts.people.containsKey(email)) {
+                            currentContacts.people[email] = person
+                        }
+                    }
+                }
+            }
+        }
+
         val extension = target.extensions.getByType(SisyphusExtension::class.java)
         val publishingExtension = target.extensions.getByType(PublishingExtension::class.java)
+
+        publishingExtension.publications.withType(MavenPublication::class.java) {
+            it.pom {
+                it.licenses {
+                    it.license {
+                        it.name.set("MIT License")
+                        it.url.set("https://github.com/ButterCam/sisyphus/blob/master/LICENSE")
+                        it.distribution.set("repo")
+                    }
+                }
+            }
+        }
+
+        if (!extension.signKeyName.isNullOrEmpty()) {
+            target.pluginManager.apply(SigningPlugin::class.java)
+            val signing = target.extensions.getByType(SigningExtension::class.java)
+            signing.useGpgCmd()
+            target.afterEvaluate {
+                publishingExtension.publications.all {
+                    signing.sign(it)
+                }
+            }
+        }
 
         if (extension.isRelease) {
             publishingExtension.repositories.applyFromRepositoryKeys(extension.repositories, extension.releaseRepositories)
@@ -159,6 +203,10 @@ class SisyphusProjectPlugin : Plugin<Project> {
                     this.jcenter()
                     null
                 }
+                "portal" -> repositories[repositoryKey] ?: run {
+                    this.gradlePluginPortal()
+                    null
+                }
                 else -> repositories[repositoryKey]
             }
 
@@ -167,9 +215,19 @@ class SisyphusProjectPlugin : Plugin<Project> {
             this.maven {
                 it.name = repositoryKey
                 it.url = URI.create(repository.url)
-                it.credentials.username = repository.username
-                it.credentials.password = repository.password
+                it.credentials.username = repository.username ?: ""
+                it.credentials.password = repository.password ?: ""
             }
+        }
+    }
+
+    private fun Project.tryApplyPluginClass(className: String): Boolean {
+        return try {
+            val plugin = Class.forName(className)
+            this.pluginManager.apply(plugin)
+            true
+        } catch (ex: ClassNotFoundException) {
+            false
         }
     }
 }

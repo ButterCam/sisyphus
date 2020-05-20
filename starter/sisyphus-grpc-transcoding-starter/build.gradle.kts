@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+description = "Starter for building gRPC server which with HTTP and gRPC Transcoding in Sisyphus Framework"
+
 dependencies {
     api(project(":lib:sisyphus-protobuf"))
     api(project(":lib:sisyphus-grpc"))

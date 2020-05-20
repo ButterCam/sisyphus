@@ -1,10 +1,12 @@
 plugins {
     `java-platform`
     id("nebula.maven-publish")
-    id("sisyphus.project")
+    sisyphus
 }
 
 group = "com.bybutter.sisyphus"
+description = "Sisyphus Project (Bill of Materials)"
+
 
 dependencies {
     constraints {

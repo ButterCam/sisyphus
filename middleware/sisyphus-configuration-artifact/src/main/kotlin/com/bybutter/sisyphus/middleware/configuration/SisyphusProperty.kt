@@ -11,7 +11,7 @@ val dependency: TargetRepositorySetting = TargetRepositorySetting(),
 val config: SisyphusConfigArtifacts
 )
 
-data class TargetRepositorySetting(val repositories: List<String> = listOf("local", "central", "jcenter"))
+data class TargetRepositorySetting(val repositories: List<String> = listOf("local", "central", "jcenter", "portal"))
 
 data class Repository(
     val url: String,

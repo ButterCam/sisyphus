@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+description = "Middleware for using JDBC in Sisyphus Project"
+
 dependencies {
     api(Dependencies.jooq)
     implementation(Dependencies.hikari)

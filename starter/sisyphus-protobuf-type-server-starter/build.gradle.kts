@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+description = "Starter for build application with Protobuf type server in Sisyphus Framework"
+
 dependencies {
     api(project(":lib:sisyphus-protobuf"))
     api(project(":lib:sisyphus-grpc"))

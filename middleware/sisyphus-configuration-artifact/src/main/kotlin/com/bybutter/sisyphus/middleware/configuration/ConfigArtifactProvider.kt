@@ -40,6 +40,10 @@ class ConfigArtifactProvider : EnvironmentPostProcessor {
                     aether.registerJCenter()
                     null
                 }
+                "portal" -> properties.repositories[repositoryKey] ?: run {
+                    aether.registerGradlePortal()
+                    null
+                }
                 else -> properties.repositories[repositoryKey]
             }
 

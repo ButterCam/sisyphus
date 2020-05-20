@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+description = "Middleware for using Retrofit in Sisyphus Project"
+
 dependencies {
     api(Dependencies.Kotlin.Coroutines.jdk)
     api(Dependencies.retrofit)

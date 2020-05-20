@@ -5,6 +5,8 @@ plugins {
     protobuf
 }
 
+description = "Sisyphus customized Protobuf runtime for Kotlin"
+
 dependencies {
     implementation(project(":lib:sisyphus-jackson"))
     api(project(":lib:sisyphus-common"))
