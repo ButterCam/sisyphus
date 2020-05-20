@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package bybutter.api;
+package sisyphus.api;
 
 import "google/protobuf/descriptor.proto";
 

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package bybutter.api.paging;
+package sisyphus.api.paging;
 
 option java_package = "com.bybutter.sisyphus.api.paging";
 option objc_class_prefix = "SIS";
