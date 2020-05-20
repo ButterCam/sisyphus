@@ -4,11 +4,11 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class SisyphusProperty(
     @NestedConfigurationProperty
-val repositories: Map<String, Repository> = mapOf(),
+    val repositories: Map<String, Repository> = mapOf(),
     @NestedConfigurationProperty
-val dependency: TargetRepositorySetting = TargetRepositorySetting(),
+    val dependency: TargetRepositorySetting = TargetRepositorySetting(),
     @NestedConfigurationProperty
-val config: SisyphusConfigArtifacts
+    val config: SisyphusConfigArtifacts = SisyphusConfigArtifacts()
 )
 
 data class TargetRepositorySetting(val repositories: List<String> = listOf("local", "central", "jcenter", "portal"))
