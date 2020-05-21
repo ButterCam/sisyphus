@@ -5,10 +5,8 @@ import org.springframework.boot.web.codec.CodecCustomizer
 import org.springframework.http.codec.CodecConfigurer
 import org.springframework.http.codec.DecoderHttpMessageReader
 import org.springframework.http.codec.EncoderHttpMessageWriter
-import org.springframework.stereotype.Component
 import org.springframework.util.MimeType
 
-@Component
 class Jackson2YamlCodecCustomizer : CodecCustomizer {
     companion object {
         val DEFAULT_YAML_MIME_TYPES = arrayOf(

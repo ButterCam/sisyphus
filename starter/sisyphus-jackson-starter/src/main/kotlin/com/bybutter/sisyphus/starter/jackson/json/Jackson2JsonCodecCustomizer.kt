@@ -7,9 +7,7 @@ import org.springframework.http.codec.DecoderHttpMessageReader
 import org.springframework.http.codec.EncoderHttpMessageWriter
 import org.springframework.http.codec.json.Jackson2JsonDecoder
 import org.springframework.http.codec.json.Jackson2JsonEncoder
-import org.springframework.stereotype.Component
 
-@Component
 class Jackson2JsonCodecCustomizer : CodecCustomizer {
     override fun customize(configurer: CodecConfigurer) {
         configurer.customCodecs().register(EncoderHttpMessageWriter(Jackson2JsonEncoder(Json.mapper)))
