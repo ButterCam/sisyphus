@@ -25,20 +25,12 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
       - uses: ButterCam/prepare-sisyphus-build@bc33e0b
         with:
-          snapshot: snapshot,mavenSnapshot
-          release: release,mavenRelease
-          snapshot-url: ${{ secrets.NEXUS_SNAPSHOT_URL }}
-          snapshot-username: ${{ secrets.NEXUS_USERNAME }}
-          snapshot-password: ${{ secrets.NEXUS_PASSWORD }}
-          mavenSnapshot-url: https://oss.sonatype.org/content/repositories/snapshots
-          mavenSnapshot-username: ${{ secrets.OSSRH_USERNAME }}
-          mavenSnapshot-password: ${{ secrets.OSSRH_PASSWORD }}
-          release-url: ${{ secrets.NEXUS_RELEASE_URL }}
-          release-username: ${{ secrets.NEXUS_USERNAME }}
-          release-password: ${{ secrets.NEXUS_PASSWORD }}
-          mavenRelease-url: https://oss.sonatype.org/service/local/staging/deploy/maven2
-          mavenRelease-username: ${{ secrets.OSSRH_USERNAME }}
-          mavenRelease-password: ${{ secrets.OSSRH_PASSWORD }}
+          snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
+          snapshot-username: ${{ secrets.OSSRH_USERNAME }}
+          snapshot-password: ${{ secrets.OSSRH_PASSWORD }}
+          release-url: https://oss.sonatype.org/service/local/staging/deploy/maven2
+          release-username: ${{ secrets.OSSRH_USERNAME }}
+          release-password: ${{ secrets.OSSRH_PASSWORD }}
           gradle-portal-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
           gradle-portal-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
           gpg-key-name: ${{ secrets.GPG_KEY_NAME }}
