@@ -4,12 +4,11 @@ import com.bybutter.sisyphus.project.gradle.SisyphusExtension
 import com.bybutter.sisyphus.project.gradle.applyFromRepositoryKeys
 import com.bybutter.sisyphus.project.gradle.ensurePlugin
 import com.bybutter.sisyphus.project.gradle.tryApplyPluginClass
-import nebula.plugin.contacts.ContactsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 
-class ProjectPublishingPlugin: Plugin<Project> {
+class ProjectPublishingPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.ensurePlugin("nebula.maven-base-publish", ::apply) {
             return

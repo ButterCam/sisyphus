@@ -13,7 +13,7 @@ class ProjectContactsPlugin : Plugin<Project> {
         }
         try {
             Class.forName("nebula.plugin.contacts.ContactsExtension")
-        }catch (ex: ClassNotFoundException) {
+        } catch (ex: ClassNotFoundException) {
             return
         }
         val rootContacts = target.rootProject.extensions.findByType(ContactsExtension::class.java) ?: return

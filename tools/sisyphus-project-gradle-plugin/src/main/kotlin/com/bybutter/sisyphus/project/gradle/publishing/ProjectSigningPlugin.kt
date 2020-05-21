@@ -8,7 +8,7 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.plugins.signing.SigningExtension
 import org.gradle.plugins.signing.SigningPlugin
 
-class ProjectSigningPlugin: Plugin<Project> {
+class ProjectSigningPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.ensurePlugin("nebula.maven-base-publish", ::apply) {
             return

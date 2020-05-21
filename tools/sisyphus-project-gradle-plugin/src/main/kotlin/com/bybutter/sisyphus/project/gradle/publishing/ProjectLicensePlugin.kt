@@ -1,12 +1,12 @@
 package com.bybutter.sisyphus.project.gradle.publishing
 
 import com.bybutter.sisyphus.project.gradle.ensurePlugin
+import java.io.File
 import nebula.plugin.info.scm.ScmInfoExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import java.io.File
 
 class ProjectLicensePlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -40,7 +40,7 @@ class ProjectLicensePlugin : Plugin<Project> {
 
     private fun detectLicenseFile(target: Project): File? {
         for (file in target.rootProject.projectDir.listFiles() ?: arrayOf()) {
-            if(file.name.contains("license", true)) {
+            if (file.name.contains("license", true)) {
                 return file
             }
         }
@@ -51,7 +51,7 @@ class ProjectLicensePlugin : Plugin<Project> {
         val license = file.readText()
 
         for ((name, regex) in licenseRegex) {
-            if(regex.containsMatchIn(license)){
+            if (regex.containsMatchIn(license)) {
                 return name
             }
         }

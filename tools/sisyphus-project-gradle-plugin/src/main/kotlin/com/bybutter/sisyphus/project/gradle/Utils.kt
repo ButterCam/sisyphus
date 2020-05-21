@@ -1,8 +1,8 @@
 package com.bybutter.sisyphus.project.gradle
 
+import java.net.URI
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
-import java.net.URI
 
 internal inline fun Project.ensurePlugin(id: String, noinline block: (Project) -> Unit, returnBlock: () -> Unit) {
     if (!pluginManager.hasPlugin(id)) {
