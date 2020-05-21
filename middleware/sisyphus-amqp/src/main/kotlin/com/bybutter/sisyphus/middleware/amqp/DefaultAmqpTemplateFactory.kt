@@ -22,7 +22,7 @@ open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
         }
     }
 
-    protected fun createConnection(host: String, port: Int, property: MessageQueueProperty): ConnectionFactory {
+    protected open fun createConnection(host: String, port: Int, property: MessageQueueProperty): ConnectionFactory {
         return connectionFactories.getOrPut("$host:$port/${property.vhost}") {
             CachingConnectionFactory(host, port).apply {
                 this.virtualHost = property.vhost

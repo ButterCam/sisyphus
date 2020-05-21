@@ -11,7 +11,7 @@ open class DefaultElasticClientFactory : ElasticClientFactory {
         return createElasticClient(property.host, property.port, property)
     }
 
-    protected fun createElasticClient(
+    protected open fun createElasticClient(
         host: String,
         port: Int,
         property: ElasticProperty

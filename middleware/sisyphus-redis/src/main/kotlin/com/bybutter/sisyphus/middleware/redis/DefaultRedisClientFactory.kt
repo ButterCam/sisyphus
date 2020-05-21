@@ -10,7 +10,7 @@ open class DefaultRedisClientFactory : RedisClientFactory {
         return createRedisClient(property.host, property.port, property)
     }
 
-    protected fun createRedisClient(host: String, port: Int, property: RedisProperty): RedisClient {
+    protected open fun createRedisClient(host: String, port: Int, property: RedisProperty): RedisClient {
         return clients.getOrPut("$host:$port") {
             RedisClient.create(RedisURI.Builder.redis(host, port).withPassword(property.password).build())
         }
