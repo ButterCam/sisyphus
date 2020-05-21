@@ -5,12 +5,8 @@ import org.apache.http.auth.AuthScope
 import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.elasticsearch.client.RestClient
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.stereotype.Component
 
-@Component
-@ConditionalOnMissingBean(value = [ElasticClientFactory::class])
-class DefaultElasticClientFactory : ElasticClientFactory {
+open class DefaultElasticClientFactory : ElasticClientFactory {
     override fun createClient(property: ElasticProperty): RestClient {
         return createElasticClient(property.host, property.port, property)
     }

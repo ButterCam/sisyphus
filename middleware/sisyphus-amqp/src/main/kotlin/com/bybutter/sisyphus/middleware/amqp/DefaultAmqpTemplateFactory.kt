@@ -6,17 +6,13 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.stereotype.Component
 
-@Component
-@ConditionalOnMissingBean(value = [AmqpTemplateFactory::class])
-class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
+open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
     private val connectionFactories: MutableMap<String, ConnectionFactory> = hashMapOf()
 
     override fun createTemplate(property: MessageQueueProperty): AmqpTemplate {
         return RabbitTemplate(
-                createConnection(property.host, property.port, property)
+            createConnection(property.host, property.port, property)
         ).apply {
             property.queue?.let {
                 this.setDefaultReceiveQueue(it)

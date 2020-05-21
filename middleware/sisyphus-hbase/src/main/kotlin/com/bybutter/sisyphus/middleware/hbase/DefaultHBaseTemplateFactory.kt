@@ -4,12 +4,8 @@ import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.HConstants
 import org.apache.hadoop.hbase.client.Connection
 import org.apache.hadoop.hbase.client.ConnectionFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.stereotype.Component
 
-@Component
-@ConditionalOnMissingBean(value = [HBaseTemplateFactory::class])
-class DefaultHBaseTemplateFactory : HBaseTemplateFactory {
+open class DefaultHBaseTemplateFactory : HBaseTemplateFactory {
     private val connections: MutableMap<String, Connection> = hashMapOf()
 
     override fun createTemplate(property: HBaseTableProperty): HTableTemplate<*, *> {
