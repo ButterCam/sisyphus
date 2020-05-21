@@ -21,7 +21,6 @@ import org.springframework.boot.autoconfigure.web.ServerProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.EnvironmentAware
 import org.springframework.context.Lifecycle
-import org.springframework.context.SmartLifecycle
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
