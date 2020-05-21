@@ -4,12 +4,8 @@ import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.HConstants
 import org.apache.hadoop.hbase.client.Connection
 import org.apache.hadoop.hbase.client.ConnectionFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.stereotype.Component
 
-@Component
-@ConditionalOnMissingBean(value = [HBaseTemplateFactory::class])
-class DefaultHBaseTemplateFactory : HBaseTemplateFactory {
+open class DefaultHBaseTemplateFactory : HBaseTemplateFactory {
     private val connections: MutableMap<String, Connection> = hashMapOf()
 
     override fun createTemplate(property: HBaseTableProperty): HTableTemplate<*, *> {
@@ -17,7 +13,7 @@ class DefaultHBaseTemplateFactory : HBaseTemplateFactory {
         return createTemplate(property.template, connection)
     }
 
-    protected fun createConnection(urls: List<String>, property: HBaseTableProperty): Connection {
+    protected open fun createConnection(urls: List<String>, property: HBaseTableProperty): Connection {
         return connections.getOrPut(urls.sorted().joinToString()) {
             val config = HBaseConfiguration.create().apply {
                 this[HConstants.ZOOKEEPER_QUORUM] = urls.joinToString(",")
@@ -26,7 +22,7 @@ class DefaultHBaseTemplateFactory : HBaseTemplateFactory {
         }
     }
 
-    protected fun createTemplate(clazz: Class<*>, connection: Connection): HTableTemplate<*, *> {
+    protected open fun createTemplate(clazz: Class<*>, connection: Connection): HTableTemplate<*, *> {
         val template = clazz.constructors.first {
             it.canAccess(null) && it.parameters.isEmpty()
         }.newInstance() as HTableTemplate<*, *>

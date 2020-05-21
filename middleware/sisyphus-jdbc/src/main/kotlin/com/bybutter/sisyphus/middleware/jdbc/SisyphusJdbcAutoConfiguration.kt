@@ -15,4 +15,10 @@ class SisyphusJdbcAutoConfiguration {
     fun sisyphusTransactionProvider(): TransactionProvider {
         return SisyphusTransactionProvider()
     }
+
+    @Bean
+    @ConditionalOnMissingBean(value = [DslContextFactory::class])
+    fun defaultDslContextFactory(configInterceptors: List<JooqConfigInterceptor>): DslContextFactory {
+        return object : AbstractDslContextFactory(configInterceptors) {}
+    }
 }
