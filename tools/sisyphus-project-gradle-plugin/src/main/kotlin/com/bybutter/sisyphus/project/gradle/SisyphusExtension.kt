@@ -25,6 +25,8 @@ open class SisyphusExtension(val project: Project) {
 
     var snapshotRepositories: MutableList<String> = mutableListOf("snapshot")
 
+    var dockerPublishRegistries: MutableList<String> = mutableListOf()
+
     val signKeyName: String?
 
     init {
@@ -57,6 +59,8 @@ open class SisyphusExtension(val project: Project) {
             ?: releaseRepositories
         snapshotRepositories = (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
             ?: snapshotRepositories
+        dockerPublishRegistries = (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
+            ?: dockerPublishRegistries
 
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
     }
