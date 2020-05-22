@@ -16,6 +16,8 @@ dependencies {
     compileOnly("com.netflix.nebula:gradle-info-plugin")
     compileOnly("com.netflix.nebula:gradle-contacts-plugin")
     compileOnly("org.jlleitschuh.gradle:ktlint-gradle")
+    compileOnly("com.palantir.gradle.docker:gradle-docker")
+    compileOnly("org.springframework.boot:spring-boot-gradle-plugin")
 }
 
 gradlePlugin {

@@ -23,7 +23,7 @@ jobs:
         uses: crazy-max/ghaction-import-gpg@v2
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      - uses: ButterCam/prepare-sisyphus-build@bc33e0b
+      - uses: ButterCam/prepare-sisyphus-build@v1
         with:
           snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
           snapshot-username: ${{ secrets.OSSRH_USERNAME }}
