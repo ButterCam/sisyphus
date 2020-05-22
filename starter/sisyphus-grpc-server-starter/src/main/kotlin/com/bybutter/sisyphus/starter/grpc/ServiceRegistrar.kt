@@ -16,21 +16,14 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
+import org.springframework.boot.web.server.Shutdown
 import org.springframework.context.EnvironmentAware
+import org.springframework.context.Lifecycle
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
 class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
-    companion object {
-        private val logger = LoggerFactory.getLogger(ServiceRegistrar::class.java)
-
-        const val GRPC_PORT_PROPERTY = "grpc.port"
-        const val DEFAULT_GRPC_PORT = "9090"
-
-        const val QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER = "sisyphus:grpc:server"
-    }
-
     private lateinit var environment: Environment
 
     override fun setEnvironment(environment: Environment) {
@@ -47,7 +40,7 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
             }
 
             val services = beanFactory.getBeansWithAnnotation(RpcServiceImpl::class.java)
-            logger.info("${services.size} grpc services registered: ${services.keys.joinToString(", ")}")
+            logger.info("${services.size} gRPC services registered: ${services.keys.joinToString(", ")}")
             for ((_, service) in services) {
                 builder = when (service) {
                     is BindableService -> {
@@ -78,10 +71,28 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
             builder.build()
         }
-
         (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER, definitionBuilder.beanDefinition)
+
+        val lifecycleBuilder = BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
+            val server = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
+            val shutdown = environment.getProperty("server.shutdown", Shutdown::class.java)
+            ServerLifecycle(server, shutdown ?: Shutdown.IMMEDIATE)
+        }
+        (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER_LIFECYCLE, lifecycleBuilder.beanDefinition)
     }
 
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(ServiceRegistrar::class.java)
+
+        const val GRPC_PORT_PROPERTY = "server.grpc.port"
+
+        const val DEFAULT_GRPC_PORT = "9090"
+
+        const val QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER = "sisyphus:grpc:server"
+
+        const val QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER_LIFECYCLE = "sisyphus:grpc:server-lifecycle"
     }
 }
