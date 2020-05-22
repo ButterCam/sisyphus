@@ -12,25 +12,19 @@ import io.grpc.ServerInterceptor
 import io.grpc.ServerServiceDefinition
 import io.grpc.ServerStreamTracer
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
-import org.springframework.boot.autoconfigure.web.ServerProperties
-import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.web.server.Shutdown
 import org.springframework.context.EnvironmentAware
 import org.springframework.context.Lifecycle
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-@EnableConfigurationProperties(ServerProperties::class)
 class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     private lateinit var environment: Environment
-
-    @Autowired
-    private lateinit var serverProperties: ServerProperties
 
     override fun setEnvironment(environment: Environment) {
         this.environment = environment
@@ -81,7 +75,8 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
         val lifecycleBuilder = BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
             val server = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
-            ServerLifecycle(server, serverProperties.shutdown)
+            val shutdown = environment.getProperty("server.shutdown", Shutdown::class.java)
+            ServerLifecycle(server, shutdown ?: Shutdown.IMMEDIATE)
         }
         (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER_LIFECYCLE, lifecycleBuilder.beanDefinition)
     }
