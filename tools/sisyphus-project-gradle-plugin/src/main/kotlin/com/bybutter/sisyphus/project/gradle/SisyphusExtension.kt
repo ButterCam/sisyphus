@@ -47,8 +47,8 @@ open class SisyphusExtension(val project: Project) {
             val repositoryName = result.groupValues[1]
 
             val url = project.findProperty("sisyphus.repositories.$repositoryName.url") as? String ?: continue
-            val username = project.findProperty("sisyphus.repositories.$repositoryName.username") as? String ?: continue
-            val password = project.findProperty("sisyphus.repositories.$repositoryName.password") as? String ?: continue
+            val username = project.findProperty("sisyphus.repositories.$repositoryName.username") as? String
+            val password = project.findProperty("sisyphus.repositories.$repositoryName.password") as? String
 
             repositories[repositoryName] = Repository(url, username, password)
         }

@@ -13,9 +13,10 @@ internal inline fun Project.ensurePlugin(id: String, noinline block: (Project) -
     }
 }
 
-internal fun Project.tryApplyPluginClass(className: String): Boolean {
+internal fun Project.tryApplyPluginClass(className: String, action: () -> Unit = {}): Boolean {
     return try {
         val plugin = Class.forName(className)
+        action()
         this.pluginManager.apply(plugin)
         true
     } catch (ex: ClassNotFoundException) {
@@ -50,8 +51,8 @@ internal fun RepositoryHandler.applyFromRepositoryKeys(repositories: Map<String,
         this.maven {
             it.name = repositoryKey
             it.url = URI.create(repository.url)
-            it.credentials.username = repository.username ?: ""
-            it.credentials.password = repository.password ?: ""
+            it.credentials.username = repository.username
+            it.credentials.password = repository.password
         }
     }
 }

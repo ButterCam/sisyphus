@@ -16,7 +16,9 @@ class SisyphusDockerPlugin : Plugin<Project> {
 
         val dockerFile = target.projectDir.resolve("Dockerfile")
         if (!dockerFile.exists()) return
-        if (!target.tryApplyPluginClass("com.palantir.gradle.docker.PalantirDockerPlugin")) return
+        if (!target.tryApplyPluginClass("com.palantir.gradle.docker.PalantirDockerPlugin") {
+                target.afterEvaluate { afterEvaluate(it) }
+            }) return
         val docker = target.extensions.getByType(DockerExtension::class.java)
         docker.name = "${target.name}:${target.version}"
 
@@ -29,14 +31,23 @@ class SisyphusDockerPlugin : Plugin<Project> {
             project = project.parent
         }
 
-        target.tasks.withType(AbstractArchiveTask::class.java) {
-            it.outputs
-        }
-
         val sisyphus = target.extensions.getByType(SisyphusExtension::class.java)
         for (registry in sisyphus.dockerPublishRegistries) {
             val registryInfo = sisyphus.repositories[registry] ?: continue
             docker.tag(registry, "${registryInfo.url}/${docker.name}")
         }
+    }
+
+    private fun afterEvaluate(target: Project) {
+        val docker = target.extensions.getByType(DockerExtension::class.java)
+
+        target.tasks.withType(AbstractArchiveTask::class.java) {
+            docker.files(it.outputs)
+        }
+
+        docker.buildArgs(docker.buildArgs + mapOf(
+            "PROJECT_NAME" to target.name,
+            "PROJECT_VERSION" to target.version.toString()
+        ))
     }
 }
