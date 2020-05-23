@@ -36,3 +36,6 @@ jobs:
           gpg-key-name: ${{ secrets.GPG_KEY_NAME }}
       - name: Publish with Gradle
         run: gradle publish
+      - name: Publish plugins to Gradle Portal
+        if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
+        run: gradle publishPlugins
