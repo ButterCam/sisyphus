@@ -37,8 +37,8 @@ open class SisyphusExtension(val project: Project) {
 
         version = when {
             developer != null -> "$developer-SNAPSHOT"
-            branchName != null -> "$branchName-SNAPSHOT"
             tagName != null -> "$tagName"
+            branchName != null -> "$branchName-SNAPSHOT"
             else -> project.version as String
         }
 
