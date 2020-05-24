@@ -13,7 +13,7 @@ class ProjectLicensePlugin : Plugin<Project> {
         target.ensurePlugin("nebula.maven-base-publish", ::apply) {
             return
         }
-        target.ensurePlugin("nebula.maven-scm", ::apply) {
+        target.ensurePlugin("nebula.info-scm", ::apply) {
             return
         }
 
