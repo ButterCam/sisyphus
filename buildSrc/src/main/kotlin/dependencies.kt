@@ -93,6 +93,8 @@ object Dependencies {
         const val netty = "$group:grpc-netty"
 
         const val proto = "$group:grpc-protobuf"
+
+        const val kotlin = "$group:grpc-kotlin-stub"
     }
 
     object Maven {

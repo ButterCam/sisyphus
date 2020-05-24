@@ -49,5 +49,6 @@ dependencies {
         api("com.gradle.publish:plugin-publish-plugin:0.11.0")
         api("org.eclipse.jgit:org.eclipse.jgit:5.7.0.202003110725-r")
         api("com.palantir.gradle.docker:gradle-docker:0.25.0")
+        api("io.grpc:grpc-kotlin-stub:0.1.2")
     }
 }

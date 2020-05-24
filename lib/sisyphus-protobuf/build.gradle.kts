@@ -13,7 +13,6 @@ dependencies {
 
     implementation(Dependencies.Grpc.proto)
     implementation(Dependencies.Kotlin.Coroutines.guava)
-    api(Dependencies.Grpc.stub)
     api(Dependencies.Kotlin.Coroutines.reactor)
     api(Dependencies.Proto.base)
 
