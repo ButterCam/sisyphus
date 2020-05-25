@@ -15,7 +15,7 @@ jobs:
           java-version: 1.11
       - uses: ButterCam/prepare-sisyphus-build@v1
         with:
-          dependency-repositories: local,maven,jcenter,portal,snapshot
+          dependency-repositories: local,central,jcenter,portal,snapshot
           snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
           snapshot-username: ${{ secrets.OSSRH_USERNAME }}
           snapshot-password: ${{ secrets.OSSRH_PASSWORD }}
