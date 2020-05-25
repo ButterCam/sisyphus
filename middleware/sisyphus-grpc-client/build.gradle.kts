@@ -2,7 +2,6 @@ middleware
 
 plugins {
     `java-library`
-    protobuf
 }
 
 description = "Middleware for using gRPC client in Sisyphus Project"

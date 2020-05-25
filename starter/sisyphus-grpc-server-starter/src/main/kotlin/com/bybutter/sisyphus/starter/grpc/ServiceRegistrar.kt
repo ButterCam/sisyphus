@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc
 
 import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
+import com.bybutter.sisyphus.rpc.GrpcServerConstants
 import com.bybutter.sisyphus.spring.BeanUtils
 import com.bybutter.sisyphus.starter.grpc.support.ReflectionService
 import com.bybutter.sisyphus.starter.grpc.support.ReflectionServiceAlpha
@@ -32,7 +33,7 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
     override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
-            var builder = ServerBuilder.forPort(environment.getProperty(GRPC_PORT_PROPERTY, DEFAULT_GRPC_PORT).toInt())
+            var builder = ServerBuilder.forPort(environment.getProperty(GrpcServerConstants.GRPC_PORT_PROPERTY, Int::class.java, GrpcServerConstants.DEFAULT_GRPC_PORT))
 
             val builderInterceptors = beanFactory.getBeansOfType(ServerBuilderInterceptor::class.java)
             for ((_, builderInterceptor) in builderInterceptors) {
@@ -86,10 +87,6 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
     companion object {
         private val logger = LoggerFactory.getLogger(ServiceRegistrar::class.java)
-
-        const val GRPC_PORT_PROPERTY = "server.grpc.port"
-
-        const val DEFAULT_GRPC_PORT = "9090"
 
         const val QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER = "sisyphus:grpc:server"
 
