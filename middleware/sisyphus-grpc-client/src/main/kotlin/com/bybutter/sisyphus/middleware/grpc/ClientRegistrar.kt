@@ -7,6 +7,7 @@ import io.grpc.Channel
 import io.grpc.ClientInterceptor
 import io.grpc.ManagedChannelBuilder
 import io.grpc.stub.AbstractStub
+import kotlin.reflect.full.companionObject
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
@@ -17,7 +18,6 @@ import org.springframework.context.EnvironmentAware
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
-import kotlin.reflect.full.companionObject
 
 @Component
 class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
@@ -43,7 +43,7 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
             val rpcService = AnnotationUtils.findAnnotation(serviceClass, RpcService::class.java) ?: continue
             val service = rpcService.client.java.declaringClass
             val stub = service.kotlin.companionObject?.java?.classes?.firstOrNull {
-                it.name == "Stub"
+                it.simpleName == "Stub"
             } ?: throw IllegalStateException("Grpc service must have stub class in companion.")
 
             val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(rpcService.client.java as Class<Any>) {
@@ -64,10 +64,10 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
             for (service in property.services) {
                 val rpcService = service.getAnnotation(RpcService::class.java)
                     ?: throw IllegalStateException("Grpc service must be annotated with 'RpcService'.")
-                val client = service.declaredClasses.firstOrNull { it.name == "Client" }
+                val client = service.declaredClasses.firstOrNull { it.simpleName == "Client" }
                     ?: throw IllegalStateException("Grpc service must have nested class named 'Client'.")
                 val stub = service.kotlin.companionObject?.java?.classes?.firstOrNull {
-                    it.name == "Stub"
+                    it.simpleName == "Stub"
                 } ?: throw IllegalStateException("Grpc service must have stub class in companion.")
 
                 if (registry.containsBeanDefinition(rpcService.value)) {
