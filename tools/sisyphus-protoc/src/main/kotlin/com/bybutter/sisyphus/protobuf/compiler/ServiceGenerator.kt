@@ -30,13 +30,13 @@ class ServiceGenerator(override val parent: FileGenerator, val descriptor: Descr
     override val protoName: String = descriptor.name
 
     val supportName by lazy { "${kotlinName}Support" }
-    val stubName by lazy { "${kotlinName}Stub" }
+    val stubName = "Stub"
 
     val fullSupportName: String by lazy {
         "${parent.internalKotlinName}.$supportName"
     }
     val fullStubName: String by lazy {
-        "${parent.internalKotlinName}.$stubName"
+        "$fullSupportName.$stubName"
     }
 
     val serviceType: ClassName by lazy {
@@ -176,6 +176,7 @@ class ServiceGenerator(override val parent: FileGenerator, val descriptor: Descr
         return TypeSpec.classBuilder(supportName)
                 .addModifiers(KModifier.ABSTRACT)
                 .superclass(ServiceSupport::class)
+                .addType(generateStub())
                 .addProperty(
                         PropertySpec.builder("descriptor", ServiceDescriptorProto::class)
                                 .addModifiers(KModifier.OVERRIDE)
