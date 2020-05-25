@@ -77,15 +77,15 @@ class ServiceGenerator(override val parent: FileGenerator, val descriptor: Descr
         return TypeSpec.classBuilder(kotlinName)
                 .addKdoc(escapeDoc(documentation))
                 .addModifiers(KModifier.ABSTRACT)
-                .superclass(AbstractCoroutineServerImpl::class)
-                .addSuperclassConstructorParameter("context")
-                .addFunction(
+                .primaryConstructor(
                         FunSpec.constructorBuilder().addParameter(
                                 ParameterSpec.builder("context", CoroutineContext::class)
                                         .defaultValue("%T", EmptyCoroutineContext::class)
                                         .build()
                         ).build()
                 )
+                .superclass(AbstractCoroutineServerImpl::class)
+                .addSuperclassConstructorParameter("context")
                 .addType(
                         TypeSpec.companionObjectBuilder().superclass(supportType).build()
                 )
@@ -100,7 +100,7 @@ class ServiceGenerator(override val parent: FileGenerator, val descriptor: Descr
                     for (child in children) {
                         when (child) {
                             is ServiceMethodGenerator -> {
-                                addFunction(child.generateService())
+                                addFunction(child.generateAbstractFunction())
                             }
                         }
                     }
@@ -132,7 +132,7 @@ class ServiceGenerator(override val parent: FileGenerator, val descriptor: Descr
                     for (child in children) {
                         when (child) {
                             is ServiceMethodGenerator ->
-                                addFunction(child.generateClient())
+                                addFunction(child.generateClientFunction())
                         }
                     }
                 }
@@ -204,7 +204,7 @@ class ServiceGenerator(override val parent: FileGenerator, val descriptor: Descr
                                         for (child in children) {
                                             when (child) {
                                                 is ServiceMethodGenerator -> {
-                                                    add(".addMethod(%L)", kotlinName)
+                                                    add(".addMethod(%L)\n", child.kotlinName)
                                                 }
                                             }
                                         }
