@@ -6,5 +6,5 @@ import io.grpc.ServiceDescriptor
 abstract class ServiceSupport {
     abstract val descriptor: ServiceDescriptorProto
 
-    open val serviceDescriptor: ServiceDescriptor = ServiceDescriptor.newBuilder("").build()
+    abstract val serviceDescriptor: ServiceDescriptor
 }
