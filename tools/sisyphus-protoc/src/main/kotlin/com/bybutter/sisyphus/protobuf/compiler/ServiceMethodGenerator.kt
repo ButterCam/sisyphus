@@ -3,33 +3,28 @@ package com.bybutter.sisyphus.protobuf.compiler
 import com.bybutter.sisyphus.api.http
 import com.bybutter.sisyphus.collection.contentEquals
 import com.bybutter.sisyphus.protobuf.primitives.MethodOptions
-import com.bybutter.sisyphus.rpc.ManyToManyCall
-import com.bybutter.sisyphus.rpc.ManyToOneCall
 import com.bybutter.sisyphus.rpc.RpcBound
 import com.bybutter.sisyphus.rpc.RpcMethod
-import com.bybutter.sisyphus.rpc.ServerCallHandlers
-import com.bybutter.sisyphus.rpc.asStreamObserver
 import com.bybutter.sisyphus.string.toCamelCase
-import com.google.common.util.concurrent.ListenableFuture
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
+import io.grpc.Metadata
 import io.grpc.MethodDescriptor
-import io.grpc.ServerCallHandler
+import io.grpc.kotlin.ServerCalls
 import io.grpc.stub.ClientCalls
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.guava.await
+import kotlinx.coroutines.flow.Flow
 
 class ServiceMethodGenerator(override val parent: ServiceGenerator, val descriptor: DescriptorProtos.MethodDescriptorProto) : ProtobufElement() {
     override val kotlinName: String = descriptor.name.toCamelCase()
@@ -86,96 +81,57 @@ class ServiceMethodGenerator(override val parent: ServiceGenerator, val descript
 
     fun generateInfo(): PropertySpec {
         return PropertySpec.Companion.builder(kotlinName, MethodDescriptor::class.asTypeName().parameterizedBy(inputClassName, outputClassName))
-            .initializer(buildCodeBlock {
-                add("%T.newBuilder<%T,·%T>()\n", MethodDescriptor::class.asTypeName(), inputClassName, outputClassName)
-                add(".setType(MethodDescriptor.MethodType.%L)\n", methodType)
-                add(".setFullMethodName(%S)\n", MethodDescriptor.generateFullMethodName(parent.fullProtoName, protoName))
-                add(".setRequestMarshaller(%T)\n", inputClassName)
-                add(".setResponseMarshaller(%T)\n", outputClassName)
-                add(".setSchemaDescriptor(%N)\n", MemberName(ensureParent<FileGenerator>().fullKotlinName, ensureParent<FileGenerator>().fileMeta))
-                add(".build()\n")
-            })
-            .build()
-    }
-
-    fun generateClient(): FunSpec {
-        val builder = FunSpec.builder(kotlinName)
-            .addKdoc(escapeDoc(documentation))
-            .addModifiers(KModifier.ABSTRACT)
-            .addAnnotation(
-                AnnotationSpec.builder(RpcMethod::class)
-                    .addMember("name = %S", protoName)
-                    .addMember("input = %T(type = %S, streaming = %L)", RpcBound::class, input, inputStreaming)
-                    .addMember("output = %T(type = %S, streaming = %L)", RpcBound::class, output, outputStreaming)
-                    .build()
-            )
-
-        when (methodType) {
-            MethodDescriptor.MethodType.UNARY -> {
-                builder.addModifiers(KModifier.SUSPEND)
-                builder.addParameter("input", inputClassName)
-                builder.returns(outputClassName)
-            }
-            MethodDescriptor.MethodType.CLIENT_STREAMING -> {
-                builder.returns(ManyToOneCall::class.asClassName().parameterizedBy(inputClassName, outputClassName))
-            }
-            MethodDescriptor.MethodType.SERVER_STREAMING -> {
-                builder.addParameter("input", inputClassName)
-                builder.returns(ReceiveChannel::class.asClassName().parameterizedBy(outputClassName))
-            }
-            MethodDescriptor.MethodType.BIDI_STREAMING -> {
-                builder.returns(ManyToManyCall::class.asClassName().parameterizedBy(inputClassName, outputClassName))
-            }
-            MethodDescriptor.MethodType.UNKNOWN -> throw UnsupportedOperationException("Unknown method type.")
-        }
-        return builder.build()
+                .initializer(buildCodeBlock {
+                    add("%T.newBuilder<%T,·%T>()\n", MethodDescriptor::class.asTypeName(), inputClassName, outputClassName)
+                    add(".setType(MethodDescriptor.MethodType.%L)\n", methodType)
+                    add(".setFullMethodName(%S)\n", MethodDescriptor.generateFullMethodName(parent.fullProtoName, protoName))
+                    add(".setRequestMarshaller(%T)\n", inputClassName)
+                    add(".setResponseMarshaller(%T)\n", outputClassName)
+                    add(".setSchemaDescriptor(%N)\n", MemberName(ensureParent<FileGenerator>().fullKotlinName, ensureParent<FileGenerator>().fileMeta))
+                    add(".build()\n")
+                })
+                .build()
     }
 
     fun generateClientStub(): FunSpec {
-        val builder = generateClient().toBuilder()
+        val builder = generateClientFunction().toBuilder()
         builder.modifiers.remove(KModifier.ABSTRACT)
         builder.addModifiers(KModifier.OVERRIDE)
         builder.annotations.clear()
 
-        builder.addCode(buildCodeBlock {
-            addStatement("val call = channel.newCall(%T.%L, callOptions)", parent.serviceType, kotlinName)
-            when (methodType) {
-                MethodDescriptor.MethodType.UNARY -> {
-                    addStatement("return %T.futureUnaryCall(call, input).%M()", ClientCalls::class.asTypeName(), ListenableFuture<*>::await.asMemberName())
-                }
-                MethodDescriptor.MethodType.CLIENT_STREAMING -> {
-                    addStatement("val defer = %T()", CompletableDeferred::class.asTypeName().parameterizedBy(outputClassName))
-                    addStatement("val request = %T.asyncClientStreamingCall(call, defer.%M())", ClientCalls::class.asTypeName(), CompletableDeferred<*>::asStreamObserver.asMemberName())
-                    addStatement("return %T(request, defer)", ManyToOneCall::class.asTypeName())
-                }
-                MethodDescriptor.MethodType.SERVER_STREAMING -> {
-                    addStatement("val channel = %T(%T.UNLIMITED)", Channel::class.asTypeName().parameterizedBy(outputClassName), Channel::class)
-                    addStatement("%T.asyncServerStreamingCall(call, input, channel.%M())", ClientCalls::class.asTypeName(), Channel<*>::asStreamObserver.asMemberName())
-                    addStatement("return channel")
-                }
-                MethodDescriptor.MethodType.BIDI_STREAMING -> {
-                    addStatement("val channel = %T(%T.UNLIMITED)", Channel::class.asTypeName().parameterizedBy(outputClassName), Channel::class)
-                    addStatement("val request = %T.asyncBidiStreamingCall(call, channel.%M())", ClientCalls::class.asTypeName(), Channel<*>::asStreamObserver.asMemberName())
-                    addStatement("return %T(request, channel)", ManyToManyCall::class.asTypeName())
-                }
-                MethodDescriptor.MethodType.UNKNOWN -> throw UnsupportedOperationException("Unknown method type.")
+        builder.parameters.removeIf { it.name == "metadata" }
+        builder.addParameter("metadata", Metadata::class)
+
+        when (methodType) {
+            MethodDescriptor.MethodType.UNARY -> {
+                builder.addStatement("return %T.unaryRpc(channel, %T.%L, input, callOptions, metadata)", io.grpc.kotlin.ClientCalls::class, parent.serviceType, kotlinName)
             }
-        })
+            MethodDescriptor.MethodType.CLIENT_STREAMING -> {
+                builder.addStatement("return %T.clientStreamingRpc(channel, %T.%L, input, callOptions, metadata)", io.grpc.kotlin.ClientCalls::class, parent.serviceType, kotlinName)
+            }
+            MethodDescriptor.MethodType.SERVER_STREAMING -> {
+                builder.addStatement("return %T.serverStreamingRpc(channel, %T.%L, input, callOptions, metadata)", io.grpc.kotlin.ClientCalls::class, parent.serviceType, kotlinName)
+            }
+            MethodDescriptor.MethodType.BIDI_STREAMING -> {
+                builder.addStatement("return %T.bidiStreamingRpc(channel, %T.%L, input, callOptions, metadata)", io.grpc.kotlin.ClientCalls::class, parent.serviceType, kotlinName)
+            }
+            MethodDescriptor.MethodType.UNKNOWN -> throw UnsupportedOperationException("Unknown method type.")
+        }
 
         return builder.build()
     }
 
-    fun generateService(): FunSpec {
+    fun generateAbstractFunction(): FunSpec {
         val builder = FunSpec.builder(kotlinName)
-            .addKdoc(escapeDoc(documentation))
-            .addModifiers(KModifier.ABSTRACT)
-            .addAnnotation(
-                AnnotationSpec.builder(RpcMethod::class)
-                    .addMember("name = %S", protoName)
-                    .addMember("input = %T(type = %S, streaming = %L)", RpcBound::class, input, inputStreaming)
-                    .addMember("output = %T(type = %S, streaming = %L)", RpcBound::class, output, outputStreaming)
-                    .build()
-            )
+                .addKdoc(escapeDoc(documentation))
+                .addModifiers(KModifier.ABSTRACT)
+                .addAnnotation(
+                        AnnotationSpec.builder(RpcMethod::class)
+                                .addMember("name = %S", protoName)
+                                .addMember("input = %T(type = %S, streaming = %L)", RpcBound::class, input, inputStreaming)
+                                .addMember("output = %T(type = %S, streaming = %L)", RpcBound::class, output, outputStreaming)
+                                .build()
+                )
 
         when (methodType) {
             MethodDescriptor.MethodType.UNARY, MethodDescriptor.MethodType.CLIENT_STREAMING -> {
@@ -186,13 +142,13 @@ class ServiceMethodGenerator(override val parent: ServiceGenerator, val descript
         }
 
         if (inputStreaming) {
-            builder.addParameter("input", ReceiveChannel::class.asClassName().parameterizedBy(getTypeNameByProtoName(input)))
+            builder.addParameter("input", Flow::class.asClassName().parameterizedBy(getTypeNameByProtoName(input)))
         } else {
             builder.addParameter("input", getTypeNameByProtoName(input))
         }
 
         if (outputStreaming) {
-            builder.returns(ReceiveChannel::class.asClassName().parameterizedBy(getTypeNameByProtoName(output)))
+            builder.returns(Flow::class.asClassName().parameterizedBy(getTypeNameByProtoName(output)))
         } else {
             builder.returns(getTypeNameByProtoName(output))
         }
@@ -200,35 +156,22 @@ class ServiceMethodGenerator(override val parent: ServiceGenerator, val descript
         return builder.build()
     }
 
-    fun generateServiceHandler(): PropertySpec {
-        val handler = "${kotlinName}Handler"
-
-        val builder = PropertySpec.Companion.builder(handler, ServerCallHandler::class.asTypeName().parameterizedBy(inputClassName, outputClassName))
-            .initializer(buildCodeBlock {
-                when (methodType) {
-                    MethodDescriptor.MethodType.UNARY -> {
-                        beginScope("%T.asyncUnaryCall", ServerCallHandlers::class) {
-                            addStatement("this.%L(it)", kotlinName)
-                        }
-                    }
-                    MethodDescriptor.MethodType.CLIENT_STREAMING -> {
-                        beginScope("%T.asyncClientStreamingCall", ServerCallHandlers::class) {
-                            addStatement("this.%L(it)", kotlinName)
-                        }
-                    }
-                    MethodDescriptor.MethodType.SERVER_STREAMING -> {
-                        beginScope("%T.asyncServerStreamingCall", ServerCallHandlers::class) {
-                            addStatement("this.%L(it)", kotlinName)
-                        }
-                    }
-                    MethodDescriptor.MethodType.BIDI_STREAMING -> {
-                        beginScope("%T.asyncBidiStreamingCall", ServerCallHandlers::class) {
-                            addStatement("this.%L(it)", kotlinName)
-                        }
-                    }
-                    MethodDescriptor.MethodType.UNKNOWN -> throw UnsupportedOperationException("Unknown method type.")
-                }
-            })
+    fun generateClientFunction(): FunSpec {
+        val builder = generateAbstractFunction().toBuilder()
+        builder.addParameter(
+                ParameterSpec.builder("metadata", Metadata::class).defaultValue("%T()", Metadata::class).build()
+        )
         return builder.build()
+    }
+
+    fun generateMethodDefined(): CodeBlock = buildCodeBlock {
+        val functionName = when (this@ServiceMethodGenerator.methodType) {
+            MethodDescriptor.MethodType.UNARY -> "unaryServerMethodDefinition"
+            MethodDescriptor.MethodType.CLIENT_STREAMING -> "clientStreamingServerMethodDefinition"
+            MethodDescriptor.MethodType.SERVER_STREAMING -> "serverStreamingServerMethodDefinition"
+            MethodDescriptor.MethodType.BIDI_STREAMING -> "bidiStreamingServerMethodDefinition"
+            MethodDescriptor.MethodType.UNKNOWN -> TODO()
+        }
+        addStatement("%T.%L(context, %L, ::%L)", ServerCalls::class, functionName, kotlinName, kotlinName)
     }
 }

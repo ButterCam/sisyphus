@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.support
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
-import com.bybutter.sisyphus.rpc.GrpcContextCoroutineContextElement
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ExtensionNumberResponse
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ExtensionRequest
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.FileDescriptorResponse
@@ -14,9 +13,9 @@ import io.grpc.InternalNotifyOnServerBuild
 import io.grpc.Server
 import io.grpc.ServerServiceDefinition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReflectionServiceAlpha : ServerReflection(), InternalNotifyOnServerBuild {
@@ -26,8 +25,8 @@ class ReflectionServiceAlpha : ServerReflection(), InternalNotifyOnServerBuild {
         services = server.services
     }
 
-    override fun serverReflectionInfo(input: ReceiveChannel<ServerReflectionRequest>): ReceiveChannel<ServerReflectionResponse> = GlobalScope.produce(GrpcContextCoroutineContextElement()) {
-        for (request in input) {
+    override fun serverReflectionInfo(input: Flow<ServerReflectionRequest>): Flow<ServerReflectionResponse> = flow {
+        input.collect { request ->
             val response = ServerReflectionResponse {
                 validHost = request.host
                 originalRequest = request
@@ -51,7 +50,7 @@ class ReflectionServiceAlpha : ServerReflection(), InternalNotifyOnServerBuild {
                 }
             }
 
-            send(response)
+            emit(response)
         }
     }
 

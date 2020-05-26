@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package com.bybutter.sisyphus.middleware.grpc.test;
+package com.bybutter.sisyphus.starter.grpc.test;
 
 message Request {
     int32 value = 1;

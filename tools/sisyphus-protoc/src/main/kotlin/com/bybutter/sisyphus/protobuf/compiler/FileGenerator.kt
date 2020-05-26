@@ -113,7 +113,6 @@ class FileGenerator(override val parent: ProtobufGenerateContext, val descriptor
                             addType(child.generateSupport())
                         }
                         is ServiceGenerator -> {
-                            addType(child.generateStub())
                             addType(child.generateSupport())
                         }
                     }
