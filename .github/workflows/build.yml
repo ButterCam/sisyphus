@@ -17,7 +17,7 @@ jobs:
         with:
           dependency-repositories: local,central,snapshot,portal
           snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
-          snapshot-username: ${{ secrets.OSSRH_USERNAME }}
-          snapshot-password: ${{ secrets.OSSRH_PASSWORD }}
+          snapshot-username: ''
+          snapshot-password: ''
       - name: Build with Gradle
         run: gradle build

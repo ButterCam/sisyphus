@@ -45,7 +45,6 @@ class RegisterTest {
             }).collect {
                 println("receive: ${it.value}")
             }
-            result2
         }
     }
 }
