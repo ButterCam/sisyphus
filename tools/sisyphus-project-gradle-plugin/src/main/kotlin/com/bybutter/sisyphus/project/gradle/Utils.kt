@@ -51,10 +51,10 @@ internal fun RepositoryHandler.applyFromRepositoryKeys(repositories: Map<String,
         this.maven {
             it.name = repositoryKey
             it.url = URI.create(repository.url)
-            if(repository.username != null){
+            if (repository.username != null) {
                 it.credentials.username = repository.username
             }
-            if(repository.password != null){
+            if (repository.password != null) {
                 it.credentials.password = repository.password
             }
         }
