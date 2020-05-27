@@ -69,10 +69,7 @@ class SwaggerRouterFunction private constructor(
             val serverPath = listOf(DescriptorProtos.FileDescriptorProto.SERVICE_FIELD_NUMBER, fileDescriptor?.service?.indexOf(serviceDescriptor))
             val tag = serviceDescriptor.name
             val hosts = serviceDescriptor.options?.metadata?.hosts
-            tags.add(Tag().apply {
-                name = tag
-                description = SwaggerDescription.fetchDescription(serverPath, fileDescriptor)
-            })
+            val servicePaths = Paths()
 
             serviceDescriptor.method.forEach { method ->
                 val httpRule = method.options?.http
@@ -81,6 +78,7 @@ class SwaggerRouterFunction private constructor(
                     // Get input type proto,used to find notes and generate request parameters.
                     val inputTypeProto = ProtoTypes.ensureSupportByProtoName(method.inputType)
                     val inputTypeFields = (inputTypeProto.fieldDescriptors).toMutableList()
+                    val field = inputTypeFields.firstOrNull { fieldDescriptorProto -> fieldDescriptorProto.name == httpRule.body }
                     // Get request body param fields.
                     val bodyParam = when (httpRule.body) {
                         "" -> null
@@ -88,14 +86,9 @@ class SwaggerRouterFunction private constructor(
                             inputTypeFields.clear()
                             modelNames.add(method.inputType)
                             method.inputType
-                        }
-                        else -> {
-                            val field = inputTypeFields.first { fieldDescriptorProto -> fieldDescriptorProto.name == httpRule.body }
-                            if (field.type != FieldDescriptorProto.Type.MESSAGE) {
-                                throw UnsupportedOperationException("Only support message type body")
-                            }
+                        } else -> {
                             inputTypeFields.remove(field)
-                            modelNames.add(field.typeName)
+                            if (field!!.type == FieldDescriptorProto.Type.MESSAGE) modelNames.add(field.typeName)
                             field.typeName
                         }
                     }
@@ -125,7 +118,13 @@ class SwaggerRouterFunction private constructor(
                                 required = true
                                 content = Content().apply {
                                     addMediaType("application/json", MediaType().apply {
-                                        schema = ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
+                                        schema = field?.let {
+                                            if (FieldDescriptorProto.Type.MESSAGE == field.type) {
+                                                ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
+                                            } else {
+                                                SwaggerSchema.fetchSchema(field.type, bodyParam)
+                                            }
+                                        } ?: ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
                                     })
                                 }
                             })
@@ -154,8 +153,15 @@ class SwaggerRouterFunction private constructor(
                         }
                     }
                     operation.operationId("${it.serviceDescriptor.name}/${method.name}")
-                    paths.putAll(SwaggerPaths.fetchPaths(httpRule, inputTypeProto, inputTypeFields, operation))
+                    servicePaths.putAll(SwaggerPaths.fetchPaths(httpRule, inputTypeProto, inputTypeFields, operation, servicePaths))
                 }
+            }
+            if (servicePaths.isNotEmpty()) {
+                tags.add(Tag().apply {
+                    name = tag
+                    description = SwaggerDescription.fetchDescription(serverPath, fileDescriptor)
+                })
+                paths.putAll(servicePaths)
             }
         }
 
@@ -178,9 +184,7 @@ class SwaggerRouterFunction private constructor(
             }) + SwaggerServers.fetchServers(property.servers)
             components = Components().apply {
                 this.schemas = schemas
-                if (property.securitySchemes != null) {
-                    securitySchemes = SwaggerSecuritySchemes.fetchSecuritySchemes(property.securitySchemes)
-                }
+                if (property.securitySchemes != null) securitySchemes = SwaggerSecuritySchemes.fetchSecuritySchemes(property.securitySchemes)
             }
         }
         return ServerResponse.ok().bodyValue(Json.mapper().writeValueAsString(openApi))
