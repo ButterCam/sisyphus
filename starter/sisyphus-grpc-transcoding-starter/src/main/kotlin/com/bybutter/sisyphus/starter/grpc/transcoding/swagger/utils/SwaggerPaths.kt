@@ -99,9 +99,9 @@ object SwaggerPaths {
     private fun fetchRequestUrl(url: String): Map<String, List<String>> {
         val params = mutableListOf<String>()
         // According to: segmentation, determine whether to include a custom request method.
-        val uri = url.split(":")
+        val urlFragments = url.split(":")
         val requestUrl = buildString {
-            for (s in PathTemplate.create(uri[0]).withoutVars().toString().split("/")) {
+            for (s in PathTemplate.create(urlFragments[0]).withoutVars().toString().split("/")) {
                 if (s.isNotEmpty()) {
                     append("/")
                     when (s) {
@@ -115,9 +115,9 @@ object SwaggerPaths {
                     }
                 }
             }
-            if (uri.size == 2) {
+            if (urlFragments.size == 2) {
                 append(":")
-                append(uri[1])
+                append(urlFragments[1])
             }
         }
         return mapOf(requestUrl to params)
