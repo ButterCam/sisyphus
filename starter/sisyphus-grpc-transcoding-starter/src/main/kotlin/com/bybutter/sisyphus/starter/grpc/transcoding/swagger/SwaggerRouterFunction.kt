@@ -117,7 +117,7 @@ class SwaggerRouterFunction private constructor(
                             requestBody(RequestBody().apply {
                                 required = true
                                 content = Content().apply {
-                                    val schema = if(field != null && field.type != FieldDescriptorProto.Type.MESSAGE) {
+                                    val schema = if (field != null && field.type != FieldDescriptorProto.Type.MESSAGE) {
                                         SwaggerSchema.fetchSchema(field.type, bodyParam)
                                     } else {
                                         ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
