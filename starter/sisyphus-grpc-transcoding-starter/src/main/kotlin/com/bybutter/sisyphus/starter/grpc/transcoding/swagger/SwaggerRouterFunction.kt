@@ -117,14 +117,22 @@ class SwaggerRouterFunction private constructor(
                             requestBody(RequestBody().apply {
                                 required = true
                                 content = Content().apply {
+                                    val schema = if(field != null && field.type != FieldDescriptorProto.Type.MESSAGE) {
+                                        SwaggerSchema.fetchSchema(field.type, bodyParam)
+                                    } else {
+                                        ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
+                                    }
                                     addMediaType("application/json", MediaType().apply {
-                                        schema = field?.let {
-                                            if (FieldDescriptorProto.Type.MESSAGE == field.type) {
-                                                ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
-                                            } else {
-                                                SwaggerSchema.fetchSchema(field.type, bodyParam)
-                                            }
-                                        } ?: ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
+                                        this.schema = schema
+                                    })
+                                    addMediaType("text/xml", MediaType().apply {
+                                        this.schema = schema
+                                    })
+                                    addMediaType("multipart/form-data", MediaType().apply {
+                                        this.schema = schema
+                                    })
+                                    addMediaType("application/x-www-form-urlencoded", MediaType().apply {
+                                        this.schema = schema
                                     })
                                 }
                             })
