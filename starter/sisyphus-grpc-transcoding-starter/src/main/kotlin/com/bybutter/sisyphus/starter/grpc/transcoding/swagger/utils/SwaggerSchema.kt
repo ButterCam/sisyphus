@@ -28,17 +28,17 @@ object SwaggerSchema {
         val subTypeNames = mutableSetOf<String>()
         val schema = ObjectSchema().apply {
             val messagePath = listOf(DescriptorProtos.FileDescriptorProto.MESSAGE_TYPE_FIELD_NUMBER, fileDescriptor?.messageType?.indexOf(descriptor))
-            fieldDescriptors.forEach {
+            for (field in fieldDescriptors) {
                 // Whether the field is decorated by 'repeated'.
-                val repeated = it.label == FieldDescriptorProto.Label.REPEATED
-                val fieldSchema = if (it.type == FieldDescriptorProto.Type.MESSAGE) {
-                    subTypeNames.add(it.typeName.trim('.'))
-                    ObjectSchema().`$ref`(SwaggerRouterFunction.COMPONENTS_SCHEMAS_PREFIX + it.typeName.trim('.'))
+                val repeated = field.label == FieldDescriptorProto.Label.REPEATED
+                val fieldSchema = if (field.type == FieldDescriptorProto.Type.MESSAGE) {
+                    subTypeNames.add(field.typeName.trim('.'))
+                    ObjectSchema().`$ref`(SwaggerRouterFunction.COMPONENTS_SCHEMAS_PREFIX + field.typeName.trim('.'))
                 } else {
-                    fetchSchema(it.type, it.typeName)
+                    fetchSchema(field.type, field.typeName)
                 }
-                this.addProperties(it.jsonName, (if (repeated) ArraySchema().items(fieldSchema) else fieldSchema).apply {
-                    SwaggerDescription.fetchDescription(messagePath + listOf(DescriptorProtos.FileDescriptorProto.PACKAGE_FIELD_NUMBER, fieldDescriptors.indexOf(it)), fileDescriptor)?.let { description ->
+                this.addProperties(field.jsonName, (if (repeated) ArraySchema().items(fieldSchema) else fieldSchema).apply {
+                    SwaggerDescription.fetchDescription(messagePath + listOf(DescriptorProtos.FileDescriptorProto.PACKAGE_FIELD_NUMBER, fieldDescriptors.indexOf(field)), fileDescriptor)?.let { description ->
                         this.description = description
                     }
                 })
@@ -68,7 +68,7 @@ object SwaggerSchema {
                     if (hasOptions) enumValues.add(EnumValueOptions.parse(description.options!!.toProto()).string) else enumValues.add(description.number.toString())
                 }
                 if (hasOptions) StringSchema()._enum(enumValues) else IntegerSchema().format("int32").apply {
-                    enumValues.forEach { value ->
+                    for (value in enumValues) {
                         addEnumItem(value.toInt())
                     }
                 }

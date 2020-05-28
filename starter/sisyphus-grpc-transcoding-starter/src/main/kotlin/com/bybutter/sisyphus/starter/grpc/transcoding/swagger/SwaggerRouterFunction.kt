@@ -60,109 +60,107 @@ class SwaggerRouterFunction private constructor(
         val schemas = mutableMapOf<String, Schema<*>>()
         val params = SwaggerParams.fetchParams(property.params)
 
-        services.forEach {
+        for (service in services) {
             // Get service file.
-            val fileDescriptor = ProtoTypes.getFileContainingSymbol(it.serviceDescriptor.name)
+            val fileDescriptor = ProtoTypes.getFileContainingSymbol(service.serviceDescriptor.name)
             // Get service descriptor.
-            val serviceDescriptor = ProtoTypes.getDescriptorBySymbol(it.serviceDescriptor.name) as ServiceDescriptorProto
+            val serviceDescriptor = ProtoTypes.getDescriptorBySymbol(service.serviceDescriptor.name) as ServiceDescriptorProto
             // Get service path,used to find notes.
             val serverPath = listOf(DescriptorProtos.FileDescriptorProto.SERVICE_FIELD_NUMBER, fileDescriptor?.service?.indexOf(serviceDescriptor))
             val tag = serviceDescriptor.name
             val hosts = serviceDescriptor.options?.metadata?.hosts
             val servicePaths = Paths()
 
-            serviceDescriptor.method.forEach { method ->
-                val httpRule = method.options?.http
-                if (httpRule != null) {
-                    val modelNames = mutableSetOf(method.outputType)
-                    // Get input type proto,used to find notes and generate request parameters.
-                    val inputTypeProto = ProtoTypes.ensureSupportByProtoName(method.inputType)
-                    val inputTypeFields = (inputTypeProto.fieldDescriptors).toMutableList()
-                    val field = inputTypeFields.firstOrNull { fieldDescriptorProto -> fieldDescriptorProto.name == httpRule.body }
-                    // Get request body param fields.
-                    val bodyParam = when (httpRule.body) {
-                        "" -> null
-                        "*" -> {
-                            inputTypeFields.clear()
-                            modelNames.add(method.inputType)
-                            method.inputType
-                        } else -> {
-                            inputTypeFields.remove(field)
-                            if (field!!.type == FieldDescriptorProto.Type.MESSAGE) modelNames.add(field.typeName)
-                            field.typeName
-                        }
+            for (method in serviceDescriptor.method) {
+                val httpRule = method.options?.http ?: continue
+                val modelNames = mutableSetOf(method.outputType)
+                // Get input type proto,used to find notes and generate request parameters.
+                val inputTypeProto = ProtoTypes.ensureSupportByProtoName(method.inputType)
+                val inputTypeFields = (inputTypeProto.fieldDescriptors).toMutableList()
+                val field = inputTypeFields.firstOrNull { fieldDescriptorProto -> fieldDescriptorProto.name == httpRule.body }
+                // Get request body param fields.
+                val bodyParam = when (httpRule.body) {
+                    "" -> null
+                    "*" -> {
+                        inputTypeFields.clear()
+                        modelNames.add(method.inputType)
+                        method.inputType
+                    } else -> {
+                        inputTypeFields.remove(field)
+                        if (field!!.type == FieldDescriptorProto.Type.MESSAGE) modelNames.add(field.typeName)
+                        field.typeName
                     }
-                    // Generate all schema related to this method.
-                    while (true) {
-                        val subModelNames = mutableSetOf<String>()
-                        for (typeName in modelNames) {
-                            if (schemas[typeName] != null) continue
-                            SwaggerSchema.fetchSchemaModel(typeName).let { schema ->
-                                schemas[typeName.trim('.')] = schema.schema
-                                subModelNames.addAll(schema.subTypeNames)
-                            }
-                        }
-                        modelNames.clear()
-                        modelNames.addAll(subModelNames)
-
-                        if (modelNames.isEmpty()) break
-                    }
-
-                    // Get method path, used to find notes.
-                    val methodPath = serverPath + listOf(DescriptorProtos.FileDescriptorProto.PACKAGE_FIELD_NUMBER, serviceDescriptor.method.indexOf(method))
-                    val operation = Operation().apply {
-                        this.tags = listOf(tag)
-                        summary = SwaggerDescription.fetchDescription(methodPath, fileDescriptor) ?: method.name
-                        if (bodyParam != null) {
-                            requestBody(RequestBody().apply {
-                                required = true
-                                content = Content().apply {
-                                    val schema = if (field != null && field.type != FieldDescriptorProto.Type.MESSAGE) {
-                                        SwaggerSchema.fetchSchema(field.type, bodyParam)
-                                    } else {
-                                        ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
-                                    }
-                                    addMediaType("application/json", MediaType().apply {
-                                        this.schema = schema
-                                    })
-                                    addMediaType("text/xml", MediaType().apply {
-                                        this.schema = schema
-                                    })
-                                    addMediaType("multipart/form-data", MediaType().apply {
-                                        this.schema = schema
-                                    })
-                                    addMediaType("application/x-www-form-urlencoded", MediaType().apply {
-                                        this.schema = schema
-                                    })
-                                }
-                            })
-                        }
-
-                        if (hosts != null && hosts.isNotEmpty()) {
-                            addParametersItem(SwaggerParams.fetchApiDomainParam(hosts))
-                        }
-
-                        params.forEach { param ->
-                            addParametersItem(param)
-                        }
-
-                        if (property.securitySchemes != null) {
-                            addSecurityItem(SwaggerSecuritySchemes.fetchSecurityRequirement(property.securitySchemes!!))
-                        }
-                        responses = ApiResponses().apply {
-                            addApiResponse("200", ApiResponse().apply {
-                                description = method.outputType.split(".").last()
-                                content = Content().apply {
-                                    addMediaType("application/json", MediaType().apply {
-                                        schema = ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + method.outputType.trim('.'))
-                                    })
-                                }
-                            })
-                        }
-                    }
-                    operation.operationId("${it.serviceDescriptor.name}/${method.name}")
-                    servicePaths.putAll(SwaggerPaths.fetchPaths(httpRule, inputTypeProto, inputTypeFields, operation, servicePaths))
                 }
+                // Generate all schema related to this method.
+                while (true) {
+                    val subModelNames = mutableSetOf<String>()
+                    for (typeName in modelNames) {
+                        if (schemas.containsKey(typeName)) continue
+                        SwaggerSchema.fetchSchemaModel(typeName).let { schema ->
+                            schemas[typeName.trim('.')] = schema.schema
+                            subModelNames.addAll(schema.subTypeNames)
+                        }
+                    }
+                    modelNames.clear()
+                    modelNames.addAll(subModelNames)
+
+                    if (modelNames.isEmpty()) break
+                }
+
+                // Get method path, used to find notes.
+                val methodPath = serverPath + listOf(DescriptorProtos.FileDescriptorProto.PACKAGE_FIELD_NUMBER, serviceDescriptor.method.indexOf(method))
+                val operation = Operation().apply {
+                    this.tags = listOf(tag)
+                    summary = SwaggerDescription.fetchDescription(methodPath, fileDescriptor) ?: method.name
+                    if (bodyParam != null) {
+                        requestBody(RequestBody().apply {
+                            required = true
+                            content = Content().apply {
+                                val schema = if (field != null && field.type != FieldDescriptorProto.Type.MESSAGE) {
+                                    SwaggerSchema.fetchSchema(field.type, bodyParam)
+                                } else {
+                                    ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
+                                }
+                                addMediaType("application/json", MediaType().apply {
+                                    this.schema = schema
+                                })
+                                addMediaType("text/xml", MediaType().apply {
+                                    this.schema = schema
+                                })
+                                addMediaType("multipart/form-data", MediaType().apply {
+                                    this.schema = schema
+                                })
+                                addMediaType("application/x-www-form-urlencoded", MediaType().apply {
+                                    this.schema = schema
+                                })
+                            }
+                        })
+                    }
+
+                    if (hosts != null && hosts.isNotEmpty()) {
+                        addParametersItem(SwaggerParams.fetchApiDomainParam(hosts))
+                    }
+
+                    params.forEach { param ->
+                        addParametersItem(param)
+                    }
+
+                    if (property.securitySchemes != null) {
+                        addSecurityItem(SwaggerSecuritySchemes.fetchSecurityRequirement(property.securitySchemes!!))
+                    }
+                    responses = ApiResponses().apply {
+                        addApiResponse("200", ApiResponse().apply {
+                            description = method.outputType.split(".").last()
+                            content = Content().apply {
+                                addMediaType("application/json", MediaType().apply {
+                                    schema = ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + method.outputType.trim('.'))
+                                })
+                            }
+                        })
+                    }
+                }
+                operation.operationId("${service.serviceDescriptor.name}/${method.name}")
+                servicePaths.putAll(SwaggerPaths.fetchPaths(httpRule, inputTypeProto, inputTypeFields, operation, servicePaths))
             }
             if (servicePaths.isNotEmpty()) {
                 tags.add(Tag().apply {
