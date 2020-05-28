@@ -19,32 +19,71 @@ object SwaggerPaths {
     /**
      * Build Paths based on request method.
      * */
-    fun fetchPaths(httpRule: HttpRule, inputTypeProto: ProtoSupport<*, *>, inputTypeFields: MutableList<FieldDescriptorProto>, operation: Operation): Paths {
-        return Paths().apply {
-            when (httpRule.pattern) {
-                is HttpRule.Pattern.Get -> {
-                    val requestUrlMap = fetchRequestUrl(httpRule.get)
-                    this[requestUrlMap.keys.first()] = PathItem().get(fetchOperation(httpRule.get, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation))
+    fun fetchPaths(httpRule: HttpRule, inputTypeProto: ProtoSupport<*, *>, inputTypeFields: MutableList<FieldDescriptorProto>, operation: Operation, paths: Paths): Paths {
+        when (httpRule.pattern) {
+            is HttpRule.Pattern.Get -> {
+                val requestUrlMap = fetchRequestUrl(httpRule.get)
+                val key = requestUrlMap.keys.first()
+                val item = fetchOperation(httpRule.get, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                if (paths[key] == null) {
+                    paths[key] = PathItem().get(item)
+                } else {
+                    paths[key].apply {
+                        this!!.get = item
+                    }
                 }
-                is HttpRule.Pattern.Post -> {
-                    val requestUrlMap = fetchRequestUrl(httpRule.post)
-                    this[requestUrlMap.keys.first()] = PathItem().post(fetchOperation(httpRule.post, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation))
-                }
-                is HttpRule.Pattern.Put -> {
-                    val requestUrlMap = fetchRequestUrl(httpRule.put)
-                    this[requestUrlMap.keys.first()] = PathItem().put(fetchOperation(httpRule.put, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation))
-                }
-                is HttpRule.Pattern.Patch -> {
-                    val requestUrlMap = fetchRequestUrl(httpRule.patch)
-                    this[requestUrlMap.keys.first()] = PathItem().patch(fetchOperation(httpRule.patch, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation))
-                }
-                is HttpRule.Pattern.Delete -> {
-                    val requestUrlMap = fetchRequestUrl(httpRule.delete)
-                    this[requestUrlMap.keys.first()] = PathItem().delete(fetchOperation(httpRule.delete, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation))
-                }
-                else -> throw UnsupportedOperationException("Unknown http rule pattern")
             }
+            is HttpRule.Pattern.Post -> {
+                val requestUrlMap = fetchRequestUrl(httpRule.post)
+                val key = requestUrlMap.keys.first()
+                val item = fetchOperation(httpRule.post, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                if (paths[key] == null) {
+                    paths[key] = PathItem().post(item)
+                } else {
+                    paths[key].apply {
+                        this!!.post = item
+                    }
+                }
+            }
+            is HttpRule.Pattern.Put -> {
+                val requestUrlMap = fetchRequestUrl(httpRule.put)
+                val key = requestUrlMap.keys.first()
+                val item = fetchOperation(httpRule.put, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                if (paths[key] == null) {
+                    paths[key] = PathItem().put(item)
+                } else {
+                    paths[key].apply {
+                        this!!.put = item
+                    }
+                }
+            }
+            is HttpRule.Pattern.Patch -> {
+                val requestUrlMap = fetchRequestUrl(httpRule.patch)
+                val key = requestUrlMap.keys.first()
+                val item = fetchOperation(httpRule.patch, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                if (paths[key] == null) {
+                    paths[key] = PathItem().patch(item)
+                } else {
+                    paths[key].apply {
+                        this!!.patch = item
+                    }
+                }
+            }
+            is HttpRule.Pattern.Delete -> {
+                val requestUrlMap = fetchRequestUrl(httpRule.delete)
+                val key = requestUrlMap.keys.first()
+                val item = fetchOperation(httpRule.delete, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                if (paths[key] == null) {
+                    paths[key] = PathItem().delete(item)
+                } else {
+                    paths[key].apply {
+                        this!!.delete = item
+                    }
+                }
+            }
+            else -> throw UnsupportedOperationException("Unknown http rule pattern")
         }
+        return paths
     }
 
     /***
@@ -55,11 +94,14 @@ object SwaggerPaths {
      *  2. /v1/sisyphus/{name=users\*} --> /v1/sisyphus/users/{var1}
      *  3. /v1/sisyphus/{name=users\*\*} --> /v1/sisyphus/users/{var1}/{var2}
      *  4. /v1/sisyphus/{name=users\**} --> /v1/sisyphus/users/{var1}
+     *  5. /v1/sisyphus/{name=users\*}:archive --> /v1/sisyphus/users/{var1}:archive
      * */
     private fun fetchRequestUrl(url: String): Map<String, List<String>> {
         val params = mutableListOf<String>()
+        // According to: segmentation, determine whether to include a custom request method.
+        val urlFragments = url.split(":")
         val requestUrl = buildString {
-            for (s in PathTemplate.create(url).withoutVars().toString().split("/")) {
+            for (s in PathTemplate.create(urlFragments[0]).withoutVars().toString().split("/")) {
                 if (s.isNotEmpty()) {
                     append("/")
                     when (s) {
@@ -69,10 +111,13 @@ object SwaggerPaths {
                             append("{")
                             append(param)
                             append("}")
-                        }
-                        else -> append(s)
+                        } else -> append(s)
                     }
                 }
+            }
+            if (urlFragments.size == 2) {
+                append(":")
+                append(urlFragments[1])
             }
         }
         return mapOf(requestUrl to params)
