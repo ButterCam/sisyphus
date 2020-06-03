@@ -34,9 +34,11 @@ open class SisyphusExtension(val project: Project) {
         isDevelop = developer != null
         val branchName: String? = System.getenv("BRANCH_NAME")
         val tagName: String? = System.getenv("TAG_NAME")
+        val buildVersion: String? = System.getenv("BUILD_VERSION")
 
         version = when {
             developer != null -> "$developer-SNAPSHOT"
+            buildVersion != null -> "$buildVersion"
             tagName != null -> "$tagName"
             branchName != null -> "$branchName-SNAPSHOT"
             else -> project.version as String
