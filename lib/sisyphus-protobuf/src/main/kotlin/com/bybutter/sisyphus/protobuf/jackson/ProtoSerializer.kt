@@ -22,6 +22,7 @@ import com.bybutter.sisyphus.protobuf.primitives.UInt32Value
 import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 import com.bybutter.sisyphus.protobuf.primitives.Value
 import com.bybutter.sisyphus.protobuf.primitives.string
+import com.bybutter.sisyphus.protobuf.primitives.toMessage
 import com.bybutter.sisyphus.security.base64UrlSafeWithPadding
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JavaType
@@ -94,7 +95,7 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
             is BytesValue -> writeBytes(value, gen, provider)
             is ListValue -> writeList(value, gen, provider)
             is FieldMask -> writeFieldMask(value, gen, provider)
-            is com.bybutter.sisyphus.protobuf.primitives.Any -> writeAny(value, gen, provider)
+            is com.bybutter.sisyphus.protobuf.primitives.Any -> writeAny(value.toMessage(), gen, provider)
             is Message<*, *> -> writeRawProto(value, gen, provider)
             is CustomProtoType<*> -> writeCustom(value, gen, provider)
             is List<*> -> writeList(value, gen, provider)
