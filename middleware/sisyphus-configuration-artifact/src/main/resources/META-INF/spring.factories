@@ -1,3 +1,6 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
   com.bybutter.sisyphus.middleware.configuration.GradlePropertiesProvider,\
   com.bybutter.sisyphus.middleware.configuration.ConfigArtifactProvider
+
+org.springframework.context.ApplicationListener=\
+  com.bybutter.sisyphus.middleware.configuration.ConfigArtifactProvider
