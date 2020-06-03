@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
-import com.bybutter.sisyphus.api.metadata
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
 import io.grpc.ServerServiceDefinition
@@ -19,7 +18,6 @@ class TranscodingServiceRouterFunction private constructor(
     private val proto: ServiceDescriptorProto,
     private val methodRouters: List<RouterFunction<ServerResponse>>
 ) : RouterFunction<ServerResponse> {
-    private val hosts = proto.options?.metadata?.hosts?.toSet() ?: setOf()
 
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
         // Set the service attributes.
@@ -27,14 +25,8 @@ class TranscodingServiceRouterFunction private constructor(
         request.attributes()[TranscodingFunctions.SERVICE_DESCRIPTOR_ATTRIBUTE] = service.serviceDescriptor
         request.attributes()[TranscodingFunctions.SERVICE_PROTO_ATTRIBUTE] = proto
 
-        val host = request.headers().firstHeader(apiDomainHeader) ?: buildString {
-            append(request.uri().host)
-            if (request.uri().port != -1) {
-                append(":")
-                append(request.uri().port)
-            }
-        }
-        if (hosts.isNotEmpty() && host !in hosts) {
+        val serviceName = request.headers().firstHeader(GRPC_SERVICE_NAME_HEADER)
+        if (!serviceName.isNullOrEmpty() && service.serviceDescriptor.name != serviceName) {
             return Mono.empty()
         }
 
@@ -45,7 +37,7 @@ class TranscodingServiceRouterFunction private constructor(
     }
 
     companion object {
-        val apiDomainHeader = "X-Api-Domain"
+        const val GRPC_SERVICE_NAME_HEADER = "grpc-service-name"
 
         operator fun invoke(service: ServerServiceDefinition): RouterFunction<ServerResponse>? {
             // Ensure for the service proto.

@@ -36,13 +36,13 @@ object SwaggerParams {
         }
     }
 
-    fun fetchApiDomainParam(hosts: List<String>): HeaderParameter {
+    fun fetchGrpcServiceNameParam(serviceName: String): HeaderParameter {
         return HeaderParameter().apply {
-            name = TranscodingServiceRouterFunction.apiDomainHeader
+            name = TranscodingServiceRouterFunction.GRPC_SERVICE_NAME_HEADER
             required = false
             schema = ArraySchema().apply {
                 items = StringSchema()
-                default = hosts
+                default = serviceName
             }
         }
     }

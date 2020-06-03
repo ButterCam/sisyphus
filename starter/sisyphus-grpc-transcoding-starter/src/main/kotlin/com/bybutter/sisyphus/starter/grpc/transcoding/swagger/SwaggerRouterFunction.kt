@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.swagger
 
 import com.bybutter.sisyphus.api.http
-import com.bybutter.sisyphus.api.metadata
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
@@ -68,7 +67,6 @@ class SwaggerRouterFunction private constructor(
             // Get service path,used to find notes.
             val serverPath = listOf(DescriptorProtos.FileDescriptorProto.SERVICE_FIELD_NUMBER, fileDescriptor?.service?.indexOf(serviceDescriptor))
             val tag = serviceDescriptor.name
-            val hosts = serviceDescriptor.options?.metadata?.hosts
             val servicePaths = Paths()
 
             for (method in serviceDescriptor.method) {
@@ -137,9 +135,7 @@ class SwaggerRouterFunction private constructor(
                         })
                     }
 
-                    if (hosts != null && hosts.isNotEmpty()) {
-                        addParametersItem(SwaggerParams.fetchApiDomainParam(hosts))
-                    }
+                    addParametersItem(SwaggerParams.fetchGrpcServiceNameParam(service.serviceDescriptor.name))
 
                     params.forEach { param ->
                         addParametersItem(param)

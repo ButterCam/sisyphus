@@ -40,7 +40,6 @@ class TranscodingRouterFunction private constructor(
                 request.attributes().clear()
                 request.attributes() += oldAttributes
                 it.success()
-                // it.error(TranscodingNotSupportException())
             }
         )
     }
