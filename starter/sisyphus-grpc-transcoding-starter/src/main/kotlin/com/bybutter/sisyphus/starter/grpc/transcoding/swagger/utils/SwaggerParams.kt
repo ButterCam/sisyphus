@@ -40,9 +40,8 @@ object SwaggerParams {
         return HeaderParameter().apply {
             name = TranscodingServiceRouterFunction.GRPC_SERVICE_NAME_HEADER
             required = false
-            schema = ArraySchema().apply {
-                items = StringSchema()
-                default = serviceName
+            schema = StringSchema().apply {
+                setDefault(serviceName)
             }
         }
     }
