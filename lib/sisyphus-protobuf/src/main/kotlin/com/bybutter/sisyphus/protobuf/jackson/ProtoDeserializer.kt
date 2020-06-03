@@ -118,7 +118,7 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
             Value.Kind.StringValue::class.java -> Value.Kind.StringValue(p.text)
             FieldMask::class.java -> readFieldMask(type, p, ctxt)
             Message::class.java,
-            Any::class.java -> readAnyProto(type, p, ctxt)
+            com.bybutter.sisyphus.protobuf.primitives.Any::class.java -> readAnyProto(type, p, ctxt)
             Timestamp::class.java -> readTimestamp(type, p, ctxt)
             Duration::class.java -> readDuration(type, p, ctxt)
             ListValue::class.java -> readList(p, ctxt)
