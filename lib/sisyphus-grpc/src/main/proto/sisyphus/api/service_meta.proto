@@ -9,7 +9,6 @@ option objc_class_prefix = "SIS";
 
 message ServiceMetadata {
     string name = 1;
-    repeated string hosts = 2;
 }
 
 extend google.protobuf.ServiceOptions {

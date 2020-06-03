@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils
 
 import com.bybutter.sisyphus.starter.grpc.transcoding.TranscodingServiceRouterFunction
 import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.Param
-import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.StringSchema
 import io.swagger.v3.oas.models.parameters.CookieParameter
@@ -36,13 +35,12 @@ object SwaggerParams {
         }
     }
 
-    fun fetchApiDomainParam(hosts: List<String>): HeaderParameter {
+    fun fetchGrpcServiceNameParam(serviceName: String): HeaderParameter {
         return HeaderParameter().apply {
-            name = TranscodingServiceRouterFunction.apiDomainHeader
+            name = TranscodingServiceRouterFunction.GRPC_SERVICE_NAME_HEADER
             required = false
-            schema = ArraySchema().apply {
-                items = StringSchema()
-                default = hosts
+            schema = StringSchema().apply {
+                setDefault(serviceName)
             }
         }
     }
