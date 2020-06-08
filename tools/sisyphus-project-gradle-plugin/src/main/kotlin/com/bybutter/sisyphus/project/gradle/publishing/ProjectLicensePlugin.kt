@@ -63,7 +63,7 @@ class ProjectLicensePlugin : Plugin<Project> {
 
         for (githubPattern in githubPatterns) {
             val result = githubPattern.matchEntire(origin) ?: continue
-            return "${result.groups[1]}/${result.groups[2]}"
+            return "${result.groups[1]?.value}/${result.groups[2]?.value}"
         }
         return null
     }
