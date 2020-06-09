@@ -192,7 +192,7 @@ Ready to rolling boulder with Sisyphus yet? Hold on! We need to plan our route f
    }
    ```
 
-4. **Run**
+4. **Run the Application**
 
    The service project is just a non-runnable library, we need create an application project to run our service projects.
 
@@ -214,7 +214,7 @@ Ready to rolling boulder with Sisyphus yet? Hold on! We need to plan our route f
    }
    ```
 
-   We only need one code in the application project, the `main` function.
+   We only need one function in the application project, the `main` function.
 
    ```kotlin
    @SpringBootApplication
