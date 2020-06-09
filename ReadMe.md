@@ -42,15 +42,15 @@ Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sis
 
 [**Sisyphus Protobuf Plugin**](/tools/sisyphus-protobuf-gradle-plugin) is the way how we generate code by `.proto` files in Gradle.
 
-**And More** tools like [CEL(Common Expression Language)](https://github.com/google/cel-spec), [Filtering](https://aip.bybutter.com/160) and [Ordering](https://aip.bybutter.com/132#ordering) Script will help you to design APIs follow Google AIP.
+**And More** tools like [CEL(Common Expression Language)](https://github.com/google/cel-spec), [Filtering](https://aip.bybutter.com/160) and [Ordering](https://aip.bybutter.com/132#ordering) scripts will help you to design APIs following Google AIP.
 
 ## Rolling with Sisyphus
 
-Ready to rolling boulder with Sisyphus yet? Hold on! We need to plan our route first.
+Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our route first.
 
 1. **Configure Sisyphus with gradle.properties**
 
-   We use [gradle.properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) to configure global settings of Sisyphus and all Sisyphus Projects.
+   We use [gradle.properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) to configure global settings of Sisyphus and all Sisyphus projects.
 
    ```properties
    # [DEV,PROD] Set developer name for developing environment.
@@ -84,11 +84,11 @@ Ready to rolling boulder with Sisyphus yet? Hold on! We need to plan our route f
    >
    > **[PROD]** for production runtime environment properties.
 
-   `gradle.properties` are shared between Gradle and Spring. Sisyphus Project Plugin will load it and configure Gradle automatically, Sisyphus Configuration Artifact will load it for Spring Framework.
+   `gradle.properties` are shared between Gradle and Spring. Sisyphus Project Plugin will load them and configure Gradle automatically. Sisyphus Configuration Artifact will load them for Spring Framework.
 
 2. **Write Protobuf schemas**
 
-   The next step is designing APIs, create a schema project and write `.proto` files in this project.
+   The next step is to design APIs, which means to create a schema project and to write `.proto` files in this project.
 
    This is a sample schema project `build.gradle.kts` config.
 
@@ -142,13 +142,13 @@ Ready to rolling boulder with Sisyphus yet? Hold on! We need to plan our route f
    }
    ```
 
-   > Additionally, `kotlin` and `java` classes also can be added to schema project, we suggest only add util or helper classes. 
+   > Additionally, `kotlin` and `java` classes are able to be added to schema project too. However, we do not recommend anything like this added excluding util or helper classes.
 
    Use the `gradlew generateProtos` task to generate kotlin files from proto files.
 
 3. **Implement API**
 
-   API schema is ready now,  the next step is implementing this API schema. Create a service project and refer the schema project.
+   API schema is ready now. The next step is to implement this API schema. Create a service project and refer to the schema project.
 
    This is a sample service project `build.gradle.kts` config.
 
@@ -194,7 +194,7 @@ Ready to rolling boulder with Sisyphus yet? Hold on! We need to plan our route f
 
 4. **Run the Application**
 
-   The service project is just a non-runnable library, we need create an application project to run our service projects.
+   The service project is just a non-runnable library. We need to create an application project to run our service projects.
 
    This is a sample application project `build.gradle.kts` config.
 
