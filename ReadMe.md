@@ -42,5 +42,188 @@ Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sis
 
 [**Sisyphus Protobuf Plugin**](/tools/sisyphus-protobuf-gradle-plugin) is the way how we generate code by `.proto` files in Gradle.
 
-**And More** tools like [CEL(Common Expression Language)](https://github.com/google/cel-spec), [Filtering](https://aip.bybutter.com/160) and [Ordering](https://aip.bybutter.com/132#ordering) Script will help you to design APIs follow Google AIP.
+**And More** tools like [CEL(Common Expression Language)](https://github.com/google/cel-spec), [Filtering](https://aip.bybutter.com/160) and [Ordering](https://aip.bybutter.com/132#ordering) scripts will help you to design APIs following Google AIP.
 
+## Rolling with Sisyphus
+
+Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our route first.
+
+1. **Configure Sisyphus with gradle.properties**
+
+   We use [gradle.properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) to configure global settings of Sisyphus and all Sisyphus projects.
+
+   ```properties
+   # [DEV,PROD] Set developer name for developing environment.
+   sisyphus.developer=higan
+   
+   # Use 'sisyphus.repository.<name>.url' Register maven repository for Sisyphus usage.
+   # [DEV,PROD] Url of repository named 'snapshot'.
+   sisyphus.repositories.snapshot.url=https://repo1.maven.org/maven2/
+   # [DEV,PROD] Optional, user name of repository.
+   sisyphus.repositories.snapshot.username=
+   # [DEV,PROD] Optional, password of repository.
+   sisyphus.repositories.snapshot.password=
+   
+   # Repositories for different usage, there are 4 embedded repositories.
+   # 'local'(maven local), 'central'(maven central), 'jcenter', 'portal'(gradle portal).
+   
+   # [DEV,PROD] Repositories for resolving dependencies, default value is 'local,central,jcenter,portal'.
+   sisyphus.dependency.repositories=local,central,jcenter,portal
+   # [DEV] Repositories for snapshot publishing, default value is 'snapshot'.
+   sisyphus.snapshot.repositories=snapshot
+   # [DEV] Repositories for release publishing, default value is 'release'.
+   sisyphus.release.repositories=release
+   # [DEV] Repositories for docker publishing.
+   sisyphus.docker.repositories=
+   
+   # [PROD] Configuration artifacts, it will be resolved in runtime.
+   sisyphus.config.artifacts=foo.bar:baz:1.0.0
+   ```
+
+   > **[DEV]** for developing environment properties.
+   >
+   > **[PROD]** for production runtime environment properties.
+
+   `gradle.properties` are shared between Gradle and Spring. Sisyphus Project Plugin will load them and configure Gradle automatically. Sisyphus Configuration Artifact will load them for Spring Framework.
+
+2. **Write Protobuf schemas**
+
+   The next step is to design APIs, which means to create a schema project and to write `.proto` files in this project.
+
+   This is a sample schema project `build.gradle.kts` config.
+
+   ```kotlin
+   plugins {
+       `java-library` // We build this project as a java library.
+       kotlin // Use the kotlin plugin to compile .kt files
+       id("com.bybutter.sisyphus.project") version "0.0.3" // Use the sisyphus project management plugin.
+       id("com.bybutter.sisyphus.protobuf") version "0.0.3" // Use the sisyphus protobuf compiler plugin.
+   }
+   
+   dependencies {
+       api("com.bybutter.sisyphus:sisyphus-grpc:0.0.3") // Dependent on sisyphus grpc runtime.
+       /*proto("com.foo.bar:baz:1.0.0")*/ // Use 'proto' configuration to config jars need to compile proto.
+       /*protoApi("com.foo.bar:baz:1.0.0")*/ // Use 'protoApi' configuration to config needed jars in proto compiling.
+       // All dependencies in 'implementation' configuration will auto add to 'protoApi' configuration.
+   }
+   ```
+
+   Now we can write `.proto` files in `src/main/proto` folder.
+
+   ```protobuf
+   syntax = "proto3";
+   
+   option java_multiple_files = true;
+   option java_package = "com.bybutter.sisyphus.examples.helloworld";
+   
+   package sisyphus.examples.helloworld;
+   
+   import "google/api/annotations.proto";
+   
+   // The greeting api definition.
+   service GreetingApi {
+     // Sends a greeting
+     rpc Greet (GreetRequest) returns (GreetResponse) {
+       option (google.api.http) = {
+           post: "/v1:greet"
+           body: "*"
+       };
+     }
+   }
+   
+   // The request message containing the user's name.
+   message GreetRequest {
+     string name = 1;
+   }
+   
+   // The response message containing the greetings
+   message GreetResponse {
+     string message = 1;
+   }
+   ```
+
+   > Additionally, `kotlin` and `java` classes are able to be added to schema project too. However, we do not recommend anything like this added excluding util or helper classes.
+
+   Use the `gradlew generateProtos` task to generate kotlin files from proto files.
+
+3. **Implement API**
+
+   API schema is ready now. The next step is to implement this API schema. Create a service project and refer to the schema project.
+
+   This is a sample service project `build.gradle.kts` config.
+
+   ```kotlin
+   plugins {
+       `java-library`
+       kotlin
+       id("com.bybutter.sisyphus.project") version "0.0.3"
+   }
+   
+   dependencies {
+       api("com.bybutter.sisyphus.middleware:sisyphus-grpc-client:0.0.3") // Dependent on spring grpc runtime.
+       api(project("schema:example-schema")) // Dependent on schema project.
+   }
+   ```
+
+   Create spring auto-config for service project.
+
+   ```kotlin
+   @Configuration
+   @ComponentScan(basePackageClasses = [AutoConfig::class])
+   class AutoConfig
+   ```
+
+   Register auto-config in `src/main/resources/META-INF/spring.factories`.
+
+   ```properties
+   org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.bybutter.sisyphus.examples.helloworld.AutoConfig
+   ```
+
+   Write the implementation by extend generated service classes.
+
+   ```kotlin
+   @RpcServiceImpl
+   class GreetingApiImpl : GreetingApi() {
+       override suspend fun greet(input: GreetRequest): GreetResponse {
+           return GreetResponse {
+               message = "Hello ${input.name}!"
+           }
+       }
+   }
+   ```
+
+4. **Run the Application**
+
+   The service project is just a non-runnable library. We need to create an application project to run our service projects.
+
+   This is a sample application project `build.gradle.kts` config.
+
+   ```kotlin
+   plugins {
+       application
+       kotlin
+       `kotlin-spring`
+       id("com.bybutter.sisyphus.project") version "0.0.3"
+   }
+   
+   dependencies {
+       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-server-starter:0.0.3") // Dependent on spring grpc starter.
+       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-transcoding-starter:0.0.3") // [Optional] Enable the http-transcoding feature.
+       implementation("com.bybutter.sisyphus.starter:sisyphus-protobuf-type-server-starter:0.0.3") // [Optional] Enable the type server feature.
+       implementation(project("service:example-service")) 	// Dependent on service project.
+   }
+   ```
+
+   We only need one function in the application project, the `main` function.
+
+   ```kotlin
+   @SpringBootApplication
+   @EnableHttpToGrpcTranscoding
+   class MarcoApplication
+   
+   fun main(args: Array<String>) {
+       SpringApplication.run(MarcoApplication::class.java, *args)
+   }
+   ```
+
+   Use the `gradlew bootRun` task to run our application.
