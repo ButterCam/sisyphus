@@ -68,6 +68,8 @@ object Dependencies {
             const val cp = "$group:spring-boot-configuration-processor"
 
             const val jackson = "$group:spring-boot-starter-json"
+
+            const val actuator = "$group:spring-boot-starter-actuator"
         }
     }
 
@@ -109,6 +111,10 @@ object Dependencies {
         const val wagonFile = "$group.wagon:wagon-file"
 
         const val wagonHttp = "$group.wagon:wagon-http"
+    }
+
+    object Micrometer {
+        const val prometheus = "io.micrometer:micrometer-registry-prometheus"
     }
 
     const val elastic5 = "org.elasticsearch.client:transport"
