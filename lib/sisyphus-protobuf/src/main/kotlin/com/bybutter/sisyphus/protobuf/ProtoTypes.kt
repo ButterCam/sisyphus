@@ -14,6 +14,7 @@ import kotlin.reflect.full.companionObjectInstance
 
 object ProtoTypes {
     private val protoToClassMap: BiMap<String, Class<*>> = HashBiMap.create()
+    private val protoToServiceMap: BiMap<String, Class<*>> = HashBiMap.create()
 
     // HashMap is faster than mutableMapOf(LinkedHashMap)
     private val fileInfoMap: MutableMap<String, FileDescriptorProto> = hashMapOf()
@@ -34,6 +35,14 @@ object ProtoTypes {
 
     fun registerProtoType(protoType: String, kotlinType: KClass<*>) {
         protoToClassMap[protoType] = kotlinType.java
+    }
+
+    fun registerService(protoType: String, kotlinType: Class<*>) {
+        protoToServiceMap[protoType] = kotlinType
+    }
+
+    fun registerService(protoType: String, kotlinType: KClass<*>) {
+        protoToServiceMap[protoType] = kotlinType.java
     }
 
     private fun registerFileSymbol(file: FileDescriptorProto) {

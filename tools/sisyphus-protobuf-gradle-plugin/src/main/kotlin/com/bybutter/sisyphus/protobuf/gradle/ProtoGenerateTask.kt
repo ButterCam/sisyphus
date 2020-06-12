@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.protobuf.gradle
 
+import com.bybutter.sisyphus.io.replaceExtensionName
 import com.bybutter.sisyphus.protobuf.ProtoFileMeta
 import com.bybutter.sisyphus.protobuf.compiler.ProtobufGenerateContext
 import com.google.protobuf.DescriptorProtos
@@ -63,6 +64,10 @@ open class ProtoGenerateTask : SourceTask() {
         for (generateResult in result) {
             generateResult.file.writeTo(output.toPath())
             generateResult.implFile.writeTo(implOutput.toPath())
+
+            val descFile = Paths.get(resourceOutput.toPath().toString(), generateResult.descriptor.name.replaceExtensionName("proto", "pb"))
+            Files.createDirectories(descFile.parent)
+            Files.write(descFile, generateResult.descriptor.toProto())
         }
 
         val fileMetas = Paths.get(resourceOutput.toPath().toString(), "META-INF/services/${ProtoFileMeta::class.java.name}")
