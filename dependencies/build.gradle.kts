@@ -50,5 +50,7 @@ dependencies {
         api("org.eclipse.jgit:org.eclipse.jgit:5.7.0.202003110725-r")
         api("com.palantir.gradle.docker:gradle-docker:0.25.0")
         api("io.grpc:grpc-kotlin-stub:0.1.2")
+        api("io.micrometer:micrometer-registry-prometheus:1.5.1")
+        api("org.springframework.boot:spring-boot-starter-actuator:2.3.0.RELEASE")
     }
 }
