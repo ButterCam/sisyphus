@@ -9,10 +9,10 @@ import io.grpc.ServerCall
 import io.grpc.ServerCallHandler
 import io.grpc.ServerInterceptor
 import io.grpc.Status
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 import java.time.Duration
 import kotlin.concurrent.thread
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
 @Component
 class ServerMicrometerInterceptor : ServerInterceptor {
