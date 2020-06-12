@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
+import com.bybutter.sisyphus.protobuf.primitives.FileDescriptorProto
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.FileSpec
 
@@ -26,9 +27,9 @@ class ProtobufGenerateContext : ProtobufElement() {
         return children.mapNotNull { it as? FileGenerator }.filter {
             source.contains(it.protoFilePath)
         }.map {
-            GeneratingResult(it.generate(), it.generateInternal(), it.fileMetaTypeName.toString())
+            GeneratingResult(it.generate(), it.generateInternal(), FileDescriptorProto.parse(it.descriptor.toByteArray()), it.fileMetaTypeName.toString())
         }
     }
 }
 
-data class GeneratingResult(val file: FileSpec, val implFile: FileSpec, val fileMeta: String)
+data class GeneratingResult(val file: FileSpec, val implFile: FileSpec, val descriptor: FileDescriptorProto, val fileMeta: String)

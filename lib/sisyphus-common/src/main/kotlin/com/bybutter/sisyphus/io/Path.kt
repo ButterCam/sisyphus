@@ -29,3 +29,9 @@ fun String.toPlatformPath(): String {
         }
     }
 }
+
+fun String.replaceExtensionName(old: String, new: String): String {
+    val extension = ".$old"
+    if (!this.endsWith(extension)) return this
+    return this.substring(0, this.length - old.length - 1) + ".$new"
+}
