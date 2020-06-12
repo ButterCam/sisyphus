@@ -28,11 +28,11 @@ class MicrometerRegistrar constructor(private var registry: MeterRegistry) {
         registry.timer("sisyphus_all_request")
     }
 
-    @Synchronized fun incrRemoteRequest(duration: Duration) {
+    fun incrRemoteRequest(duration: Duration) {
         remoteRequestTimer.record(duration)
     }
 
-    @Synchronized fun incrAllRequest(duration: Duration) {
+    fun incrAllRequest(duration: Duration) {
         allRequestTimer.record(duration)
     }
 }

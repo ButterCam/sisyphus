@@ -10,7 +10,6 @@ import io.grpc.ServerCallHandler
 import io.grpc.ServerInterceptor
 import io.grpc.Status
 import java.time.Duration
-import kotlin.concurrent.thread
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -27,13 +26,10 @@ class ServerMicrometerInterceptor : ServerInterceptor {
 
 class ServerMicrometerCall<ReqT : Any, RespT : Any>(call: ServerCall<ReqT, RespT>, private val micrometerRegistrar: MicrometerRegistrar, private val host: String?) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
     override fun close(status: Status, trailers: Metadata) {
-        val cost = System.nanoTime() - REQUEST_TIMESTAMP_CONTEXT_KEY.get()
-        thread() {
-            val costDuration = Duration.ofNanos(cost)
-            micrometerRegistrar.incrAllRequest(costDuration)
-            if (host != null && !host.startsWith("localhost")) {
-                micrometerRegistrar.incrRemoteRequest(costDuration)
-            }
+        val costDuration = Duration.ofNanos(System.nanoTime() - REQUEST_TIMESTAMP_CONTEXT_KEY.get())
+        micrometerRegistrar.incrAllRequest(costDuration)
+        if (host != null && !host.startsWith("localhost")) {
+            micrometerRegistrar.incrRemoteRequest(costDuration)
         }
         super.close(status, trailers)
     }
