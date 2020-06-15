@@ -1,17 +1,17 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger
 
 import com.bybutter.sisyphus.api.http
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
 import com.bybutter.sisyphus.starter.grpc.transcoding.EmptyRouterFunction
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.authentication.SwaggerValidate
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils.SwaggerDescription
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils.SwaggerParams
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils.SwaggerPaths
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils.SwaggerSchema
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils.SwaggerSecuritySchemes
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils.SwaggerServers
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication.SwaggerValidate
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerDescription
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerParams
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerPaths
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerSchema
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerSecuritySchemes
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerServers
 import com.google.protobuf.DescriptorProtos
 import io.grpc.Server
 import io.grpc.ServerServiceDefinition

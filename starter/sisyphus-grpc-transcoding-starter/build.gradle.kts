@@ -15,4 +15,5 @@ dependencies {
     api(project(":starter:sisyphus-webflux-starter"))
     implementation(Dependencies.Grpc.stub)
     implementation(Dependencies.swagger)
+    compileOnly(Dependencies.Spring.Boot.actuator)
 }

@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger.authentication
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication
 
 import org.springframework.web.reactive.function.server.ServerRequest
 

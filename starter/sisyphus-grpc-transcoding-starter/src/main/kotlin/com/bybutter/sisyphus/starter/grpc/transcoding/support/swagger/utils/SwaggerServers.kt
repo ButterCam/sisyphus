@@ -1,6 +1,6 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.SwaggerServer
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerServer
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.servers.ServerVariable
 import io.swagger.v3.oas.models.servers.ServerVariables

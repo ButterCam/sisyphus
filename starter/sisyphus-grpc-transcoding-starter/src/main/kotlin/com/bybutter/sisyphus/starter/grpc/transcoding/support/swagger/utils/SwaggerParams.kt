@@ -1,7 +1,7 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
 import com.bybutter.sisyphus.starter.grpc.transcoding.TranscodingServiceRouterFunction
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.Param
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.Param
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.StringSchema
 import io.swagger.v3.oas.models.parameters.CookieParameter

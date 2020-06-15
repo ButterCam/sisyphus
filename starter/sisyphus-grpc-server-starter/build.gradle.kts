@@ -12,8 +12,7 @@ dependencies {
     api(project(":middleware:sisyphus-grpc-client"))
     api(project(":middleware:sisyphus-configuration-artifact"))
     implementation(Dependencies.Grpc.stub)
-    implementation(Dependencies.Spring.Boot.actuator)
-    implementation(Dependencies.Micrometer.prometheus)
+    compileOnly(Dependencies.Spring.Boot.actuator)
     runtimeOnly(Dependencies.Grpc.netty)
 }
 

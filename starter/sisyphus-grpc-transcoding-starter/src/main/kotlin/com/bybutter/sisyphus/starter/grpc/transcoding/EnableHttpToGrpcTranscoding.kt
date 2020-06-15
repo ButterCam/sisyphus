@@ -1,6 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.authentication.DefaultSwaggerConfig
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication.DefaultSwaggerConfig
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 

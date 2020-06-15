@@ -14,6 +14,7 @@ javaPlatform {
 dependencies {
     api(platform(project(":sisyphus-bom")))
     api(platform("org.springframework.boot:spring-boot-dependencies:2.3.0.RELEASE"))
+    api(platform("io.micrometer:micrometer-bom:1.5.1"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.3.72"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.7"))
     api(platform("org.apache.maven:maven:3.6.3"))
@@ -50,6 +51,5 @@ dependencies {
         api("org.eclipse.jgit:org.eclipse.jgit:5.7.0.202003110725-r")
         api("com.palantir.gradle.docker:gradle-docker:0.25.0")
         api("io.grpc:grpc-kotlin-stub:0.1.2")
-        api("io.micrometer:micrometer-registry-prometheus:1.5.1")
     }
 }

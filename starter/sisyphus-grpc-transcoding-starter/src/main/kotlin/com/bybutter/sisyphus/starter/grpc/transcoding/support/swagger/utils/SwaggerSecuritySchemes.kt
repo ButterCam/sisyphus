@@ -1,7 +1,7 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.Scheme
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.SwaggerOAuthFlow
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.Scheme
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerOAuthFlow
 import io.swagger.v3.oas.models.security.OAuthFlow
 import io.swagger.v3.oas.models.security.OAuthFlows
 import io.swagger.v3.oas.models.security.Scopes

@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bybutter.sisyphus.starter.grpc.SisyphusGrpcServerAutoConfiguration
+com.bybutter.sisyphus.starter.grpc.SisyphusGrpcServerAutoConfiguration,\
+com.bybutter.sisyphus.starter.grpc.support.metrics.SisyphusMetricsAutoConfiguration
