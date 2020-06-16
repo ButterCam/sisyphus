@@ -3,9 +3,8 @@ package com.bybutter.sisyphus.starter.grpc
 import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
 import com.bybutter.sisyphus.rpc.GrpcServerConstants
 import com.bybutter.sisyphus.spring.BeanUtils
-import com.bybutter.sisyphus.starter.grpc.support.ReflectionService
-import com.bybutter.sisyphus.starter.grpc.support.ReflectionServiceAlpha
-import com.bybutter.sisyphus.starter.grpc.support.RpcBinaryLog
+import com.bybutter.sisyphus.starter.grpc.support.reflection.ReflectionService
+import com.bybutter.sisyphus.starter.grpc.support.reflection.ReflectionServiceAlpha
 import io.grpc.BindableService
 import io.grpc.Server
 import io.grpc.ServerBuilder
@@ -66,7 +65,6 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                 builder = builder.addStreamTracerFactory(factory)
             }
 
-            builder.setBinaryLog(RpcBinaryLog())
             builder.addService(ReflectionServiceAlpha())
             builder.addService(ReflectionService())
 

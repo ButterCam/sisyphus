@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
 import com.bybutter.sisyphus.api.HttpRule
 import com.bybutter.sisyphus.api.resource.PathTemplate

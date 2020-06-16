@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.starter.grpc.support
+package com.bybutter.sisyphus.starter.grpc.support.reflection
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ExtensionNumberResponse

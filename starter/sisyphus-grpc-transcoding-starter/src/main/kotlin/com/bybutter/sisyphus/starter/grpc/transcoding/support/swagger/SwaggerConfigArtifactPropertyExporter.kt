@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger
 
 import com.bybutter.sisyphus.middleware.configuration.ConfigFormatFilePropertyExporter
 

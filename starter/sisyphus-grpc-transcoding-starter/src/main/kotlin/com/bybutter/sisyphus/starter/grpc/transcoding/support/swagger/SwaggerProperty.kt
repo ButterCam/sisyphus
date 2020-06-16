@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger
 
 import io.swagger.v3.oas.models.security.SecurityScheme
 import org.springframework.boot.context.properties.ConfigurationProperties

@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding.swagger.utils
+package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
@@ -6,7 +6,7 @@ import com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.EnumValueOptions
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.string
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.SwaggerRouterFunction
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerRouterFunction
 import com.google.protobuf.DescriptorProtos
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.BooleanSchema

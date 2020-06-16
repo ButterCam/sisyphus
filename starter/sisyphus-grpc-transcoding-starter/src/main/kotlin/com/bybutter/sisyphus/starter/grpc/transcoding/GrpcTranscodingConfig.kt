@@ -1,9 +1,9 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.starter.grpc.ServiceRegistrar
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.SwaggerProperty
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.SwaggerRouterFunction
-import com.bybutter.sisyphus.starter.grpc.transcoding.swagger.authentication.SwaggerValidate
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerProperty
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerRouterFunction
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication.SwaggerValidate
 import com.bybutter.sisyphus.starter.webflux.CorsConfigurationSourceRegistrar
 import io.grpc.Server
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory

@@ -113,10 +113,6 @@ object Dependencies {
         const val wagonHttp = "$group.wagon:wagon-http"
     }
 
-    object Micrometer {
-        const val prometheus = "io.micrometer:micrometer-registry-prometheus"
-    }
-
     const val elastic5 = "org.elasticsearch.client:transport"
 
     const val mysql = "mysql:mysql-connector-java"
