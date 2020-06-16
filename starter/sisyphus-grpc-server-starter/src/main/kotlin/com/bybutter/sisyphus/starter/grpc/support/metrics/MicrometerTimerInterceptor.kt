@@ -28,16 +28,18 @@ class MicrometerTimerInterceptor(private val registry: MeterRegistry) : ServerIn
             val costDuration = Duration.ofNanos(System.nanoTime() - REQUEST_TIMESTAMP_CONTEXT_KEY.get())
 
             registry.timer("sisyphus_grpc_requests",
-                "service", delegate().methodDescriptor.serviceName,
-                "method", delegate().methodDescriptor.fullMethodName,
-                "status", status.code.name
+                    "service", delegate().methodDescriptor.serviceName,
+                    "method", delegate().methodDescriptor.fullMethodName,
+                    "status", status.code.name,
+                    "exception", status.cause?.javaClass?.name ?: "None"
             ).record(costDuration)
 
             if (host != null && !host.startsWith("localhost")) {
                 registry.timer("sisyphus_grpc_incoming_requests",
-                    "service", delegate().methodDescriptor.serviceName,
-                    "method", delegate().methodDescriptor.fullMethodName,
-                    "status", status.code.name
+                        "service", delegate().methodDescriptor.serviceName,
+                        "method", delegate().methodDescriptor.fullMethodName,
+                        "status", status.code.name,
+                        "exception", status.cause?.javaClass?.name ?: "None"
                 ).record(costDuration)
             }
 
