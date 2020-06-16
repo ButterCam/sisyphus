@@ -197,6 +197,20 @@ object ProtoTypes {
         val extensions = extensionMap[name.trim('.')] ?: mutableMapOf()
         return extensions.keys
     }
+
+    fun getRegisteredServices(): Set<String> {
+        return symbolMap.mapNotNull { (key, value) ->
+            if(value.descriptor is ServiceDescriptorProto){
+                key
+            }else {
+                null
+            }
+        }.toSet()
+    }
+
+    fun getProtoToServiceMap(key: String):Class<*>?{
+        return protoToServiceMap[key]
+    }
 }
 
 private data class DescriptorInfo(val file: FileDescriptorProto, val descriptor: Any)

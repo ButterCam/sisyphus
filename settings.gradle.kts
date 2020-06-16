@@ -18,6 +18,7 @@ include("middleware:sisyphus-elastic")
 include("middleware:sisyphus-hbase")
 include("middleware:sisyphus-grpc-client")
 include("middleware:sisyphus-retrofit")
+include("middleware:sisyphus-grpc-client-kubernetes")
 
 include("starter:sisyphus-jackson-starter")
 include("starter:sisyphus-webflux-starter")
