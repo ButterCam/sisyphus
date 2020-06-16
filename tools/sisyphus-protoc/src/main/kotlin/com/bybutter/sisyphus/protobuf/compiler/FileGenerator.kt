@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
 import com.bybutter.sisyphus.api.resourceDefinition
-import com.bybutter.sisyphus.io.replaceExtensionName
 import com.bybutter.sisyphus.protobuf.ProtoFileMeta
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FileDescriptorProto
