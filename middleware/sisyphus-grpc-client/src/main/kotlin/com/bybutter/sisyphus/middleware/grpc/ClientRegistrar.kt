@@ -7,23 +7,15 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
-import org.springframework.context.EnvironmentAware
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware, ApplicationContextAware {
+class ClientRegistrar : BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
     companion object {
         private val logger = LoggerFactory.getLogger(ClientRegistrar::class.java)
     }
 
-    private lateinit var environment: Environment
-
     private lateinit var clientRepositories: List<ClientRepository>
-
-    override fun setEnvironment(environment: Environment) {
-        this.environment = environment
-    }
 
     override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
         val registry = beanFactory as BeanDefinitionRegistry
