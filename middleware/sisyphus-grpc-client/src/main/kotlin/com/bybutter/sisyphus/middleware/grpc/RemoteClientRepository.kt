@@ -10,8 +10,10 @@ import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE - 1000)
 class RemoteClientRepository : ClientRepository {
+
+    override var order: Int = Int.MIN_VALUE
+
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory): List<AbstractBeanDefinition> {
         val properties = beanFactory.getBeansOfType<GrpcChannelProperty>()
         if (properties.isEmpty()) return arrayListOf()

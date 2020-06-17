@@ -15,7 +15,6 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE + 1000)
 class LocalClientRepository : ClientRepository, EnvironmentAware {
 
     private lateinit var environment: Environment
@@ -23,6 +22,8 @@ class LocalClientRepository : ClientRepository, EnvironmentAware {
     override fun setEnvironment(environment: Environment) {
         this.environment = environment
     }
+
+    override var order: Int = Int.MAX_VALUE
 
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory): List<AbstractBeanDefinition> {
         val localPort = environment.getProperty(GrpcServerConstants.GRPC_PORT_PROPERTY, Int::class.java, GrpcServerConstants.DEFAULT_GRPC_PORT)

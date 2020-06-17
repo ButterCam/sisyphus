@@ -44,6 +44,8 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware, A
     }
 
     override fun setApplicationContext(applicationContext: ApplicationContext) {
-        clientRepositories = applicationContext.getBeansOfType<ClientRepository>().values.toList()
+        clientRepositories = applicationContext.getBeansOfType<ClientRepository>().values.toList().sortedBy {
+            it.order
+        }
     }
 }

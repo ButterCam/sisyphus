@@ -10,6 +10,8 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition
 
 interface ClientRepository {
 
+    var order: Int
+
     fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory): List<AbstractBeanDefinition>
 
     fun processStub(stub: AbstractStub<*>, beanFactory: ConfigurableListableBeanFactory): AbstractStub<*> {

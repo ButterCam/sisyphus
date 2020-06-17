@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component
 @Component
 class KubernetesClientRepository : ClientRepository {
 
+    override var order: Int = Int.MIN_VALUE + 1000
+
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory): List<AbstractBeanDefinition> {
         val api = CoreV1Api(Config.fromCluster())
         val namespace = String(Files.readAllBytes(Paths.get("/var/run/secrets/kubernetes.io/serviceaccount/namespace")), Charset.defaultCharset())
