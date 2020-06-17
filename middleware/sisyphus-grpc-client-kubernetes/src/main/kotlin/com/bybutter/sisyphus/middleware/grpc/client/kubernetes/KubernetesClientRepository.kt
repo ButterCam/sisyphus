@@ -11,24 +11,29 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.core.env.Environment
-import org.springframework.stereotype.Component
-@Component
+
 class KubernetesClientRepository : ClientRepository {
 
-    override var order: Int = Int.MIN_VALUE + 1000
+    override var order: Int = Int.MIN_VALUE + 2000
 
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition> {
-        val api = CoreV1Api(Config.fromCluster())
-        val namespace = String(Files.readAllBytes(Paths.get("/var/run/secrets/kubernetes.io/serviceaccount/namespace")), Charset.defaultCharset())
+        val api = try {
+            CoreV1Api(Config.fromCluster())
+        } catch (e: Exception) {
+            throw IllegalStateException("Get config fail, maybe not in k8s.")
+        }
+        val path = Paths.get(Config.SERVICEACCOUNT_ROOT, "namespace")
+        if (!Files.exists(path)) {
+            throw IllegalStateException("can not find ${path.fileName}.")
+        }
+        val namespace = String(Files.readAllBytes(path), Charset.defaultCharset())
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
-        val registerServices = ProtoTypes.getRegisteredServices()
-        for (registerService in registerServices) {
-            val list = api.listNamespacedService(namespace, null, null, null, null, registerService, null, null, null, null)
+        val registerServices = ProtoTypes.getProtoToServiceMap()
+        for ((serviceName, service) in registerServices) {
+            val list = api.listNamespacedService(namespace, null, null, null, null, serviceName, null, null, null, null)
             val channel = list.items[0].spec?.ports?.get(0)?.port?.let {
-                createGrpcChannel(registerService, it)
+                createGrpcChannel(serviceName, it)
             } ?: continue
-            val service = ProtoTypes.getProtoToServiceMap(registerService)
-                    ?: throw IllegalStateException("Grpc service not be found.")
             val client = getClientFromService(service)
             val stub = getStubFromService(service)
             val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {

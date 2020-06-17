@@ -135,7 +135,7 @@ object Dependencies {
 
     const val nettyTcnative = "io.netty:netty-tcnative-boringssl-static"
 
-    const val kubeJavaClient = "io.kubernetes:client-java:8.0.2"
+    const val kubeJavaClient = "io.kubernetes:client-java"
 
     const val retrofit = "com.squareup.retrofit2:retrofit"
 

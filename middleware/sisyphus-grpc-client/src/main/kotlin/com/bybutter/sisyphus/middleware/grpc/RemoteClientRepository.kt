@@ -5,12 +5,10 @@ import org.springframework.beans.factory.getBeansOfType
 import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.core.env.Environment
-import org.springframework.stereotype.Component
 
-@Component
 class RemoteClientRepository : ClientRepository {
 
-    override var order: Int = Int.MIN_VALUE
+    override var order: Int = Int.MAX_VALUE - 1000
 
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition> {
         val properties = beanFactory.getBeansOfType<GrpcChannelProperty>()

@@ -125,7 +125,7 @@ object ProtoTypes {
 
     fun ensureClassByProtoName(name: String): Class<*> {
         return getClassByProtoName(name)
-            ?: throw UnsupportedOperationException("Message '$name' not defined in current context.")
+                ?: throw UnsupportedOperationException("Message '$name' not defined in current context.")
     }
 
     fun getClassByTypeUrl(url: String): Class<*>? {
@@ -134,7 +134,7 @@ object ProtoTypes {
 
     fun ensureClassByTypeUrl(url: String): Class<*> {
         return getClassByTypeUrl(url)
-            ?: throw UnsupportedOperationException("Message '$url' not defined in current context.")
+                ?: throw UnsupportedOperationException("Message '$url' not defined in current context.")
     }
 
     fun getSupportByProtoName(name: String): ProtoSupport<*, *>? {
@@ -143,7 +143,7 @@ object ProtoTypes {
 
     fun ensureSupportByProtoName(name: String): ProtoSupport<*, *> {
         return getSupportByProtoName(name)
-            ?: throw UnsupportedOperationException("Message '$name' not defined in current context.")
+                ?: throw UnsupportedOperationException("Message '$name' not defined in current context.")
     }
 
     fun getSupportByTypeUrl(url: String): ProtoSupport<*, *>? {
@@ -152,7 +152,7 @@ object ProtoTypes {
 
     fun ensureSupportByTypeUrl(url: String): ProtoSupport<*, *> {
         return getSupportByTypeUrl(url)
-            ?: throw UnsupportedOperationException("Message '$url' not defined in current context.")
+                ?: throw UnsupportedOperationException("Message '$url' not defined in current context.")
     }
 
     fun getProtoNameByClass(clazz: Class<*>): String? {
@@ -208,8 +208,8 @@ object ProtoTypes {
         }.toSet()
     }
 
-    fun getProtoToServiceMap(key: String): Class<*>? {
-        return protoToServiceMap[key]
+    fun getProtoToServiceMap(): Map<String, Class<*>> {
+        return protoToServiceMap
     }
 }
 
