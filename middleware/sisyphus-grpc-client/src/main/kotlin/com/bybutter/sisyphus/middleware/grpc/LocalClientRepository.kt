@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.middleware.grpc
 import com.bybutter.sisyphus.rpc.GrpcServerConstants
 import com.bybutter.sisyphus.rpc.RpcService
 import io.grpc.ManagedChannelBuilder
+import kotlin.reflect.full.companionObject
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -12,7 +13,6 @@ import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.core.annotation.Order
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
-import kotlin.reflect.full.companionObject
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1000)

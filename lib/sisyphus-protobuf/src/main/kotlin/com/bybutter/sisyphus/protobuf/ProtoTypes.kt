@@ -200,15 +200,15 @@ object ProtoTypes {
 
     fun getRegisteredServices(): Set<String> {
         return symbolMap.mapNotNull { (key, value) ->
-            if(value.descriptor is ServiceDescriptorProto){
+            if (value.descriptor is ServiceDescriptorProto) {
                 key
-            }else {
+            } else {
                 null
             }
         }.toSet()
     }
 
-    fun getProtoToServiceMap(key: String):Class<*>?{
+    fun getProtoToServiceMap(key: String): Class<*>? {
         return protoToServiceMap[key]
     }
 }

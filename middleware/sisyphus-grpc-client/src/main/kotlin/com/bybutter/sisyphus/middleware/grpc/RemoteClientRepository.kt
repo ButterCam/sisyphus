@@ -1,6 +1,6 @@
 package com.bybutter.sisyphus.middleware.grpc
 
-import com.bybutter.sisyphus.rpc.RpcService
+import kotlin.reflect.full.companionObject
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
 import org.springframework.beans.factory.support.AbstractBeanDefinition
@@ -8,7 +8,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
-import kotlin.reflect.full.companionObject
 
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE - 1000)
