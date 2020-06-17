@@ -5,14 +5,27 @@ import io.grpc.Channel
 import io.grpc.ClientInterceptor
 import io.grpc.ManagedChannelBuilder
 import io.grpc.stub.AbstractStub
+import kotlin.reflect.full.companionObject
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.AbstractBeanDefinition
+import org.springframework.core.env.Environment
 
 interface ClientRepository {
 
     var order: Int
 
-    fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory): List<AbstractBeanDefinition>
+    fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition>
+
+    fun getStubFromService(service: Class<*>): Class<*> {
+        return service.kotlin.companionObject?.java?.classes?.firstOrNull {
+            it.simpleName == "Stub"
+        } ?: throw IllegalStateException("Grpc service must have stub class in companion.")
+    }
+
+    fun getClientFromService(service: Class<*>): Class<*> {
+        return service.declaredClasses.firstOrNull { it.simpleName == "Client" }
+                ?: throw IllegalStateException("Grpc service must have nested class named 'Client'.")
+    }
 
     fun processStub(stub: AbstractStub<*>, beanFactory: ConfigurableListableBeanFactory): AbstractStub<*> {
         var result = stub
