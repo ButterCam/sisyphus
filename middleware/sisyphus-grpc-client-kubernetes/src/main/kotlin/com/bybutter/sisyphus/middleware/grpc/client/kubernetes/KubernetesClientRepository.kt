@@ -4,13 +4,13 @@ import com.bybutter.sisyphus.middleware.grpc.ClientRepository
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import io.kubernetes.client.openapi.apis.CoreV1Api
 import io.kubernetes.client.util.Config
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Paths
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.core.env.Environment
+import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class KubernetesClientRepository : ClientRepository {
 
@@ -19,8 +19,10 @@ class KubernetesClientRepository : ClientRepository {
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition> {
         val api = try {
             CoreV1Api(Config.fromCluster())
-        } catch (e: Exception) {
-            throw IllegalStateException("Get config fail, maybe not in k8s.")
+        } catch (e: IllegalStateException) {
+            throw IllegalStateException("Get config fail: $e, maybe not in k8s.")
+        } catch (e: NullPointerException) {
+            throw e
         }
         val path = Paths.get(Config.SERVICEACCOUNT_ROOT, "namespace")
         if (!Files.exists(path)) {
