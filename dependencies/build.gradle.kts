@@ -28,6 +28,7 @@ dependencies {
         api("org.reflections:reflections:0.9.12")
         api("com.github.os72:protoc-jar:3.11.4")
         api("io.netty:netty-tcnative-boringssl-static:2.0.30.Final")
+        api("io.kubernetes:client-java:8.0.2")
         api("org.apache.maven.wagon:wagon-http:3.4.0")
         api("org.junit.jupiter:junit-jupiter:5.6.2")
         api("org.reflections:reflections:0.9.12")
