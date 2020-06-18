@@ -30,12 +30,13 @@ class KubernetesClientRepository : ClientRepository {
         }
         val namespace = String(Files.readAllBytes(path), Charset.defaultCharset())
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
-        val registerServices = ProtoTypes.getProtoToServiceMap()
-        for ((serviceName, service) in registerServices) {
+        val registerServiceNames = ProtoTypes.getRegisteredServiceNames()
+        for (serviceName in registerServiceNames) {
             val list = api.listNamespacedService(namespace, null, null, null, null, serviceName, null, null, null, null)
             val channel = list.items[0].spec?.ports?.get(0)?.port?.let {
                 createGrpcChannel(serviceName, it)
             } ?: continue
+            val service = ProtoTypes.getRegisterService(serviceName) ?: throw IllegalStateException("Grpc service not be found.")
             val client = getClientFromService(service)
             val stub = getStubFromService(service)
             val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
