@@ -4,13 +4,13 @@ import com.bybutter.sisyphus.middleware.grpc.ClientRepository
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import io.kubernetes.client.openapi.apis.CoreV1Api
 import io.kubernetes.client.util.Config
+import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Paths
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.core.env.Environment
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class KubernetesClientRepository : ClientRepository {
 
