@@ -198,12 +198,12 @@ object ProtoTypes {
         return extensions.keys
     }
 
-    fun getRegisteredServices(): Set<String> {
+    fun getRegisteredServiceNames(): Set<String> {
         return protoToServiceMap.keys
     }
 
-    fun getProtoToServiceMap(): Map<String, Class<*>> {
-        return protoToServiceMap
+    fun getRegisterService(name: String): Class<*>? {
+        return protoToServiceMap[name]
     }
 }
 
