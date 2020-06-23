@@ -58,7 +58,7 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
         var result = visit(and.e)
 
         for (relation in and.e1) {
-            if (result == true) break
+            if (result == false) break
             result = and(result, relation)
         }
 
@@ -200,7 +200,7 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
     fun visit(literal: CelParser.LiteralContext): Any? {
         return when (literal) {
             is CelParser.IntContext -> literal.text.toLong()
-            is CelParser.UintContext -> literal.text.toULong()
+            is CelParser.UintContext -> literal.text.substring(0, literal.text.length - 1).toULong()
             is CelParser.DoubleContext -> literal.text.toDouble()
             is CelParser.StringContext -> celString(literal.text)
             is CelParser.BytesContext -> celBytes(literal.text)
