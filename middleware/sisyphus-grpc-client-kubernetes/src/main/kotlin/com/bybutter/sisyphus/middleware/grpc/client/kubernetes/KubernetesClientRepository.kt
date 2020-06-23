@@ -48,9 +48,7 @@ class KubernetesClientRepository : ClientRepository {
                 logger.error("Get api exception '${e.message}' when list kubernetes services in namespace '${e.responseBody}'.")
                 continue
             }
-            if (list.items.isEmpty()) {
-                continue
-            }
+            if (list.items.isEmpty()) continue
             val k8sService = list.items[0]
             val labelValue = k8sService.metadata?.labels?.get(serviceName) ?: continue
             val port = k8sService.spec?.ports?.first {
