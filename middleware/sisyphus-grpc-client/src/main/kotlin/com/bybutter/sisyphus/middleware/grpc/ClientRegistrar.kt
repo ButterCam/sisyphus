@@ -33,6 +33,7 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                 val beanName = clientBean.beanClass.name
                 if (!registry.containsBeanDefinition(beanName)) {
                     registry.registerBeanDefinition(beanName, clientBean)
+                    logger.info("Register '$beanName Client' via '${clientRepository.javaClass.name}' clientRepository ")
                 }
             }
         }
