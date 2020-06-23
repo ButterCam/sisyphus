@@ -9,21 +9,14 @@ import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ServerRefle
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ServerReflectionRequest
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ServerReflectionResponse
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ServiceResponse
-import io.grpc.InternalNotifyOnServerBuild
-import io.grpc.Server
-import io.grpc.ServerServiceDefinition
+import io.grpc.InternalServer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ReflectionServiceAlpha : ServerReflection(), InternalNotifyOnServerBuild {
-    private lateinit var services: List<ServerServiceDefinition>
-
-    override fun notifyOnBuild(server: Server) {
-        services = server.services
-    }
+class ReflectionServiceAlpha : ServerReflection() {
 
     override fun serverReflectionInfo(input: Flow<ServerReflectionRequest>): Flow<ServerReflectionResponse> = flow {
         input.collect { request ->
@@ -87,7 +80,7 @@ class ReflectionServiceAlpha : ServerReflection(), InternalNotifyOnServerBuild {
 
     private fun listService(name: String): ServerReflectionResponse.MessageResponse.ListServicesResponse {
         return ServerReflectionResponse.MessageResponse.ListServicesResponse(ListServiceResponse {
-            this.service += services.map {
+            this.service += InternalServer.SERVER_CONTEXT_KEY.get().services.map {
                 ServiceResponse {
                     this.name = it.serviceDescriptor.name
                 }
