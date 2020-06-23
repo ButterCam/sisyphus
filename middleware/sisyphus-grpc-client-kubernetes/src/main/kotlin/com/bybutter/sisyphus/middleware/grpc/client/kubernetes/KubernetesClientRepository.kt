@@ -17,29 +17,30 @@ import org.springframework.core.env.Environment
 class KubernetesClientRepository : ClientRepository {
 
     override var order: Int = Int.MIN_VALUE + 2000
-    private val logger = LoggerFactory.getLogger(this.javaClass)
-
+    companion object {
+        private val logger = LoggerFactory.getLogger(this.javaClass)
+    }
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition> {
         val api = try {
             CoreV1Api(Config.fromCluster())
         } catch (e: IllegalStateException) {
-            throw IllegalStateException("Get config fail: $e, maybe not in k8s.")
+            throw IllegalStateException("Get config fail: $e, maybe not in kubernetes.")
         } catch (e: NullPointerException) {
             throw e
         }
         val path = Paths.get(Config.SERVICEACCOUNT_ROOT, "namespace")
         if (!Files.exists(path)) {
-            throw IllegalStateException("can not find ${path.fileName}.")
+            throw IllegalStateException("Can not find kubernetes namespace file ${path.fileName}.")
         }
         val namespace = String(Files.readAllBytes(path), Charset.defaultCharset())
-        logger.info("Kubernetes namespace is $namespace.")
+        logger.info("Detect application running in kubernetes namespace $namespace.")
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
         val registerServiceNames = ProtoTypes.getRegisteredServiceNames()
         for (serviceName in registerServiceNames) {
             val list = try {
                 api.listNamespacedService(namespace, null, null, null, null, serviceName, null, null, null, null)
             } catch (e: ApiException) {
-                logger.error("ResponseBody is ${e.responseBody}")
+                logger.error("Get api exception '${e.message}' when list kubernetes services in namespace '${e.responseBody}'.")
                 throw e
             }
             if (list.items.isEmpty()) {
@@ -48,13 +49,13 @@ class KubernetesClientRepository : ClientRepository {
             val k8sService = list.items[0]
             val labelValue = k8sService.metadata?.labels?.get(serviceName) ?: continue
             val port = k8sService.spec?.ports?.first {
-                it.name == labelValue || it.port == labelValue.toInt()
+                it.name == labelValue || it.port.toString() == labelValue
             }?.port ?: continue
             val host = k8sService.metadata?.name ?: continue
-            logger.info("Grpc channel is $host:$port.")
+            logger.info("Discover gRPC service '${list.items[0].metadata?.name}' on kubernetes '$host:$port'.")
             val channel = createGrpcChannel(host, port)
             val service = ProtoTypes.getRegisterService(serviceName)
-                    ?: throw IllegalStateException("Grpc service not be found.")
+                    ?: throw IllegalStateException("GRPC service not be found.")
             val client = getClientFromService(service)
             val stub = getStubFromService(service)
             val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
