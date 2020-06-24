@@ -53,21 +53,21 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    We use [gradle.properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) to configure global settings of Sisyphus and all Sisyphus projects.
 
    ```properties
-   # [DEV,PROD] Set developer name for developing environment.
+   # [DEV,RT] Set developer name for developing environment.
    sisyphus.developer=higan
    
    # Use 'sisyphus.repository.<name>.url' Register maven repository for Sisyphus usage.
-   # [DEV,PROD] Url of repository named 'snapshot'.
+   # [DEV,RT] Url of repository named 'snapshot'.
    sisyphus.repositories.snapshot.url=https://repo1.maven.org/maven2/
-   # [DEV,PROD] Optional, user name of repository.
+   # [DEV,RT] Optional, user name of repository.
    sisyphus.repositories.snapshot.username=
-   # [DEV,PROD] Optional, password of repository.
+   # [DEV,RT] Optional, password of repository.
    sisyphus.repositories.snapshot.password=
    
    # Repositories for different usage, there are 4 embedded repositories.
    # 'local'(maven local), 'central'(maven central), 'jcenter', 'portal'(gradle portal).
    
-   # [DEV,PROD] Repositories for resolving dependencies, default value is 'local,central,jcenter,portal'.
+   # [DEV,RT] Repositories for resolving dependencies, default value is 'local,central,jcenter,portal'.
    sisyphus.dependency.repositories=local,central,jcenter,portal
    # [DEV] Repositories for snapshot publishing, default value is 'snapshot'.
    sisyphus.snapshot.repositories=snapshot
@@ -76,13 +76,13 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    # [DEV] Repositories for docker publishing.
    sisyphus.docker.repositories=
    
-   # [PROD] Configuration artifacts, it will be resolved in runtime.
+   # [RT] Configuration artifacts, it will be resolved in runtime.
    sisyphus.config.artifacts=foo.bar:baz:1.0.0
    ```
 
    > **[DEV]** for developing environment properties.
    >
-   > **[PROD]** for production runtime environment properties.
+   > **[RT]** for runtime environment properties.
 
    `gradle.properties` are shared between Gradle and Spring. Sisyphus Project Plugin will load them and configure Gradle automatically. Sisyphus Configuration Artifact will load them for Spring Framework.
 
@@ -95,7 +95,7 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    ```kotlin
    plugins {
        `java-library` // We build this project as a java library.
-       kotlin // Use the kotlin plugin to compile .kt files
+       kotlin("jvm") version "1.3.72" // Use the kotlin plugin to compile .kt files
        id("com.bybutter.sisyphus.project") version "0.0.3" // Use the sisyphus project management plugin.
        id("com.bybutter.sisyphus.protobuf") version "0.0.3" // Use the sisyphus protobuf compiler plugin.
    }
@@ -155,7 +155,7 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    ```kotlin
    plugins {
        `java-library`
-       kotlin
+       kotlin("jvm") version "1.3.72"
        id("com.bybutter.sisyphus.project") version "0.0.3"
    }
    
@@ -201,7 +201,7 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    ```kotlin
    plugins {
        application
-       kotlin
+       kotlin("jvm") version "1.3.72"
        `kotlin-spring`
        id("com.bybutter.sisyphus.project") version "0.0.3"
    }
