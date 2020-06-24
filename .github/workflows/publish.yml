@@ -26,16 +26,12 @@ jobs:
       - uses: ButterCam/prepare-sisyphus-build@v1
         with:
           dependency-repositories: local,central,jcenter,portal,snapshot
-          release-repositories: release,github
           snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
           snapshot-username: ${{ secrets.OSSRH_USERNAME }}
           snapshot-password: ${{ secrets.OSSRH_PASSWORD }}
           release-url: https://oss.sonatype.org/service/local/staging/deploy/maven2
           release-username: ${{ secrets.OSSRH_USERNAME }}
           release-password: ${{ secrets.OSSRH_PASSWORD }}
-          github-url: https://maven.pkg.github.com/ButterCam/sisyphus
-          github-username: ${{ env.GITHUB_ACTOR }}
-          github-password: ${{ secrets.GITHUB_TOKEN }}
           gradle-portal-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
           gradle-portal-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
           gpg-key-name: ${{ secrets.GPG_KEY_NAME }}
