@@ -11,9 +11,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
-    companion object {
-        private val logger = LoggerFactory.getLogger(ClientRegistrar::class.java)
-    }
 
     private lateinit var environment: Environment
 
@@ -33,11 +30,16 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                 val beanName = clientBean.beanClass.name
                 if (!registry.containsBeanDefinition(beanName)) {
                     registry.registerBeanDefinition(beanName, clientBean)
+                    logger.info("Register '$beanName Client' via '${clientRepository.javaClass.simpleName}'.")
                 }
             }
         }
     }
 
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(ClientRegistrar::class.java)
     }
 }
