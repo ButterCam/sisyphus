@@ -18,10 +18,6 @@ class KubernetesClientRepository : ClientRepository {
 
     override var order: Int = Int.MIN_VALUE + 2000
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(this.javaClass)
-    }
-
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition> {
         val api = try {
             CoreV1Api(Config.fromCluster())
@@ -66,5 +62,9 @@ class KubernetesClientRepository : ClientRepository {
             beanDefinitionList.add(clientBeanDefinition.beanDefinition)
         }
         return beanDefinitionList
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(this.javaClass)
     }
 }
