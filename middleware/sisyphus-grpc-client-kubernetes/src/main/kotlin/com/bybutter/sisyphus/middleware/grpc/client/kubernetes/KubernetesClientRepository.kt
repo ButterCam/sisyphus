@@ -19,29 +19,26 @@ class KubernetesClientRepository : ClientRepository {
     override var order: Int = Int.MIN_VALUE + 2000
 
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition> {
-        val api = try {
-            CoreV1Api(Config.fromCluster())
-        } catch (e: IllegalStateException) {
-            logger.warn("Due to kubernetes environment not found, skip discover service on kubernetes cluster")
-            return emptyList()
-        } catch (e: NullPointerException) {
-            logger.warn("Due to kubernetes environment not found, skip discover service on kubernetes cluster")
-            return emptyList()
-        }
         val path = Paths.get(Config.SERVICEACCOUNT_ROOT, "namespace")
         if (!Files.exists(path)) {
-            logger.warn("Due to Can not find kubernetes namespace file ${path.fileName}, skip discover service on kubernetes cluster")
+            logger.warn("Skip discovering services on kubernetes cluster, kubernetes downward API file not found.")
             return emptyList()
         }
         val namespace = String(Files.readAllBytes(path), Charset.defaultCharset())
-        logger.info("Detect application running in kubernetes namespace $namespace.")
+        val api = try {
+            CoreV1Api(Config.fromCluster())
+        } catch (e: Exception) {
+            logger.warn("Skip discovering services on kubernetes cluster, an ${e.javaClass.name}('${e.message}') occurred when creating kubernetes client.")
+            return emptyList()
+        }
+        logger.debug("Detect application is running in kubernetes namespace $namespace.")
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
         val registerServiceNames = ProtoTypes.getRegisteredServiceNames()
         for (serviceName in registerServiceNames) {
             val list = try {
                 api.listNamespacedService(namespace, null, null, null, null, serviceName, null, null, null, null)
             } catch (e: ApiException) {
-                logger.error("Get api exception '${e.message}' when list kubernetes services in namespace '${e.responseBody}'.")
+                logger.error("An exception('${e.message}') occurred when listing kubernetes services in namespace '$namespace'.")
                 continue
             }
             if (list.items.isEmpty()) continue
@@ -51,7 +48,7 @@ class KubernetesClientRepository : ClientRepository {
                 it.name == labelValue || it.port.toString() == labelValue
             }?.port ?: continue
             val host = k8sService.metadata?.name ?: continue
-            logger.info("Discover gRPC service '${list.items[0].metadata?.name}' on kubernetes '$host:$port'.")
+            logger.info("GRPC service '$serviceName' discovered in kubernetes service '$host:$port'.")
             val channel = createGrpcChannel(host, port)
             val service = ProtoTypes.getRegisterService(serviceName) ?: continue
             val client = getClientFromService(service)

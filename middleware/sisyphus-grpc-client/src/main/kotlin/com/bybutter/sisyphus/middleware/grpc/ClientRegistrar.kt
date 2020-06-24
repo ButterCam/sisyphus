@@ -38,6 +38,7 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
     }
+
     companion object {
         private val logger = LoggerFactory.getLogger(ClientRegistrar::class.java)
     }
