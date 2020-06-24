@@ -34,7 +34,7 @@ jobs:
           release-url: https://oss.sonatype.org/service/local/staging/deploy/maven2
           release-username: ${{ secrets.OSSRH_USERNAME }}
           release-password: ${{ secrets.OSSRH_PASSWORD }}
-          github-url: https://maven.pkg.github.com/ButterCam
+          github-url: https://maven.pkg.github.com/ButterCam/sisyphus
           github-username: ${{ env.GITHUB_ACTOR }}
           github-password: ${{ secrets.GITHUB_TOKEN }}
           gradle-portal-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
