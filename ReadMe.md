@@ -36,6 +36,8 @@ Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sis
 
 [**Sisyphus Configuration Artifact**](/middleware/sisyphus-configuration-artifact) is the way how we manage configurations and developing environment.
 
+[**Sisyphus Kubernetes gRPC client**](/middleware/sisyphus-grpc-client-kubernetes) is the way how we implement service discovery in Kubernetes.
+
 [**Sisyphus Protobuf Compiler**](/tools/sisyphus-protoc) is the way how we generate Kotlin codes by `.proto` files.
 
 [**Sisyphus Project Plugin**](/tools/sisyphus-project-gradle-plugin) is the way how we manage project and configuring Gradle.
