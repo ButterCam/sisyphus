@@ -50,7 +50,12 @@ Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sis
 
 Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our route first.
 
-1. **Configure Sisyphus with gradle.properties**
+1. **System requirement**
+
+   - Gradle 6.5+
+   - JDK 11+
+
+2. **Configure Sisyphus with gradle.properties**
 
    We use [gradle.properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) to configure global settings of Sisyphus and all Sisyphus projects.
 
@@ -88,7 +93,7 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
 
    `gradle.properties` are shared between Gradle and Spring. Sisyphus Project Plugin will load them and configure Gradle automatically. Sisyphus Configuration Artifact will load them for Spring Framework.
 
-2. **Write Protobuf schemas**
+3. **Write Protobuf schemas**
 
    The next step is to design APIs, which means to create a schema project and to write `.proto` files in this project.
 
@@ -148,7 +153,7 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
 
    Use the `gradlew generateProtos` task to generate kotlin files from proto files.
 
-3. **Implement API**
+4. **Implement API**
 
    API schema is ready now. The next step is to implement this API schema. Create a service project and refer to the schema project.
 
@@ -194,7 +199,7 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    }
    ```
 
-4. **Run the Application**
+5. **Run the Application**
 
    The service project is just a non-runnable library. We need to create an application project to run our service projects.
 
