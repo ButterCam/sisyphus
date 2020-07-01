@@ -50,6 +50,7 @@ class KubernetesClientRepository : ClientRepository {
             val host = k8sService.metadata?.name ?: continue
             logger.info("GRPC service '$serviceName' discovered in kubernetes service '$host:$port'.")
             val channel = createGrpcChannel(host, port)
+            channelLifecycleManager(channel, beanFactory)
             val service = ProtoTypes.getRegisterService(serviceName) ?: continue
             val client = getClientFromService(service)
             val stub = getStubFromService(service)

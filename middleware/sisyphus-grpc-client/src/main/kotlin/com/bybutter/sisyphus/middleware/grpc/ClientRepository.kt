@@ -3,11 +3,15 @@ package com.bybutter.sisyphus.middleware.grpc
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientInterceptor
+import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import io.grpc.stub.AbstractStub
 import kotlin.reflect.full.companionObject
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.AbstractBeanDefinition
+import org.springframework.beans.factory.support.BeanDefinitionBuilder
+import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.context.Lifecycle
 import org.springframework.core.env.Environment
 
 interface ClientRepository {
@@ -55,5 +59,18 @@ interface ClientRepository {
     fun createGrpcClient(target: Class<*>, channel: Channel): AbstractStub<*> {
         return target.getDeclaredConstructor(Channel::class.java, CallOptions::class.java)
                 .newInstance(channel, CallOptions.DEFAULT) as AbstractStub<*>
+    }
+
+    fun channelLifecycleManager(channel: Channel, beanFactory: ConfigurableListableBeanFactory) {
+        if (channel is ManagedChannel) {
+            val lifecycleBuilder = BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
+                ManagedChannelLifecycle(channel)
+            }
+            (beanFactory as BeanDefinitionRegistry).registerBeanDefinition("$QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE:${channel.authority()}", lifecycleBuilder.beanDefinition)
+        }
+    }
+
+    companion object {
+        const val QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE = "sisyphus:grpc:channel-lifecycle"
     }
 }

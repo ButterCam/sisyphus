@@ -15,6 +15,7 @@ class LocalClientRepository : ClientRepository {
     override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition> {
         val localPort = environment.getProperty(GrpcServerConstants.GRPC_PORT_PROPERTY, Int::class.java, GrpcServerConstants.DEFAULT_GRPC_PORT)
         val localChannel = createGrpcChannel("localhost", localPort)
+        channelLifecycleManager(localChannel, beanFactory)
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
         for (serviceName in beanFactory.getBeanNamesForAnnotation(RpcServiceImpl::class.java)) {
             val serviceBeanDefinition = beanFactory.getBeanDefinition(serviceName)
