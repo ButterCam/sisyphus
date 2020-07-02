@@ -40,7 +40,7 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                 }
             }
         }
-            }
+    }
 
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
     }
