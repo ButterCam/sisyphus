@@ -6,7 +6,7 @@ import kotlin.concurrent.thread
 import org.springframework.context.SmartLifecycle
 
 class ManagedChannelLifecycle : SmartLifecycle {
-    private val channelList: MutableList<ManagedChannel> = mutableListOf()
+    private val channelList: MutableSet<ManagedChannel> = mutableSetOf()
 
     private var running = false
 
