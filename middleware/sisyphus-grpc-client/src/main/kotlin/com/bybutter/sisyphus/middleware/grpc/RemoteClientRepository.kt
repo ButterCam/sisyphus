@@ -15,8 +15,7 @@ class RemoteClientRepository : ClientRepository {
         if (properties.isEmpty()) return arrayListOf()
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
         for (property in properties.values) {
-            val channel = createGrpcChannel(property)
-            channelLifecycleManager(channel, beanFactory)
+            val channel = createGrpcChannel(property, beanFactory)
             beanFactory.registerSingleton(property.name, channel)
             for (service in property.services) {
                 val client = getClientFromService(service)

@@ -5,20 +5,39 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 import org.springframework.context.SmartLifecycle
 
-class ManagedChannelLifecycle(private val channel: ManagedChannel) : SmartLifecycle {
-    override fun isRunning(): Boolean = true
+class ManagedChannelLifecycle : SmartLifecycle {
+    private val channelList: MutableList<ManagedChannel> = mutableListOf()
+
+    private var running = false
+
+    fun registerManagedChannel(channel: ManagedChannel) {
+        channelList += channel
+    }
+
+    override fun isRunning(): Boolean = running
 
     override fun start() {
+        running = true
     }
 
     override fun stop() {
-        channel.shutdownNow()
+        running = false
+        for (channel in channelList) {
+            channel.shutdownNow()
+        }
+        channelList.clear()
     }
 
     override fun stop(callback: Runnable) {
-        channel.shutdown()
-        thread(name = "grpc-channel-shutdown-${channel.authority()}") {
-            channel.awaitTermination(30, TimeUnit.SECONDS)
+        running = false
+        for (channel in channelList) {
+            channel.shutdown()
+        }
+        thread(name = "grpc-channel-shutdown") {
+            for (channel in channelList) {
+                channel.awaitTermination(30, TimeUnit.SECONDS)
+            }
+            channelList.clear()
             callback.run()
         }
     }
