@@ -44,9 +44,9 @@ class ValueNode : PatcherNode {
             else -> throw IllegalStateException()
         }
 
-        val propertyType = if(field.label == FieldDescriptorProto.Label.REPEATED) {
+        val propertyType = if (field.label == FieldDescriptorProto.Label.REPEATED) {
             property.returnType.arguments.first().type?.classifier as? KClass<*>
-        }else {
+        } else {
             property.returnType.classifier as? KClass<*>
         }
         if (propertyType != null && propertyType.isSubclassOf(CustomProtoType::class)) {
