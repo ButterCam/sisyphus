@@ -36,14 +36,14 @@ class KubernetesClientRepository : ClientRepository {
         val registerServiceNames = ProtoTypes.getRegisteredServiceNames()
         for (serviceName in registerServiceNames) {
             val list = try {
-                api.listNamespacedService(namespace, null, null, null, null, serviceName, null, null, null, null)
+                api.listNamespacedService(namespace, null, null, null, null, "sisyphus/$serviceName", null, null, null, null)
             } catch (e: ApiException) {
-                logger.error("An exception('${e.message}') occurred when listing kubernetes services in namespace '$namespace'.")
+                logger.error("An exception('${e.responseBody}') occurred when listing kubernetes services in namespace '$namespace'.")
                 continue
             }
             if (list.items.isEmpty()) continue
             val k8sService = list.items[0]
-            val labelValue = k8sService.metadata?.labels?.get(serviceName) ?: continue
+            val labelValue = k8sService.metadata?.labels?.get("sisyphus/$serviceName") ?: continue
             val port = k8sService.spec?.ports?.first {
                 it.name == labelValue || it.port.toString() == labelValue
             }?.port ?: continue
