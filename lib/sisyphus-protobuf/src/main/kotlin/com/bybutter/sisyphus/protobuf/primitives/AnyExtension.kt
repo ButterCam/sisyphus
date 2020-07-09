@@ -7,6 +7,7 @@ import com.bybutter.sisyphus.protobuf.ProtoTypes
  * Wrap message to [Any].
  */
 fun Message<*, *>.toAny(): Any {
+    if (this is Any) return this
     return Any {
         this.typeUrl = this@toAny.typeUrl()
         this.value = this@toAny.toProto()
