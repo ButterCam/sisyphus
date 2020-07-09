@@ -4,7 +4,6 @@ import com.bybutter.sisyphus.jackson.javaType
 import com.bybutter.sisyphus.protobuf.CustomProtoType
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoEnum
-import com.bybutter.sisyphus.protobuf.WellKnownTypes
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
