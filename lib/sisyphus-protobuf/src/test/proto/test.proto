@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/any.proto";
 
 package com.bybutter.sisyphus.protobuf.test;
 
@@ -31,6 +32,8 @@ message MapMessageTest {
     }
     google.protobuf.Timestamp timestamp = 7;
     google.protobuf.Duration duration = 8;
+    map<string, google.protobuf.Any> any_map_value = 9;
+    repeated google.protobuf.Any any_list_value = 10;
 
     message NestedMessage {
         int32 int32_value = 1;
