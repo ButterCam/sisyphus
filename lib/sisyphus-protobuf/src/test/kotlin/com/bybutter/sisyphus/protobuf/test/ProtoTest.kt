@@ -124,6 +124,22 @@ class ProtoTest {
             this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")
             this.timestamp = Timestamp.now()
             this.duration = Duration(8L, 0L, 0L)
+            this.anyMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
+            this.anyListValue += listOf(
+                MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
         }
 
         val json = raw.toJson()
@@ -147,6 +163,22 @@ class ProtoTest {
             this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")
             this.timestamp = Timestamp.now()
             this.duration = Duration(8L, 0L, 0L)
+            this.anyMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
+            this.anyListValue += listOf(
+                MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
         }
 
         val yml = raw.toYaml()

@@ -1,9 +1,9 @@
 package com.bybutter.sisyphus.protobuf.jackson
 
+import com.bybutter.sisyphus.jackson.javaType
 import com.bybutter.sisyphus.protobuf.CustomProtoType
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoEnum
-import com.bybutter.sisyphus.protobuf.WellKnownTypes
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
@@ -28,9 +28,11 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import com.fasterxml.jackson.databind.type.TypeFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import java.lang.reflect.Type
 import kotlin.math.round
+import kotlin.reflect.jvm.javaType
 
 @OptIn(ExperimentalUnsignedTypes::class)
 open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
@@ -43,7 +45,7 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
     constructor(type: JavaType) : super(type)
 
     override fun serialize(value: T, gen: JsonGenerator, provider: SerializerProvider) {
-        writeAny(value as Any, gen, provider)
+        writeAny(value as Any, value.javaType, gen, provider)
     }
 
     private fun getSerializedPropertyName(field: FieldDescriptorProto, gen: JsonGenerator, provider: SerializerProvider): String {
@@ -60,19 +62,11 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
             }
 
             gen.writeFieldName(getSerializedPropertyName(field, gen, provider))
-            if (field.typeName == WellKnownTypes.ANY_TYPENAME) {
-                if (fieldValue is List<*>) {
-                    writeAnyList(fieldValue as List<Message<*, *>>, gen, provider)
-                } else {
-                    writeAny(fieldValue as Message<*, *>, gen, provider)
-                }
-            } else {
-                writeAny(fieldValue!!, gen, provider)
-            }
+            writeAny(fieldValue!!, TypeFactory.defaultInstance().constructType(value.getProperty(field.number)?.returnType?.javaType), gen, provider)
         }
     }
 
-    protected fun writeAny(value: Any, gen: JsonGenerator, provider: SerializerProvider) {
+    protected fun writeAny(value: Any, type: JavaType, gen: JsonGenerator, provider: SerializerProvider) {
         when (value) {
             is NullValue -> writeNull(value, gen, provider)
             is String -> gen.writeString(value)
@@ -96,10 +90,16 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
             is ListValue -> writeList(value, gen, provider)
             is FieldMask -> writeFieldMask(value, gen, provider)
             is com.bybutter.sisyphus.protobuf.primitives.Any -> writeAny(value.toMessage(), gen, provider)
-            is Message<*, *> -> writeRawProto(value, gen, provider)
+            is List<*> -> writeList(value, type, gen, provider)
+            is Map<*, *> -> writeMap(value, type, gen, provider)
             is CustomProtoType<*> -> writeCustom(value, gen, provider)
-            is List<*> -> writeList(value, gen, provider)
-            is Map<*, *> -> writeMap(value, gen, provider)
+            is Message<*, *> -> {
+                if (type.rawClass == Message::class.java) {
+                    writeAny(value as Message<*, *>, gen, provider)
+                } else {
+                    writeRawProto(value, gen, provider)
+                }
+            }
             else -> {
                 throw UnsupportedOperationException("Unsupported type '${value.javaClass}($value)' in proto.")
             }
@@ -113,7 +113,8 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
     }
 
     protected fun writeCustom(value: CustomProtoType<*>, gen: JsonGenerator, provider: SerializerProvider) {
-        writeAny(value.raw() ?: NullValue.NULL_VALUE, gen, provider)
+        val raw = value.raw() ?: NullValue.NULL_VALUE
+        writeAny(raw, raw.javaType, gen, provider)
     }
 
     protected fun writeAnyList(value: List<Message<*, *>>, gen: JsonGenerator, provider: SerializerProvider) {
@@ -300,22 +301,22 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
         gen.writeEndArray()
     }
 
-    protected fun writeList(value: List<*>, gen: JsonGenerator, provider: SerializerProvider) {
+    protected fun writeList(value: List<*>, type: JavaType, gen: JsonGenerator, provider: SerializerProvider) {
         gen.writeStartArray()
         for (item in value) {
             item ?: continue
-            writeAny(item, gen, provider)
+            writeAny(item, type.contentType, gen, provider)
         }
         gen.writeEndArray()
     }
 
-    protected fun writeMap(value: Map<*, *>, gen: JsonGenerator, provider: SerializerProvider) {
+    protected fun writeMap(value: Map<*, *>, type: JavaType, gen: JsonGenerator, provider: SerializerProvider) {
         gen.writeStartObject()
         for ((key, value) in value) {
             key ?: continue
             value ?: continue
             gen.writeFieldName(key.toString())
-            writeAny(value, gen, provider)
+            writeAny(value, type.contentType, gen, provider)
         }
         gen.writeEndObject()
     }
