@@ -46,9 +46,9 @@ open class ProtobufApiLintTask : SourceTask() {
     private fun outputMessageToFile(message: String) {
         val outPutDirectory = project.layout.buildDirectory.file(project.provider {
             "reports/apilinter"
-        }).get().asFile.toPath()
-        Files.createDirectory(outPutDirectory)
-        Files.write(Paths.get(outPutDirectory.toString(), "apilinter.json"), message.toByteArray())
+        }).get().asFile
+        if (!outPutDirectory.exists()) Files.createDirectories(outPutDirectory.toPath())
+        Files.write(Paths.get(outPutDirectory.toPath().toString(), "apilinter.json"), message.toByteArray())
     }
 
     private fun ruleHandle(cmd: MutableList<String>, apiLinterConfig: ApiLinterConfig) {

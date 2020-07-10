@@ -10,7 +10,7 @@ class ApiLinterRunner {
 
     fun runApiLinter(args: List<String>, version: String): String? {
         val apiLinterTemp = extractApiLinter(version)
-        return executeCmd(apiLinterTemp?.absolutePath, args)
+        return executeCmd(apiLinterTemp.absolutePath, args)
     }
 
     private fun executeCmd(cmd: String, args: List<String>): String {
@@ -27,11 +27,12 @@ class ApiLinterRunner {
 
     private fun extractApiLinter(version: String): File {
         val tempBinDir = createTempBinDir()
-        val platform = detectPlatform()
+        val osName = System.getProperties().getProperty("os.name").normalize()
+        val platform = detectPlatform(osName)
         val srcFilePath = Paths.get(version, "api-linter-$version-$platform.exe").toString()
         val srcFile = ClassPathResource(srcFilePath)
         if (!srcFile.exists()) {
-            throw UnsupportedOperationException("Unsupported api linter version $version or platform $platform.")
+            throw UnsupportedOperationException("Unsupported api linter version $version or platform $osName.")
         }
         val apiLinterTemp = File(tempBinDir, "apilinter.exe")
         populateFile(srcFile, apiLinterTemp)
@@ -40,8 +41,7 @@ class ApiLinterRunner {
         return apiLinterTemp
     }
 
-    private fun detectPlatform(): String {
-        val osName = System.getProperties().getProperty("os.name").normalize()
+    private fun detectPlatform(osName: String): String {
         return when {
             (osName.startsWith("macosx") || osName.startsWith("osx")) -> "darwin"
             osName.startsWith("linux") -> "linux"
