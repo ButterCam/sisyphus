@@ -67,7 +67,7 @@ open class ProtobufApiLintTask : SourceTask() {
     private fun printMessage(linterResponseList: List<LinterResponse>, protoPathMapping: Map<String, String>) {
         for (linterResponse in linterResponseList) {
             linterResponse.problems.forEach {
-                println("api-linter: ${protoPathMapping[linterResponse.filePath]}:${it.location.startPosition["line_number"]}:${it.location.startPosition["column_number"]}  ${it.message} rule detail in ${it.ruleDocUri}")
+                println("api-linter: ${protoPathMapping[linterResponse.filePath]}:${it.location.startPosition.lineNumber}:${it.location.startPosition.columnNumber}  ${it.message} rule detail in ${it.ruleDocUri}")
             }
         }
     }
@@ -84,4 +84,6 @@ data class LinterResponse(@JsonProperty("file_path") var filePath: String, @Json
 
 data class Problem(var message: String, var location: Location, @JsonProperty("rule_id") var ruleId: String, @JsonProperty("rule_doc_uri") var ruleDocUri: String)
 
-data class Location(@JsonProperty("start_position") val startPosition: Map<String, String>, @JsonProperty("end_position") val endPosition: Map<String, String>)
+data class Location(@JsonProperty("start_position") val startPosition: FilePosition, @JsonProperty("end_position") val endPosition: FilePosition)
+
+data class FilePosition(@JsonProperty("line_number") var lineNumber: Int, @JsonProperty("column_number") var columnNumber: Int)
