@@ -20,9 +20,13 @@ class ApiLinterRunner {
             apiLinterCmd.add(arg)
         }
         println("api-linter executing: $apiLinterCmd")
-        val process = ProcessBuilder(apiLinterCmd).start()
+        val process = ProcessBuilder(apiLinterCmd).redirectErrorStream(true).start()
         val result = process.text()
-        process.waitFor()
+        val exitCode = process.waitFor()
+        if (exitCode != 0) {
+            println("api-linter: $result")
+            throw IllegalStateException("Api linter return with non-zero value '$exitCode'.")
+        }
         return result
     }
 
