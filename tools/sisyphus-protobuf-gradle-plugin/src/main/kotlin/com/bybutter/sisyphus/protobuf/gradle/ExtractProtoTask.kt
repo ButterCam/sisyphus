@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf.gradle
 import com.bybutter.sisyphus.io.toUnixPath
 import com.bybutter.sisyphus.protobuf.compiler.ProtocRunner
 import java.io.File
-import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -88,7 +87,7 @@ open class ExtractProtoTask : SourceTask() {
         if (source) {
             val protoName = name.toUnixPath()
             sourceProtos.add(protoName)
-            sourceFileMapping[protoName] = URI(file.toUri().toURL().path).path
+            sourceFileMapping[protoName] = file.toString()
         }
         val targetFile = protoPath.toPath().resolve(name)
         Files.createDirectories(targetFile.parent)
