@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.protobuf.gradle
 import com.bybutter.sisyphus.io.toUnixPath
 import com.bybutter.sisyphus.protobuf.compiler.ProtocRunner
 import java.io.File
+import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -39,6 +40,7 @@ open class ExtractProtoTask : SourceTask() {
 
     private val scannedMapping = mutableMapOf<String, String>()
     private val sourceProtos = mutableSetOf<String>()
+    private val sourceFileMapping = mutableMapOf<String, String>()
 
     private fun addProto(file: File) {
         addProto(file.toPath())
@@ -65,7 +67,7 @@ open class ExtractProtoTask : SourceTask() {
         Files.walkFileTree(dir, object : SimpleFileVisitor<Path>() {
             override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                 if (file.fileName.toString().endsWith(".proto")) {
-                    addProtoInternal(dir.relativize(file).toString(), Files.readAllBytes(file), source)
+                    addProtoInternal(dir.relativize(file).toString(), Files.readAllBytes(file), file, source)
                 }
                 if (file.endsWith("protomap")) {
                     scannedMapping += Files.readAllLines(file).mapNotNull {
@@ -82,9 +84,11 @@ open class ExtractProtoTask : SourceTask() {
         })
     }
 
-    private fun addProtoInternal(name: String, value: ByteArray, source: Boolean) {
+    private fun addProtoInternal(name: String, value: ByteArray, file: Path, source: Boolean) {
         if (source) {
-            sourceProtos.add(name.toUnixPath())
+            val protoName = name.toUnixPath()
+            sourceProtos.add(protoName)
+            sourceFileMapping[protoName] = URI(file.toUri().toURL().path).path
         }
         val targetFile = protoPath.toPath().resolve(name)
         Files.createDirectories(targetFile.parent)
@@ -133,6 +137,7 @@ open class ExtractProtoTask : SourceTask() {
         Files.write(Paths.get(protoPath.toPath().toString(), "protodesc.pb"), desc.toByteArray())
         Files.write(Paths.get(protoPath.toPath().toString(), "protomap"), scannedMapping.map { "${it.key}=${it.value}" })
         Files.write(Paths.get(protoPath.toPath().toString(), "protosrc"), sourceProtos)
+        Files.write(Paths.get(protoPath.toPath().toString(), "protofile"), sourceFileMapping.map { "${it.key}=${it.value}" })
 
         val enableServices = protobuf.service?.apis?.map { it.name }?.toSet()
         val releaseProtos = mutableSetOf<String>()

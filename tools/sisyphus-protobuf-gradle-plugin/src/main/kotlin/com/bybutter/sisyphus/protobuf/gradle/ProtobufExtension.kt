@@ -13,6 +13,8 @@ open class ProtobufExtension {
 
     val service get() = serviceConfig
 
+    val linter = ApiLinterConfig()
+
     var autoGenerating = true
 
     fun sourceSet(name: String, block: ProtoGeneratingConfig.() -> Unit = {}): ProtoGeneratingConfig {
@@ -25,6 +27,10 @@ open class ProtobufExtension {
         serviceConfig = serviceConfig?.invoke(block) ?: Service(block)
     }
 
+    fun linter(block: ApiLinterConfig.() -> Unit) {
+        linter.block()
+    }
+
     fun packageMapping(proto: String, kotlin: String) {
         packageMapping[proto] = kotlin
     }
@@ -33,5 +39,7 @@ open class ProtobufExtension {
         packageMapping.putAll(mapping)
     }
 }
+
+data class ApiLinterConfig(var version: String? = null, val enableRules: MutableSet<String> = mutableSetOf(), val disableRules: MutableSet<String> = mutableSetOf(), val excludeFiles: MutableSet<String> = mutableSetOf())
 
 data class ProtoGeneratingConfig(var inputDir: String? = null, var outputDir: String? = null, var implDir: String? = null, var resourceOutputDir: String? = null)
