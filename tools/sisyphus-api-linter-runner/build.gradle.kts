@@ -7,7 +7,3 @@ plugins {
 }
 
 description = "Runner and executable manager for Google API Linter on java"
-
-dependencies {
-    implementation(Dependencies.Spring.Boot.boot)
-}
