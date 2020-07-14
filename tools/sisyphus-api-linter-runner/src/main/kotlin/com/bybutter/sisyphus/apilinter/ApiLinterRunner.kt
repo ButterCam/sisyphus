@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.apilinter
 
 import java.io.BufferedReader
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -19,9 +20,13 @@ class ApiLinterRunner {
             apiLinterCmd.add(arg)
         }
         println("api-linter executing: $apiLinterCmd")
-        val process = ProcessBuilder(apiLinterCmd).start()
+        val process = ProcessBuilder(apiLinterCmd).redirectErrorStream(true).start()
         val result = process.text()
-        process.waitFor()
+        val exitCode = process.waitFor()
+        if (exitCode != 0) {
+            println("api-linter: $result")
+            throw IllegalStateException("Api linter return with non-zero value '$exitCode'.")
+        }
         return result
     }
 
@@ -29,13 +34,17 @@ class ApiLinterRunner {
         val osName = System.getProperties().getProperty("os.name").normalize()
         val platform = detectPlatform(osName)
         val srcFilePath = Paths.get(version, "api-linter-$version-$platform.exe").toString()
-        val srcFile = this.javaClass.classLoader.getResource(srcFilePath)
-                ?: throw UnsupportedOperationException("Unsupported api linter version $version or platform $osName.")
+        val srcFile = this.javaClass.classLoader.getResource(srcFilePath.replace(File.separatorChar, '/'))
+            ?: throw UnsupportedOperationException("Unsupported api linter version $version for platform $osName.")
         val executable = createTempBinDir().resolve("apilinter.exe")
         srcFile.openStream().use {
             Files.copy(it, executable)
         }
-        Files.setPosixFilePermissions(executable, setOf(PosixFilePermission.OWNER_EXECUTE))
+        when (platform) {
+            "darwin", "linux" -> {
+                Files.setPosixFilePermissions(executable, setOf(PosixFilePermission.OWNER_EXECUTE))
+            }
+        }
         return executable.also {
             it.toFile().deleteOnExit()
         }
