@@ -5,7 +5,7 @@ import com.bybutter.sisyphus.cel.grammar.CelParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
-class CelEngine(global: Map<String, Any?>, val runtime: CelRuntime = CelRuntime()) {
+class CelEngine(global: Map<String, Any?> = mapOf(), val runtime: CelRuntime = CelRuntime()) {
     val context = CelContext(this, global)
 
     fun eval(cel: String): Any? {
@@ -21,7 +21,9 @@ class CelEngine(global: Map<String, Any?>, val runtime: CelRuntime = CelRuntime(
     companion object {
         fun parse(cel: String): CelParser.StartContext {
             val lexer = CelLexer(CharStreams.fromString(cel))
+            lexer.addErrorListener(CelErrorListener)
             val parser = CelParser(CommonTokenStream(lexer))
+            parser.addErrorListener(CelErrorListener)
             return parser.start()
         }
     }

@@ -286,7 +286,9 @@ class MessageFilter(filter: String, val runtime: FilterRuntime = FilterRuntime()
     companion object {
         fun parse(filter: String): FilterParser.FilterContext {
             val lexer = FilterLexer(CharStreams.fromString(filter))
+            lexer.addErrorListener(FilterSyntaxErrorListener)
             val parser = FilterParser(CommonTokenStream(lexer))
+            parser.addErrorListener(FilterSyntaxErrorListener)
             return parser.filter()
         }
     }
