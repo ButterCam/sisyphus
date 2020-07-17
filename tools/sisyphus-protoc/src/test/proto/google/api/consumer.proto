@@ -38,8 +38,8 @@ option java_package = "com.google.api";
 //      - name: EXTENDED_TILE_CACHE_PERIOD
 //        type: INT64
 message ProjectProperties {
-    // List of per consumer project-specific properties.
-    repeated Property properties = 1;
+  // List of per consumer project-specific properties.
+  repeated Property properties = 1;
 }
 
 // Defines project properties.
@@ -53,30 +53,30 @@ message ProjectProperties {
 // These values can be set via API producer console. Only API providers can
 // define and set these properties.
 message Property {
-    // Supported data type of the property values
-    enum PropertyType {
-        // The type is unspecified, and will result in an error.
-        UNSPECIFIED = 0;
+  // Supported data type of the property values
+  enum PropertyType {
+    // The type is unspecified, and will result in an error.
+    UNSPECIFIED = 0;
 
-        // The type is `int64`.
-        INT64 = 1;
+    // The type is `int64`.
+    INT64 = 1;
 
-        // The type is `bool`.
-        BOOL = 2;
+    // The type is `bool`.
+    BOOL = 2;
 
-        // The type is `string`.
-        STRING = 3;
+    // The type is `string`.
+    STRING = 3;
 
-        // The type is 'double'.
-        DOUBLE = 4;
-    }
+    // The type is 'double'.
+    DOUBLE = 4;
+  }
 
-    // The name of the property (a.k.a key).
-    string name = 1;
+  // The name of the property (a.k.a key).
+  string name = 1;
 
-    // The type of this property.
-    PropertyType type = 2;
+  // The type of this property.
+  PropertyType type = 2;
 
-    // The description of the property
-    string description = 3;
+  // The description of the property
+  string description = 3;
 }

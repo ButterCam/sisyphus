@@ -6,9 +6,9 @@ option java_package = "com.bybutter.sisyphus.api.paging";
 option objc_class_prefix = "SIS";
 
 message NameAnchorPaging {
-    string name = 1;
+  string name = 1;
 }
 
 message OffsetPaging {
-    int32 offset = 1;
+  int32 offset = 1;
 }

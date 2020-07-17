@@ -32,7 +32,7 @@ dependencies {
         api("org.apache.maven.wagon:wagon-http:3.4.1")
         api("org.junit.jupiter:junit-jupiter:5.6.2")
         api("org.reflections:reflections:0.9.12")
-        api("com.squareup.okhttp3:okhttp:4.7.2")
+        api("com.squareup.okhttp3:okhttp:4.8.0")
         api("com.squareup.retrofit2:retrofit:2.9.0")
         api("io.github.resilience4j:resilience4j-retrofit:1.5.0")
         api("org.antlr:antlr4:4.8")
@@ -46,11 +46,11 @@ dependencies {
         api("com.github.ben-manes:gradle-versions-plugin:0.28.0")
         api("com.netflix.nebula:nebula-publishing-plugin:17.3.0")
         api("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
-        api("com.netflix.nebula:gradle-info-plugin:8.3.1")
+        api("com.netflix.nebula:gradle-info-plugin:8.3.2")
         api("org.gradle.kotlin:plugins:1.3.6")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
         api("org.eclipse.jgit:org.eclipse.jgit:5.7.0.202003110725-r")
         api("com.palantir.gradle.docker:gradle-docker:0.25.0")
-        api("io.grpc:grpc-kotlin-stub:0.1.3")
+        api("io.grpc:grpc-kotlin-stub:0.1.4")
     }
 }

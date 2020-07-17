@@ -8,5 +8,5 @@ option java_package = "com.bybutter.sisyphus.protobuf";
 option objc_class_prefix = "SIS";
 
 extend google.protobuf.EnumValueOptions {
-    string string = 26051;
+  string string = 26051;
 }

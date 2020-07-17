@@ -26,6 +26,6 @@ option objc_class_prefix = "GAPI";
 
 // Source information used to create a Service Config
 message SourceInfo {
-    // All files used during config generation.
-    repeated google.protobuf.Any source_files = 1;
+  // All files used during config generation.
+  repeated google.protobuf.Any source_files = 1;
 }

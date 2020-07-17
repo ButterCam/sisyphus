@@ -25,24 +25,24 @@ option objc_class_prefix = "GAPI";
 
 // A description of a label.
 message LabelDescriptor {
-    // Value types that can be used as label values.
-    enum ValueType {
-        // A variable-length string. This is the default.
-        STRING = 0;
+  // Value types that can be used as label values.
+  enum ValueType {
+    // A variable-length string. This is the default.
+    STRING = 0;
 
-        // Boolean; true or false.
-        BOOL = 1;
+    // Boolean; true or false.
+    BOOL = 1;
 
-        // A 64-bit signed integer.
-        INT64 = 2;
-    }
+    // A 64-bit signed integer.
+    INT64 = 2;
+  }
 
-    // The label key.
-    string key = 1;
+  // The label key.
+  string key = 1;
 
-    // The type of data that can be assigned to the label.
-    ValueType value_type = 2;
+  // The type of data that can be assigned to the label.
+  ValueType value_type = 2;
 
-    // A human-readable description for the label.
-    string description = 3;
+  // A human-readable description for the label.
+  string description = 3;
 }

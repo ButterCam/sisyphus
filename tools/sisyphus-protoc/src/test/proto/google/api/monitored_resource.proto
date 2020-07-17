@@ -36,33 +36,33 @@ option objc_class_prefix = "GAPI";
 // provide a `list` method that returns the monitored resource descriptors used
 // by the API.
 message MonitoredResourceDescriptor {
-    // Optional. The resource name of the monitored resource descriptor:
-    // `"projects/{project_id}/monitoredResourceDescriptors/{type}"` where
-    // {type} is the value of the `type` field in this object and
-    // {project_id} is a project ID that provides API-specific context for
-    // accessing the type.  APIs that do not use project information can use the
-    // resource name format `"monitoredResourceDescriptors/{type}"`.
-    string name = 5;
+  // Optional. The resource name of the monitored resource descriptor:
+  // `"projects/{project_id}/monitoredResourceDescriptors/{type}"` where
+  // {type} is the value of the `type` field in this object and
+  // {project_id} is a project ID that provides API-specific context for
+  // accessing the type.  APIs that do not use project information can use the
+  // resource name format `"monitoredResourceDescriptors/{type}"`.
+  string name = 5;
 
-    // Required. The monitored resource type. For example, the type
-    // `"cloudsql_database"` represents databases in Google Cloud SQL.
-    // The maximum length of this value is 256 characters.
-    string type = 1;
+  // Required. The monitored resource type. For example, the type
+  // `"cloudsql_database"` represents databases in Google Cloud SQL.
+  // The maximum length of this value is 256 characters.
+  string type = 1;
 
-    // Optional. A concise name for the monitored resource type that might be
-    // displayed in user interfaces. It should be a Title Cased Noun Phrase,
-    // without any article or other determiners. For example,
-    // `"Google Cloud SQL Database"`.
-    string display_name = 2;
+  // Optional. A concise name for the monitored resource type that might be
+  // displayed in user interfaces. It should be a Title Cased Noun Phrase,
+  // without any article or other determiners. For example,
+  // `"Google Cloud SQL Database"`.
+  string display_name = 2;
 
-    // Optional. A detailed description of the monitored resource type that might
-    // be used in documentation.
-    string description = 3;
+  // Optional. A detailed description of the monitored resource type that might
+  // be used in documentation.
+  string description = 3;
 
-    // Required. A set of labels used to describe instances of this monitored
-    // resource type. For example, an individual Google Cloud SQL database is
-    // identified by values for the labels `"database_id"` and `"zone"`.
-    repeated LabelDescriptor labels = 4;
+  // Required. A set of labels used to describe instances of this monitored
+  // resource type. For example, an individual Google Cloud SQL database is
+  // identified by values for the labels `"database_id"` and `"zone"`.
+  repeated LabelDescriptor labels = 4;
 }
 
 // An object representing a resource that can be used for monitoring, logging,
@@ -79,15 +79,15 @@ message MonitoredResourceDescriptor {
 //       "labels": { "instance_id": "12345678901234",
 //                   "zone": "us-central1-a" }}
 message MonitoredResource {
-    // Required. The monitored resource type. This field must match
-    // the `type` field of a [MonitoredResourceDescriptor][google.api.MonitoredResourceDescriptor] object. For
-    // example, the type of a Compute Engine VM instance is `gce_instance`.
-    string type = 1;
+  // Required. The monitored resource type. This field must match
+  // the `type` field of a [MonitoredResourceDescriptor][google.api.MonitoredResourceDescriptor] object. For
+  // example, the type of a Compute Engine VM instance is `gce_instance`.
+  string type = 1;
 
-    // Required. Values for all of the labels listed in the associated monitored
-    // resource descriptor. For example, Compute Engine VM instances use the
-    // labels `"project_id"`, `"instance_id"`, and `"zone"`.
-    map<string, string> labels = 2;
+  // Required. Values for all of the labels listed in the associated monitored
+  // resource descriptor. For example, Compute Engine VM instances use the
+  // labels `"project_id"`, `"instance_id"`, and `"zone"`.
+  map<string, string> labels = 2;
 }
 
 // Auxiliary metadata for a [MonitoredResource][google.api.MonitoredResource] object.
@@ -97,19 +97,19 @@ message MonitoredResource {
 // pipeline to extract metadata for cloud resources of all types , and stores
 // the metadata in this message.
 message MonitoredResourceMetadata {
-    // Output only. Values for predefined system metadata labels.
-    // System labels are a kind of metadata extracted by Google Stackdriver.
-    // Stackdriver determines what system labels are useful and how to obtain
-    // their values. Some examples: "machine_image", "vpc", "subnet_id",
-    // "security_group", "name", etc.
-    // System label values can be only strings, Boolean values, or a list of
-    // strings. For example:
-    //
-    //     { "name": "my-test-instance",
-    //       "security_group": ["a", "b", "c"],
-    //       "spot_instance": false }
-    google.protobuf.Struct system_labels = 1;
+  // Output only. Values for predefined system metadata labels.
+  // System labels are a kind of metadata extracted by Google Stackdriver.
+  // Stackdriver determines what system labels are useful and how to obtain
+  // their values. Some examples: "machine_image", "vpc", "subnet_id",
+  // "security_group", "name", etc.
+  // System label values can be only strings, Boolean values, or a list of
+  // strings. For example:
+  //
+  //     { "name": "my-test-instance",
+  //       "security_group": ["a", "b", "c"],
+  //       "spot_instance": false }
+  google.protobuf.Struct system_labels = 1;
 
-    // Output only. A map of user-defined metadata labels.
-    map<string, string> user_labels = 2;
+  // Output only. A map of user-defined metadata labels.
+  map<string, string> user_labels = 2;
 }

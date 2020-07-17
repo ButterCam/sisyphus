@@ -54,29 +54,29 @@ option objc_class_prefix = "GAPI";
 //         logs:
 //         - activity_history
 message Logging {
-    // Configuration of a specific logging destination (the producer project
-    // or the consumer project).
-    message LoggingDestination {
-        // The monitored resource type. The type must be defined in the
-        // [Service.monitored_resources][google.api.Service.monitored_resources] section.
-        string monitored_resource = 3;
+  // Configuration of a specific logging destination (the producer project
+  // or the consumer project).
+  message LoggingDestination {
+    // The monitored resource type. The type must be defined in the
+    // [Service.monitored_resources][google.api.Service.monitored_resources] section.
+    string monitored_resource = 3;
 
-        // Names of the logs to be sent to this destination. Each name must
-        // be defined in the [Service.logs][google.api.Service.logs] section. If the log name is
-        // not a domain scoped name, it will be automatically prefixed with
-        // the service name followed by "/".
-        repeated string logs = 1;
-    }
+    // Names of the logs to be sent to this destination. Each name must
+    // be defined in the [Service.logs][google.api.Service.logs] section. If the log name is
+    // not a domain scoped name, it will be automatically prefixed with
+    // the service name followed by "/".
+    repeated string logs = 1;
+  }
 
-    // Logging configurations for sending logs to the producer project.
-    // There can be multiple producer destinations, each one must have a
-    // different monitored resource type. A log can be used in at most
-    // one producer destination.
-    repeated LoggingDestination producer_destinations = 1;
+  // Logging configurations for sending logs to the producer project.
+  // There can be multiple producer destinations, each one must have a
+  // different monitored resource type. A log can be used in at most
+  // one producer destination.
+  repeated LoggingDestination producer_destinations = 1;
 
-    // Logging configurations for sending logs to the consumer project.
-    // There can be multiple consumer destinations, each one must have a
-    // different monitored resource type. A log can be used in at most
-    // one consumer destination.
-    repeated LoggingDestination consumer_destinations = 2;
+  // Logging configurations for sending logs to the consumer project.
+  // There can be multiple consumer destinations, each one must have a
+  // different monitored resource type. A log can be used in at most
+  // one consumer destination.
+  repeated LoggingDestination consumer_destinations = 2;
 }

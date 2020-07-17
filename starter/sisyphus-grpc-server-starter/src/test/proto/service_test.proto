@@ -3,16 +3,16 @@ syntax = "proto3";
 package com.bybutter.sisyphus.starter.grpc.test;
 
 message Request {
-    int32 value = 1;
+  int32 value = 1;
 }
 
 message Response {
-    string value = 1;
+  string value = 1;
 }
 
 service RpcService {
-    rpc SayHello (Request) returns (Response);
-    rpc SayHelloStream (Request) returns (stream Response);
-    rpc SayHelloStream2 (stream Request) returns (Response);
-    rpc SayHelloStream3 (stream Request) returns (stream Response);
+  rpc SayHello (Request) returns (Response);
+  rpc SayHelloStream (Request) returns (stream Response);
+  rpc SayHelloStream2 (stream Request) returns (Response);
+  rpc SayHelloStream3 (stream Request) returns (stream Response);
 }

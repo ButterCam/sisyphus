@@ -2,11 +2,11 @@ plugins {
     `java-library`
     `kotlin-dsl`
     id("idea")
-    id("com.bybutter.sisyphus.project") version "0.0.4-M0"
+    id("com.bybutter.sisyphus.project") version "0.0.4"
 }
 
 dependencies {
-    implementation(platform("com.bybutter.sisyphus:sisyphus-dependencies:0.0.4-M0"))
+    implementation(platform("com.bybutter.sisyphus:sisyphus-dependencies:0.0.4"))
     implementation("com.bybutter.sisyphus.tools:sisyphus-protobuf-gradle-plugin")
     implementation("com.bybutter.sisyphus.tools:sisyphus-project-gradle-plugin")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")

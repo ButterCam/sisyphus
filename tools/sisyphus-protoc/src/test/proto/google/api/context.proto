@@ -40,23 +40,23 @@ option objc_class_prefix = "GAPI";
 // Available context types are defined in package
 // `google.rpc.context`.
 message Context {
-    // A list of RPC context rules that apply to individual API methods.
-    //
-    // **NOTE:** All service configuration rules follow "last one wins" order.
-    repeated ContextRule rules = 1;
+  // A list of RPC context rules that apply to individual API methods.
+  //
+  // **NOTE:** All service configuration rules follow "last one wins" order.
+  repeated ContextRule rules = 1;
 }
 
 // A context rule provides information about the context for an individual API
 // element.
 message ContextRule {
-    // Selects the methods to which this rule applies.
-    //
-    // Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
-    string selector = 1;
+  // Selects the methods to which this rule applies.
+  //
+  // Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+  string selector = 1;
 
-    // A list of full type names of requested contexts.
-    repeated string requested = 2;
+  // A list of full type names of requested contexts.
+  repeated string requested = 2;
 
-    // A list of full type names of provided contexts.
-    repeated string provided = 3;
+  // A list of full type names of provided contexts.
+  repeated string provided = 3;
 }

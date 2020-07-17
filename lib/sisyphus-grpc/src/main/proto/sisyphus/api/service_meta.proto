@@ -8,9 +8,9 @@ option java_package = "com.bybutter.sisyphus.api";
 option objc_class_prefix = "SIS";
 
 message ServiceMetadata {
-    string name = 1;
+  string name = 1;
 }
 
 extend google.protobuf.ServiceOptions {
-    ServiceMetadata metadata = 26051;
+  ServiceMetadata metadata = 26051;
 }

@@ -29,56 +29,56 @@ option objc_class_prefix = "GAPI";
 // applicable advice about potential consequences for the change, such as
 // backwards-incompatibility.
 message ConfigChange {
-    // Object hierarchy path to the change, with levels separated by a '.'
-    // character. For repeated fields, an applicable unique identifier field is
-    // used for the index (usually selector, name, or id). For maps, the term
-    // 'key' is used. If the field has no unique identifier, the numeric index
-    // is used.
-    // Examples:
-    // - visibility.rules[selector=="google.LibraryService.CreateBook"].restriction
-    // - quota.metric_rules[selector=="google"].metric_costs[key=="reads"].value
-    // - logging.producer_destinations[0]
-    string element = 1;
+  // Object hierarchy path to the change, with levels separated by a '.'
+  // character. For repeated fields, an applicable unique identifier field is
+  // used for the index (usually selector, name, or id). For maps, the term
+  // 'key' is used. If the field has no unique identifier, the numeric index
+  // is used.
+  // Examples:
+  // - visibility.rules[selector=="google.LibraryService.CreateBook"].restriction
+  // - quota.metric_rules[selector=="google"].metric_costs[key=="reads"].value
+  // - logging.producer_destinations[0]
+  string element = 1;
 
-    // Value of the changed object in the old Service configuration,
-    // in JSON format. This field will not be populated if ChangeType == ADDED.
-    string old_value = 2;
+  // Value of the changed object in the old Service configuration,
+  // in JSON format. This field will not be populated if ChangeType == ADDED.
+  string old_value = 2;
 
-    // Value of the changed object in the new Service configuration,
-    // in JSON format. This field will not be populated if ChangeType == REMOVED.
-    string new_value = 3;
+  // Value of the changed object in the new Service configuration,
+  // in JSON format. This field will not be populated if ChangeType == REMOVED.
+  string new_value = 3;
 
-    // The type for this change, either ADDED, REMOVED, or MODIFIED.
-    ChangeType change_type = 4;
+  // The type for this change, either ADDED, REMOVED, or MODIFIED.
+  ChangeType change_type = 4;
 
-    // Collection of advice provided for this change, useful for determining the
-    // possible impact of this change.
-    repeated Advice advices = 5;
+  // Collection of advice provided for this change, useful for determining the
+  // possible impact of this change.
+  repeated Advice advices = 5;
 }
 
 // Generated advice about this change, used for providing more
 // information about how a change will affect the existing service.
 message Advice {
-    // Useful description for why this advice was applied and what actions should
-    // be taken to mitigate any implied risks.
-    string description = 2;
+  // Useful description for why this advice was applied and what actions should
+  // be taken to mitigate any implied risks.
+  string description = 2;
 }
 
 // Classifies set of possible modifications to an object in the service
 // configuration.
 enum ChangeType {
-    // No value was provided.
-    CHANGE_TYPE_UNSPECIFIED = 0;
+  // No value was provided.
+  CHANGE_TYPE_UNSPECIFIED = 0;
 
-    // The changed object exists in the 'new' service configuration, but not
-    // in the 'old' service configuration.
-    ADDED = 1;
+  // The changed object exists in the 'new' service configuration, but not
+  // in the 'old' service configuration.
+  ADDED = 1;
 
-    // The changed object exists in the 'old' service configuration, but not
-    // in the 'new' service configuration.
-    REMOVED = 2;
+  // The changed object exists in the 'old' service configuration, but not
+  // in the 'new' service configuration.
+  REMOVED = 2;
 
-    // The changed object exists in both service configurations, but its value
-    // is different.
-    MODIFIED = 3;
+  // The changed object exists in both service configurations, but its value
+  // is different.
+  MODIFIED = 3;
 }

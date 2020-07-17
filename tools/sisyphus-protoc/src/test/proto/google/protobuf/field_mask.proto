@@ -240,6 +240,6 @@ option cc_enable_arenas = true;
 // request should verify the included field paths, and return an
 // `INVALID_ARGUMENT` error if any path is duplicated or unmappable.
 message FieldMask {
-    // The set of field mask paths.
-    repeated string paths = 1;
+  // The set of field mask paths.
+  repeated string paths = 1;
 }
