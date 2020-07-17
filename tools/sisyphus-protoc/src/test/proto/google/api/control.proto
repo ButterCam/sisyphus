@@ -26,7 +26,7 @@ option objc_class_prefix = "GAPI";
 // service controller handles features like abuse, quota, billing, logging,
 // monitoring, etc.
 message Control {
-    // The service control environment to use. If empty, no control plane
-    // feature (like quota and billing) will be enabled.
-    string environment = 1;
+  // The service control environment to use. If empty, no control plane
+  // feature (like quota and billing) will be enabled.
+  string environment = 1;
 }

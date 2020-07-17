@@ -68,107 +68,107 @@ option objc_class_prefix = "GAPI";
 //         requirements:
 //           provider_id: google_calendar_auth
 message Service {
-    // The semantic version of the service configuration. The config version
-    // affects the interpretation of the service configuration. For example,
-    // certain features are enabled by default for certain config versions.
-    // The latest config version is `3`.
-    google.protobuf.UInt32Value config_version = 20;
+  // The semantic version of the service configuration. The config version
+  // affects the interpretation of the service configuration. For example,
+  // certain features are enabled by default for certain config versions.
+  // The latest config version is `3`.
+  google.protobuf.UInt32Value config_version = 20;
 
-    // The DNS address at which this service is available,
-    // e.g. `calendar.googleapis.com`.
-    string name = 1;
+  // The DNS address at which this service is available,
+  // e.g. `calendar.googleapis.com`.
+  string name = 1;
 
-    // A unique ID for a specific instance of this message, typically assigned
-    // by the client for tracking purpose. If empty, the server may choose to
-    // generate one instead.
-    string id = 33;
+  // A unique ID for a specific instance of this message, typically assigned
+  // by the client for tracking purpose. If empty, the server may choose to
+  // generate one instead.
+  string id = 33;
 
-    // The product title for this service.
-    string title = 2;
+  // The product title for this service.
+  string title = 2;
 
-    // The Google project that owns this service.
-    string producer_project_id = 22;
+  // The Google project that owns this service.
+  string producer_project_id = 22;
 
-    // A list of API interfaces exported by this service. Only the `name` field
-    // of the [google.protobuf.Api][google.protobuf.Api] needs to be provided by the configuration
-    // author, as the remaining fields will be derived from the IDL during the
-    // normalization process. It is an error to specify an API interface here
-    // which cannot be resolved against the associated IDL files.
-    repeated google.protobuf.Api apis = 3;
+  // A list of API interfaces exported by this service. Only the `name` field
+  // of the [google.protobuf.Api][google.protobuf.Api] needs to be provided by the configuration
+  // author, as the remaining fields will be derived from the IDL during the
+  // normalization process. It is an error to specify an API interface here
+  // which cannot be resolved against the associated IDL files.
+  repeated google.protobuf.Api apis = 3;
 
-    // A list of all proto message types included in this API service.
-    // Types referenced directly or indirectly by the `apis` are
-    // automatically included.  Messages which are not referenced but
-    // shall be included, such as types used by the `google.protobuf.Any` type,
-    // should be listed here by name. Example:
-    //
-    //     types:
-    //     - name: google.protobuf.Int32
-    repeated google.protobuf.Type types = 4;
+  // A list of all proto message types included in this API service.
+  // Types referenced directly or indirectly by the `apis` are
+  // automatically included.  Messages which are not referenced but
+  // shall be included, such as types used by the `google.protobuf.Any` type,
+  // should be listed here by name. Example:
+  //
+  //     types:
+  //     - name: google.protobuf.Int32
+  repeated google.protobuf.Type types = 4;
 
-    // A list of all enum types included in this API service.  Enums
-    // referenced directly or indirectly by the `apis` are automatically
-    // included.  Enums which are not referenced but shall be included
-    // should be listed here by name. Example:
-    //
-    //     enums:
-    //     - name: google.someapi.v1.SomeEnum
-    repeated google.protobuf.Enum enums = 5;
+  // A list of all enum types included in this API service.  Enums
+  // referenced directly or indirectly by the `apis` are automatically
+  // included.  Enums which are not referenced but shall be included
+  // should be listed here by name. Example:
+  //
+  //     enums:
+  //     - name: google.someapi.v1.SomeEnum
+  repeated google.protobuf.Enum enums = 5;
 
-    // Additional API documentation.
-    Documentation documentation = 6;
+  // Additional API documentation.
+  Documentation documentation = 6;
 
-    // API backend configuration.
-    Backend backend = 8;
+  // API backend configuration.
+  Backend backend = 8;
 
-    // HTTP configuration.
-    Http http = 9;
+  // HTTP configuration.
+  Http http = 9;
 
-    // Quota configuration.
-    Quota quota = 10;
+  // Quota configuration.
+  Quota quota = 10;
 
-    // Auth configuration.
-    Authentication authentication = 11;
+  // Auth configuration.
+  Authentication authentication = 11;
 
-    // Context configuration.
-    Context context = 12;
+  // Context configuration.
+  Context context = 12;
 
-    // Configuration controlling usage of this service.
-    Usage usage = 15;
+  // Configuration controlling usage of this service.
+  Usage usage = 15;
 
-    // Configuration for network endpoints.  If this is empty, then an endpoint
-    // with the same name as the service is automatically generated to service all
-    // defined APIs.
-    repeated Endpoint endpoints = 18;
+  // Configuration for network endpoints.  If this is empty, then an endpoint
+  // with the same name as the service is automatically generated to service all
+  // defined APIs.
+  repeated Endpoint endpoints = 18;
 
-    // Configuration for the service control plane.
-    Control control = 21;
+  // Configuration for the service control plane.
+  Control control = 21;
 
-    // Defines the logs used by this service.
-    repeated LogDescriptor logs = 23;
+  // Defines the logs used by this service.
+  repeated LogDescriptor logs = 23;
 
-    // Defines the metrics used by this service.
-    repeated MetricDescriptor metrics = 24;
+  // Defines the metrics used by this service.
+  repeated MetricDescriptor metrics = 24;
 
-    // Defines the monitored resources used by this service. This is required
-    // by the [Service.monitoring][google.api.Service.monitoring] and [Service.logging][google.api.Service.logging] configurations.
-    repeated MonitoredResourceDescriptor monitored_resources = 25;
+  // Defines the monitored resources used by this service. This is required
+  // by the [Service.monitoring][google.api.Service.monitoring] and [Service.logging][google.api.Service.logging] configurations.
+  repeated MonitoredResourceDescriptor monitored_resources = 25;
 
-    // Billing configuration.
-    Billing billing = 26;
+  // Billing configuration.
+  Billing billing = 26;
 
-    // Logging configuration.
-    Logging logging = 27;
+  // Logging configuration.
+  Logging logging = 27;
 
-    // Monitoring configuration.
-    Monitoring monitoring = 28;
+  // Monitoring configuration.
+  Monitoring monitoring = 28;
 
-    // System parameter configuration.
-    SystemParameters system_parameters = 29;
+  // System parameter configuration.
+  SystemParameters system_parameters = 29;
 
-    // Output only. The source information for this configuration if available.
-    SourceInfo source_info = 37;
+  // Output only. The source information for this configuration if available.
+  SourceInfo source_info = 37;
 
-    // Experimental configuration.
-    reserved 101;
+  // Experimental configuration.
+  reserved 101;
 }

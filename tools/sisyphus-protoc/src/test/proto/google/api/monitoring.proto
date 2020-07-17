@@ -62,27 +62,27 @@ option objc_class_prefix = "GAPI";
 //         - library.googleapis.com/book/returned_count
 //         - library.googleapis.com/book/overdue_count
 message Monitoring {
-    // Configuration of a specific monitoring destination (the producer project
-    // or the consumer project).
-    message MonitoringDestination {
-        // The monitored resource type. The type must be defined in
-        // [Service.monitored_resources][google.api.Service.monitored_resources] section.
-        string monitored_resource = 1;
+  // Configuration of a specific monitoring destination (the producer project
+  // or the consumer project).
+  message MonitoringDestination {
+    // The monitored resource type. The type must be defined in
+    // [Service.monitored_resources][google.api.Service.monitored_resources] section.
+    string monitored_resource = 1;
 
-        // Names of the metrics to report to this monitoring destination.
-        // Each name must be defined in [Service.metrics][google.api.Service.metrics] section.
-        repeated string metrics = 2;
-    }
+    // Names of the metrics to report to this monitoring destination.
+    // Each name must be defined in [Service.metrics][google.api.Service.metrics] section.
+    repeated string metrics = 2;
+  }
 
-    // Monitoring configurations for sending metrics to the producer project.
-    // There can be multiple producer destinations, each one must have a
-    // different monitored resource type. A metric can be used in at most
-    // one producer destination.
-    repeated MonitoringDestination producer_destinations = 1;
+  // Monitoring configurations for sending metrics to the producer project.
+  // There can be multiple producer destinations, each one must have a
+  // different monitored resource type. A metric can be used in at most
+  // one producer destination.
+  repeated MonitoringDestination producer_destinations = 1;
 
-    // Monitoring configurations for sending metrics to the consumer project.
-    // There can be multiple consumer destinations, each one must have a
-    // different monitored resource type. A metric can be used in at most
-    // one consumer destination.
-    repeated MonitoringDestination consumer_destinations = 2;
+  // Monitoring configurations for sending metrics to the consumer project.
+  // There can be multiple consumer destinations, each one must have a
+  // different monitored resource type. A metric can be used in at most
+  // one consumer destination.
+  repeated MonitoringDestination consumer_destinations = 2;
 }
