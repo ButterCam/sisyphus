@@ -38,5 +38,5 @@ jobs:
       - name: Publish with Gradle
         run: gradle publish
       - name: Publish plugins to Gradle Portal
-        if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
+        if: ${{ github.event_name == 'release' }}
         run: gradle publishPlugins
