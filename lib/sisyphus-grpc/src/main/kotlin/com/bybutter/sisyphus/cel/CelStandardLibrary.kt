@@ -281,7 +281,7 @@ open class CelStandardLibrary {
         return key in map
     }
 
-    // string.(string) -> bool
+    // string.contains(string) -> bool
     open fun String.contains(other: String): Boolean {
         return this.contains(other, false)
     }

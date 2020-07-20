@@ -18,4 +18,9 @@ contacts {
         github = "yuxin-zhao"
         roles.add("maintainer")
     })
+    addPerson("jane.zhangjin@outlook.com", delegateClosureOf<nebula.plugin.contacts.Contact> {
+        moniker = "ZhangJin"
+        github = "ZhangJin233"
+        roles.add("tester")
+    })
 }
