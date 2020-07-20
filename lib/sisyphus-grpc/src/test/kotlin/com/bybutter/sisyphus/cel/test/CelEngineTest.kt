@@ -23,49 +23,49 @@ class CelEngineTest {
         engine.assertEvalResult(""" 'this is string'.endsWith(type('')) """, true)
         engine.assertEvalResult(""" 'this is string'.matches('') """, false)
         engine.assertEvalResult(""" 'this is string'.startsWith('abc') """, false)
-        engine.assertEvalResult("""!true""", false)
-        engine.assertEvalResult("""!false""", true)
-        engine.assertEvalResult("""-(2)""", -2L)
-        engine.assertEvalResult("""2u""", 2UL)
-        engine.assertEvalResult("""-(2.00)""", -2.0)
-        engine.assertEvalResult("""1 == 1""", true)
-        engine.assertEvalResult("""1 == 0""", false)
-        engine.assertEvalResult("""1 % 2""", 1L)
-        engine.assertEvalResult("""1u % 2u""", 1UL)
-        engine.assertEvalResult("""false && true""", false)
-        engine.assertEvalResult("""true && false""", false)
-        engine.assertEvalResult("""true && true""", true)
-        engine.assertEvalResult("""1 * 2""", 2L)
-        engine.assertEvalResult("""1.00 * 2.00""", 2.0)
-        engine.assertEvalResult("""1u * 2u""", 2UL)
-        engine.assertEvalResult("""1.00 + 2.00""", 3.0)
-        engine.assertEvalResult("""'abc' + 'def'""", "abcdef")
-        engine.assertEvalResult("""1u + 2u""", 3UL)
-        engine.assertEvalResult("""3 - 2""", 1L)
-        engine.assertEvalResult("""3.00 - 2.00""", 1.0)
-        engine.assertEvalResult("""3 - 4""", -1L)
-        engine.assertEvalResult("""3u - 3u""", 0UL)
-        engine.assertEvalResult("""3.00 / 3.00""", 1.0)
-        engine.assertEvalResult("""3u / 3u""", 1UL)
-        engine.assertEvalResult("""(1,2) + (3,4)""", (4L))
+        engine.assertEvalResult(""" !true """, false)
+        engine.assertEvalResult(""" !false """, true)
+        engine.assertEvalResult(""" -(2) """, -2L)
+        engine.assertEvalResult(""" 2u """, 2UL)
+        engine.assertEvalResult(""" -(2.00) """, -2.0)
+        engine.assertEvalResult(""" 1 == 1 """, true)
+        engine.assertEvalResult(""" 1 == 0 """, false)
+        engine.assertEvalResult(""" 1 % 2 """, 1L)
+        engine.assertEvalResult(""" 1u % 2u """, 1UL)
+        engine.assertEvalResult(""" 1 * 2 """, 2L)
+        engine.assertEvalResult(""" 1.00 * 2.00 """, 2.0)
+        engine.assertEvalResult(""" 1u * 2u """, 2UL)
+        engine.assertEvalResult(""" 1.00 + 2.00 """, 3.0)
+        engine.assertEvalResult(""" 'abc' + 'def' """, "abcdef")
+        engine.assertEvalResult(""" 1u + 2u """, 3UL)
+        engine.assertEvalResult(""" 3 - 2 """, 1L)
+        engine.assertEvalResult(""" 3.00 - 2.00 """, 1.0)
+        engine.assertEvalResult(""" 3 - 4 """, -1L)
+        engine.assertEvalResult(""" 3u - 3u """, 0UL)
+        engine.assertEvalResult(""" 3.00 / 3.00 """, 1.0)
+        engine.assertEvalResult(""" 3u / 3u """, 1UL)
     }
 
     @Test
     fun `test byteArray cel eval`() {
         val engine = CelEngine(mapOf(
             "left" to byteArrayOf(1, 2),
-            "right" to byteArrayOf(3)
+            "right" to byteArrayOf(3),
+            "value" to byteArrayOf()
         ))
-        engine.assertEvalResult("""left + right'""", byteArrayOf(1, 2, 3))
+        engine.assertEvalResult("""left + right""", byteArrayOf(1, 2, 3))
+        engine.assertEvalResult("""left + value""", byteArrayOf(1, 2))
     }
 
     @Test
     fun `test list cel eval`() {
         val engine = CelEngine(mapOf(
             "left" to listOf<Long>(1L, 2L),
-            "right" to listOf<Long>(3L)
+            "right" to listOf<Long>(3L),
+            "value" to listOf<Long>()
         ))
         engine.assertEvalResult("""left + right""", listOf(1L, 2L, 3L))
+        engine.assertEvalResult("""left + value""", listOf(1L, 2L))
     }
 
     @Test
@@ -118,8 +118,8 @@ class CelEngineTest {
             "left" to byteArrayOf(1, 2),
             "right" to byteArrayOf(1, 2)
         ))
-        engine.assertEvalResult("""left = right'""", byteArrayOf(1, 2))
-        engine.assertEvalResult("""left > right'""", false)
+        engine.assertEvalResult("""left == right""", false)
+        engine.assertEvalResult("""left > right""", false)
         engine.assertEvalResult("""type(left)""", "bytes")
         engine.assertEvalResult("""size(left)""", 2L)
         engine.assertEvalResult("""string(left)""", "AQI")
@@ -131,32 +131,32 @@ class CelEngineTest {
             "left" to byteArrayOf(1, 2, 3),
             "right" to byteArrayOf(1, 2)
         ))
-        engine.assertEvalResult("""left = right'""", byteArrayOf(1, 2, 3))
-        engine.assertEvalResult("""left > right'""", true)
-        engine.assertEvalResult("""left < right'""", false)
+        engine.assertEvalResult("""left == right""", false)
+        engine.assertEvalResult("""left > right""", true)
+        engine.assertEvalResult("""left < right""", false)
     }
 
     @Test
     fun `test conditional cel eval`() {
         val engine = CelEngine(mapOf(
-            "conditional" to true,
+            "value" to true,
             "value1" to 1L,
             "value2" to 3L
         ))
-        engine.assertEvalResult("""conditional? value1 : value2""", 1L)
+        engine.assertEvalResult("""value? value1 : value2""", 1L)
 
         val engine2 = CelEngine(mapOf(
-            "conditional" to false,
+            "value" to false,
             "value1" to 1L,
             "value2" to 3L
         ))
-        engine2.assertEvalResult("""conditional? value1 : value2""", 3L)
+        engine2.assertEvalResult("""value? value1 : value2""", 3L)
 
         val engine3 = CelEngine(mapOf(
-            "conditional" to false,
+            "value" to false,
             "value2" to 3L
         ))
-        engine3.assertEvalResult("""conditional? value1 : value2""", 3L)
+        engine3.assertEvalResult("""value? value1 : value2""", 3L)
     }
 
     @Test
@@ -240,12 +240,20 @@ class CelEngineTest {
     @Test
     fun `test logicalOr cel eval`() {
         val engine = CelEngine(mapOf())
-        engine.assertEvalResult(""" true || false""", true)
-        engine.assertEvalResult(""" false || true""", true)
-        engine.assertEvalResult(""" true || true""", true)
-        engine.assertEvalResult(""" false || false""", false)
+        engine.assertEvalResult(""" true || false """, true)
+        engine.assertEvalResult(""" false || true """, true)
+        engine.assertEvalResult(""" true || true """, true)
+        engine.assertEvalResult(""" false || false """, false)
     }
 
+    @Test
+    fun `test logicalAnd cel eval`() {
+        val engine = CelEngine(mapOf())
+        engine.assertEvalResult(""" true && false """, false)
+        engine.assertEvalResult(""" false && true """, false)
+        engine.assertEvalResult(""" true && true """, true)
+        engine.assertEvalResult(""" false && false """, false)
+    }
     @Test
     fun `test double type conversion`() {
         val engine = CelEngine(mapOf())
@@ -259,7 +267,7 @@ class CelEngineTest {
     @Test
     fun `test type denotation`() {
         val engine = CelEngine(mapOf())
-        engine.assertEvalResult("""type(12345678901L)""", "int")
+        engine.assertEvalResult("""type(12345678901)""", "int")
         engine.assertEvalResult("""type(123u)""", "uint")
         engine.assertEvalResult("""type(1.0)""", "double")
         engine.assertEvalResult("""type(null)""", "null_type")
@@ -313,7 +321,7 @@ class CelEngineTest {
     @Test
     fun `test string type conversion`() {
         val engine = CelEngine(mapOf())
-        engine.assertEvalResult("""string(12L)""", "12")
+        engine.assertEvalResult("""string(12)""", "12")
         engine.assertEvalResult("""string(12u)""", "12")
         engine.assertEvalResult("""string(12.0)""", "12.0")
     }
@@ -321,7 +329,7 @@ class CelEngineTest {
     @Test
     fun `test uint type conversion`() {
         val engine = CelEngine(mapOf())
-        engine.assertEvalResult("""uint(12L)""", 12UL)
+        engine.assertEvalResult("""uint(12)""", 12UL)
         engine.assertEvalResult("""uint(12.0)""", 12UL)
         engine.assertEvalResult("""uint('12')""", 12UL)
     }
@@ -374,7 +382,7 @@ class CelEngineTest {
         val result7 = engine.eval("""value.map(x,x == 1)""")
         val result8 = engine.eval("""value.map(x,x * x)""")
         val result9 = engine.eval("""value.filter(x,x % 2 > 0)""")
-        val result10 = engine.eval("""value.filter(x,x > 3""")
+        val result10 = engine.eval("""value.filter(x,x >= 3)""")
         Assertions.assertEquals(result, true)
         Assertions.assertEquals(result2, false)
         Assertions.assertEquals(result3, true)
@@ -384,7 +392,7 @@ class CelEngineTest {
         Assertions.assertEquals(result7, arrayListOf(true, false))
         Assertions.assertEquals(result8, arrayListOf(1L, 9L))
         Assertions.assertEquals(result9, arrayListOf(1L, 3L))
-        Assertions.assertEquals(result10, arrayListOf<Int>())
+        Assertions.assertEquals(result10, arrayListOf(3L))
     }
 
     @Test
