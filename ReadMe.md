@@ -1,6 +1,6 @@
 # Sisyphus  
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom)](https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom) [![Dependencies](https://img.shields.io/librariesio/release/maven/com.bybutter.sisyphus:sisyphus-dependencies)](https://libraries.io/maven/com.bybutter.sisyphus:sisyphus-dependencies)
+![JDK version](https://img.shields.io/badge/jdk-11-green?logo=java) ![Gradle Version](https://img.shields.io/badge/gradle-%5E6.5-green?logo=gradle) [![Maven Central](https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom)](https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom) [![Dependencies](https://img.shields.io/librariesio/release/maven/com.bybutter.sisyphus:sisyphus-dependencies)](https://libraries.io/maven/com.bybutter.sisyphus:sisyphus-dependencies)
 
 Sisyphus is the way how we provide backend services. It integrates all tools and libraries needed for designing API which follows the [Google API Improvement Proposals](https://aip.bybutter.com).
 
