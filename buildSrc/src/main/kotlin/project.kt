@@ -47,6 +47,16 @@ val Project.lib: Project
         return this
     }
 
+val Project.proto: Project
+    get() {
+        group = "com.bybutter.sisyphus.proto"
+
+        pluginManager.apply(JavaLibraryPlugin::class.java)
+        pluginManager.apply(SisyphusProjectPlugin::class.java)
+
+        return this
+    }
+
 val Project.starter: Project
     get() {
         next

@@ -15,6 +15,7 @@ dependencies {
     api(Dependencies.Kotlin.Coroutines.reactor)
     api(Dependencies.Kotlin.Coroutines.guava)
     api(Dependencies.Proto.base)
+    api(project(":proto:sisyphus-grpc-protos"))
 
     implementation(project(":lib:sisyphus-jackson"))
     implementation(project(":lib:sisyphus-common"))
@@ -22,6 +23,7 @@ dependencies {
     implementation(Dependencies.Kotlin.reflect)
 
     proto(Dependencies.Proto.grpcProto)
+    proto(project(":proto:sisyphus-grpc-protos"))
     antlr(Dependencies.antlr4)
 }
 

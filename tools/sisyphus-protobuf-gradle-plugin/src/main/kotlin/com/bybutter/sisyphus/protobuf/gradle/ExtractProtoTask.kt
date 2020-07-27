@@ -28,10 +28,10 @@ open class ExtractProtoTask : SourceTask() {
     @get:OutputDirectory
     lateinit var protoPath: File
 
-    @get:Internal
+    @get:InputFiles
     lateinit var protoConfig: Configuration
 
-    @get:Internal
+    @get:InputFiles
     lateinit var protoApiConfig: Configuration
 
     @get:Internal
