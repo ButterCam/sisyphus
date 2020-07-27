@@ -79,7 +79,7 @@ object Dependencies {
         const val base = "$group:protobuf-java"
         const val apiCompiler = "com.google.api:api-compiler:0.0.8"
 
-        const val runtimeProto = "$group:protobuf-java:3.11.4"
+        const val runtimeProto = "$group:protobuf-java:3.12.2"
         const val grpcProto = "com.google.api.grpc:proto-google-common-protos:1.18.0"
     }
 
