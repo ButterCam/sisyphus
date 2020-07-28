@@ -113,8 +113,6 @@ class ProtobufPlugin : Plugin<Project> {
             it.description = "Extract protos for '${sourceSet.name}' source set."
             it.protobuf = extension
 
-            it.source(inputDir)
-
             it.dependsOn(target.proto(sourceSet))
             it.dependsOn(target.protoApi(sourceSet))
         }.get()
@@ -150,7 +148,6 @@ class ProtobufPlugin : Plugin<Project> {
             it.description = "Generate protos for '${sourceSet.name}' source set."
 
             it.dependsOn(extractTask)
-            it.source(extractTask.protoPath)
         }.get()
 
         target.extensions.findByType(IdeaModel::class.java)?.apply {

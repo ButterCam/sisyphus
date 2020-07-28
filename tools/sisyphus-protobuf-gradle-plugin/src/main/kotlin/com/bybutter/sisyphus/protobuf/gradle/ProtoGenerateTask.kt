@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.io.replaceExtensionName
 import com.bybutter.sisyphus.protobuf.ProtoFileMeta
 import com.bybutter.sisyphus.protobuf.compiler.ProtobufGenerateContext
 import com.google.protobuf.DescriptorProtos
+import org.gradle.api.DefaultTask
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -12,7 +13,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 
-open class ProtoGenerateTask : SourceTask() {
+open class ProtoGenerateTask : DefaultTask() {
     @get:InputDirectory
     lateinit var protoPath: File
 
