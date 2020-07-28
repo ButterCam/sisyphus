@@ -73,16 +73,18 @@
 -  Add LICENSE [[59e9ae3](https://github.com/ButterCam/sisyphus/commit/59e9ae38ac8cece9fac5cf054eb3dcc5cd7436fe)]
 
 
-<a name="0.0.6-M0"></a>
-## 0.0.6-M0 (2020-07-27)
+<a name="0.0.6-M1"></a>
+## 0.0.6-M1 (2020-07-28)
 
 ### Changed
 
-- 🔧 Add gitmoji changelog support [[1bfb19f](https://github.com/ButterCam/sisyphus/commit/1bfb19f1358722e87962b92b08641d6b2bc0dfa8)]
+- ⬆️ Upgrade dependencies ⬆️ Spring Boot 2.3.1 -&gt; 2.3.2 ⬆️ Swagger 2.1.3 -&gt; 2.1.4 ⬆️ Nebula Gradle Info 8.3.2 -&gt; 8.4.0 ⬆️ JGit 5.7.0.202003110725-r -&gt; 5.7.0.202007141445-r [[c3c8b4b](https://github.com/ButterCam/sisyphus/commit/c3c8b4b0c2780c5daa320363ce7be03fbc4a156a)]
+- 🔧 Add gitmoji changelog support ([#56](https://github.com/ButterCam/sisyphus/issues/56)) [[f14eb09](https://github.com/ButterCam/sisyphus/commit/f14eb09a041acdab830b0baf9aa972ca0f0e4821)]
 - ♻️ Separate proto from lib module ([#55](https://github.com/ButterCam/sisyphus/issues/55)) [[26a1121](https://github.com/ButterCam/sisyphus/commit/26a1121e4265d31982970820e76715e29547b934)]
 
 ### Miscellaneous
 
+- 📝 Update changelog [[a86b7e4](https://github.com/ButterCam/sisyphus/commit/a86b7e49b091843bf07c2d872f1c8e5b41a60c1f)]
 -  Add gradle and jdk badge ([#54](https://github.com/ButterCam/sisyphus/issues/54)) [[a99e5e0](https://github.com/ButterCam/sisyphus/commit/a99e5e03c6d8be25801e09c0fb2a987fefd089bf)]
 -  Add unit tests for sisyphus-grpc cel module ([#49](https://github.com/ButterCam/sisyphus/issues/49)) [[a8cf64d](https://github.com/ButterCam/sisyphus/commit/a8cf64dcd410f26186c99630e83da948527f99a9)]
 -  Throw exception when running cel with syntax error ([#53](https://github.com/ButterCam/sisyphus/issues/53)) [[f9ecd10](https://github.com/ButterCam/sisyphus/commit/f9ecd10049698f600e2f30704d0df2c4736bf86b)]

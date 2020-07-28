@@ -7,12 +7,12 @@ import com.google.protobuf.DescriptorProtos
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 
-open class ProtoGenerateTask : SourceTask() {
+open class ProtoGenerateTask : DefaultTask() {
     @get:InputDirectory
     lateinit var protoPath: File
 

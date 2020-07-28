@@ -10,15 +10,15 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
+import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 
-open class ExtractProtoTask : SourceTask() {
+open class ExtractProtoTask : DefaultTask() {
     @get:InputFiles
     lateinit var input: FileCollection
 
