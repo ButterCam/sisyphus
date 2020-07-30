@@ -6,7 +6,8 @@ data class RedisProperty(
     val name: String?,
     val host: String,
     val port: Int,
-    val password: String
+    val password: String,
+    val database: Int?
 )
 
 data class RedisProperties(
