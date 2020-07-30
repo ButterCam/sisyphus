@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.data
 
 import java.nio.ByteBuffer
-import java.util.Arrays
 
 fun ByteArray.hash(): Int {
     return this.contentHashCode()
