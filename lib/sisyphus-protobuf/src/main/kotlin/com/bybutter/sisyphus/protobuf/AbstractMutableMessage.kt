@@ -159,21 +159,21 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
                 if (target.label == FieldDescriptorProto.Label.REPEATED) {
                     this[target.name] = if (source.label == FieldDescriptorProto.Label.REPEATED) {
                         message.get<List<Any>>(source.name).mapNotNull {
-                            buildMessage(source.type, it)
+                            buildTypeMessage(source.type, it)
                         }
                     } else {
-                        listOf(buildMessage(source.type, message[source.name]) ?: continue)
+                        listOf(buildTypeMessage(source.type, message[source.name]) ?: continue)
                     }
                     continue
                 }
                 if (source.label != FieldDescriptorProto.Label.REPEATED) {
-                    this[target.name] = buildMessage(source.type, message[source.name]) ?: continue
+                    this[target.name] = buildTypeMessage(source.type, message[source.name]) ?: continue
                 }
             }
         }
     }
 
-    private fun buildMessage(type: FieldDescriptorProto.Type, value: Any): Message<*, *>? {
+    private fun buildTypeMessage(type: FieldDescriptorProto.Type, value: Any): Message<*, *>? {
         return when (type) {
             DOUBLE -> DoubleValue { this.value = value as Double }
             FLOAT -> FloatValue { this.value = value as Float }

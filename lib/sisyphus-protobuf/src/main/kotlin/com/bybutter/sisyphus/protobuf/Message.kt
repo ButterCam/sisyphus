@@ -139,7 +139,7 @@ interface MutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Messa
     /**
      * Copy another message to current mutable message.
      *
-     * Will overwrite current mutable message value
+     * Will overwrite current mutable message value.
      * */
     fun copyFrom(message: Message<*, *>)
 
