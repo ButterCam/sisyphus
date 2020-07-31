@@ -32,6 +32,10 @@ interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
 
     fun fieldDescriptors(): List<FieldDescriptorProto>
 
+    fun fieldDescriptorOrNull(fieldName: String): FieldDescriptorProto?
+
+    fun fieldDescriptorOrNull(fieldNumber: Int): FieldDescriptorProto?
+
     fun fieldDescriptor(fieldName: String): FieldDescriptorProto
 
     fun fieldDescriptor(fieldNumber: Int): FieldDescriptorProto
@@ -123,14 +127,28 @@ interface MutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Messa
     fun clear(fieldNumber: Int): Any?
 
     /**
-     * Clear all optional and repeated fields
+     * Clear all optional and repeated fields.
      */
     fun clear()
 
     /**
-     * Merge another message to current mutable message
+     * Merge another message to current mutable message.
      */
     fun mergeWith(other: T?)
+
+    /**
+     * Copy another message to current mutable message.
+     *
+     * Will overwrite current mutable message value
+     * */
+    fun copyFrom(message: Message<*, *>)
+
+    /**
+     * Fill another message to current mutable message.
+     *
+     * Keep current mutable message value.
+     * */
+    fun fillFrom(message: Message<*, *>)
 
     fun readFrom(input: CodedInputStream, size: Int)
 }
