@@ -64,39 +64,82 @@ fun ByteArray.toByte(): Byte {
 
 fun ByteArray.toShort(): Short {
     return ByteBuffer.allocate(2).apply {
-        put(this@toShort)
+        put(this@toShort.wrapTo(2))
     }.getShort(0)
 }
 
 fun ByteArray.toInt(): Int {
     return ByteBuffer.allocate(4).apply {
-        put(this@toInt)
+        put(this@toInt.wrapTo(4))
     }.getInt(0)
 }
 
 fun ByteArray.toLong(): Long {
     return ByteBuffer.allocate(8).apply {
-        put(this@toLong)
+        put(this@toLong.wrapTo(8))
     }.getLong(0)
 }
 
 fun ByteArray.toFloat(): Float {
     return ByteBuffer.allocate(4).apply {
-        put(this@toFloat)
+        put(this@toFloat.wrapTo(4))
     }.getFloat(0)
 }
 
 fun ByteArray.toDouble(): Double {
     return ByteBuffer.allocate(8).apply {
-        put(this@toDouble)
+        put(this@toDouble.wrapTo(8))
     }.getDouble(0)
 }
 
 fun ByteArray.wrapTo(size: Int): ByteArray {
     if (this.size < size) {
-        return ByteArray(size - this.size) + this
+        val result = ByteArray(size)
+        this.copyInto(result, size - this.size)
+        return result
     }
     return this
+}
+
+inline fun ByteArray.trim(predicate: (Byte) -> Boolean): ByteArray {
+    var startIndex = 0
+    var endIndex = size - 1
+    var startFound = false
+
+    while (startIndex <= endIndex) {
+        val index = if (!startFound) startIndex else endIndex
+        val match = predicate(this[index])
+
+        if (!startFound) {
+            if (!match)
+                startFound = true
+            else
+                startIndex += 1
+        } else {
+            if (!match)
+                break
+            else
+                endIndex -= 1
+        }
+    }
+
+    return copyOfRange(startIndex, endIndex + 1)
+}
+
+inline fun ByteArray.trimStart(predicate: (Byte) -> Boolean): ByteArray {
+    for (index in this.indices)
+        if (!predicate(this[index]))
+            return copyOfRange(index, size)
+
+    return byteArrayOf()
+}
+
+inline fun ByteArray.trimEnd(predicate: (Byte) -> Boolean): ByteArray {
+    for (index in this.indices.reversed())
+        if (!predicate(this[index]))
+            return copyOfRange(0, index + 1)
+
+    return byteArrayOf()
 }
 
 class ByteArrayHashingWrapper(val target: ByteArray) {
