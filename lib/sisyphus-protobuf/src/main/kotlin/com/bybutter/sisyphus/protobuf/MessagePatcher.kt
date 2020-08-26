@@ -121,8 +121,17 @@ class MessagePatcher : PatcherNode {
     }
 
     fun applyTo(message: MutableMessage<*, *>) {
-        val function = MutableMessage<*, *>::mergeWith as KFunction<Unit>
-        function.call(message, asMessage(message.type()))
+        for ((field, value) in nodes) {
+            if (message.getProperty(field) == null) {
+                continue
+            }
+
+            if(value is MessagePatcher && message.has(field)) {
+                value.applyTo(message[field])
+            } else {
+                message[field] = value.asField(message.fieldDescriptor(field), message.getProperty(field)!!)
+            }
+        }
     }
 
     @OptIn(InternalProtoApi::class)
@@ -138,12 +147,7 @@ class MessagePatcher : PatcherNode {
     @OptIn(InternalProtoApi::class)
     fun asMessage(type: String): Message<*, *> {
         return ProtoTypes.ensureSupportByProtoName(type).newMutable().apply {
-            for ((field, value) in nodes) {
-                if (this.getProperty(field) == null) {
-                    continue
-                }
-                this[field] = value.asField(this.fieldDescriptor(field), this.getProperty(field)!!)
-            }
+            applyTo(this)
         }
     }
 }
