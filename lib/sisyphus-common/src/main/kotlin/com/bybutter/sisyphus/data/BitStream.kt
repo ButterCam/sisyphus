@@ -1,53 +1,62 @@
 package com.bybutter.sisyphus.data
 
 import java.io.InputStream
-import kotlin.experimental.and
-import kotlin.experimental.inv
-import kotlin.experimental.or
+import java.io.OutputStream
+import java.util.BitSet
 
 class BitInputStream(private val source: InputStream) : InputStream() {
-    private var pos = 8
+    private var pos = -1
     private var byte: Int = 0
 
     override fun read(): Int {
-        if (pos > 7) {
+        if (pos < 0) {
             byte = source.read()
             if (byte == -1) {
                 return -1
             }
-            pos = 0
+            pos = 7
         }
 
-        return if (byte and (1 shl pos++) > 0) {
+        return if (byte and (1 shl pos--) > 0) {
             1
         } else {
             0
         }
     }
 
-    fun readBits(byteArray: ByteArray, bits: Int): Int {
-        if (bits > byteArray.size * 8) {
+    fun readBits(data: BitSet, bits: Int): Int {
+        if (bits > data.size()) {
             throw IllegalArgumentException()
         }
 
         var read = 0
-        for (i in 0 until bits) {
-            if (pos > 7) {
-                byte = source.read()
-                if (byte == -1) {
-                    break
-                }
-                pos = 0
+        loop@for (i in 0 until bits) {
+            when (read()) {
+                0 -> data.set(i, false)
+                1 -> data.set(i, true)
+                else -> break@loop
             }
-
             read++
-            if (byte and (1 shl pos++) > 0) {
-                byteArray[i / 8] = byteArray[i / 8] or (1 shl (i % 8)).toByte()
-            } else {
-                byteArray[i / 8] = byteArray[i / 8] and (1 shl (i % 8)).toByte().inv()
+        }
+        return read
+    }
+
+    fun readInt(value: IntArray, bits: Int): Int {
+        if (bits > 32) throw IllegalArgumentException("'bits' must less than or equal to 32.")
+        if (value.isEmpty()) throw IllegalArgumentException("'value' must not be empty.")
+        var int = 0
+
+        var read = 0
+        loop@for (i in 0 until bits) {
+            when (read()) {
+                1 -> int = int or (1 shl (bits - i - 1))
+                0 -> int
+                else -> break@loop
             }
+            read++
         }
 
+        value[0] = int
         return read
     }
 
@@ -80,92 +89,48 @@ class BitInputStream(private val source: InputStream) : InputStream() {
     }
 }
 
-class BitBuffer(private val data: ByteArray) {
-    private var pos = 0
+class BitOutputStream(private val target: OutputStream) : OutputStream() {
+    private var pos = 7
+    private var byte: Int = 0
 
-    fun read(): Int {
-        if (pos >= data.size * 8) {
-            return -1
+    override fun write(b: Int) {
+        if (b > 0) {
+            byte = byte or (1 shl pos)
         }
+        pos--
 
-        return if (data[pos / 8] and (1 shl (pos % 8)).toByte() > 0) {
-            1
-        } else {
-            0
-        }
-    }
-
-    fun write(value: Int): Int {
-        if (pos >= data.size * 8) {
-            return 0
-        }
-
-        if (value > 0) {
-            data[pos / 8] = data[pos / 8] or (1 shl (pos % 8)).toByte()
-        } else {
-            data[pos / 8] = data[pos / 8] and (1 shl (pos % 8)).toByte().inv()
-        }
-        pos++
-        return 1
-    }
-
-    fun readBits(byteArray: ByteArray, bits: Int): Int {
-        if (bits > byteArray.size * 8) {
-            throw IllegalArgumentException()
-        }
-
-        var read = 0
-        for (i in 0 until bits) {
-            if (pos >= data.size * 8) {
-                break
-            }
-
-            read++
-            if (data[pos / 8] and (1 shl (pos % 8)).toByte() > 0) {
-                byteArray[i / 8] = byteArray[i / 8] or (1 shl (i % 8)).toByte()
-            } else {
-                byteArray[i / 8] = byteArray[i / 8] and (1 shl (i % 8)).toByte().inv()
-            }
-            pos++
-        }
-
-        return read
-    }
-
-    fun writeBits(byteArray: ByteArray, bits: Int): Int {
-        if (bits > byteArray.size * 8) {
-            throw IllegalArgumentException()
-        }
-
-        var written = 0
-        for (i in 0 until bits) {
-            if (pos >= data.size * 8) {
-                break
-            }
-
-            written++
-            if (byteArray[i / 8] and (1 shl (i % 8)).toByte() > 0) {
-                data[pos / 8] = data[pos / 8] or (1 shl (pos % 8)).toByte()
-            } else {
-                data[pos / 8] = data[pos / 8] and (1 shl (pos % 8)).toByte().inv()
-            }
-            pos++
-        }
-
-        return written
-    }
-
-    fun seek(offset: Int): Int {
-        pos += offset
         if (pos < 0) {
-            pos = 0
-        } else if (pos > data.size * 8) {
-            pos = data.size * 8
+            target.write(byte)
+            byte = 0
+            pos = 7
         }
-        return pos
     }
 
-    fun toByteArray(): ByteArray {
-        return data
+    fun writeBits(data: BitSet, bits: Int) {
+        if (bits > data.size()) {
+            throw IllegalArgumentException()
+        }
+
+        for (i in 0 until bits) {
+            if (data[i]) {
+                write(1)
+            } else {
+                write(0)
+            }
+        }
+    }
+
+    fun writeInt(value: Int, bits: Int) {
+        for (i in 0 until bits) {
+            if (value and (1 shl (bits - i - 1)) > 0) {
+                write(1)
+            } else {
+                write(0)
+            }
+        }
+    }
+
+    override fun close() {
+        target.close()
     }
 }
