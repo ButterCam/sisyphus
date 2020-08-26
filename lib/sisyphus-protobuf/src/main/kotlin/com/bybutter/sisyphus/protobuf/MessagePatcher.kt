@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.security.base64Decode
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.isSubclassOf
@@ -126,7 +125,7 @@ class MessagePatcher : PatcherNode {
                 continue
             }
 
-            if(value is MessagePatcher && message.has(field)) {
+            if (value is MessagePatcher && message.has(field)) {
                 value.applyTo(message[field])
             } else {
                 message[field] = value.asField(message.fieldDescriptor(field), message.getProperty(field)!!)
