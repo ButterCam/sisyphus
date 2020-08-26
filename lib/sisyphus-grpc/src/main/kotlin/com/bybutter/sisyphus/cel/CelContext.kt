@@ -13,7 +13,6 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
     }
 
     fun visit(start: CelParser.StartContext): Any? {
-        val t = 1
         val expr = start.e ?: return null
         return visit(expr)
     }

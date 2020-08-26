@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.primitives.Empty
 import com.bybutter.sisyphus.rpc.Code
 import com.bybutter.sisyphus.rpc.STATUS_META_KEY
+import com.bybutter.sisyphus.security.base64
 import com.bybutter.sisyphus.security.base64UrlSafe
 import com.bybutter.sisyphus.starter.grpc.transcoding.util.toHttpStatus
 import com.bybutter.sisyphus.starter.webflux.DetectBodyInserter
@@ -60,10 +61,10 @@ class TranscodingCallListener(private val body: String) : ClientCall.Listener<Me
             }
             // No message returned by gRPC, maybe some unknown error happened.
             else -> builder.body(DetectBodyInserter(
-                    com.bybutter.sisyphus.rpc.Status {
-                        this.code = status.code.value()
-                        this.message = status.description ?: status.cause?.message ?: "Unknown"
-                    }
+                com.bybutter.sisyphus.rpc.Status {
+                    this.code = status.code.value()
+                    this.message = status.description ?: status.cause?.message ?: "Unknown"
+                }
             ))
         }
         this.response.onNext(response)
@@ -84,11 +85,11 @@ class TranscodingCallListener(private val body: String) : ClientCall.Listener<Me
             // Skip ignore headers.
             if (IGNORE_GRPC_HEADER.contains(key)) continue
             // Skip bin headers.
-            if (key.endsWith(Metadata.BINARY_HEADER_SUFFIX)) continue
-            // Skip gRPC headers.
-            if (key.startsWith("grpc-")) continue
-
-            header(key, metadata[Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER)])
+            if (key.endsWith(Metadata.BINARY_HEADER_SUFFIX)) {
+                header(key, metadata[Metadata.Key.of(key, Metadata.BINARY_BYTE_MARSHALLER)]?.base64())
+            } else {
+                header(key, metadata[Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER)])
+            }
         }
         return this
     }
