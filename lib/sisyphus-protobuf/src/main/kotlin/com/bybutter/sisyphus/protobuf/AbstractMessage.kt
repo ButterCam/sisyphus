@@ -40,15 +40,23 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
     }
 
     override fun fieldDescriptor(fieldName: String): FieldDescriptorProto {
-        return _support.fieldInfo(fieldName)
-            ?: _extensions.values.firstNotNull { it.fieldInfo(fieldName) }
+        return fieldDescriptorOrNull(fieldName)
             ?: throw IllegalArgumentException("Message not contains field definition of '$fieldName'.")
     }
 
     override fun fieldDescriptor(fieldNumber: Int): FieldDescriptorProto {
+        return fieldDescriptorOrNull(fieldNumber)
+                ?: throw IllegalArgumentException("Message not contains field definition of '$fieldNumber'.")
+    }
+
+    override fun fieldDescriptorOrNull(fieldName: String): FieldDescriptorProto? {
+        return _support.fieldInfo(fieldName)
+                ?: _extensions.values.firstNotNull { it.fieldInfo(fieldName) }
+    }
+
+    override fun fieldDescriptorOrNull(fieldNumber: Int): FieldDescriptorProto? {
         return _support.fieldInfo(fieldNumber)
                 ?: _extensions.values.firstNotNull { it.fieldInfo(fieldNumber) }
-                ?: throw IllegalArgumentException("Message not contains field definition of '$fieldNumber'.")
     }
 
     fun invalidCache() {
