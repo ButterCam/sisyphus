@@ -2,15 +2,15 @@ plugins {
     `java-library`
     `kotlin-dsl`
     id("idea")
-    id("com.bybutter.sisyphus.project") version "0.0.6-M2"
+    id("com.bybutter.sisyphus.project") version "0.0.6-M3"
 }
 
 dependencies {
-    implementation(platform("com.bybutter.sisyphus:sisyphus-dependencies:0.0.6-M2"))
+    implementation(platform("com.bybutter.sisyphus:sisyphus-dependencies:0.0.6-M3"))
     implementation("com.bybutter.sisyphus.tools:sisyphus-protobuf-gradle-plugin")
     implementation("com.bybutter.sisyphus.tools:sisyphus-project-gradle-plugin")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
-    implementation("org.jetbrains.kotlin:kotlin-allopen")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0")
+    implementation("org.jetbrains.kotlin:kotlin-allopen:1.4.0")
     implementation("org.springframework.boot:spring-boot-gradle-plugin")
     implementation("org.jlleitschuh.gradle:ktlint-gradle")
     implementation("com.github.ben-manes:gradle-versions-plugin")
