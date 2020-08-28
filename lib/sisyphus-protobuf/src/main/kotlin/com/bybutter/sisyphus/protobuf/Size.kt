@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.protobuf
 
 import com.google.protobuf.CodedOutputStream
 
-@OptIn(ExperimentalUnsignedTypes::class)
 object Size {
     fun ofEnum(field: Int, value: ProtoEnum?): Int {
         value ?: return 0
