@@ -6,6 +6,7 @@ import java.nio.file.Files
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Usage
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
@@ -69,6 +70,7 @@ class ProtobufPlugin : Plugin<Project> {
             isCanBeResolved = true
             isTransitive = false
             description = "Proto files to compile for source set '${sourceSet.name}'"
+            attributes.attribute(Usage.USAGE_ATTRIBUTE, target.objects.named(Usage::class.java, Usage.JAVA_API))
         }
     }
 
@@ -78,6 +80,7 @@ class ProtobufPlugin : Plugin<Project> {
             isCanBeConsumed = false
             isCanBeResolved = true
             extendsFrom(target.configurations.getByName(sourceSet.implementationConfigurationName))
+            attributes.attribute(Usage.USAGE_ATTRIBUTE, target.objects.named(Usage::class.java, Usage.JAVA_API))
         }
     }
 

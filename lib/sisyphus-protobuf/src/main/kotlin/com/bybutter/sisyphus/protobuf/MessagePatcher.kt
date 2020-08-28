@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.security.base64Decode
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.isSubclassOf
@@ -121,8 +120,17 @@ class MessagePatcher : PatcherNode {
     }
 
     fun applyTo(message: MutableMessage<*, *>) {
-        val function = MutableMessage<*, *>::mergeWith as KFunction<Unit>
-        function.call(message, asMessage(message.type()))
+        for ((field, value) in nodes) {
+            if (message.getProperty(field) == null) {
+                continue
+            }
+
+            if (value is MessagePatcher && message.has(field)) {
+                value.applyTo(message[field])
+            } else {
+                message[field] = value.asField(message.fieldDescriptor(field), message.getProperty(field)!!)
+            }
+        }
     }
 
     @OptIn(InternalProtoApi::class)
@@ -138,12 +146,7 @@ class MessagePatcher : PatcherNode {
     @OptIn(InternalProtoApi::class)
     fun asMessage(type: String): Message<*, *> {
         return ProtoTypes.ensureSupportByProtoName(type).newMutable().apply {
-            for ((field, value) in nodes) {
-                if (this.getProperty(field) == null) {
-                    continue
-                }
-                this[field] = value.asField(this.fieldDescriptor(field), this.getProperty(field)!!)
-            }
+            applyTo(this)
         }
     }
 }
