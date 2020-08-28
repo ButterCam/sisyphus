@@ -9,17 +9,11 @@ import com.bybutter.sisyphus.longrunning.Operation
 import com.bybutter.sisyphus.longrunning.OperationSupport
 import com.bybutter.sisyphus.longrunning.Operations
 import com.bybutter.sisyphus.longrunning.WaitOperationRequest
-import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
 import com.bybutter.sisyphus.protobuf.primitives.Empty
 import com.bybutter.sisyphus.rpc.Code
 import com.bybutter.sisyphus.rpc.StatusException
-import org.springframework.beans.factory.annotation.Autowired
 
-@RpcServiceImpl
-class Operations : Operations() {
-    @Autowired(required = false)
-    private val supports: List<OperationSupport> = listOf()
-
+class Operations(private val supports: Iterable<OperationSupport>) : Operations() {
     override suspend fun listOperations(input: ListOperationsRequest): ListOperationsResponse {
         for (repository in supports) {
             if (!repository.supportOperationParent(input.name)) continue
