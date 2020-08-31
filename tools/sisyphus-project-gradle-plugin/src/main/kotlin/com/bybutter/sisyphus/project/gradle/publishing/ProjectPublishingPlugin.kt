@@ -10,8 +10,10 @@ import org.gradle.api.publish.PublishingExtension
 
 class ProjectPublishingPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("nebula.maven-base-publish", ::apply) {
-            return
+        target.ensurePlugin("nebula.maven-base-publish") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         target.tryApplyPluginClass("nebula.plugin.info.InfoPlugin")

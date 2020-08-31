@@ -8,8 +8,10 @@ import org.gradle.api.Project
 
 class JavaBaseProjectPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("java-base", ::apply) {
-            return
+        target.ensurePlugin("java-base") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         val extension = target.extensions.getByType(SisyphusExtension::class.java)

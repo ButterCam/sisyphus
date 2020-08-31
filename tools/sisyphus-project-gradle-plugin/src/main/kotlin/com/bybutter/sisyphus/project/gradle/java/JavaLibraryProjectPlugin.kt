@@ -7,8 +7,10 @@ import org.gradle.api.Project
 
 class JavaLibraryProjectPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("java-library", ::apply) {
-            return
+        target.ensurePlugin("java-library") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         target.tryApplyPluginClass("nebula.plugin.publishing.maven.MavenPublishPlugin")

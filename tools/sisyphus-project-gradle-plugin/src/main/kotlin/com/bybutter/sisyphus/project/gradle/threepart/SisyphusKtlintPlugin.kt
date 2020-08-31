@@ -10,8 +10,10 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 class SisyphusKtlintPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("org.jlleitschuh.gradle.ktlint", ::apply) {
-            return
+        target.ensurePlugin("org.jlleitschuh.gradle.ktlint") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         val extension = target.extensions.getByType(KtlintExtension::class.java)
