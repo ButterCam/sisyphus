@@ -140,7 +140,7 @@ private data class ExchangeRate(
         val current: ExchangeRate by lazy {
             ExchangeRate::class.java.classLoader.getResources("exchangerate.json").asSequence().map {
                 it.readText().parseJson<ExchangeRate>()
-            }.maxByOrNull {
+            }.maxBy {
                 it.time_last_update_unix
             }?.apply {
                 rates[Money.STD] = rates.getValue("CNY") * 100
