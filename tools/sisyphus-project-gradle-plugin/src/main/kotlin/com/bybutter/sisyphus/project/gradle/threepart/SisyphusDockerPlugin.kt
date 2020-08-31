@@ -10,8 +10,10 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask
 
 class SisyphusDockerPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("application", ::apply) {
-            return
+        target.ensurePlugin("application") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         val dockerFile = target.projectDir.resolve("Dockerfile")

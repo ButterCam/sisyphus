@@ -7,11 +7,10 @@ import org.gradle.api.tasks.SourceSetContainer
 
 class SisyphusAntlrKotlinPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("org.gradle.antlr", ::apply) {
-            return
-        }
-        target.ensurePlugin("kotlin", ::apply) {
-            return
+        target.ensurePlugin("org.gradle.antlr", "kotlin") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         val sourceSets = target.extensions.getByType(SourceSetContainer::class.java)

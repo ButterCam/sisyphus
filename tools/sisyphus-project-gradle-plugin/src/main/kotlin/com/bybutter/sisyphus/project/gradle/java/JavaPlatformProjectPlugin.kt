@@ -9,8 +9,10 @@ import org.gradle.api.publish.maven.MavenPublication
 
 class JavaPlatformProjectPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("java-platform", ::apply) {
-            return
+        target.ensurePlugin("java-platform") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         target.tryApplyPluginClass("nebula.plugin.publishing.maven.MavenPublishPlugin")
