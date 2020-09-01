@@ -1,5 +1,25 @@
 # Changelog
 
+<a name="0.0.7"></a>
+## 0.0.7 (2020-08-31)
+
+### Fixed
+
+- 🐛 Workaround for crashing with project plugin(KT-37435) [[4792b9c](https://github.com/ButterCam/sisyphus/commit/4792b9cef990def1a15df9a723672ed18f432f4b)]
+
+
+<a name="0.0.6"></a>
+## 0.0.6 (2020-08-28)
+
+### Added
+
+- ✨ Common operation api support ([#65](https://github.com/ButterCam/sisyphus/issues/65)) [[6b1a442](https://github.com/ButterCam/sisyphus/commit/6b1a442b9f12e01dcd1405ffae7e551d9c054f8c)]
+
+### Changed
+
+- ⬆️ Upgrade to kotlin 1.4.0 ([#64](https://github.com/ButterCam/sisyphus/issues/64)) [[f67cc97](https://github.com/ButterCam/sisyphus/commit/f67cc97ae108ec2d4698d436564e321966869560)]
+
+
 <a name="0.0.5"></a>
 ## 0.0.5 (2020-07-17)
 
@@ -73,18 +93,48 @@
 -  Add LICENSE [[59e9ae3](https://github.com/ButterCam/sisyphus/commit/59e9ae38ac8cece9fac5cf054eb3dcc5cd7436fe)]
 
 
-<a name="0.0.6-M1"></a>
-## 0.0.6-M1 (2020-07-28)
+<a name="0.0.6-M3"></a>
+## 0.0.6-M3 (2020-08-27)
+
+### Added
+
+- ✨ Add copyFrom and fillFrom method for MutableMessage ([#62](https://github.com/ButterCam/sisyphus/issues/62)) [[3581332](https://github.com/ButterCam/sisyphus/commit/3581332d02041002bd0b711046d1690a304a2b51)]
+- ✨ Supported for redis database modification and add jooq page util ([#63](https://github.com/ButterCam/sisyphus/issues/63)) [[f6da309](https://github.com/ButterCam/sisyphus/commit/f6da3092a646c58e61ca4a049ab26165cdda3e78)]
+- ✨ Support base32 and more base coding ([#61](https://github.com/ButterCam/sisyphus/issues/61)) [[224db19](https://github.com/ButterCam/sisyphus/commit/224db198fc45acc82ec3082b02e9b89a9c663bd7)]
+- ✨ Support configure database for redis ([#60](https://github.com/ButterCam/sisyphus/issues/60)) [[25847f3](https://github.com/ButterCam/sisyphus/commit/25847f31b92a9de33576595da55501904edd6186)]
 
 ### Changed
 
-- ⬆️ Upgrade dependencies ⬆️ Spring Boot 2.3.1 -&gt; 2.3.2 ⬆️ Swagger 2.1.3 -&gt; 2.1.4 ⬆️ Nebula Gradle Info 8.3.2 -&gt; 8.4.0 ⬆️ JGit 5.7.0.202003110725-r -&gt; 5.7.0.202007141445-r [[c3c8b4b](https://github.com/ButterCam/sisyphus/commit/c3c8b4b0c2780c5daa320363ce7be03fbc4a156a)]
+- 🚸 Prepare upgrade to kotlin 1.4.0 [[8a3ed62](https://github.com/ButterCam/sisyphus/commit/8a3ed6241f7ac707e3bdaa090840d3f9e8c958d7)]
+
+
+<a name="0.0.6-M2"></a>
+## 0.0.6-M2 (2020-07-29)
+
+### Fixed
+
+- 🐛 Fix dependency of jGit ([#59](https://github.com/ButterCam/sisyphus/issues/59)) [[67f534e](https://github.com/ButterCam/sisyphus/commit/67f534e9c62833d32ba93bfd03fbc3c1f81f52e6)]
+
+
+<a name="0.0.6-M1"></a>
+## 0.0.6-M1 (2020-07-28)
+
+### Fixed
+
+- 🐛 Make configuration as proto generate task input ([#58](https://github.com/ButterCam/sisyphus/issues/58)) [[96334fd](https://github.com/ButterCam/sisyphus/commit/96334fde6b045cde9e2d429cd89aa546496bb820)]
+
+
+<a name="0.0.6-M0"></a>
+## 0.0.6-M0 (2020-07-27)
+
+### Changed
+
 - 🔧 Add gitmoji changelog support ([#56](https://github.com/ButterCam/sisyphus/issues/56)) [[f14eb09](https://github.com/ButterCam/sisyphus/commit/f14eb09a041acdab830b0baf9aa972ca0f0e4821)]
 - ♻️ Separate proto from lib module ([#55](https://github.com/ButterCam/sisyphus/issues/55)) [[26a1121](https://github.com/ButterCam/sisyphus/commit/26a1121e4265d31982970820e76715e29547b934)]
 
 ### Miscellaneous
 
-- 📝 Update changelog [[a86b7e4](https://github.com/ButterCam/sisyphus/commit/a86b7e49b091843bf07c2d872f1c8e5b41a60c1f)]
+- 📝 Update changelog ([#57](https://github.com/ButterCam/sisyphus/issues/57)) [[b647b6f](https://github.com/ButterCam/sisyphus/commit/b647b6fc5a5fd1c07ff604e08a99d7c368c5144c)]
 -  Add gradle and jdk badge ([#54](https://github.com/ButterCam/sisyphus/issues/54)) [[a99e5e0](https://github.com/ButterCam/sisyphus/commit/a99e5e03c6d8be25801e09c0fb2a987fefd089bf)]
 -  Add unit tests for sisyphus-grpc cel module ([#49](https://github.com/ButterCam/sisyphus/issues/49)) [[a8cf64d](https://github.com/ButterCam/sisyphus/commit/a8cf64dcd410f26186c99630e83da948527f99a9)]
 -  Throw exception when running cel with syntax error ([#53](https://github.com/ButterCam/sisyphus/issues/53)) [[f9ecd10](https://github.com/ButterCam/sisyphus/commit/f9ecd10049698f600e2f30704d0df2c4736bf86b)]

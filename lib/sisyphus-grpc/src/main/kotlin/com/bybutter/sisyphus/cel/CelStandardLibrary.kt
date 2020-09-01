@@ -31,7 +31,6 @@ import java.time.ZoneOffset
 import java.util.Arrays
 import java.util.concurrent.TimeUnit
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class CelStandardLibrary {
 
     // !_

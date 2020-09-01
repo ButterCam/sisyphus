@@ -8,9 +8,12 @@ import org.gradle.api.Project
 
 class ProjectContactsPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("nebula.maven-base-publish", ::apply) {
-            return
+        target.ensurePlugin("nebula.maven-base-publish") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
+
         try {
             Class.forName("nebula.plugin.contacts.ContactsExtension")
         } catch (ex: ClassNotFoundException) {

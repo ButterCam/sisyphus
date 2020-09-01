@@ -6,7 +6,6 @@ import com.google.protobuf.CodedInputStream
 import com.google.protobuf.WireFormat
 import kotlin.reflect.full.companionObjectInstance
 
-@OptIn(ExperimentalUnsignedTypes::class)
 object ProtoReader {
     fun <T : ProtoEnum> readEnum(input: CodedInputStream, clazz: Class<T>, field: Int, wire: Int): T? {
         return when (wire) {

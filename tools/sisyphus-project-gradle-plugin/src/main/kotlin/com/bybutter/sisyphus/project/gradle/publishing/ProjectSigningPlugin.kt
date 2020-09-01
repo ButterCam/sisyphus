@@ -10,8 +10,10 @@ import org.gradle.plugins.signing.SigningPlugin
 
 class ProjectSigningPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("nebula.maven-base-publish", ::apply) {
-            return
+        target.ensurePlugin("nebula.maven-base-publish") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         val sisyphus = target.extensions.getByType(SisyphusExtension::class.java)

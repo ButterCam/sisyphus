@@ -23,7 +23,6 @@ import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 import com.google.protobuf.CodedInputStream
 import com.google.protobuf.WireFormat
 
-@OptIn(ExperimentalUnsignedTypes::class)
 abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
     support: ProtoSupport<T, TM>
 ) : AbstractMessage<T, TM>(support), MutableMessage<T, TM> {

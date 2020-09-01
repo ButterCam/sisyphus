@@ -2,6 +2,6 @@
   "project": {
     "name": "sisyphus",
     "description": "Sisyphus is the way how we provide backend services.",
-    "version": "0.0.6-M1"
+    "version": "0.0.7"
   }
 }

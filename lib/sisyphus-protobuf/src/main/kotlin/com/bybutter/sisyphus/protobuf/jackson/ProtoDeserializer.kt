@@ -37,7 +37,6 @@ import kotlin.Boolean
 import kotlin.ByteArray
 import kotlin.Double
 import kotlin.Enum
-import kotlin.ExperimentalUnsignedTypes
 import kotlin.Float
 import kotlin.IllegalStateException
 import kotlin.Int
@@ -55,7 +54,6 @@ import kotlin.reflect.jvm.javaType
 import kotlin.toUInt
 import kotlin.toULong
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
 
     constructor(type: Class<T>) : super(type)
