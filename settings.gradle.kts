@@ -5,6 +5,7 @@ include("lib:sisyphus-dto")
 include("lib:sisyphus-jackson")
 include("lib:sisyphus-protobuf")
 include("lib:sisyphus-grpc")
+include("lib:sisyphus-test")
 
 include("tools:sisyphus-protoc")
 include("tools:sisyphus-project-gradle-plugin")
