@@ -1,8 +1,10 @@
 package com.bybutter.sisyphus.starter.grpc
 
+import com.bybutter.sisyphus.longrunning.OperationSupport
 import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
 import com.bybutter.sisyphus.rpc.GrpcServerConstants
 import com.bybutter.sisyphus.spring.BeanUtils
+import com.bybutter.sisyphus.starter.grpc.support.operation.Operations
 import com.bybutter.sisyphus.starter.grpc.support.reflection.ReflectionService
 import com.bybutter.sisyphus.starter.grpc.support.reflection.ReflectionServiceAlpha
 import io.grpc.BindableService
@@ -65,6 +67,8 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                 builder = builder.addStreamTracerFactory(factory)
             }
 
+            val operationSupports = BeanUtils.getBeans<OperationSupport>(beanFactory)
+            builder.addService(Operations(operationSupports.values.toList()))
             builder.addService(ReflectionServiceAlpha())
             builder.addService(ReflectionService())
 

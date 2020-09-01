@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf
 import com.google.protobuf.CodedOutputStream
 import com.google.protobuf.WireFormat
 
-@OptIn(ExperimentalUnsignedTypes::class)
 object ProtoWriter {
     fun writeEnum(output: CodedOutputStream, field: Int, value: ProtoEnum?) {
         value ?: return

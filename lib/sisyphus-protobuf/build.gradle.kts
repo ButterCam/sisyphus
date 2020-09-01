@@ -15,8 +15,10 @@ dependencies {
     implementation(Dependencies.Kotlin.Coroutines.guava)
     api(Dependencies.Kotlin.Coroutines.reactor)
     api(Dependencies.Proto.base)
+    api(project(":proto:sisyphus-protos"))
 
     proto(Dependencies.Proto.runtimeProto)
+    proto(project(":proto:sisyphus-protos"))
 }
 
 protobuf {

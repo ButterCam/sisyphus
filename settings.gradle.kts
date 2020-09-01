@@ -7,6 +7,9 @@ include("lib:sisyphus-protobuf")
 include("lib:sisyphus-grpc")
 include("lib:sisyphus-test")
 
+include("proto:sisyphus-protos")
+include("proto:sisyphus-grpc-protos")
+
 include("tools:sisyphus-protoc")
 include("tools:sisyphus-project-gradle-plugin")
 include("tools:sisyphus-protobuf-gradle-plugin")
