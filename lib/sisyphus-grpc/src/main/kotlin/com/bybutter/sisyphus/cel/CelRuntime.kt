@@ -17,7 +17,7 @@ import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.javaMethod
 
-open class CelRuntime(protected val macro: CelMacro = CelMacro(), protected val std: CelStandardLibrary = CelStandardLibrary()) {
+open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibrary = CelStandardLibrary()) {
     private val memberFunctions = mutableMapOf<String, MutableList<KFunction<*>>>()
 
     private val macroFunctions = mutableMapOf<String, MutableList<KFunction<*>>>()

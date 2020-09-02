@@ -34,7 +34,6 @@ import java.lang.reflect.Type
 import kotlin.math.round
 import kotlin.reflect.jvm.javaType
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
     companion object {
         private val oneOfCache = mutableMapOf<Type, String>()

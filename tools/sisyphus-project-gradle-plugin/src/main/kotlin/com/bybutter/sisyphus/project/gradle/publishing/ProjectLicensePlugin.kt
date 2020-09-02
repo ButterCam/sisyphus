@@ -10,11 +10,10 @@ import org.gradle.api.publish.maven.MavenPublication
 
 class ProjectLicensePlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.ensurePlugin("nebula.maven-base-publish", ::apply) {
-            return
-        }
-        target.ensurePlugin("nebula.info-scm", ::apply) {
-            return
+        target.ensurePlugin("nebula.maven-base-publish", "nebula.info-scm") {
+            apply(it)
+        }.also {
+            if (!it) return
         }
 
         val file = detectLicenseFile(target) ?: return

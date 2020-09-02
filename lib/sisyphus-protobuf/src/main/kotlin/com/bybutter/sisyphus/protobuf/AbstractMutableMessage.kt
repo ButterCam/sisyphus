@@ -1,9 +1,28 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.protobuf.primitives.BoolValue
+import com.bybutter.sisyphus.protobuf.primitives.BytesValue
+import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.BOOL
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.BYTES
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.DOUBLE
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.FLOAT
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.INT32
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.INT64
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.MESSAGE
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.STRING
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.UINT32
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.UINT64
+import com.bybutter.sisyphus.protobuf.primitives.FloatValue
+import com.bybutter.sisyphus.protobuf.primitives.Int32Value
+import com.bybutter.sisyphus.protobuf.primitives.Int64Value
+import com.bybutter.sisyphus.protobuf.primitives.StringValue
+import com.bybutter.sisyphus.protobuf.primitives.UInt32Value
+import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 import com.google.protobuf.CodedInputStream
 import com.google.protobuf.WireFormat
 
-@OptIn(ExperimentalUnsignedTypes::class)
 abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
     support: ProtoSupport<T, TM>
 ) : AbstractMessage<T, TM>(support), MutableMessage<T, TM> {
@@ -26,6 +45,14 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
         if (size != Int.MAX_VALUE && input.totalBytesRead - current != size) {
             throw IllegalStateException("Wrong message data at position $current with length $size.")
         }
+    }
+
+    override fun copyFrom(message: Message<*, *>) {
+        copyFrom(message, false)
+    }
+
+    override fun fillFrom(message: Message<*, *>) {
+        copyFrom(message, true)
     }
 
     override fun <T> set(fieldName: String, value: T) {
@@ -107,6 +134,56 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
     protected fun clearAllFieldInExtensions() {
         for ((_, extension) in _extensions) {
             extension.clear()
+        }
+    }
+
+    private fun copyFrom(message: Message<*, *>, keepOriginalValues: Boolean = false) {
+        for (source in message.descriptor().field) {
+            val target = this.fieldDescriptorOrNull(source.name) ?: continue
+
+            if (keepOriginalValues && this.has(source.name)) continue
+
+            if (target.type == source.type && target.typeName == source.typeName) {
+                if (target.label == source.label) {
+                    this[target.name] = message.get<Any>(source.name)
+                    continue
+                }
+                if (target.label == FieldDescriptorProto.Label.REPEATED) {
+                    this[target.name] = listOf(message.get<Any>(source.name))
+                    continue
+                }
+            }
+
+            if (target.type == MESSAGE && target.typeName == WellKnownTypes.ANY_TYPENAME) {
+                if (target.label == FieldDescriptorProto.Label.REPEATED) {
+                    this[target.name] = if (source.label == FieldDescriptorProto.Label.REPEATED) {
+                        message.get<List<Any>>(source.name).mapNotNull {
+                            buildTypeMessage(source.type, it)
+                        }
+                    } else {
+                        listOf(buildTypeMessage(source.type, message[source.name]) ?: continue)
+                    }
+                    continue
+                }
+                if (source.label != FieldDescriptorProto.Label.REPEATED) {
+                    this[target.name] = buildTypeMessage(source.type, message[source.name]) ?: continue
+                }
+            }
+        }
+    }
+
+    private fun buildTypeMessage(type: FieldDescriptorProto.Type, value: Any): Message<*, *>? {
+        return when (type) {
+            DOUBLE -> DoubleValue { this.value = value as Double }
+            FLOAT -> FloatValue { this.value = value as Float }
+            INT64 -> Int64Value { this.value = value as Long }
+            UINT64 -> UInt64Value { this.value = value as ULong }
+            INT32 -> Int32Value { this.value = value as Int }
+            BOOL -> BoolValue { this.value = value as Boolean }
+            STRING -> StringValue { this.value = value as String }
+            BYTES -> BytesValue { this.value = value as ByteArray }
+            UINT32 -> UInt32Value { this.value = value as UInt }
+            else -> null
         }
     }
 }

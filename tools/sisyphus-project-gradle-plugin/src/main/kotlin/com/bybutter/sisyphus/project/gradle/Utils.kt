@@ -4,6 +4,19 @@ import java.net.URI
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 
+internal fun Project.ensurePlugin(vararg ids: String, block: (Project) -> Unit): Boolean {
+    for (id in ids) {
+        if (!pluginManager.hasPlugin(id)) {
+            pluginManager.withPlugin(id) {
+                block(this)
+            }
+            return false
+        }
+    }
+
+    return true
+}
+
 internal inline fun Project.ensurePlugin(id: String, noinline block: (Project) -> Unit, returnBlock: () -> Unit) {
     if (!pluginManager.hasPlugin(id)) {
         pluginManager.withPlugin(id) {
