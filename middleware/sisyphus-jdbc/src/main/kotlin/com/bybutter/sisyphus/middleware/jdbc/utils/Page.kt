@@ -4,11 +4,11 @@ import com.bybutter.sisyphus.api.paging.OffsetPaging
 import com.bybutter.sisyphus.api.paging.invoke
 import com.bybutter.sisyphus.api.paging.nextPage
 import org.jooq.Record
-import org.jooq.SelectConditionStep
+import org.jooq.SelectLimitStep
 
 data class Page<T>(var data: List<T>, var nextToken: String?, var total: Int? = null)
 
-inline fun <reified T : Record> SelectConditionStep<T>.withPaging(pageToken: String, pageSize: Int, needTotal: Boolean = true): Page<T> {
+inline fun <reified T : Record> SelectLimitStep<T>.withPaging(pageToken: String, pageSize: Int, needTotal: Boolean = true): Page<T> {
     val offset = OffsetPaging(pageToken)?.offset
     val size = if (pageSize in 1..30) {
         pageSize
