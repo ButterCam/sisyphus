@@ -22,8 +22,11 @@ dependencies {
     implementation(Dependencies.Grpc.proto)
     implementation(Dependencies.Kotlin.reflect)
 
+    proto(platform(project(":sisyphus-dependencies")))
     proto(Dependencies.Proto.grpcProto)
     proto(project(":proto:sisyphus-grpc-protos"))
+
+    antlr(platform(project(":sisyphus-dependencies")))
     antlr(Dependencies.antlr4)
 }
 

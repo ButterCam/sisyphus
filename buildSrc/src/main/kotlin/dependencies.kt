@@ -80,10 +80,8 @@ object Dependencies {
         private const val group = "com.google.protobuf"
 
         const val base = "$group:protobuf-java"
-        const val apiCompiler = "com.google.api:api-compiler:0.0.8"
-
-        const val runtimeProto = "$group:protobuf-java:3.12.2"
-        const val grpcProto = "com.google.api.grpc:proto-google-common-protos:1.18.0"
+        const val apiCompiler = "com.google.api:api-compiler"
+        const val grpcProto = "com.google.api.grpc:proto-google-common-protos"
     }
 
     object Grpc {
@@ -148,7 +146,7 @@ object Dependencies {
 
     const val lettuce = "io.lettuce:lettuce-core"
 
-    const val antlr4 = "org.antlr:antlr4:4.8"
+    const val antlr4 = "org.antlr:antlr4"
 
     const val swagger = "io.swagger.core.v3:swagger-core"
 }
