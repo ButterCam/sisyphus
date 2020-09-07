@@ -45,7 +45,7 @@ class MessageQueueRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAw
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
 
-            val connectionName ="${name}ConnectionFactory"
+            val connectionName = "${name}ConnectionFactory"
             val connectionDefinition = BeanDefinitionBuilder.genericBeanDefinition(ConnectionFactory::class.java) {
                 val factory = beanFactory.getBean(AmqpTemplateFactory::class.java)
                 factory.createConnectionFactory(property)
