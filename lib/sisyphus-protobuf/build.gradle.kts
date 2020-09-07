@@ -17,7 +17,8 @@ dependencies {
     api(Dependencies.Proto.base)
     api(project(":proto:sisyphus-protos"))
 
-    proto(Dependencies.Proto.runtimeProto)
+    proto(platform(project(":sisyphus-dependencies")))
+    proto(Dependencies.Proto.base)
     proto(project(":proto:sisyphus-protos"))
 }
 
