@@ -5,6 +5,7 @@ include("lib:sisyphus-dto")
 include("lib:sisyphus-jackson")
 include("lib:sisyphus-protobuf")
 include("lib:sisyphus-grpc")
+include("lib:sisyphus-test")
 
 include("proto:sisyphus-protos")
 include("proto:sisyphus-grpc-protos")
