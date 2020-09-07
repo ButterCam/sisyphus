@@ -51,6 +51,8 @@ val Project.proto: Project
     get() {
         group = "com.bybutter.sisyphus.proto"
 
+        managedDependencies
+
         pluginManager.apply(JavaLibraryPlugin::class.java)
         pluginManager.apply(SisyphusProjectPlugin::class.java)
 
