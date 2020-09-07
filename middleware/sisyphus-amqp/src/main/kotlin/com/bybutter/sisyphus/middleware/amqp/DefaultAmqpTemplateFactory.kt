@@ -12,19 +12,20 @@ open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
 
     override fun createTemplate(property: MessageQueueProperty): AmqpTemplate {
         return RabbitTemplate(
-            createConnection(property.host, property.port, property)
+                createConnectionFactory(property)
         ).apply {
             property.queue?.let {
                 this.setDefaultReceiveQueue(it)
             }
-            this.exchange = property.exchange ?: ""
+
+            this.setExchange(property.exchange ?: "")
             this.messageConverter = Jackson2JsonMessageConverter(Json.mapper)
         }
     }
 
-    protected open fun createConnection(host: String, port: Int, property: MessageQueueProperty): ConnectionFactory {
-        return connectionFactories.getOrPut("$host:$port/${property.vhost}") {
-            CachingConnectionFactory(host, port).apply {
+    override fun createConnectionFactory(property: MessageQueueProperty): ConnectionFactory {
+        return connectionFactories.getOrPut("${property.host}:${property.port}/${property.vhost}") {
+            CachingConnectionFactory(property.host, property.port).apply {
                 this.virtualHost = property.vhost
                 this.username = property.userName
                 this.setPassword(property.password)
