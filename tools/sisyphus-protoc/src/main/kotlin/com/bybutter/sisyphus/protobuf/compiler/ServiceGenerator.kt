@@ -2,8 +2,10 @@ package com.bybutter.sisyphus.protobuf.compiler
 
 import com.bybutter.sisyphus.collection.contentEquals
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
+import com.bybutter.sisyphus.rpc.CallOptionsInterceptor
 import com.bybutter.sisyphus.rpc.RpcService
 import com.bybutter.sisyphus.rpc.ServiceSupport
+import com.bybutter.sisyphus.rpc.SisyphusStub
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -21,7 +23,6 @@ import io.grpc.CallOptions
 import io.grpc.ServerServiceDefinition
 import io.grpc.ServiceDescriptor
 import io.grpc.kotlin.AbstractCoroutineServerImpl
-import io.grpc.stub.AbstractStub
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -144,20 +145,23 @@ class ServiceGenerator(override val parent: FileGenerator, val descriptor: Descr
                 .primaryConstructor(
                         FunSpec.constructorBuilder()
                                 .addParameter("channel", io.grpc.Channel::class)
+                                .addParameter(ParameterSpec.builder("optionsInterceptors", Iterable::class.parameterizedBy(CallOptionsInterceptor::class)).defaultValue("listOf()").build())
                                 .addParameter(ParameterSpec.builder("callOptions", CallOptions::class).defaultValue("CallOptions.DEFAULT").build())
                                 .build())
                 .addAnnotation(INTERNAL_PROTO_API)
                 .addSuperinterface(clientType)
-                .superclass(AbstractStub::class.asClassName().parameterizedBy(stubType))
+                .superclass(SisyphusStub::class.asClassName().parameterizedBy(stubType))
                 .addSuperclassConstructorParameter("channel")
+                .addSuperclassConstructorParameter("optionsInterceptors")
                 .addSuperclassConstructorParameter("callOptions")
                 .addFunction(
                         FunSpec.builder("build")
                                 .addModifiers(KModifier.OVERRIDE)
                                 .addParameter("channel", io.grpc.Channel::class)
+                                .addParameter("optionsInterceptors", Iterable::class.parameterizedBy(CallOptionsInterceptor::class))
                                 .addParameter("callOptions", CallOptions::class)
                                 .returns(stubType)
-                                .addStatement("return %T(channel, callOptions)", stubType)
+                                .addStatement("return %T(channel, optionsInterceptors, callOptions)", stubType)
                                 .build()
                 )
                 .apply {

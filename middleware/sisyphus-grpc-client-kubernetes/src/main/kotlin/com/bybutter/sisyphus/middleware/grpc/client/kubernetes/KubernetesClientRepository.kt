@@ -1,7 +1,12 @@
 package com.bybutter.sisyphus.middleware.grpc.client.kubernetes
 
+import com.bybutter.sisyphus.middleware.grpc.ClientBuilderInterceptor
 import com.bybutter.sisyphus.middleware.grpc.ClientRepository
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.rpc.CallOptionsInterceptor
+import com.bybutter.sisyphus.spring.BeanUtils
+import io.grpc.CallOptions
+import io.grpc.ClientInterceptor
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.CoreV1Api
 import io.kubernetes.client.util.Config
@@ -49,12 +54,15 @@ class KubernetesClientRepository : ClientRepository {
             }?.port ?: continue
             val host = k8sService.metadata?.name ?: continue
             logger.info("GRPC service '$serviceName' discovered in kubernetes service '$host:$port'.")
-            val channel = createGrpcChannel(host, port, beanFactory)
+            val channel = createGrpcChannel("$host:$port", beanFactory)
             val service = ProtoTypes.getRegisterService(serviceName) ?: continue
             val client = getClientFromService(service)
             val stub = getStubFromService(service)
             val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
-                processStub(createGrpcClient(stub, channel), beanFactory)
+                val builderInterceptors = BeanUtils.getSortedBeans(beanFactory, ClientBuilderInterceptor::class.java)
+                val clientInterceptors = BeanUtils.getSortedBeans(beanFactory, ClientInterceptor::class.java)
+                val optionsInterceptors = BeanUtils.getSortedBeans(beanFactory, CallOptionsInterceptor::class.java)
+                interceptStub(createGrpcClient(stub, channel, optionsInterceptors.values, CallOptions.DEFAULT), builderInterceptors.values, clientInterceptors.values)
             }
             beanDefinitionList.add(clientBeanDefinition.beanDefinition)
         }
