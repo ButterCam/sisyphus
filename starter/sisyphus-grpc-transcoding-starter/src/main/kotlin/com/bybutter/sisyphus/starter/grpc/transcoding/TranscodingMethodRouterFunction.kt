@@ -11,19 +11,27 @@ import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
 import com.bybutter.sisyphus.reflect.uncheckedCast
+import com.bybutter.sisyphus.rpc.Code
+import com.bybutter.sisyphus.rpc.Status
+import com.bybutter.sisyphus.rpc.fromThrowable
 import com.bybutter.sisyphus.starter.grpc.support.REQUEST_ID_META_KEY
+import com.bybutter.sisyphus.starter.grpc.transcoding.util.toHttpStatus
+import com.bybutter.sisyphus.starter.webflux.DetectBodyInserter
 import com.bybutter.sisyphus.string.randomString
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientCall
+import io.grpc.ForwardingClientCall
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.ServerMethodDefinition
+import io.grpc.stub.ClientCalls
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
+import reactor.core.publisher.MonoProcessor
 
 class TranscodingMethodRouterFunction private constructor(
     private val method: ServerMethodDefinition<*, *>,
@@ -148,5 +156,28 @@ class TranscodingMethodRouterFunction private constructor(
 
             return TranscodingMethodRouterFunction(method, proto, httpRule)
         }
+    }
+}
+
+class Test<T1, T2>(call: ClientCall<T1, T2>) : ForwardingClientCall.SimpleForwardingClientCall<T1, T2>(call) {
+    private val response = MonoProcessor.create<Mono<ServerResponse>>()
+
+    fun response(): Mono<ServerResponse> {
+        return response.flatMap { it }
+    }
+
+    override fun cancel(message: String?, cause: Throwable?) {
+        super.cancel(message, cause)
+
+        val status = cause?.let { Status.fromThrowable(it) } ?: Status {
+            this.code = Code.UNKNOWN.number
+            message?.let {
+                this.message = it
+            }
+        }
+
+        response.onNext(ServerResponse
+                .status(status.toHttpStatus())
+                .body(DetectBodyInserter(status)))
     }
 }
