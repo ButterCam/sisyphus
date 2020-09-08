@@ -16,6 +16,7 @@ inline fun debug(block: () -> Message<*, *>) {
 }
 
 fun initDebug(context: Context): Context {
+    if (debugEnabled) return context
     return context.withValue(DEBUG_INFO_KEY, mutableListOf())
 }
 
