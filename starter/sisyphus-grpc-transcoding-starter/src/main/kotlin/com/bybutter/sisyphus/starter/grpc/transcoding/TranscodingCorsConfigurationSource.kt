@@ -29,7 +29,7 @@ class TranscodingCorsConfigurationSource(server: Server, baseConfiguration: Cors
 
         // Find a supported request path.
         val pattern = corsConfigurations.keys.firstOrNull {
-            PathMatcher.match(it, lookupPath.value())
+            PathMatcher.match(it, lookupPath.value(), setOf('/', ':', '@'))
         } ?: return null
 
         return corsConfigurations[pattern]
