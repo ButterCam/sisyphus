@@ -8,7 +8,7 @@ import org.jooq.SelectLimitStep
 
 data class Page<T>(var data: List<T>, var nextToken: String?, var total: Int? = null)
 
-inline fun <reified T : Record> SelectLimitStep<T>.withPaging(pageToken: String, pageSize: Int, needTotal: Boolean = true): Page<T> {
+fun <T : Record> SelectLimitStep<T>.withPaging(pageToken: String, pageSize: Int, needTotal: Boolean = true): Page<T> {
     val offset = OffsetPaging(pageToken)?.offset
     val size = if (pageSize in 1..30) {
         pageSize
@@ -16,7 +16,7 @@ inline fun <reified T : Record> SelectLimitStep<T>.withPaging(pageToken: String,
         30
     }
     val count = if (needTotal) this.count() else null
-    val data = this.offset(offset).limit(size).fetchInto(T::class.java)
+    val data = this.offset(offset).limit(size).fetchInto(this.recordType)
     val next = OffsetPaging(pageToken).nextPage(data.size, size)
     return Page(data, next, count)
 }
