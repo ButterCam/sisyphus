@@ -29,6 +29,8 @@ class CorsConfigurationSourceRegistrar : BeanDefinitionRegistryPostProcessor {
             addAllowedOrigin(CorsConfiguration.ALL)
             addAllowedMethod(HttpMethod.OPTIONS)
             addAllowedMethod(HttpMethod.HEAD)
+            addExposedHeader("X-Request-Id")
+            addExposedHeader("X-Renewal-Access")
         }
     }
 }

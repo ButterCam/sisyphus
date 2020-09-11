@@ -6,6 +6,8 @@ import java.nio.file.Files
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ModuleDependency
+import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.Usage
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSet
@@ -66,10 +68,22 @@ class ProtobufPlugin : Plugin<Project> {
 
     private fun registerProtoConfig(target: Project, extension: ProtobufExtension, sourceSet: SourceSet): Configuration {
         return target.configurations.maybeCreate(sourceSet.getProtoConfigurationName()).apply {
+            description = "Proto files to compile for source set '${sourceSet.name}'"
             isCanBeConsumed = false
             isCanBeResolved = true
-            isTransitive = false
-            description = "Proto files to compile for source set '${sourceSet.name}'"
+            this.withDependencies {
+                for (dependency in it) {
+                    val moduleDependency = dependency as? ModuleDependency ?: continue
+                    when (moduleDependency.attributes.getAttribute(Category.CATEGORY_ATTRIBUTE)?.name) {
+                        Category.ENFORCED_PLATFORM, Category.REGULAR_PLATFORM, Category.LIBRARY -> {
+                            dependency.isTransitive = true
+                        }
+                        else -> {
+                            dependency.isTransitive = false
+                        }
+                    }
+                }
+            }
             attributes.attribute(Usage.USAGE_ATTRIBUTE, target.objects.named(Usage::class.java, Usage.JAVA_API))
         }
     }

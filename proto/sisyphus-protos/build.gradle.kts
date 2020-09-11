@@ -7,5 +7,5 @@ plugins {
 description = "Sisyphus common protos for Protobuf Runtime"
 
 dependencies {
-    api(Dependencies.Proto.runtimeProto)
+    api(Dependencies.Proto.base)
 }
