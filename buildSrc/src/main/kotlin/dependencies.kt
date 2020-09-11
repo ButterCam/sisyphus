@@ -38,6 +38,22 @@ object Dependencies {
             const val smile = "$group:jackson-dataformat-smile"
         }
     }
+    object Aliyun {
+        object RocketMQ {
+            private const val group = "com.aliyun.openservices"
+            const val RocketMQ = "$group:ons-client"
+        }
+    }
+
+    object Alibaba {
+        object Sentinel {
+            private const val group = "com.alibaba.csp"
+            const val GrpcAdapter = "$group:sentinel-grpc-adapter"
+            const val SentinelTransport = "$group:sentinel-transport-simple-http"
+            const val SentinelFlowControl = "$group:sentinel-parameter-flow-control"
+            const val SentinelDatasource = "$group:sentinel-datasource-redis"
+        }
+    }
 
     object Spring {
         object Framework {

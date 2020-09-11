@@ -14,6 +14,8 @@ dependencies {
     implementation(Dependencies.Grpc.stub)
     compileOnly(Dependencies.Spring.Boot.actuator)
     runtimeOnly(Dependencies.Grpc.netty)
+    api(Dependencies.Alibaba.Sentinel.GrpcAdapter)
+    api(Dependencies.Alibaba.Sentinel.SentinelTransport)
 }
 
 protobuf {

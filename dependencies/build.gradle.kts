@@ -52,5 +52,10 @@ dependencies {
         api("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r")
         api("com.palantir.gradle.docker:gradle-docker:0.25.0")
         api("io.grpc:grpc-kotlin-stub:0.1.5")
+        api("com.aliyun.openservices:ons-client:1.8.7.1.Final")
+        api("com.alibaba.csp:sentinel-grpc-adapter:1.8.0")
+        api("com.alibaba.csp:sentinel-transport-simple-http:1.8.0")
+        api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.0")
+        api("com.alibaba.csp:sentinel-datasource-redis:1.8.0")
     }
 }

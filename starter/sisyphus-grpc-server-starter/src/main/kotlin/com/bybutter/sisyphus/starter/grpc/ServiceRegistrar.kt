@@ -36,6 +36,13 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
             var builder = ServerBuilder.forPort(environment.getProperty(GrpcServerConstants.GRPC_PORT_PROPERTY, Int::class.java, GrpcServerConstants.DEFAULT_GRPC_PORT))
 
+            val beanNames = beanFactory.getBeanNamesForType(SisyphusSentinelGrpcServerInterceptor::class.java)
+            if (beanNames.isNotEmpty()) {
+                logger.info("Register SentinelGrpcServerInterceptor")
+                val sisyphusSentinelGrpcServerInterceptor = beanFactory.getBean(SisyphusSentinelGrpcServerInterceptor::class.java)
+                builder.intercept(sisyphusSentinelGrpcServerInterceptor)
+            }
+
             val builderInterceptors = beanFactory.getBeansOfType(ServerBuilderInterceptor::class.java)
             for ((_, builderInterceptor) in builderInterceptors) {
                 builder = builderInterceptor.intercept(builder)
