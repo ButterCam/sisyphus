@@ -176,9 +176,41 @@ class URIBuilder {
 
     fun build(): URI {
         return if (isOpaque) {
-            URI(scheme, schemeSpecificPart, fragment)
+            URI(buildString {
+                scheme?.let {
+                    append(it)
+                    append(":")
+                }
+                schemeSpecificPart?.let {
+                    append(it)
+                }
+                fragment?.let {
+                    append("#")
+                    append(it)
+                }
+            })
         } else {
-            URI(scheme, authority, path, query, fragment)
+            URI(buildString {
+                scheme?.let {
+                    append(it)
+                    append(":")
+                }
+                authority?.let {
+                    append("//")
+                    append(it)
+                }
+                path?.let {
+                    append(it)
+                }
+                query?.let {
+                    append("?")
+                    append(it)
+                }
+                fragment?.let {
+                    append("#")
+                    append(it)
+                }
+            })
         }
     }
 
