@@ -1,11 +1,11 @@
-package com.bybutter.sisyphus.middleware.elastic
+package com.bybutter.sisyphus.middleware.elastic.autoconfigure
 
+import com.bybutter.sisyphus.middleware.elastic.DefaultElasticClientFactory
+import com.bybutter.sisyphus.middleware.elastic.ElasticClientFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Configuration
 
-@Configuration
 @ComponentScan(basePackageClasses = [SisyphusElasticAutoConfiguration::class])
 class SisyphusElasticAutoConfiguration {
     @Bean

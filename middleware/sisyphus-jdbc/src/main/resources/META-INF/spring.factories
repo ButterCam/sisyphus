@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bybutter.sisyphus.middleware.jdbc.SisyphusJdbcAutoConfiguration
+com.bybutter.sisyphus.middleware.jdbc.autoconfigure.SisyphusJdbcAutoConfiguration

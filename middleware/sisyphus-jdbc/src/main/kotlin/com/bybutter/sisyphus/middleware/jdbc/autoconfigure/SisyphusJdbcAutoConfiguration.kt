@@ -1,13 +1,14 @@
-package com.bybutter.sisyphus.middleware.jdbc
+package com.bybutter.sisyphus.middleware.jdbc.autoconfigure
 
+import com.bybutter.sisyphus.middleware.jdbc.AbstractDslContextFactory
+import com.bybutter.sisyphus.middleware.jdbc.DslContextFactory
+import com.bybutter.sisyphus.middleware.jdbc.JooqConfigInterceptor
 import com.bybutter.sisyphus.middleware.jdbc.transaction.SisyphusTransactionProvider
 import org.jooq.TransactionProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Configuration
 
-@Configuration
 @ComponentScan(basePackageClasses = [SisyphusJdbcAutoConfiguration::class])
 class SisyphusJdbcAutoConfiguration {
     @Bean

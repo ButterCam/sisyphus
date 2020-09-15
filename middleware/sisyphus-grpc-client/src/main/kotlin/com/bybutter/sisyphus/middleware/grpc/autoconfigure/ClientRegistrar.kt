@@ -1,5 +1,7 @@
-package com.bybutter.sisyphus.middleware.grpc
+package com.bybutter.sisyphus.middleware.grpc.autoconfigure
 
+import com.bybutter.sisyphus.middleware.grpc.ClientRepository
+import com.bybutter.sisyphus.middleware.grpc.ManagedChannelLifecycle
 import com.bybutter.sisyphus.spi.ServiceLoader
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
@@ -21,7 +23,8 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     }
 
     override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
-        val clientRepositories = ServiceLoader.load(ClientRepository::class.java)
+
+        val clientRepositories = ServiceLoader.load(ClientRepository::class.java).sortedBy { it.order }
 
         val registry = beanFactory as BeanDefinitionRegistry
 
