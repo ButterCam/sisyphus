@@ -1,5 +1,6 @@
-package com.bybutter.sisyphus.middleware.jdbc
+package com.bybutter.sisyphus.middleware.jdbc.autoconfigure
 
+import com.bybutter.sisyphus.middleware.jdbc.JooqConfigInterceptor
 import kotlin.streams.toList
 import org.jooq.Configuration
 import org.jooq.ExecuteListenerProvider
