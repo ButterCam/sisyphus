@@ -38,6 +38,12 @@ object Dependencies {
             const val smile = "$group:jackson-dataformat-smile"
         }
     }
+    object Aliyun {
+        object RocketMQ {
+            private const val group = "com.aliyun.openservices"
+            const val RocketMQ = "$group:ons-client"
+        }
+    }
 
     object Spring {
         object Framework {
