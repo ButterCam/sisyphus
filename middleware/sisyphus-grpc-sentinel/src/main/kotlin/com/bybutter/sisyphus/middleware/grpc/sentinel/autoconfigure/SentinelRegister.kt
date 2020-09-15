@@ -19,7 +19,7 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-class SentinelRegister : BeanDefinitionRegistryPostProcessor, EnvironmentAware{
+class SentinelRegister : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     private lateinit var environment: Environment
 
     override fun setEnvironment(environment: Environment) {
@@ -38,13 +38,12 @@ class SentinelRegister : BeanDefinitionRegistryPostProcessor, EnvironmentAware{
             System.setProperty("csp.sentinel.dashboard.server", property.serverAddr)
             System.setProperty("project.name", property.projectName)
 
-        when(property.database){
+        when (property.database) {
             SentinelDatabase.NONE -> {
-
             }
             SentinelDatabase.REDIS -> {
                 try {
-                    if(property.redisClientName == null){
+                    if (property.redisClientName == null) {
                         throw StatusException(Code.UNAVAILABLE, "redisClientName can not be null.")
                     }
                     val redisClient = beanFactory.getBean(property.redisClientName, RedisClient::class.java)
@@ -54,7 +53,7 @@ class SentinelRegister : BeanDefinitionRegistryPostProcessor, EnvironmentAware{
                     }.beanDefinition
                     beanDefinition.initMethodName = "init"
                     registry.registerBeanDefinition(beanName, beanDefinition)
-                }catch (e: ClassNotFoundException){
+                } catch (e: ClassNotFoundException) {
                     throw StatusException(Code.NOT_FOUND, "RedisClient bean not found.")
                 }
             }

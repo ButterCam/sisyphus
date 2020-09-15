@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 
 @ComponentScan(basePackageClasses = [SisyphusSentinelAutoConfiguration::class])
-@AutoConfigureAfter(name = ["com.bybutter.sisyphus.middleware.redis.SisyphusRedisAutoConfiguration"])
+@AutoConfigureAfter(name = ["com.bybutter.sisyphus.middleware.redis.autoconfigure.SisyphusRedisAutoConfiguration"])
 class SisyphusSentinelAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(value = [SentinelTemplateFactory::class])

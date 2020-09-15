@@ -21,7 +21,7 @@ class SisyphusSentinelGrpcServerInterceptor(fallbackMessage: String) : SentinelG
 
     private val statusRuntimeException = StatusRuntimeException(Status.CANCELLED)
 
-    override fun <ReqT, RespT> interceptCall(call: ServerCall<ReqT, RespT>, headers: Metadata?, next: ServerCallHandler<ReqT, RespT>): ServerCall.Listener<ReqT>? {
+    override fun <ReqT : Any, RespT : Any> interceptCall(call: ServerCall<ReqT, RespT>, headers: Metadata, next: ServerCallHandler<ReqT, RespT>): ServerCall.Listener<ReqT> {
         val fullMethodName = call.methodDescriptor.fullMethodName
         // Remote address: serverCall.getAttributes().get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR);
         var entry: Entry? = null

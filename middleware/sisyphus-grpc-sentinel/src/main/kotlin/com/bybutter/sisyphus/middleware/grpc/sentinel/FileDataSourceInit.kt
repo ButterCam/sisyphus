@@ -23,8 +23,7 @@ import com.bybutter.sisyphus.jackson.parseJson
 import java.io.File
 import java.io.IOException
 
-
-class FileDataSourceInit(private val sentinelProperties: SentinelProperties): InitFunc {
+class FileDataSourceInit(private val sentinelProperties: SentinelProperties) : InitFunc {
 
     override fun init() {
         val ruleDir = "~${File.separator}${sentinelProperties.projectName}${File.separator}sentinel${File.separator}rules"
@@ -98,33 +97,32 @@ class FileDataSourceInit(private val sentinelProperties: SentinelProperties): In
                 ::encodeJson
         )
         ModifyParamFlowRulesCommandHandler.setWritableDataSource(paramFlowRuleWDS)
-
     }
 
     /**
      * 流控规则对象转换
      */
-    private val flowRuleListParser: Converter<String, List<FlowRule>> = Converter { source: String -> source.parseJson<List<FlowRule>>()}
+    private val flowRuleListParser: Converter<String, List<FlowRule>> = Converter { source: String -> source.parseJson<List<FlowRule>>() }
 
     /**
      * 降级规则对象转换
      */
-    private val degradeRuleListParser: Converter<String, List<DegradeRule>> = Converter { source: String -> source.parseJson<List<DegradeRule>>()}
+    private val degradeRuleListParser: Converter<String, List<DegradeRule>> = Converter { source: String -> source.parseJson<List<DegradeRule>>() }
 
     /**
      * 系统规则对象转换
      */
-    private val systemRuleListParser: Converter<String, List<SystemRule>> = Converter { source: String -> source.parseJson<List<SystemRule>>()}
+    private val systemRuleListParser: Converter<String, List<SystemRule>> = Converter { source: String -> source.parseJson<List<SystemRule>>() }
 
     /**
      * 授权规则对象转换
      */
-    private val authorityRuleListParser: Converter<String, List<AuthorityRule>> = Converter { source: String -> source.parseJson<List<AuthorityRule>>()}
+    private val authorityRuleListParser: Converter<String, List<AuthorityRule>> = Converter { source: String -> source.parseJson<List<AuthorityRule>>() }
 
     /**
      * 热点规则对象转换
      */
-    private val hotParamFlowRuleListParser: Converter<String, List<ParamFlowRule>> = Converter { source: String -> source.parseJson<List<ParamFlowRule>>()}
+    private val hotParamFlowRuleListParser: Converter<String, List<ParamFlowRule>> = Converter { source: String -> source.parseJson<List<ParamFlowRule>>() }
 
     /**
      * 创建目录
