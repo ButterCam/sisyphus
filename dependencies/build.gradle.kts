@@ -53,5 +53,9 @@ dependencies {
         api("com.palantir.gradle.docker:gradle-docker:0.25.0")
         api("io.grpc:grpc-kotlin-stub:0.1.5")
         api("com.google.api:api-compiler:0.0.8")
+        api("com.alibaba.csp:sentinel-grpc-adapter:1.8.0")
+        api("com.alibaba.csp:sentinel-transport-simple-http:1.8.0")
+        api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.0")
+        api("com.alibaba.csp:sentinel-datasource-redis:1.8.0")
     }
 }

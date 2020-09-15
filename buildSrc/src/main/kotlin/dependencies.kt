@@ -39,6 +39,16 @@ object Dependencies {
         }
     }
 
+    object Alibaba {
+        object Sentinel {
+            private const val group = "com.alibaba.csp"
+            const val GrpcAdapter = "$group:sentinel-grpc-adapter"
+            const val SentinelTransport = "$group:sentinel-transport-simple-http"
+            const val SentinelFlowControl = "$group:sentinel-parameter-flow-control"
+            const val SentinelDatasource = "$group:sentinel-datasource-redis"
+        }
+    }
+
     object Spring {
         object Framework {
             private const val group = "org.springframework"
