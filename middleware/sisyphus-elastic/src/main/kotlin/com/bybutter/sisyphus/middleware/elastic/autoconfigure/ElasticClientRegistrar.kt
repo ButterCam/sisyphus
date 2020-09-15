@@ -1,6 +1,9 @@
-package com.bybutter.sisyphus.middleware.jdbc
+package com.bybutter.sisyphus.middleware.elastic.autoconfigure
 
-import org.jooq.DSLContext
+import com.bybutter.sisyphus.middleware.elastic.ElasticClientFactory
+import com.bybutter.sisyphus.middleware.elastic.ElasticProperties
+import com.bybutter.sisyphus.middleware.elastic.ElasticProperty
+import org.elasticsearch.client.RestClient
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -12,7 +15,7 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
+class ElasticClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     private lateinit var environment: Environment
 
     override fun setEnvironment(environment: Environment) {
@@ -25,26 +28,26 @@ class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwar
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
         val beanFactory = registry as ConfigurableListableBeanFactory
 
-        val properties = beanFactory.getBeansOfType<JdbcDatabaseProperty>().toMutableMap()
-        val jdbcProperties = Binder.get(environment)
-                .bind("sisyphus", JdbcDatabaseProperties::class.java)
-                .orElse(null)?.jdbc ?: mapOf()
+        val properties = beanFactory.getBeansOfType<ElasticProperty>().toMutableMap()
+        val elasticProperties = Binder.get(environment)
+                .bind("sisyphus", ElasticProperties::class.java)
+                .orElse(null)?.elastic ?: mapOf()
 
-        properties += jdbcProperties
+        properties += elasticProperties
 
         if (properties.isEmpty()) return
 
         for ((name, property) in properties) {
             val beanName = property.name ?: "$BEAN_NAME_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DSLContext::class.java) {
-                val factory = beanFactory.getBean(DslContextFactory::class.java)
-                factory.createContext(beanName, property)
+            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RestClient::class.java) {
+                val factory = beanFactory.getBean(ElasticClientFactory::class.java)
+                factory.createClient(property)
             }.beanDefinition
             registry.registerBeanDefinition(beanName, beanDefinition)
         }
     }
 
     companion object {
-        private const val BEAN_NAME_PREFIX = "sisyphus:jdbc"
+        private const val BEAN_NAME_PREFIX = "sisyphus:elastic"
     }
 }

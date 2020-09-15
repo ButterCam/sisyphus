@@ -1,5 +1,9 @@
-package com.bybutter.sisyphus.middleware.hbase
+package com.bybutter.sisyphus.middleware.jdbc.autoconfigure
 
+import com.bybutter.sisyphus.middleware.jdbc.DslContextFactory
+import com.bybutter.sisyphus.middleware.jdbc.JdbcDatabaseProperties
+import com.bybutter.sisyphus.middleware.jdbc.JdbcDatabaseProperty
+import org.jooq.DSLContext
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -11,7 +15,7 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-class HTableTemplateRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
+class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     private lateinit var environment: Environment
 
     override fun setEnvironment(environment: Environment) {
@@ -24,26 +28,26 @@ class HTableTemplateRegistrar : BeanDefinitionRegistryPostProcessor, Environment
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
         val beanFactory = registry as ConfigurableListableBeanFactory
 
-        val properties = beanFactory.getBeansOfType<HBaseTableProperty>().toMutableMap()
-        val hbaseProperties = Binder.get(environment)
-                .bind("sisyphus", HBaseTableProperties::class.java)
-                .orElse(null)?.hbase ?: mapOf()
+        val properties = beanFactory.getBeansOfType<JdbcDatabaseProperty>().toMutableMap()
+        val jdbcProperties = Binder.get(environment)
+                .bind("sisyphus", JdbcDatabaseProperties::class.java)
+                .orElse(null)?.jdbc ?: mapOf()
 
-        properties += hbaseProperties
+        properties += jdbcProperties
 
         if (properties.isEmpty()) return
 
         for ((name, property) in properties) {
             val beanName = property.name ?: "$BEAN_NAME_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(HTableTemplate::class.java) {
-                val factory = beanFactory.getBean(HBaseTemplateFactory::class.java)
-                factory.createTemplate(property)
+            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DSLContext::class.java) {
+                val factory = beanFactory.getBean(DslContextFactory::class.java)
+                factory.createContext(beanName, property)
             }.beanDefinition
             registry.registerBeanDefinition(beanName, beanDefinition)
         }
     }
 
     companion object {
-        private const val BEAN_NAME_PREFIX = "sisyphus:hbase"
+        private const val BEAN_NAME_PREFIX = "sisyphus:jdbc"
     }
 }

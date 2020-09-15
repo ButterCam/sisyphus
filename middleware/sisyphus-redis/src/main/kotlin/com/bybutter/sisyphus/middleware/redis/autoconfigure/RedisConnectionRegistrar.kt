@@ -1,5 +1,9 @@
-package com.bybutter.sisyphus.middleware.redis
+package com.bybutter.sisyphus.middleware.redis.autoconfigure
 
+import com.bybutter.sisyphus.middleware.redis.RedisClientFactory
+import com.bybutter.sisyphus.middleware.redis.RedisProperties
+import com.bybutter.sisyphus.middleware.redis.RedisProperty
+import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
@@ -41,6 +45,13 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
                 factory.createClient(property).connect()
             }.setDestroyMethodName("close").beanDefinition
             registry.registerBeanDefinition(beanName, beanDefinition)
+
+            val redisClientName = "${property.name}:RedisClient"
+            val redisClientDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisClient::class.java) {
+                val factory = beanFactory.getBean(RedisClientFactory::class.java)
+                factory.createClient(property)
+            }.setDestroyMethodName("shutdown").beanDefinition
+            registry.registerBeanDefinition(redisClientName, redisClientDefinition)
         }
     }
 

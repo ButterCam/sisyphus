@@ -1,6 +1,9 @@
-package com.bybutter.sisyphus.middleware.elastic
+package com.bybutter.sisyphus.middleware.hbase.autoconfigure
 
-import org.elasticsearch.client.RestClient
+import com.bybutter.sisyphus.middleware.hbase.HBaseTableProperties
+import com.bybutter.sisyphus.middleware.hbase.HBaseTableProperty
+import com.bybutter.sisyphus.middleware.hbase.HBaseTemplateFactory
+import com.bybutter.sisyphus.middleware.hbase.HTableTemplate
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -12,7 +15,7 @@ import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
 @Component
-class ElasticClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
+class HTableTemplateRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     private lateinit var environment: Environment
 
     override fun setEnvironment(environment: Environment) {
@@ -25,26 +28,26 @@ class ElasticClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentA
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
         val beanFactory = registry as ConfigurableListableBeanFactory
 
-        val properties = beanFactory.getBeansOfType<ElasticProperty>().toMutableMap()
-        val elasticProperties = Binder.get(environment)
-                .bind("sisyphus", ElasticProperties::class.java)
-                .orElse(null)?.elastic ?: mapOf()
+        val properties = beanFactory.getBeansOfType<HBaseTableProperty>().toMutableMap()
+        val hbaseProperties = Binder.get(environment)
+                .bind("sisyphus", HBaseTableProperties::class.java)
+                .orElse(null)?.hbase ?: mapOf()
 
-        properties += elasticProperties
+        properties += hbaseProperties
 
         if (properties.isEmpty()) return
 
         for ((name, property) in properties) {
             val beanName = property.name ?: "$BEAN_NAME_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RestClient::class.java) {
-                val factory = beanFactory.getBean(ElasticClientFactory::class.java)
-                factory.createClient(property)
+            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(HTableTemplate::class.java) {
+                val factory = beanFactory.getBean(HBaseTemplateFactory::class.java)
+                factory.createTemplate(property)
             }.beanDefinition
             registry.registerBeanDefinition(beanName, beanDefinition)
         }
     }
 
     companion object {
-        private const val BEAN_NAME_PREFIX = "sisyphus:elastic"
+        private const val BEAN_NAME_PREFIX = "sisyphus:hbase"
     }
 }

@@ -1,5 +1,8 @@
-package com.bybutter.sisyphus.middleware.amqp
+package com.bybutter.sisyphus.middleware.amqp.autoconfigure
 
+import com.bybutter.sisyphus.middleware.amqp.AmqpTemplateFactory
+import com.bybutter.sisyphus.middleware.amqp.MessageQueueProperties
+import com.bybutter.sisyphus.middleware.amqp.MessageQueueProperty
 import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory

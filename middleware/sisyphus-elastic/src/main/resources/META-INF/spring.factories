@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bybutter.sisyphus.middleware.elastic.SisyphusElasticAutoConfiguration
+com.bybutter.sisyphus.middleware.elastic.autoconfigure.SisyphusElasticAutoConfiguration

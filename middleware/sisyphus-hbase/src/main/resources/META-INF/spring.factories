@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bybutter.sisyphus.middleware.hbase.SisyphusHBaseAutoConfiguration
+com.bybutter.sisyphus.middleware.hbase.autoconfigure.SisyphusHBaseAutoConfiguration

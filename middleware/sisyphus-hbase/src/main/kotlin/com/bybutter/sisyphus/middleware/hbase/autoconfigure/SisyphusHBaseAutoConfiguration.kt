@@ -1,11 +1,11 @@
-package com.bybutter.sisyphus.middleware.hbase
+package com.bybutter.sisyphus.middleware.hbase.autoconfigure
 
+import com.bybutter.sisyphus.middleware.hbase.DefaultHBaseTemplateFactory
+import com.bybutter.sisyphus.middleware.hbase.HBaseTemplateFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Configuration
 
-@Configuration
 @ComponentScan(basePackageClasses = [SisyphusHBaseAutoConfiguration::class])
 class SisyphusHBaseAutoConfiguration {
     @Bean
