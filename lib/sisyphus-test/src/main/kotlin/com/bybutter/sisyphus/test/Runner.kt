@@ -38,7 +38,12 @@ private fun TestCase.run(serviceTestSet: ServiceTestSet) = runBlocking {
 
         for (assert in methodTest.asserts) {
             if (celEngine.eval(assert) != false) {
+                return@runBlocking "Pass"
+            } else {
+                return@runBlocking "Fail"
             }
         }
+    }
+    fun cleanUp() {
     }
 }

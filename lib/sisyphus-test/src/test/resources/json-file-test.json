@@ -1,0 +1,22 @@
+{
+  "metadata":
+  {
+      "host": "127.0.0.1:8089",
+      "Content-Type": "application/json"
+  },
+  "serviceTestSet": [
+    {
+      "service": "/sisyphus/butter/test",
+      "methodTests": [
+        {
+          "name": "Json Arguments Provider Test name",
+          "title": "Json Arguments Provider Test name",
+          "method": "GET",
+          "asserts": [
+            "request.status == 200"
+          ]
+        }
+      ]
+    }
+  ]
+}

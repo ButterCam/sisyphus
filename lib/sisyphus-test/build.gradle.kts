@@ -14,4 +14,8 @@ dependencies {
     api("org.junit.jupiter:junit-jupiter")
     api("org.junit.jupiter:junit-jupiter-api")
     api("org.junit.jupiter:junit-jupiter-params")
+    api("io.rest-assured:rest-assured")
+    api("com.github.tomakehurst:wiremock-jre8")
+    api("org.apache.logging.log4j:log4j-api")
+    api("commons-logging:commons-logging")
 }

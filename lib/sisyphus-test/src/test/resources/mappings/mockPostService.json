@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/sisyphus/butter/test"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "Hello butter!"
+  }
+}
