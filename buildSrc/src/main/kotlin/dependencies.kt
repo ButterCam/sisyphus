@@ -46,6 +46,9 @@ object Dependencies {
             const val webflux = "$group:spring-webflux"
 
             const val tx = "$group:spring-tx"
+
+            const val amqp = "$group.amqp:spring-rabbit"
+
         }
 
         object Boot {

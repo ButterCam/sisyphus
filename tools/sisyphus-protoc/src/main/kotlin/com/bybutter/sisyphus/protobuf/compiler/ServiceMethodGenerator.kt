@@ -23,7 +23,6 @@ import com.squareup.kotlinpoet.buildCodeBlock
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.kotlin.ServerCalls
-import io.grpc.stub.ClientCalls
 import kotlinx.coroutines.flow.Flow
 
 class ServiceMethodGenerator(override val parent: ServiceGenerator, val descriptor: DescriptorProtos.MethodDescriptorProto) : ProtobufElement() {
@@ -104,16 +103,16 @@ class ServiceMethodGenerator(override val parent: ServiceGenerator, val descript
 
         when (methodType) {
             MethodDescriptor.MethodType.UNARY -> {
-                builder.addStatement("return %T.unaryRpc(channel, %T.%L, input, callOptions, metadata)", io.grpc.kotlin.ClientCalls::class, parent.serviceType, kotlinName)
+                builder.addStatement("return unaryCall(%T.%L, input, metadata)", parent.serviceType, kotlinName)
             }
             MethodDescriptor.MethodType.CLIENT_STREAMING -> {
-                builder.addStatement("return %T.clientStreamingRpc(channel, %T.%L, input, callOptions, metadata)", io.grpc.kotlin.ClientCalls::class, parent.serviceType, kotlinName)
+                builder.addStatement("return clientStreaming(%T.%L, input, metadata)", parent.serviceType, kotlinName)
             }
             MethodDescriptor.MethodType.SERVER_STREAMING -> {
-                builder.addStatement("return %T.serverStreamingRpc(channel, %T.%L, input, callOptions, metadata)", io.grpc.kotlin.ClientCalls::class, parent.serviceType, kotlinName)
+                builder.addStatement("return serverStreaming(%T.%L, input, metadata)", parent.serviceType, kotlinName)
             }
             MethodDescriptor.MethodType.BIDI_STREAMING -> {
-                builder.addStatement("return %T.bidiStreamingRpc(channel, %T.%L, input, callOptions, metadata)", io.grpc.kotlin.ClientCalls::class, parent.serviceType, kotlinName)
+                builder.addStatement("return bidiStreaming(%T.%L, input, metadata)", parent.serviceType, kotlinName)
             }
             MethodDescriptor.MethodType.UNKNOWN -> throw UnsupportedOperationException("Unknown method type.")
         }

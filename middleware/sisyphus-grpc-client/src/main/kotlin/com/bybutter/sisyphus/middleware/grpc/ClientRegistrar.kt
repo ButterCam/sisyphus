@@ -21,8 +21,7 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     }
 
     override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
-
-        val clientRepositories = ServiceLoader.load(ClientRepository::class.java).sortedBy { it.order }
+        val clientRepositories = ServiceLoader.load(ClientRepository::class.java)
 
         val registry = beanFactory as BeanDefinitionRegistry
 
