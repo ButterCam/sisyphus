@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.middleware.redis
 import io.lettuce.core.api.StatefulRedisConnection
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
+import org.springframework.beans.factory.support.AutowireCandidateQualifier
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
@@ -35,11 +36,12 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
         if (properties.isEmpty()) return
 
         for ((name, property) in properties) {
-            val beanName = property.name ?: "$BEAN_NAME_PREFIX:$name"
+            val beanName = "$BEAN_NAME_PREFIX:$name"
             val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StatefulRedisConnection::class.java) {
                 val factory = beanFactory.getBean(RedisClientFactory::class.java)
                 factory.createClient(property).connect()
             }.setDestroyMethodName("close").beanDefinition
+            beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
         }
     }
@@ -47,4 +49,10 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
     companion object {
         private const val BEAN_NAME_PREFIX = "sisyphus:redis"
     }
+}
+
+fun main() {
+    val a = AutowireCandidateQualifier(RedisConnectionRegistrar.javaClass)
+    val b = a.typeName
+    b
 }
