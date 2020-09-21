@@ -73,6 +73,8 @@ object Dependencies {
             const val jackson = "$group:spring-boot-starter-json"
 
             const val actuator = "$group:spring-boot-starter-actuator"
+
+            const val aop = "$group:spring-boot-starter-aop"
         }
     }
 
