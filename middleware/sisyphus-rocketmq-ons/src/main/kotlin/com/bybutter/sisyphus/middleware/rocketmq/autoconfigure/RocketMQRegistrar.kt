@@ -74,15 +74,15 @@ class RocketMQRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
                 }
                 ProducerType.TRANSACTION -> {
                     val checkers = beanFactory.getBeanNamesForType(LocalTransactionChecker::class.java)
-                    checkers.forEach { it ->
+                    checkers.forEach {
                         val beanDefinition = beanFactory.getBeanDefinition(it) as AbstractBeanDefinition
                         val qualifiers = beanDefinition.qualifiers
-                        qualifiers.forEach {
-                            if (it.typeName == property.qualifier.typeName) {
+                        qualifiers.forEach { qualifier ->
+                            if (qualifier.typeName == property.qualifier.typeName) {
                                 val transactionProducerName = "$BEAN_NAME_PREFIX:${name}TransactionProducer"
                                 val transactionProducerDefinition = BeanDefinitionBuilder.genericBeanDefinition(TransactionProducer::class.java) {
                                     val factory = beanFactory.getBean(RocketTemplateFactory::class.java)
-                                    val checker = beanFactory.getBean(LocalTransactionChecker::class.java)
+                                    val checker = beanFactory.getBean(it) as LocalTransactionChecker
                                     factory.createTransactionProducer(property, checker)
                                 }.beanDefinition
                                 transactionProducerDefinition.initMethodName = INIT_METHOD
