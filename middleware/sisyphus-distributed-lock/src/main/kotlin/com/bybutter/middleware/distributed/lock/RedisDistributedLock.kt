@@ -2,20 +2,20 @@ package com.bybutter.middleware.distributed.lock
 
 import io.lettuce.core.SetArgs
 import io.lettuce.core.api.StatefulRedisConnection
-import org.apache.commons.logging.LogFactory
-import org.springframework.dao.CannotAcquireLockException
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory
-import org.springframework.util.ReflectionUtils
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
+import org.apache.commons.logging.LogFactory
+import org.springframework.dao.CannotAcquireLockException
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory
+import org.springframework.util.ReflectionUtils
 
 class RedisDistributedLock : DistributedLock {
 
-    val ok = "OK"
+    private val ok = "OK"
 
     private val logger = LogFactory.getLog(RedisDistributedLock::class.java)
 
@@ -122,10 +122,10 @@ class RedisDistributedLock : DistributedLock {
     }
 
     private fun redisLock(): Boolean {
-        val result = this.statefulRedisConnection.sync().set( rKey,
+        val result = this.statefulRedisConnection.sync().set(rKey,
                 rValue,
                 SetArgs.Builder.nx().px(leaseTime)
-        )?:false
+        ) ?: false
 
         if (result == ok) {
             this.lockedAt = System.currentTimeMillis()

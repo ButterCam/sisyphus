@@ -7,6 +7,7 @@ import com.bybutter.sisyphus.jackson.Json
 import com.bybutter.sisyphus.jackson.toJson
 import io.lettuce.core.api.StatefulRedisConnection
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -14,9 +15,7 @@ import org.aspectj.lang.annotation.Pointcut
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.AbstractBeanDefinition
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component
-import java.util.concurrent.TimeUnit
 
 @Aspect
 @Component
