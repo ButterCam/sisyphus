@@ -49,7 +49,7 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
                 redisConnectionFactory
             }.setDestroyMethodName("destroy").beanDefinition
             redisConnectionFactoryBeanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
-            registry.registerBeanDefinition(connectionFactoryBeanName,redisConnectionFactoryBeanDefinition)
+            registry.registerBeanDefinition(connectionFactoryBeanName, redisConnectionFactoryBeanDefinition)
 
             val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StatefulRedisConnection::class.java) {
                 RedisClient.create(redisConnectionFactory.clientResources).connect()
