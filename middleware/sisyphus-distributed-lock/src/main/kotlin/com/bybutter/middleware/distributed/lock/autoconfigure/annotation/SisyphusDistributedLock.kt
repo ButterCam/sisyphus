@@ -9,11 +9,11 @@ import java.lang.annotation.Inherited
 @Inherited
 annotation class SisyphusDistributedLock(
     /**
-     * 方法上第一个参数的某一个字段
+     * A field of the first parameter on the method
      */
     val rKeyParam: String = "",
     /**
-     * 方法上第一个参数的某一个字段
+     * A field of the first parameter on the method
      */
     val rValueParam: String = "",
     val leaseTime: Long = 5000L,

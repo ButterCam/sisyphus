@@ -36,27 +36,29 @@ class SisyphusLockSupport {
         val args = joinPoint.args
         val key: String
         val value: String
-        if (args == null || args.isEmpty() || sisyphusDistributedLock.rKeyParam == "") {
+        if (args == null || args.isEmpty() || sisyphusDistributedLock.rKeyParam.isEmpty()) {
             key = joinPoint.signature.name
+            value = UUID.randomUUID().toString() + System.currentTimeMillis()
+        } else if (sisyphusDistributedLock.rKeyParam.isNotEmpty() && sisyphusDistributedLock.rValueParam.isEmpty()) {
+            key = Json.deserialize(args[0].toJson()).get(sisyphusDistributedLock.rKeyParam).textValue()
             value = UUID.randomUUID().toString() + System.currentTimeMillis()
         } else {
             key = Json.deserialize(args[0].toJson()).get(sisyphusDistributedLock.rKeyParam).textValue()
             value = Json.deserialize(args[0].toJson()).get(sisyphusDistributedLock.rValueParam).textValue()
         }
         var statefulRedisConnection: StatefulRedisConnection<String, String>? = null
-        val beanNamesForType = beanFactory.getBeanNamesForType(StatefulRedisConnection::class.java)
-        loop@ for (it in beanNamesForType) {
-            val abstractBeanDefinition = beanFactory.getBeanDefinition(it) as AbstractBeanDefinition
+        val beansOfType = beanFactory.getBeansOfType(StatefulRedisConnection::class.java)
+        loop@ for ((beanName, bean) in beansOfType) {
+            val abstractBeanDefinition = beanFactory.getBeanDefinition(beanName) as AbstractBeanDefinition
             for (qualifier in abstractBeanDefinition.qualifiers) {
                 if (qualifier.typeName == redisLockProperty.redisQualifier.typeName) {
-                    statefulRedisConnection = beanFactory.getBean(it) as StatefulRedisConnection<String, String>
+                    statefulRedisConnection = bean as StatefulRedisConnection<String, String>
                     break@loop
                 }
             }
         }
-        if (statefulRedisConnection == null) {
-            throw NullPointerException("stringRedisTemplate is not be null.")
-        }
+        statefulRedisConnection ?: throw NullPointerException("stringRedisTemplate is not be null.")
+
         val redisDistributedLock = RedisDistributedLock(
                 statefulRedisConnection,
                 key,
