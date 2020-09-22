@@ -1,23 +1,25 @@
 package com.bybutter.middleware.distributed.lock
 
-import java.time.Duration
+import io.lettuce.core.SetArgs
+import io.lettuce.core.api.StatefulRedisConnection
+import org.apache.commons.logging.LogFactory
+import org.springframework.dao.CannotAcquireLockException
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory
+import org.springframework.util.ReflectionUtils
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
-import org.apache.commons.logging.LogFactory
-import org.springframework.dao.CannotAcquireLockException
-import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory
-import org.springframework.util.ReflectionUtils
 
 class RedisDistributedLock : DistributedLock {
 
+    val ok = "OK"
+
     private val logger = LogFactory.getLog(RedisDistributedLock::class.java)
 
-    private var stringRedisTemplate: StringRedisTemplate
+    private var statefulRedisConnection: StatefulRedisConnection<String, String>
     private var rKey: String
     private var rValue: String
     private var leaseTime: Long = 6000L
@@ -37,8 +39,8 @@ class RedisDistributedLock : DistributedLock {
     private var leaseRenewalTime: Long = 1000L
     private var leaseRenewalNumber: Int = 5
 
-    constructor(stringRedisTemplate: StringRedisTemplate, rKey: String, rValue: String, leaseTime: Long, enableWatchDog: Boolean, threshold: Long, leaseRenewalTime: Long, leaseRenewalNumber: Int) {
-        this.stringRedisTemplate = stringRedisTemplate
+    constructor(statefulRedisConnection: StatefulRedisConnection<String, String>, rKey: String, rValue: String, leaseTime: Long, enableWatchDog: Boolean, threshold: Long, leaseRenewalTime: Long, leaseRenewalNumber: Int) {
+        this.statefulRedisConnection = statefulRedisConnection
         this.rKey = "RedisDistributedLock:$rKey"
         this.rValue = rValue
         this.leaseTime = leaseTime
@@ -48,7 +50,7 @@ class RedisDistributedLock : DistributedLock {
         this.leaseRenewalNumber = leaseRenewalNumber
     }
 
-    constructor(stringRedisTemplate: StringRedisTemplate, rKey: String, rValue: String) : this(stringRedisTemplate, rKey, rValue, 6000L, false, 0, 0, 0)
+    constructor(statefulRedisConnection: StatefulRedisConnection<String, String>, rKey: String, rValue: String) : this(statefulRedisConnection, rKey, rValue, 6000L, false, 0, 0, 0)
 
     override fun tryLock(): Boolean {
         return try {
@@ -120,17 +122,15 @@ class RedisDistributedLock : DistributedLock {
     }
 
     private fun redisLock(): Boolean {
-        val result = this.stringRedisTemplate.opsForValue().setIfAbsent(
-                rKey,
+        val result = this.statefulRedisConnection.sync().set( rKey,
                 rValue,
-                leaseTime,
-                TimeUnit.MILLISECONDS
-        ) ?: false
+                SetArgs.Builder.nx().px(leaseTime)
+        )?:false
 
-        if (result) {
+        if (result == ok) {
             this.lockedAt = System.currentTimeMillis()
         }
-        return result
+        return result == ok
     }
 
     override fun unLock() {
@@ -159,19 +159,19 @@ class RedisDistributedLock : DistributedLock {
 
     private fun isAcquiredInThisProcess(): Boolean {
         return this.rValue ==
-                this.stringRedisTemplate.boundValueOps(this.rKey).get()
+                this.statefulRedisConnection.sync().get(this.rKey)
     }
 
     private fun removeLockKey() {
         if (this.unlinkAvailable) {
             try {
-                this.stringRedisTemplate.unlink(this.rKey)
+                this.statefulRedisConnection.sync().unlink(this.rKey)
             } catch (ex: Exception) {
                 this.unlinkAvailable = false
-                this.stringRedisTemplate.delete(this.rKey)
+                this.statefulRedisConnection.sync().del(this.rKey)
             }
         } else {
-            this.stringRedisTemplate.delete(this.rKey)
+            this.statefulRedisConnection.sync().del(this.rKey)
         }
     }
 
@@ -180,11 +180,11 @@ class RedisDistributedLock : DistributedLock {
     }
 
     private fun watchDog(threshold: Long, leaseRenewalTime: Long, times: AtomicInteger) {
-        val expire = this.stringRedisTemplate.getExpire(this.rKey) * 1000
+        val expire = this.statefulRedisConnection.sync().ttl(this.rKey) * 1000
         if (expire > 0 && isAcquiredInThisProcess()) {
             if (expire <= threshold) {
                 times.incrementAndGet()
-                this.stringRedisTemplate.expire(this.rKey, Duration.ofMillis(expire + leaseRenewalTime))
+                this.statefulRedisConnection.sync().pexpire(this.rKey, expire + leaseRenewalTime)
             }
         } else {
             throw RuntimeException("exit watchDog.")

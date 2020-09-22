@@ -5,6 +5,7 @@ import com.bybutter.middleware.distributed.lock.RedisLockProperty
 import com.bybutter.middleware.distributed.lock.autoconfigure.annotation.SisyphusDistributedLock
 import com.bybutter.sisyphus.jackson.Json
 import com.bybutter.sisyphus.jackson.toJson
+import io.lettuce.core.api.StatefulRedisConnection
 import java.util.UUID
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component
+import java.util.concurrent.TimeUnit
 
 @Aspect
 @Component
@@ -42,22 +44,22 @@ class SisyphusLockSupport {
             key = Json.deserialize(args[0].toJson()).get(sisyphusDistributedLock.rKeyParam).textValue()
             value = Json.deserialize(args[0].toJson()).get(sisyphusDistributedLock.rValueParam).textValue()
         }
-        var stringRedisTemplate: StringRedisTemplate? = null
-        val beanNamesForType = beanFactory.getBeanNamesForType(StringRedisTemplate::class.java)
+        var statefulRedisConnection: StatefulRedisConnection<String, String>? = null
+        val beanNamesForType = beanFactory.getBeanNamesForType(StatefulRedisConnection::class.java)
         loop@ for (it in beanNamesForType) {
             val abstractBeanDefinition = beanFactory.getBeanDefinition(it) as AbstractBeanDefinition
             for (qualifier in abstractBeanDefinition.qualifiers) {
                 if (qualifier.typeName == redisLockProperty.redisQualifier.typeName) {
-                    stringRedisTemplate = beanFactory.getBean(it) as StringRedisTemplate
+                    statefulRedisConnection = beanFactory.getBean(it) as StatefulRedisConnection<String, String>
                     break@loop
                 }
             }
         }
-        if (stringRedisTemplate == null) {
+        if (statefulRedisConnection == null) {
             throw NullPointerException("stringRedisTemplate is not be null.")
         }
         val redisDistributedLock = RedisDistributedLock(
-                stringRedisTemplate,
+                statefulRedisConnection,
                 key,
                 value,
                 sisyphusDistributedLock.leaseTime,
@@ -66,7 +68,7 @@ class SisyphusLockSupport {
                 sisyphusDistributedLock.leaseRenewTime,
                 sisyphusDistributedLock.leaseRenewalNumber
                 )
-        if (redisDistributedLock.tryLock()) {
+        if (redisDistributedLock.tryLock(10, TimeUnit.MILLISECONDS)) {
             try {
                 return joinPoint.proceed()
             } finally {

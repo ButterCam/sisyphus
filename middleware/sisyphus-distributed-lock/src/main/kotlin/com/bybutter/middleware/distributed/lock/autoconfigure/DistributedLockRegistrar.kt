@@ -20,7 +20,7 @@ class DistributedLockRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
         val properties: RedisLockProperty? = try {
             Binder.get(environment)
-                    .bindOrCreate("sisyphus.redisLock", RedisLockProperty::class.java)
+                    .bind("sisyphus.lock", RedisLockProperty::class.java).get()
         } catch (e: Exception) {
             null
         }
