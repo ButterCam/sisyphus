@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.middleware.elastic
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class ElasticProperty(
-    val name: String?,
+    val qualifier: Class<*>,
     val protocol: String,
     val host: String,
     val port: Int,
