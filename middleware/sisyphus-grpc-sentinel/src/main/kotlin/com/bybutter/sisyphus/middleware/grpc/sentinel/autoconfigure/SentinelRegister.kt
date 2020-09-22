@@ -43,9 +43,7 @@ class SentinelRegister : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
             }
             SentinelDatabase.REDIS -> {
                 try {
-                    if (property.redisClientName == null) {
-                        throw StatusException(Code.UNAVAILABLE, "redisClientName can not be null.")
-                    }
+                    property.redisClientName ?: throw StatusException(Code.UNAVAILABLE, "redisClientName can not be null.")
                     val redisClient = beanFactory.getBean(property.redisClientName, RedisClient::class.java)
                     val beanName = "redisDataSourceInit"
                     val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisDataSourceInit::class.java) {

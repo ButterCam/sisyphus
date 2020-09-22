@@ -7,19 +7,15 @@ import com.alibaba.csp.sentinel.log.RecordLog
 import com.alibaba.csp.sentinel.property.SentinelProperty
 import com.alibaba.csp.sentinel.util.AssertUtil
 import com.bybutter.sisyphus.jackson.toJson
-import com.bybutter.sisyphus.rpc.Code
-import com.bybutter.sisyphus.rpc.StatusException
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.sync.RedisCommands
 import io.lettuce.core.pubsub.RedisPubSubAdapter
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection
 import java.util.concurrent.locks.ReentrantLock
 
-class SisyphusRedisDataSource<T> : AbstractDataSource<String, T>, WritableDataSource<T> {
+class SisyphusRedisDataSource<T>(private val redisClient: RedisClient, parser: Converter<String, T>) : AbstractDataSource<String, T>(parser), WritableDataSource<T> {
 
     private val lock: ReentrantLock = ReentrantLock()
-
-    private var redisClient: RedisClient? = null
 
     private var key: String? = null
 
@@ -29,7 +25,7 @@ class SisyphusRedisDataSource<T> : AbstractDataSource<String, T>, WritableDataSo
         lock.lock()
         try {
             val toJSONString = value?.toJson()
-            redisClient?.connect()?.async()?.set(key, toJSONString) ?: throw StatusException(Code.UNAVAILABLE, "redisClient unAvailable")
+            redisClient.connect().async().set(key, toJSONString)
         } finally {
             lock.unlock()
         }
@@ -43,22 +39,20 @@ class SisyphusRedisDataSource<T> : AbstractDataSource<String, T>, WritableDataSo
      * @param channel channel to subscribe in Redis
      * @param parser customized data parser, cannot be empty
      */
-    constructor(redisClient: RedisClient, ruleKey: String, channel: String, parser: Converter<String, T>) : super(parser) {
+    constructor(redisClient: RedisClient, ruleKey: String, channel: String, parser: Converter<String, T>) : this(redisClient, parser) {
         AssertUtil.notEmpty(ruleKey, "Redis ruleKey can not be empty")
         AssertUtil.notEmpty(channel, "Redis subscribe channel can not be empty")
         this.ruleKey = ruleKey
-        this.redisClient = redisClient
         loadInitialConfig()
         subscribeFromChannel(channel)
     }
 
-    constructor(redisClient: RedisClient, key: String, parser: Converter<String, T>) : super(parser) {
-        this.redisClient = redisClient
+    constructor(redisClient: RedisClient, key: String, parser: Converter<String, T>) : this(redisClient, parser) {
         this.key = key
     }
 
     private fun subscribeFromChannel(channel: String) {
-        val pubSubConnection: StatefulRedisPubSubConnection<String, String> = redisClient?.connectPubSub() ?: throw StatusException(Code.UNAVAILABLE, "redisClient unAvailable")
+        val pubSubConnection: StatefulRedisPubSubConnection<String, String> = redisClient.connectPubSub()
         val adapterListener: RedisPubSubAdapter<String, String> = DelegatingRedisPubSubListener(this.getProperty(), parser)
         pubSubConnection.addListener(adapterListener)
         val sync = pubSubConnection.sync()
@@ -78,13 +72,13 @@ class SisyphusRedisDataSource<T> : AbstractDataSource<String, T>, WritableDataSo
     }
 
     override fun readSource(): String {
-        checkNotNull(this.redisClient) { "Redis client has not been initialized or error occurred" }
-        val stringRedisCommands: RedisCommands<String?, String> = redisClient?.connect()?.sync() ?: throw StatusException(Code.UNAVAILABLE, "redisClient unAvailable")
+        val stringRedisCommands: RedisCommands<String?, String> = redisClient.connect().sync()
+
         return stringRedisCommands[ruleKey]
     }
 
     override fun close() {
-        redisClient?.shutdown() ?: throw StatusException(Code.UNAVAILABLE, "redisClient unAvailable")
+        redisClient.shutdown()
     }
 
     private class DelegatingRedisPubSubListener<T>(val property: SentinelProperty<T>, val parser: Converter<String, T>) : RedisPubSubAdapter<String, String>() {
