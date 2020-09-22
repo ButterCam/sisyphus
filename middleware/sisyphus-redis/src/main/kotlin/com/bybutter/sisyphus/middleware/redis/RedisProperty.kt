@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.middleware.redis
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class RedisProperty(
-    val qualifier: Class<*>,
     val name: String?,
     val host: String,
     val port: Int,
