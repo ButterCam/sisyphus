@@ -38,7 +38,7 @@ class SisyphusRedisDataSource<T> : AbstractDataSource<String, T>, WritableDataSo
     /**
      * Constructor of `RedisDataSource`.
      *
-     * @param connectionConfig Redis connection config
+     * @param redisClient Redis client
      * @param ruleKey data key in Redis
      * @param channel channel to subscribe in Redis
      * @param parser customized data parser, cannot be empty

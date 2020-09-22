@@ -38,7 +38,7 @@ class FileDataSourceInit(private val sentinelProperties: SentinelProperties) : I
         createFileIfNotExits(systemRulePath)
         createFileIfNotExits(authorityRulePath)
         createFileIfNotExits(hotParamFlowRulePath)
-        // 流控规则
+        // flowRule
         val flowRuleRDS: ReadableDataSource<String, List<FlowRule>> = FileRefreshableDataSource(
                 flowRulePath,
                 flowRuleListParser
@@ -50,7 +50,7 @@ class FileDataSourceInit(private val sentinelProperties: SentinelProperties) : I
         )
         WritableDataSourceRegistry.registerFlowDataSource(flowRuleWDS)
 
-        // 降级规则
+        // degradeRule
         val degradeRuleRDS: ReadableDataSource<String, List<DegradeRule>> = FileRefreshableDataSource(
                 degradeRulePath,
                 degradeRuleListParser
@@ -62,7 +62,7 @@ class FileDataSourceInit(private val sentinelProperties: SentinelProperties) : I
         )
         WritableDataSourceRegistry.registerDegradeDataSource(degradeRuleWDS)
 
-        // 系统规则
+        // systemRule
         val systemRuleRDS: ReadableDataSource<String, List<SystemRule>> = FileRefreshableDataSource(
                 systemRulePath,
                 systemRuleListParser
@@ -74,7 +74,7 @@ class FileDataSourceInit(private val sentinelProperties: SentinelProperties) : I
         )
         WritableDataSourceRegistry.registerSystemDataSource(systemRuleWDS)
 
-        // 授权规则
+        // authorityRule
         val authorityRuleRDS: ReadableDataSource<String, List<AuthorityRule>> = FileRefreshableDataSource(
                 flowRulePath,
                 authorityRuleListParser
@@ -86,7 +86,7 @@ class FileDataSourceInit(private val sentinelProperties: SentinelProperties) : I
         )
         WritableDataSourceRegistry.registerAuthorityDataSource(authorityRuleWDS)
 
-        // 热点参数规则
+        // hotParamFlowRule
         val hotParamFlowRuleRDS: ReadableDataSource<String, List<ParamFlowRule>> = FileRefreshableDataSource(
                 hotParamFlowRulePath,
                 hotParamFlowRuleListParser
@@ -99,36 +99,16 @@ class FileDataSourceInit(private val sentinelProperties: SentinelProperties) : I
         ModifyParamFlowRulesCommandHandler.setWritableDataSource(paramFlowRuleWDS)
     }
 
-    /**
-     * 流控规则对象转换
-     */
     private val flowRuleListParser: Converter<String, List<FlowRule>> = Converter { source: String -> source.parseJson<List<FlowRule>>() }
 
-    /**
-     * 降级规则对象转换
-     */
     private val degradeRuleListParser: Converter<String, List<DegradeRule>> = Converter { source: String -> source.parseJson<List<DegradeRule>>() }
 
-    /**
-     * 系统规则对象转换
-     */
     private val systemRuleListParser: Converter<String, List<SystemRule>> = Converter { source: String -> source.parseJson<List<SystemRule>>() }
 
-    /**
-     * 授权规则对象转换
-     */
     private val authorityRuleListParser: Converter<String, List<AuthorityRule>> = Converter { source: String -> source.parseJson<List<AuthorityRule>>() }
 
-    /**
-     * 热点规则对象转换
-     */
     private val hotParamFlowRuleListParser: Converter<String, List<ParamFlowRule>> = Converter { source: String -> source.parseJson<List<ParamFlowRule>>() }
 
-    /**
-     * 创建目录
-     *
-     * @param filePath
-     */
     private fun mkdirIfNotExits(filePath: String) {
         val file = File(filePath)
         if (!file.exists()) {
@@ -136,12 +116,6 @@ class FileDataSourceInit(private val sentinelProperties: SentinelProperties) : I
         }
     }
 
-    /**
-     * 创建文件
-     *
-     * @param filePath
-     * @throws IOException
-     */
     @Throws(IOException::class)
     private fun createFileIfNotExits(filePath: String) {
         val file = File(filePath)
