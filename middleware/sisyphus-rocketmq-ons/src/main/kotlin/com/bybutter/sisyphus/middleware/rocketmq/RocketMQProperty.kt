@@ -35,5 +35,5 @@ enum class ConsumerType {
     NORMAL,
     BATCH,
     ORDER,
-    PULL,
+    PULL
 }

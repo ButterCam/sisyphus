@@ -73,17 +73,16 @@ class RocketMQRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
                     registry.registerBeanDefinition(orderProducerName, orderProducerDefinition)
                 }
                 ProducerType.TRANSACTION -> {
-                    val checkers = beanFactory.getBeanNamesForType(LocalTransactionChecker::class.java)
-                    checkers.forEach {
-                        val beanDefinition = beanFactory.getBeanDefinition(it) as AbstractBeanDefinition
+                    val checkers = beanFactory.getBeansOfType(LocalTransactionChecker::class.java)
+                    for ((key, value) in checkers){
+                        val beanDefinition = beanFactory.getBeanDefinition(key) as AbstractBeanDefinition
                         val qualifiers = beanDefinition.qualifiers
-                        qualifiers.forEach { qualifier ->
-                            if (qualifier.typeName == property.qualifier.typeName) {
+                        qualifiers.forEach {
+                            if (it.typeName == property.qualifier.typeName) {
                                 val transactionProducerName = "$BEAN_NAME_PREFIX:${name}TransactionProducer"
                                 val transactionProducerDefinition = BeanDefinitionBuilder.genericBeanDefinition(TransactionProducer::class.java) {
                                     val factory = beanFactory.getBean(RocketTemplateFactory::class.java)
-                                    val checker = beanFactory.getBean(it) as LocalTransactionChecker
-                                    factory.createTransactionProducer(property, checker)
+                                    factory.createTransactionProducer(property, value)
                                 }.beanDefinition
                                 transactionProducerDefinition.initMethodName = INIT_METHOD
                                 transactionProducerDefinition.destroyMethodName = DESTROY_METHOD
