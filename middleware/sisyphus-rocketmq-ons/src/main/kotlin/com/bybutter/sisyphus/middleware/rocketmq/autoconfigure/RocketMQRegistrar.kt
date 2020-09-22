@@ -74,7 +74,7 @@ class RocketMQRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
                 }
                 ProducerType.TRANSACTION -> {
                     val checkers = beanFactory.getBeansOfType(LocalTransactionChecker::class.java)
-                    for ((key, value) in checkers){
+                    for ((key, value) in checkers) {
                         val beanDefinition = beanFactory.getBeanDefinition(key) as AbstractBeanDefinition
                         val qualifiers = beanDefinition.qualifiers
                         qualifiers.forEach {

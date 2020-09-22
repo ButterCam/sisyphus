@@ -16,7 +16,7 @@ class DefaultRocketTemplateFactory : RocketTemplateFactory {
     private var properties: Properties? = null
 
     override fun getMQProperties(property: RocketMQProperty): Properties {
-        return properties?:Properties().apply {
+        return properties ?: Properties().apply {
             this.setProperty(PropertyKeyConst.AccessKey, property.accessKey)
             this.setProperty(PropertyKeyConst.SecretKey, property.secretKey)
             this.setProperty(PropertyKeyConst.NAMESRV_ADDR, property.nameServerAddr)
