@@ -11,11 +11,11 @@ annotation class SisyphusDistributedLock(
     /**
      * 方法上第一个参数的某一个字段
      */
-    val rKeyParam: String,
+    val rKeyParam: String = "",
     /**
      * 方法上第一个参数的某一个字段
      */
-val rValueParam: String,
+    val rValueParam: String = "",
     val leaseTime: Long = 5000L,
     val leaseRenewTime: Long = 5000L,
     val threshold: Long = 2000L,

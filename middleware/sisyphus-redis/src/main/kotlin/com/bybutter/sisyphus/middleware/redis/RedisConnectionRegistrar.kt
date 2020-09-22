@@ -3,12 +3,14 @@ package com.bybutter.sisyphus.middleware.redis
 import io.lettuce.core.api.StatefulRedisConnection
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
+import org.springframework.beans.factory.support.AutowireCandidateQualifier
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
 import org.springframework.boot.context.properties.bind.Binder
 import org.springframework.context.EnvironmentAware
 import org.springframework.core.env.Environment
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component
 
 @Component
@@ -40,7 +42,16 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
                 val factory = beanFactory.getBean(RedisClientFactory::class.java)
                 factory.createClient(property).connect()
             }.setDestroyMethodName("close").beanDefinition
+            beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
+
+            val stringRedisTemplateName = "StringRedisTemplate:$name"
+            val stringRedisTemplateDefinition = BeanDefinitionBuilder.genericBeanDefinition(StringRedisTemplate::class.java) {
+                val factory = beanFactory.getBean(RedisClientFactory::class.java)
+                factory.createStringRedisTemplate(property)
+            }.beanDefinition
+            stringRedisTemplateDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
+            registry.registerBeanDefinition(stringRedisTemplateName, stringRedisTemplateDefinition)
         }
     }
 

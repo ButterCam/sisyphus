@@ -7,12 +7,15 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantLock
+import org.apache.commons.logging.LogFactory
 import org.springframework.dao.CannotAcquireLockException
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory
 import org.springframework.util.ReflectionUtils
 
 class RedisDistributedLock : DistributedLock {
+
+    private val logger = LogFactory.getLog(RedisDistributedLock::class.java)
 
     private var stringRedisTemplate: StringRedisTemplate
     private var rKey: String
@@ -70,6 +73,9 @@ class RedisDistributedLock : DistributedLock {
             if (!acquired) {
                 this.localLock.unlock()
             }
+            if (acquired) {
+                enableWatchDog()
+            }
             return acquired
         } catch (e: Exception) {
             this.localLock.unlock()
@@ -92,7 +98,10 @@ class RedisDistributedLock : DistributedLock {
                 rethrowAsLockException(e)
             }
         }
+        enableWatchDog()
+    }
 
+    private fun enableWatchDog() {
         if (enableWatchDog) {
             val times = AtomicInteger(0)
             val currentThread = Thread.currentThread()
@@ -107,6 +116,7 @@ class RedisDistributedLock : DistributedLock {
                 watchDog(threshold, leaseRenewalTime, times)
             }, 0, 100L, TimeUnit.MILLISECONDS)
         }
+        logger.info("start lock, RedisDistributedLock's value is ${this.rValue}")
     }
 
     private fun redisLock(): Boolean {
@@ -139,6 +149,7 @@ class RedisDistributedLock : DistributedLock {
             } else {
                 removeLockKey()
             }
+            logger.info("end lock, RedisDistributedLock's value is ${this.rValue}")
         } catch (e: Exception) {
             ReflectionUtils.rethrowRuntimeException(e)
         } finally {

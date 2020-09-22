@@ -23,7 +23,7 @@ class SisyphusLockSupport {
     @Autowired
     private lateinit var beanFactory: ConfigurableListableBeanFactory
 
-    @Autowired
+    @Autowired(required = false)
     private lateinit var redisLockProperty: RedisLockProperty
 
     @Pointcut("@annotation(sisyphusDistributedLock)")
@@ -35,7 +35,7 @@ class SisyphusLockSupport {
         val args = joinPoint.args
         val key: String
         val value: String
-        if (args == null) {
+        if (args == null || args.isEmpty() || sisyphusDistributedLock.rKeyParam == "") {
             key = joinPoint.signature.name
             value = UUID.randomUUID().toString() + System.currentTimeMillis()
         } else {
@@ -47,7 +47,7 @@ class SisyphusLockSupport {
         loop@ for (it in beanNamesForType) {
             val abstractBeanDefinition = beanFactory.getBeanDefinition(it) as AbstractBeanDefinition
             for (qualifier in abstractBeanDefinition.qualifiers) {
-                if (qualifier.typeName == redisLockProperty.redisQualifier) {
+                if (qualifier.typeName == redisLockProperty.redisQualifier.typeName) {
                     stringRedisTemplate = beanFactory.getBean(it) as StringRedisTemplate
                     break@loop
                 }
@@ -68,7 +68,6 @@ class SisyphusLockSupport {
                 )
         if (redisDistributedLock.tryLock()) {
             try {
-                redisDistributedLock.lock()
                 return joinPoint.proceed()
             } finally {
                 redisDistributedLock.unLock()
