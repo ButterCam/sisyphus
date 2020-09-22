@@ -1,8 +1,6 @@
 package com.bybutter.sisyphus.middleware.jdbc
 
 import org.jooq.Configuration
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.stereotype.Component
 
 /**
  * Interceptor for specified Jooq configuration.

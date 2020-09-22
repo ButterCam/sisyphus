@@ -64,9 +64,9 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
             set(TransactionDelegatingDataSource(datasource))
         }
         return interceptors.fold(config) { c, h ->
-            if (h.qualifier == null || h.qualifier == qualifier){
+            if (h.qualifier == null || h.qualifier == qualifier) {
                 h.intercept(c)
-            }else {
+            } else {
                 c
             }
         }
