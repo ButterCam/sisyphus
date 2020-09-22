@@ -12,10 +12,10 @@ import org.jooq.impl.DefaultConfiguration
 import org.jooq.tools.jdbc.JDBCUtils
 
 abstract class AbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) : DslContextFactory {
-    final override fun createContext(name: String, property: JdbcDatabaseProperty): DSLContext {
+    final override fun createContext(qualifier: Class<*>, property: JdbcDatabaseProperty): DSLContext {
         val url = buildJdbcUrl(property)
         val datasource = createDatasource(url, property)
-        return DSL.using(createConfiguration(name, datasource, JDBCUtils.dialect(url), configInterceptors))
+        return DSL.using(createConfiguration(qualifier, datasource, JDBCUtils.dialect(url), configInterceptors))
     }
 
     protected open fun buildJdbcUrl(property: JdbcDatabaseProperty): String {
@@ -58,16 +58,15 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         })
     }
 
-    protected open fun createConfiguration(name: String, datasource: DataSource, dialect: SQLDialect, interceptors: List<JooqConfigInterceptor>): Configuration {
+    protected open fun createConfiguration(qualifier: Class<*>, datasource: DataSource, dialect: SQLDialect, interceptors: List<JooqConfigInterceptor>): Configuration {
         val config: Configuration = DefaultConfiguration().apply {
             set(dialect)
             set(TransactionDelegatingDataSource(datasource))
         }
-
         return interceptors.fold(config) { c, h ->
-            if (h.name == null || h.name == name) {
+            if (h.qualifier == null || h.qualifier == qualifier){
                 h.intercept(c)
-            } else {
+            }else {
                 c
             }
         }

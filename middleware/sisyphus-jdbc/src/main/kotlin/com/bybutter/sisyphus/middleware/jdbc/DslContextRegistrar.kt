@@ -39,7 +39,7 @@ class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwar
             val beanName = "$BEAN_NAME_PREFIX:$name"
             val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DSLContext::class.java) {
                 val factory = beanFactory.getBean(DslContextFactory::class.java)
-                factory.createContext(beanName, property)
+                factory.createContext(property.qualifier, property)
             }.beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)

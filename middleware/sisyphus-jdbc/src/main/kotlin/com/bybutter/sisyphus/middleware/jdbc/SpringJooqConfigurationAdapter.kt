@@ -49,6 +49,8 @@ class SpringJooqConfigurationAdapter : JooqConfigInterceptor {
 
     override val name: String? = null
 
+    override val qualifier: Class<*>? = null
+
     override fun intercept(configuration: Configuration): Configuration {
         transactionProvider.ifAvailable { configuration.set(it) }
         recordMapperProvider.ifAvailable { configuration.set(it) }
