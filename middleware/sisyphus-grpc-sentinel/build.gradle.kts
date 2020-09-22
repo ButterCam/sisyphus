@@ -4,7 +4,7 @@ plugins {
     `java-library`
 }
 
-description = "Starter for building gRPC sentinel in Sisyphus Framework"
+description = "Middleware for building gRPC sentinel in Sisyphus Framework"
 
 dependencies {
     api(project(":lib:sisyphus-jackson"))
