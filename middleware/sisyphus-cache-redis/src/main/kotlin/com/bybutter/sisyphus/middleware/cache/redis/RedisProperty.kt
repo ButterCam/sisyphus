@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.middleware.redis
+package com.bybutter.sisyphus.middleware.cache.redis
 
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 

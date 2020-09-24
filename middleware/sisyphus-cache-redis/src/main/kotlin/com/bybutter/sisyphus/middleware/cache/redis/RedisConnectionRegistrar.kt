@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.middleware.redis
+package com.bybutter.sisyphus.middleware.cache.redis
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
-    private lateinit var environment: Environment
+    private var environment: Environment? = null
 
     override fun setEnvironment(environment: Environment) {
         this.environment = environment
@@ -39,7 +39,7 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
         for ((name, property) in properties) {
             val beanName = "$CONNECTION_PREFIX:$name"
             val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StatefulRedisConnection::class.java) {
-                val redisClient = beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
+                val redisClient = beanFactory.getBean(RedisFactory::class.java).createClient(property)
                 redisClient.connect()
             }.setDestroyMethodName("close").beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
@@ -47,7 +47,7 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
 
             val clientBeanName = "$CLIENT_PREFIX:$name"
             val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisClient::class.java) {
-                beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
+                beanFactory.getBean(RedisFactory::class.java).createClient(property)
             }.beanDefinition
             clientBeanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(clientBeanName, clientBeanDefinition)

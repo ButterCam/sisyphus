@@ -1,7 +1,7 @@
-package com.bybutter.sisyphus.middleware.redis
+package com.bybutter.sisyphus.middleware.cache.redis
 
 import io.lettuce.core.RedisClient
 
-interface RedisClientFactory {
+interface RedisFactory {
     fun createClient(property: RedisProperty): RedisClient
 }

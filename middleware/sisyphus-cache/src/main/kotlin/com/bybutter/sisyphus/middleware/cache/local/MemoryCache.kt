@@ -2,24 +2,21 @@
  * Copyright reserved by Beijing Muke Technology Co., Ltd. 2018
  */
 
-package com.bybutter.sisyphus.middleware.redis.cache
+package com.bybutter.sisyphus.middleware.cache.local
 
+import com.bybutter.sisyphus.middleware.cache.CacheProvider
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
-class MemoryCache<in K, V> : CacheProvider<K, V> {
-    private val cacheMap: MutableMap<K, CacheValueWrapper<V>> = ConcurrentHashMap()
+class MemoryCache : CacheProvider {
+    private val cacheMap: MutableMap<Any, CacheValueWrapper<Any>> = ConcurrentHashMap()
 
     companion object {
         @Volatile
         var threshold = 20
     }
 
-    override suspend fun get(key: K): V? {
-        return dataValidation(cacheMap[key], key)?.getValue()
-    }
-
-    override suspend fun set(key: K, value: V?) {
+    override suspend fun add(key: Any, value: Any?) {
         dataValidation(cacheMap[key], key)?.get()?.let {
             it.value = value
             return
@@ -28,70 +25,70 @@ class MemoryCache<in K, V> : CacheProvider<K, V> {
         clearExpireData()
     }
 
-    override suspend fun set(key: K, value: V?, duration: Long, unit: TimeUnit) {
-        if (duration != 0L) {
-            cacheMap[key] = CacheValueWrapper(value, duration, unit)
+    override suspend fun add(key: Any, ttl: Long, timeUnit: TimeUnit, value: Any?) {
+        if (ttl != 0L) {
+            cacheMap[key] = CacheValueWrapper(value, timeUnit.toMillis(ttl))
         } else {
             this.remove(key)
         }
         clearExpireData()
     }
 
-    override suspend fun getOrSet(key: K, action: suspend () -> V?): V? {
-        val value = action()
-        val valueWrapper = dataValidation(cacheMap[key], key)?.get() ?: {
-            CacheValueWrapper(value).apply {
+    override suspend fun addIfAbsent(key: Any, ttl: Long, timeUnit: TimeUnit, value: Any?): Any? {
+        return cacheMap[key]?.let {
+            return null
+        } ?: cacheMap.put(key, CacheValueWrapper(value, timeUnit.toMillis(ttl)))?.getValue()
+    }
+
+    override suspend fun getOrPut(key: Any, value: Any?): Any? {
+        val valueWrapper = dataValidation(cacheMap[key], key)?.get() ?: CacheValueWrapper(value).apply {
+            cacheMap[key] = this
+        }.get()
+        clearExpireData()
+        return valueWrapper?.value
+    }
+
+    override suspend fun getOrPut(key: Any, ttl: Long, timeUnit: TimeUnit, value: Any?): Any? {
+        val valueWrapper = dataValidation(cacheMap[key], key)?.get() ?: CacheValueWrapper(
+            value,
+            timeUnit.toMillis(ttl)
+        ).apply {
+            if (ttl != 0L) {
                 cacheMap[key] = this
-            }.get()
-        }()
+            } else {
+                cacheMap.remove(key)
+            }
+        }.get()
         clearExpireData()
         return valueWrapper?.value
     }
 
-    override suspend fun getOrSet(key: K, duration: Long, unit: TimeUnit, action: suspend () -> V?): V? {
-        val value = action()
-        val valueWrapper = dataValidation(cacheMap[key], key)?.get() ?: {
-            CacheValueWrapper(value, duration, unit).apply {
-                if (duration != 0L) {
-                    cacheMap[key] = this
-                } else {
-                    cacheMap.remove(key)
-                }
-            }.get()
-        }()
-        clearExpireData()
-        return valueWrapper?.value
+    override suspend fun get(key: Any): Any? {
+        return dataValidation(cacheMap[key], key)?.getValue()
     }
 
-    override suspend fun remove(key: K) {
+    override suspend fun remove(key: Any) {
         cacheMap.remove(key)
     }
 
-    override suspend fun contains(key: K): Boolean {
-        return cacheMap[key]?.get() != null
+    override suspend fun remove(keys: Collection<Any>) {
+        for (key in keys) {
+            cacheMap.remove(key)
+        }
     }
 
-    override suspend fun clear() {
-        cacheMap.clear()
-        threshold = 20
+    override suspend fun expire(key: Any, ttl: Long, timeUnit: TimeUnit) {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun increment(key: K, delta: Long): Long {
-        throw UnsupportedOperationException("MemoryCache don't support increment")
+    override suspend fun incr(key: Any): Long? {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun expire(key: K, duration: Long, unit: TimeUnit) {
-        throw UnsupportedOperationException("Expire don't support increment")
-    }
-
-    override suspend fun extendableGetOrSet(key: K, duration: Long, unit: TimeUnit, action: suspend () -> V?): V? {
-        TODO("not implemented")
-    }
-
-    private suspend fun dataValidation(cache: CacheValueWrapper<V>?, key: K): CacheValueWrapper<V>? {
+    private suspend fun dataValidation(cache: CacheValueWrapper<Any>?, key: Any): CacheValueWrapper<Any>? {
         cache ?: return null
         return if (cache.expired) {
-            this.remove(key)
+            this.remove(arrayListOf(key))
             null
         } else {
             cache
@@ -136,15 +133,21 @@ class MemoryCache<in K, V> : CacheProvider<K, V> {
         }
     }
 
+    private fun convertKey(key: Any): String? {
+        return if (key is String) {
+            key
+        } else null
+    }
+
     private class CacheValueWrapper<T> {
         private var value: ValueWrapper<T?>
         private val expireAt: Long?
 
         val expired: Boolean get() = this.expireAt != null && this.expireAt < System.currentTimeMillis()
 
-        constructor(value: T?, duration: Long, unit: TimeUnit) {
+        constructor(value: T?, ttl: Long) {
             this.value = ValueWrapper(value)
-            this.expireAt = System.currentTimeMillis() + unit.toMillis(duration)
+            this.expireAt = System.currentTimeMillis() + ttl
         }
 
         constructor(value: T?) {

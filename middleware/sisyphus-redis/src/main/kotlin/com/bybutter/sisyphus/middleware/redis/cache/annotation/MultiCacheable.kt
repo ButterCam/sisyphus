@@ -14,10 +14,12 @@ import kotlin.reflect.KClass
 )
 @Inherited
 annotation class MultiCacheable(
-    val cacheName: String = "",
-    val key: String = "",
-    val ttl: Long = 600,
-    val cacheType: CacheType = CacheType.NORMAL,
-    val cacheAdapter: KClass<out CacheAdapter> = CacheAdapter::class,
-    val remCount: Int = 8
+        val key: String = "",
+        val ttl: Long = 600,
+        val cacheType: CacheType = CacheType.NORMAL,
+        val qualifier: String = "",
+        val cacheAdapter: KClass<out CacheAdapter> = CacheAdapter::class,
+        val batchParamName: String = "",
+        val serializer: KClass<out RedisSerializer<Any>> = RedisSerializer.json()::class,
+        val remCount: Int = 8
 )
