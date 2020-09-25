@@ -11,10 +11,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.boot.context.properties.bind.Binder
 import org.springframework.context.EnvironmentAware
 import org.springframework.core.env.Environment
-import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.connection.RedisPassword
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.stereotype.Component
 
 @Component
