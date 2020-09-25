@@ -11,10 +11,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.boot.context.properties.bind.Binder
 import org.springframework.context.EnvironmentAware
 import org.springframework.core.env.Environment
-import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.connection.RedisPassword
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -41,33 +37,25 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
         if (properties.isEmpty()) return
 
         for ((name, property) in properties) {
-            val beanName = "$BEAN_NAME_PREFIX:$name"
-            val connectionFactoryBeanName = "$CONNECTION_FACTORY_BEAN_NAME_PREFIX:$name"
-
-            val redisConnectionFactory = LettuceConnectionFactory(convertToConfig(property))
-            val redisConnectionFactoryBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisConnectionFactory::class.java) {
-                redisConnectionFactory
-            }.setDestroyMethodName("destroy").beanDefinition
-            redisConnectionFactoryBeanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
-            registry.registerBeanDefinition(connectionFactoryBeanName, redisConnectionFactoryBeanDefinition)
-
+            val beanName = "$CONNECTION_PREFIX:$name"
             val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StatefulRedisConnection::class.java) {
-                RedisClient.create(redisConnectionFactory.clientResources).connect()
+                val redisClient = beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
+                redisClient.connect()
             }.setDestroyMethodName("close").beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
-        }
-    }
 
-    private fun convertToConfig(property: RedisProperty): RedisStandaloneConfiguration {
-        return RedisStandaloneConfiguration(property.host, property.port).apply {
-            this.password = RedisPassword.of(property.password)
-            this.database = property.database ?: 0
+            val clientBeanName = "$CLIENT_PREFIX:$name"
+            val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisClient::class.java) {
+                beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
+            }.beanDefinition
+            clientBeanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
+            registry.registerBeanDefinition(clientBeanName, clientBeanDefinition)
         }
     }
 
     companion object {
-        private const val BEAN_NAME_PREFIX = "sisyphus:redis"
-        private const val CONNECTION_FACTORY_BEAN_NAME_PREFIX = "sisyphus:redis:connection:factory"
+        private const val CONNECTION_PREFIX = "sisyphus:redis:connection"
+        private const val CLIENT_PREFIX = "sisyphus:redis:client"
     }
 }
