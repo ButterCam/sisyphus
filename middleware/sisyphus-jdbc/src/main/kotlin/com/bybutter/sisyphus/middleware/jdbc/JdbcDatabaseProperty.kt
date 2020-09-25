@@ -3,13 +3,13 @@ package com.bybutter.sisyphus.middleware.jdbc
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class JdbcDatabaseProperty(
-    val name: String? = null,
     val url: String,
     val userName: String? = null,
     val password: String? = null,
     val parameters: Map<String, String> = mapOf(),
     @NestedConfigurationProperty
-    val poolConfig: ConnectionPoolProperty? = null
+    val poolConfig: ConnectionPoolProperty? = null,
+    val qualifier: Class<*>
 )
 
 data class ConnectionPoolProperty(

@@ -50,7 +50,7 @@ class MultiCacheConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    fun redisCacheWriter(redisConnectionFactory: RedisConnectionFactory?): RedisCacheWriter? {
+    fun redisCacheWriter(redisConnectionFactory: RedisConnectionFactory): RedisCacheWriter? {
         return RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory)
     }
 

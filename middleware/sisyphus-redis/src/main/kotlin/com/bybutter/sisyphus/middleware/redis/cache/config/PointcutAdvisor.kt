@@ -1,5 +1,7 @@
 package com.bybutter.sisyphus.middleware.redis.cache.config
 
+import com.bybutter.sisyphus.middleware.redis.cache.annotation.MultiCacheEvict
+import com.bybutter.sisyphus.middleware.redis.cache.annotation.MultiCachePut
 import com.bybutter.sisyphus.middleware.redis.cache.annotation.MultiCacheable
 import java.io.Serializable
 import java.lang.reflect.Method
@@ -27,7 +29,7 @@ class MultiCachePutBeanFactorySourceAdvisor : AbstractBeanFactoryPointcutAdvisor
 
 class MultiCachePutSourcePointcut : StaticMethodMatcherPointcut(), Serializable {
     override fun matches(method: Method, targetClass: Class<*>): Boolean {
-        return method.getAnnotation(MultiCacheable::class.java) != null
+        return method.getAnnotation(MultiCachePut::class.java) != null
     }
 }
 
@@ -39,6 +41,6 @@ class MultiCacheEvictBeanFactorySourceAdvisor : AbstractBeanFactoryPointcutAdvis
 
 class MultiCacheEvictSourcePointcut : StaticMethodMatcherPointcut(), Serializable {
     override fun matches(method: Method, targetClass: Class<*>): Boolean {
-        return method.getAnnotation(MultiCacheable::class.java) != null
+        return method.getAnnotation(MultiCacheEvict::class.java) != null
     }
 }
