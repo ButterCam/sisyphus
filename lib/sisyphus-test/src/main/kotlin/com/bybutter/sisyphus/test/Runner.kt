@@ -9,7 +9,9 @@ import io.grpc.ManagedChannelBuilder
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.kotlin.ClientCalls
+import kotlin.reflect.full.companionObjectInstance
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 
 fun TestCase.run() {
     for (serviceTestSet in this.serviceTestSet) {
@@ -18,8 +20,8 @@ fun TestCase.run() {
 }
 
 private fun TestCase.run(serviceTestSet: ServiceTestSet) = runBlocking {
-    val service = ProtoTypes.getSupportByProtoName(serviceTestSet.service) as ServiceSupport
-    val channel = ManagedChannelBuilder.forTarget(serviceTestSet.authority).build()
+    val service = ProtoTypes.getRegisterService(serviceTestSet.service)?.kotlin?.companionObjectInstance as ServiceSupport
+    val channel = ManagedChannelBuilder.forTarget(serviceTestSet.authority).usePlaintext().build()
 
     for (methodTest in serviceTestSet.methodTests) {
         val metadata = (this@run.metadata + serviceTestSet.metadata + methodTest.metadata).filterValues { it.isNotEmpty() }
@@ -37,13 +39,14 @@ private fun TestCase.run(serviceTestSet: ServiceTestSet) = runBlocking {
         ))
 
         for (assert in methodTest.asserts) {
+
+            val logger = LoggerFactory.getLogger(this::class.java)
+
             if (celEngine.eval(assert) != false) {
-                return@runBlocking "Pass"
+                return@runBlocking logger.info("Pass")
             } else {
-                return@runBlocking "Fail"
+                return@runBlocking logger.error("Fail")
             }
         }
-    }
-    fun cleanUp() {
     }
 }

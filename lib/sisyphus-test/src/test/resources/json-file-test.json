@@ -1,19 +1,19 @@
 {
-  "metadata":
-  {
-      "host": "127.0.0.1:8089",
-      "Content-Type": "application/json"
-  },
   "serviceTestSet": [
     {
-      "service": "/sisyphus/butter/test",
+      "service": "sisyphus.test.test.TestApi",
+      "authority": "localhost:9090",
       "methodTests": [
         {
           "name": "Json Arguments Provider Test name",
           "title": "Json Arguments Provider Test name",
-          "method": "GET",
+          "method": "Echo",
+          "input": {
+            "@type": "types.butterapis.com/sisyphus.test.test.EchoRequest",
+            "message": "Hello"
+          },
           "asserts": [
-            "request.status == 200"
+            "response.message == 'echo: Hello'"
           ]
         }
       ]
