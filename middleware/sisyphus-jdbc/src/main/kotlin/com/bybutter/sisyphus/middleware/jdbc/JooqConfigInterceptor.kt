@@ -11,5 +11,7 @@ interface JooqConfigInterceptor {
      */
     val name: String?
 
+    val qualifier: Class<*>?
+
     fun intercept(configuration: Configuration): Configuration
 }

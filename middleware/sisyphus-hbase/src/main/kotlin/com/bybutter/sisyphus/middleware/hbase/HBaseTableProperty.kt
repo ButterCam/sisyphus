@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.middleware.hbase
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class HBaseTableProperty(
-    val name: String?,
+    val qualifier: Class<*>,
     val urls: List<String>,
     val publicUrls: List<String>,
     val template: Class<*>

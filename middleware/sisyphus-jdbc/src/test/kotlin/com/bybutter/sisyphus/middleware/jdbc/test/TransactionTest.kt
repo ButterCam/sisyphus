@@ -13,7 +13,6 @@ import org.jooq.impl.SQLDataType
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -21,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootApplication
 class TransactionTest {
     @Test
-    fun `test sisyphus transaction`(@Qualifier("sisyphus:jdbc:embeddedDatasource") dsl: DSLContext): Unit = runBlocking {
+    fun `test sisyphus transaction`(@Jdbc.Test dsl: DSLContext): Unit = runBlocking {
         initializeTable(dsl)
 
         assertRollback {
@@ -38,7 +37,7 @@ class TransactionTest {
     }
 
     @Test
-    fun `test sisyphus nest transaction`(@Qualifier("sisyphus:jdbc:embeddedDatasource") dsl: DSLContext): Unit = runBlocking {
+    fun `test sisyphus nest transaction`(@Jdbc.Test dsl: DSLContext): Unit = runBlocking {
         initializeTable(dsl)
 
         transaction {
@@ -60,7 +59,7 @@ class TransactionTest {
     }
 
     @Test
-    fun `test sisyphus new transaction`(@Qualifier("sisyphus:jdbc:embeddedDatasource") dsl: DSLContext): Unit = runBlocking {
+    fun `test sisyphus new transaction`(@Jdbc.Test dsl: DSLContext): Unit = runBlocking {
         initializeTable(dsl)
 
         transaction {
@@ -82,7 +81,7 @@ class TransactionTest {
     }
 
     @Test
-    fun `test sisyphus nest jooq transaction`(@Qualifier("sisyphus:jdbc:embeddedDatasource") dsl: DSLContext): Unit = runBlocking {
+    fun `test sisyphus nest jooq transaction`(@Jdbc.Test dsl: DSLContext): Unit = runBlocking {
         initializeTable(dsl)
 
         transaction {
