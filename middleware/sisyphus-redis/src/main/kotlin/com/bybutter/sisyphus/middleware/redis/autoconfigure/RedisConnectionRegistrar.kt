@@ -1,5 +1,8 @@
-package com.bybutter.sisyphus.middleware.redis
+package com.bybutter.sisyphus.middleware.redis.autoconfigure
 
+import com.bybutter.sisyphus.middleware.redis.RedisClientFactory
+import com.bybutter.sisyphus.middleware.redis.RedisProperties
+import com.bybutter.sisyphus.middleware.redis.RedisProperty
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
