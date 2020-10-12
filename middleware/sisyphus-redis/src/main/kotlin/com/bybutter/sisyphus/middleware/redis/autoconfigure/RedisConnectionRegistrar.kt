@@ -1,12 +1,10 @@
-package com.bybutter.sisyphus.middleware.redis.autoconfigure
+package com.bybutter.sisyphus.middleware.redis
 
-import com.bybutter.sisyphus.middleware.redis.RedisClientFactory
-import com.bybutter.sisyphus.middleware.redis.RedisProperties
-import com.bybutter.sisyphus.middleware.redis.RedisProperty
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
+import org.springframework.beans.factory.support.AutowireCandidateQualifier
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
@@ -39,14 +37,22 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
         if (properties.isEmpty()) return
 
         for ((name, property) in properties) {
-            val beanName = property.name ?: "$BEAN_NAME_PREFIX:$name"
+            val beanName = "$CONNECTION_PREFIX:$name"
             val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StatefulRedisConnection::class.java) {
-                val factory = beanFactory.getBean(RedisClientFactory::class.java)
-                factory.createClient(property).connect()
+                val redisClient = beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
+                redisClient.connect()
             }.setDestroyMethodName("close").beanDefinition
+            beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
 
-            val redisClientName = "${property.name}:RedisClient"
+            val clientBeanName = "$CLIENT_PREFIX:$name"
+            val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisClient::class.java) {
+                beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
+            }.beanDefinition
+            clientBeanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
+            registry.registerBeanDefinition(clientBeanName, clientBeanDefinition)
+
+            val redisClientName = "${name}:RedisClient"
             val redisClientDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisClient::class.java) {
                 val factory = beanFactory.getBean(RedisClientFactory::class.java)
                 factory.createClient(property)
@@ -56,6 +62,7 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
     }
 
     companion object {
-        private const val BEAN_NAME_PREFIX = "sisyphus:redis"
+        private const val CONNECTION_PREFIX = "sisyphus:redis:connection"
+        private const val CLIENT_PREFIX = "sisyphus:redis:client"
     }
 }

@@ -8,6 +8,6 @@ import org.springframework.context.annotation.Configuration
 class EmbeddedDatasourceConfig {
     @Bean
     fun embeddedDatasource(): JdbcDatabaseProperty {
-        return JdbcDatabaseProperty(url = "jdbc:h2:mem:test")
+        return JdbcDatabaseProperty(url = "jdbc:h2:mem:test", qualifier = Jdbc.Test::class.java)
     }
 }

@@ -57,5 +57,10 @@ dependencies {
         api("com.alibaba.csp:sentinel-transport-simple-http:1.8.0")
         api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.0")
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.0")
+        api("com.aliyun.openservices:ons-client:1.8.7.1.Final")
+        api("com.alibaba.csp:sentinel-grpc-adapter:1.8.0")
+        api("com.alibaba.csp:sentinel-transport-simple-http:1.8.0")
+        api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.0")
+        api("com.alibaba.csp:sentinel-datasource-redis:1.8.0")
     }
 }

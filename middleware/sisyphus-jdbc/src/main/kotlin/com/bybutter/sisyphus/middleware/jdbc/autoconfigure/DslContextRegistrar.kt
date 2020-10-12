@@ -6,6 +6,7 @@ import com.bybutter.sisyphus.middleware.jdbc.JdbcDatabaseProperty
 import org.jooq.DSLContext
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
+import org.springframework.beans.factory.support.AutowireCandidateQualifier
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
@@ -38,11 +39,12 @@ class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwar
         if (properties.isEmpty()) return
 
         for ((name, property) in properties) {
-            val beanName = property.name ?: "$BEAN_NAME_PREFIX:$name"
+            val beanName = "$BEAN_NAME_PREFIX:$name"
             val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DSLContext::class.java) {
                 val factory = beanFactory.getBean(DslContextFactory::class.java)
-                factory.createContext(beanName, property)
+                factory.createContext(property.qualifier, property)
             }.beanDefinition
+            beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
         }
     }
