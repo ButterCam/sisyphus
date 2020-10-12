@@ -55,7 +55,7 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
             clientBeanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(clientBeanName, clientBeanDefinition)
 
-            val redisClientName = "${name}:RedisClient"
+            val redisClientName = "$name:RedisClient"
             val redisClientDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisClient::class.java) {
                 val factory = beanFactory.getBean(RedisClientFactory::class.java)
                 factory.createClient(property)
