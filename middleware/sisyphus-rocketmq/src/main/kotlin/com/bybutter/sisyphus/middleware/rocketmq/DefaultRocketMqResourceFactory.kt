@@ -18,6 +18,7 @@ import org.apache.rocketmq.client.producer.MQProducer
 import org.apache.rocketmq.common.MixAll
 import org.apache.rocketmq.common.filter.ExpressionType
 import org.apache.rocketmq.common.message.MessageExt
+import org.slf4j.LoggerFactory
 
 open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
     override fun createProducer(producerProperty: RocketMqProducerProperty): MQProducer {
@@ -75,6 +76,7 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
                             }
                             ConsumeOrderlyStatus.SUCCESS
                         } catch (e: Exception) {
+                            listenerLogger.error("Consume message '${msgs.firstOrNull()?.msgId}' with exception on topic '${context.messageQueue.topic}'", e)
                             ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT
                         }
                     }
@@ -87,6 +89,7 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
                             }
                             ConsumeConcurrentlyStatus.CONSUME_SUCCESS
                         } catch (e: Exception) {
+                            listenerLogger.error("Consume message '${msgs.firstOrNull()?.msgId}' with exception on topic '${context.messageQueue.topic}'", e)
                             ConsumeConcurrentlyStatus.RECONSUME_LATER
                         }
                     }
@@ -101,5 +104,9 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
 
     protected open fun chooseNameServerAddr(consumerProperty: RocketMqConsumerProperty): String {
         return consumerProperty.nameServerAddr
+    }
+
+    companion object {
+        private val listenerLogger = LoggerFactory.getLogger(MessageListener::class.java)
     }
 }
