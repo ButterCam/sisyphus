@@ -64,9 +64,9 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
             if (consumerProperty.accessChannel != null) {
                 this.accessChannel = consumerProperty.accessChannel
             }
-            this.subscribe(metadata.topic, if(metadata.filterType == ExpressionType.TAG) MessageSelector.byTag(metadata.filter) else MessageSelector.bySql(metadata.filter))
+            this.subscribe(metadata.topic, if (metadata.filterType == ExpressionType.TAG) MessageSelector.byTag(metadata.filter) else MessageSelector.bySql(metadata.filter))
             val converter = metadata.converter.instance()
-            when(metadata.type) {
+            when (metadata.type) {
                 ConsumerType.ORDERLY -> {
                     this.registerMessageListener { msgs: MutableList<MessageExt>, context: ConsumeOrderlyContext ->
                         try {

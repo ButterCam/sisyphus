@@ -1,8 +1,8 @@
 package com.bybutter.sisyphus.middleware.rocketmq
 
+import kotlin.reflect.KClass
 import org.apache.rocketmq.common.filter.ExpressionType
 import org.springframework.stereotype.Component
-import kotlin.reflect.KClass
 
 @Component
 @Target(AnnotationTarget.CLASS)

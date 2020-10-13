@@ -10,11 +10,9 @@ import org.apache.rocketmq.client.consumer.MQConsumer
 import org.apache.rocketmq.client.producer.MQProducer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition
-import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBean
 import org.springframework.beans.factory.getBeansOfType
-import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.AutowireCandidateQualifier
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
