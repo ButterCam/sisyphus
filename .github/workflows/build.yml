@@ -13,6 +13,20 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
+      - uses: ButterCam/prepare-sisyphus-build@v1
+        with:
+          dependency-repositories: local,central,snapshot,portal
+          snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
+      - name: Build with Gradle
+        run: gradle build
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v3
         if: ${{ secrets.GPG_PRIVATE_KEY != null }}
@@ -25,8 +39,5 @@ jobs:
           snapshot-username: ${{ secrets.OSSRH_USERNAME }}
           snapshot-password: ${{ secrets.OSSRH_PASSWORD }}
           gpg-key-name: ${{ secrets.GPG_KEY_NAME }}
-      - name: Build with Gradle
-        run: gradle build
       - name: Pubish to snapshot repository
-        if: ${{ secrets.OSSRH_USERNAME != null && secrets.OSSRH_PASSWORD != null }}
         run: gradle publish
