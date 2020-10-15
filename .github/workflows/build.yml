@@ -29,7 +29,6 @@ jobs:
           java-version: 1.11
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v3
-        if: ${{ secrets.GPG_PRIVATE_KEY != null }}
         with:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       - uses: ButterCam/prepare-sisyphus-build@v1
