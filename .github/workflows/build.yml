@@ -21,6 +21,7 @@ jobs:
         run: gradle build
   publish:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 1.11
