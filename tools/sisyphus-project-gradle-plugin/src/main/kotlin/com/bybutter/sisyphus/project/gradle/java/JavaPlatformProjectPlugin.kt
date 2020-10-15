@@ -23,5 +23,6 @@ class JavaPlatformProjectPlugin : Plugin<Project> {
                 it.from(target.components.getByName("javaPlatform"))
             }
         }
+        target.pluginManager.apply(JavaDependenciesReplacePlugin::class.java)
     }
 }
