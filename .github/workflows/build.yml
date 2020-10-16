@@ -21,7 +21,6 @@ jobs:
         run: gradle build
   publish:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 1.11
@@ -29,6 +28,8 @@ jobs:
         with:
           java-version: 1.11
       - name: Import GPG key
+        id: import-gpg
+        continue-on-error: true
         uses: crazy-max/ghaction-import-gpg@v3
         with:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -40,4 +41,5 @@ jobs:
           snapshot-password: ${{ secrets.OSSRH_PASSWORD }}
           gpg-key-name: ${{ secrets.GPG_KEY_NAME }}
       - name: Pubish to snapshot repository
+        if: steps.import-gpg.outcome == 'success' && steps.import-gpg.conclusion == 'success'
         run: gradle publish
