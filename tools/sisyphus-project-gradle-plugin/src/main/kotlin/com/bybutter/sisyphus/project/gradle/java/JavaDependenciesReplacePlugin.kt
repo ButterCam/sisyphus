@@ -9,8 +9,8 @@ class JavaDependenciesReplacePlugin : Plugin<Project> {
         val sisyphusManagedDependencies = target.extensions.getByType(SisyphusExtension::class.java).managedDependencies
         target.configurations.all {
             it.resolutionStrategy.eachDependency { detail ->
-                sisyphusManagedDependencies[detail.requested.group]?.let { version ->
-                    detail.useVersion(version)
+                sisyphusManagedDependencies[detail.requested.group]?.let { moduleStringNotation ->
+                    detail.useVersion(moduleStringNotation.version)
                     detail.because("This dependencies version set by Sisyphus")
                 }
             }

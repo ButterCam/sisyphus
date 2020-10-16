@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.project.gradle
 
 import org.gradle.api.Project
+import org.gradle.api.internal.artifacts.dsl.ParsedModuleStringNotation
 
 open class SisyphusExtension(val project: Project) {
     var version: String
@@ -27,7 +28,7 @@ open class SisyphusExtension(val project: Project) {
 
     var dockerPublishRegistries: MutableList<String> = mutableListOf()
 
-    var managedDependencies: MutableMap<String, String> = mutableMapOf()
+    var managedDependencies: MutableMap<String, ParsedModuleStringNotation> = mutableMapOf()
 
     val signKeyName: String?
 
@@ -69,7 +70,8 @@ open class SisyphusExtension(val project: Project) {
                 ?: dockerPublishRegistries
 
         managedDependencies = (project.findProperty("sisyphus.dependency.resolve") as? String)?.split(',')?.associate {
-            it.substringBeforeLast(":").trim() to it.substringAfterLast(":").trim()
+            val moduleStringNotation = ParsedModuleStringNotation(it,null)
+            "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
         }?.toMutableMap() ?: managedDependencies
 
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
