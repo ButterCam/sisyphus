@@ -70,7 +70,7 @@ open class SisyphusExtension(val project: Project) {
                 ?: dockerPublishRegistries
 
         managedDependencies = (project.findProperty("sisyphus.dependency.resolve") as? String)?.split(',')?.associate {
-            val moduleStringNotation = ParsedModuleStringNotation(it,null)
+            val moduleStringNotation = ParsedModuleStringNotation(it, null)
             "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
         }?.toMutableMap() ?: managedDependencies
 
