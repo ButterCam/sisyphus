@@ -38,12 +38,6 @@ object Dependencies {
             const val smile = "$group:jackson-dataformat-smile"
         }
     }
-    object Aliyun {
-        object RocketMQ {
-            private const val group = "com.aliyun.openservices"
-            const val RocketMQ = "$group:ons-client"
-        }
-    }
 
     object Alibaba {
         object Sentinel {
@@ -165,6 +159,10 @@ object Dependencies {
     const val antlr4 = "org.antlr:antlr4"
 
     const val swagger = "io.swagger.core.v3:swagger-core"
+
+    const val rocketMq = "org.apache.rocketmq:rocketmq-client"
+
+    const val rocketMqAcl = "org.apache.rocketmq:rocketmq-acl"
 }
 
 val Project.managedDependencies: Project

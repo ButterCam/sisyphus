@@ -33,6 +33,7 @@ open class SisyphusExtension(val project: Project) {
         val developer: String? = project.findProperty("sisyphus.developer") as? String
         isDevelop = developer != null
         val branchName: String? = System.getenv("BRANCH_NAME")
+        val githubRef: String? = System.getenv("GITHUB_REF")
         val tagName: String? = System.getenv("TAG_NAME")
         val buildVersion: String? = System.getenv("BUILD_VERSION")
 
@@ -41,6 +42,7 @@ open class SisyphusExtension(val project: Project) {
             buildVersion != null -> "$buildVersion"
             tagName != null -> "$tagName"
             branchName != null -> "$branchName-SNAPSHOT"
+            githubRef != null && pullRequestRefRegex.matches(githubRef) -> "PR-${pullRequestRefRegex.matchEntire(githubRef)?.groupValues?.get(1)}-SNAPSHOT"
             else -> project.version as String
         }
 
@@ -69,5 +71,6 @@ open class SisyphusExtension(val project: Project) {
 
     companion object {
         private val repositoryUrlRegex = """sisyphus\.repositories\.([A-Za-z][A-Za-z0-9-_]+)\.url""".toRegex()
+        private val pullRequestRefRegex = """refs/pull/([0-9]+)/merge""".toRegex()
     }
 }

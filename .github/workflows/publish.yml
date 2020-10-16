@@ -20,9 +20,9 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v2
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       - uses: ButterCam/prepare-sisyphus-build@v1
         with:
           dependency-repositories: local,central,jcenter,portal,snapshot

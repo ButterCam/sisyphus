@@ -20,6 +20,7 @@ dependencies {
     api(platform("org.apache.maven:maven:3.6.3"))
     api(platform("io.grpc:grpc-bom:1.31.1"))
     api(platform("com.google.protobuf:protobuf-bom:3.13.0"))
+    api(platform("org.apache.rocketmq:rocketmq-all:4.7.1"))
 
     constraints {
         api("com.squareup:kotlinpoet:1.6.0")
