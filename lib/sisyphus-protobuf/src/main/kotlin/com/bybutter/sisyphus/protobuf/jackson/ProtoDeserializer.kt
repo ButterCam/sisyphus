@@ -147,10 +147,12 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
             }
 
             val propertyName = p.currentName
-            current = p.nextToken()
             val property = value.getProperty(propertyName)
+            p.nextToken()
             if (property != null) {
                 value[propertyName] = readAny(property.returnType.javaType.javaType, p, ctxt)
+            } else {
+                p.skipChildren()
             }
             current = p.nextToken()
         }
