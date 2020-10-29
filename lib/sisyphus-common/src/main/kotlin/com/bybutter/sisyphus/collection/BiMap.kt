@@ -17,9 +17,11 @@ abstract class AbstractBiMap<K, V> protected constructor(
     override val size: Int
         get() = direct.size
 
-    override val inverse: MutableBiMap<V, K> = object : AbstractBiMap<V, K>(reverse, direct) {
-        override val inverse: MutableBiMap<K, V>
-            get() = this@AbstractBiMap
+    override val inverse: MutableBiMap<V, K> by lazy {
+        object : AbstractBiMap<V, K>(reverse, direct) {
+            override val inverse: MutableBiMap<K, V>
+                get() = this@AbstractBiMap
+        }
     }
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>> =

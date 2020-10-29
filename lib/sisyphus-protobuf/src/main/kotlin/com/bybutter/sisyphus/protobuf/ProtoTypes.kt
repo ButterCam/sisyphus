@@ -1,5 +1,7 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.collection.HashBiMap
+import com.bybutter.sisyphus.collection.MutableBiMap
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
@@ -7,14 +9,12 @@ import com.bybutter.sisyphus.protobuf.primitives.FileDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
 import com.bybutter.sisyphus.spi.ServiceLoader
-import com.google.common.collect.BiMap
-import com.google.common.collect.HashBiMap
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
 
 object ProtoTypes {
-    private val protoToClassMap: BiMap<String, Class<*>> = HashBiMap.create()
-    private val protoToServiceMap: BiMap<String, Class<*>> = HashBiMap.create()
+    private val protoToClassMap: MutableBiMap<String, Class<*>> = HashBiMap()
+    private val protoToServiceMap: MutableBiMap<String, Class<*>> = HashBiMap()
 
     // HashMap is faster than mutableMapOf(LinkedHashMap)
     private val fileInfoMap: MutableMap<String, FileDescriptorProto> = hashMapOf()
@@ -156,7 +156,7 @@ object ProtoTypes {
     }
 
     fun getProtoNameByClass(clazz: Class<*>): String? {
-        return protoToClassMap.inverse()[clazz]
+        return protoToClassMap.inverse[clazz]
     }
 
     fun getDescriptorByProtoName(name: String): Any? {

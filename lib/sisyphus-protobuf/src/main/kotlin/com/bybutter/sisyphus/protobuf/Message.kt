@@ -1,18 +1,13 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.protobuf.coded.Reader
+import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.google.protobuf.CodedInputStream
-import com.google.protobuf.CodedOutputStream
 import java.io.OutputStream
 import kotlin.reflect.KProperty
 
 interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
-    /**
-     * Get message size in bytes.
-     */
-    fun size(): Int
-
     /**
      * Get message full type name, etc: google.protobuf.Any
      */
@@ -106,11 +101,9 @@ interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
 
     fun writeTo(output: OutputStream)
 
-    fun writeTo(output: CodedOutputStream)
+    fun writeTo(writer: Writer)
 
     fun writeDelimitedTo(output: OutputStream)
-
-    fun writeDelimitedTo(output: CodedOutputStream)
 
     fun unknownFields(): UnknownFields
 }
@@ -150,5 +143,7 @@ interface MutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Messa
      * */
     fun fillFrom(message: Message<*, *>)
 
-    fun readFrom(input: CodedInputStream, size: Int)
+    fun readFrom(reader: Reader, size: Int)
+
+    fun readFrom(reader: Reader)
 }

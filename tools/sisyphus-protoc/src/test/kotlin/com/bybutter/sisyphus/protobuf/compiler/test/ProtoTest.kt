@@ -44,8 +44,8 @@ class ProtoTest {
 
         val result = context.generate(ProtocRunner.generate(protoPath.toFile(), source), source, packageMapping)
         for (compileResult in result) {
-            compileResult.file.writeTo(Paths.get(System.getProperty("user.dir"), "src/test/kotlin/generated"))
-            compileResult.implFile.writeTo(Paths.get(System.getProperty("user.dir"), "src/test/kotlin/generated"))
+            compileResult.file.writeTo(Paths.get(System.getProperty("user.dir"), "../../lib/sisyphus-protobuf-lite/build/generated/source/proto/main"))
+            compileResult.implFile.writeTo(Paths.get(System.getProperty("user.dir"), "../../lib/sisyphus-protobuf-lite/build/generated/source/proto-internal/main"))
         }
     }
 }

@@ -148,6 +148,7 @@ class FileGenerator(override val parent: ProtobufGenerateContext, val descriptor
             is ExtensionsGenerator -> {
                 builder.addStatement("%T.registerExtension(%T)", element.messageGenerator.kotlinType, element.kotlinType)
             }
+            is MapEntryGenerator -> {}
             is MessageGenerator -> {
                 builder.addStatement("%T.registerProtoType(%S, %T::class)", ProtoTypes::class, element.fullProtoName, element.kotlinType)
             }
