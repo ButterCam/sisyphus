@@ -115,10 +115,10 @@ class Reader(private val inputStream: InputStream) {
 
     fun sfixed32(): Int {
         var result = 0
-        result = (result shl 8) or (readByte() and 0xFF)
-        result = (result shl 8) or (readByte() and 0xFF)
-        result = (result shl 8) or (readByte() and 0xFF)
-        result = (result shl 8) or (readByte() and 0xFF)
+        result = result or ((readByte() and 0xFF) shl 0)
+        result = result or ((readByte() and 0xFF) shl 8)
+        result = result or ((readByte() and 0xFF) shl 16)
+        result = result or ((readByte() and 0xFF) shl 24)
         return result
     }
 
@@ -148,14 +148,14 @@ class Reader(private val inputStream: InputStream) {
 
     fun sfixed64(): Long {
         var result = 0L
-        result = (result shl 8) or (readByte() and 0xFF).toLong()
-        result = (result shl 8) or (readByte() and 0xFF).toLong()
-        result = (result shl 8) or (readByte() and 0xFF).toLong()
-        result = (result shl 8) or (readByte() and 0xFF).toLong()
-        result = (result shl 8) or (readByte() and 0xFF).toLong()
-        result = (result shl 8) or (readByte() and 0xFF).toLong()
-        result = (result shl 8) or (readByte() and 0xFF).toLong()
-        result = (result shl 8) or (readByte() and 0xFF).toLong()
+        result = result or ((readByte() and 0xFF).toLong() shl 0)
+        result = result or ((readByte() and 0xFF).toLong() shl 8)
+        result = result or ((readByte() and 0xFF).toLong() shl 16)
+        result = result or ((readByte() and 0xFF).toLong() shl 24)
+        result = result or ((readByte() and 0xFF).toLong() shl 32)
+        result = result or ((readByte() and 0xFF).toLong() shl 40)
+        result = result or ((readByte() and 0xFF).toLong() shl 48)
+        result = result or ((readByte() and 0xFF).toLong() shl 56)
         return result
     }
 

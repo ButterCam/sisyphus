@@ -132,7 +132,7 @@ class Writer(private val parent: Writer? = null) {
         }
     }
 
-    internal interface Op<T> {
+    private interface Op<T> {
         val value: T
 
         val length: Int
@@ -140,7 +140,7 @@ class Writer(private val parent: Writer? = null) {
         fun write(outputStream: OutputStream)
     }
 
-    internal class Varint32(override val value: Int) : Op<Int> {
+    private class Varint32(override val value: Int) : Op<Int> {
         override val length: Int = value.varintSize
 
         override fun write(outputStream: OutputStream) {
@@ -154,7 +154,7 @@ class Writer(private val parent: Writer? = null) {
         }
     }
 
-    internal class Fixed32(override val value: Int) : Op<Int> {
+    private class Fixed32(override val value: Int) : Op<Int> {
         override val length: Int = 4
 
         override fun write(outputStream: OutputStream) {
@@ -165,7 +165,7 @@ class Writer(private val parent: Writer? = null) {
         }
     }
 
-    internal class Varint64(override val value: Long) : Op<Long> {
+    private class Varint64(override val value: Long) : Op<Long> {
         override val length: Int = value.varintSize
 
         override fun write(outputStream: OutputStream) {
@@ -179,7 +179,7 @@ class Writer(private val parent: Writer? = null) {
         }
     }
 
-    internal class Fixed64(override val value: Long) : Op<Long> {
+    private class Fixed64(override val value: Long) : Op<Long> {
         override val length: Int = 8
 
         override fun write(outputStream: OutputStream) {
@@ -194,7 +194,7 @@ class Writer(private val parent: Writer? = null) {
         }
     }
 
-    internal class Bytes(override val value: ByteArray) : Op<ByteArray> {
+    private class Bytes(override val value: ByteArray) : Op<ByteArray> {
         private val lengthDelimited = Varint32(value.size)
 
         override val length: Int = lengthDelimited.length + value.size
@@ -205,7 +205,7 @@ class Writer(private val parent: Writer? = null) {
         }
     }
 
-    internal class Nested(override val value: Writer) : Op<Writer> {
+    private class Nested(override val value: Writer) : Op<Writer> {
         override val length: Int = value.length
 
         override fun write(outputStream: OutputStream) {

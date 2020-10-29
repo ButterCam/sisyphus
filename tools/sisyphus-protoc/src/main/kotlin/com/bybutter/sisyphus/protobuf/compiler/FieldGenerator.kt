@@ -165,9 +165,9 @@ abstract class BaseFieldGenerator protected constructor(override val parent: Pro
         }
     }
 
-    // private val options: FieldOptions? by lazy {
-    //    descriptor.options.toByteArray().parseProto<FieldOptions>()
-    // }
+     private val options: FieldOptions? by lazy {
+         FieldOptions.parse(descriptor.options.toByteArray())
+     }
 
     fun asMemberName(): MemberName {
         return MemberName(parent.fullKotlinName, kotlinName)
@@ -191,36 +191,6 @@ abstract class BaseFieldGenerator protected constructor(override val parent: Pro
                     "$kotlinName has been marked as deprecated"
                 ).build()
             )
-        }
-    }
-
-    protected fun getTypeName(): String {
-        return when (descriptor.type) {
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE -> "Double"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FLOAT -> "Float"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64 -> "Int64"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT64 -> "UInt64"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32 -> "Int32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED64 -> "Fixed64"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED32 -> "Fixed32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_BOOL -> "Bool"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING -> "String"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_GROUP -> throw UnsupportedOperationException("Group is not supported by butter proto.")
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE -> {
-                if (descriptor.typeName == WellKnownTypes.ANY_TYPENAME) {
-                    "Any"
-                } else {
-                    "Message"
-                }
-            }
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES -> "Bytes"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT32 -> "UInt32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM -> "Enum"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED32 -> "SFixed32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED64 -> "SFixed64"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT32 -> "SInt32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT64 -> "SInt64"
-            null -> throw UnsupportedOperationException("Unknown field type.")
         }
     }
 
