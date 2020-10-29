@@ -165,9 +165,9 @@ abstract class BaseFieldGenerator protected constructor(override val parent: Pro
         }
     }
 
-     private val options: FieldOptions? by lazy {
-         FieldOptions.parse(descriptor.options.toByteArray())
-     }
+    private val options: FieldOptions? by lazy {
+        FieldOptions.parse(descriptor.options.toByteArray())
+    }
 
     fun asMemberName(): MemberName {
         return MemberName(parent.fullKotlinName, kotlinName)
