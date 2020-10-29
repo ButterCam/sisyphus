@@ -5,10 +5,8 @@ import com.bybutter.sisyphus.api.resource.ResourceName
 import com.bybutter.sisyphus.api.resourceReference
 import com.bybutter.sisyphus.collection.contentEquals
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.ProtoReader
-import com.bybutter.sisyphus.protobuf.ProtoWriter
-import com.bybutter.sisyphus.protobuf.Size
 import com.bybutter.sisyphus.protobuf.WellKnownTypes
+import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.primitives.FieldOptions
 import com.bybutter.sisyphus.string.toPascalCase
 import com.google.protobuf.DescriptorProtos
@@ -167,9 +165,9 @@ abstract class BaseFieldGenerator protected constructor(override val parent: Pro
         }
     }
 
-    // private val options: FieldOptions? by lazy {
-    //    descriptor.options.toByteArray().parseProto<FieldOptions>()
-    // }
+    private val options: FieldOptions? by lazy {
+        FieldOptions.parse(descriptor.options.toByteArray())
+    }
 
     fun asMemberName(): MemberName {
         return MemberName(parent.fullKotlinName, kotlinName)
@@ -196,32 +194,32 @@ abstract class BaseFieldGenerator protected constructor(override val parent: Pro
         }
     }
 
-    protected fun getTypeName(): String {
+    protected fun getProtoType(): String {
         return when (descriptor.type) {
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE -> "Double"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FLOAT -> "Float"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64 -> "Int64"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT64 -> "UInt64"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32 -> "Int32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED64 -> "Fixed64"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED32 -> "Fixed32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_BOOL -> "Bool"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING -> "String"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE -> "double"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FLOAT -> "float"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT64 -> "int64"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT64 -> "uint64"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32 -> "int32"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED64 -> "fixed64"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_FIXED32 -> "fixed32"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_BOOL -> "bool"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING -> "string"
             DescriptorProtos.FieldDescriptorProto.Type.TYPE_GROUP -> throw UnsupportedOperationException("Group is not supported by butter proto.")
             DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE -> {
                 if (descriptor.typeName == WellKnownTypes.ANY_TYPENAME) {
-                    "Any"
+                    "any"
                 } else {
-                    "Message"
+                    "message"
                 }
             }
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES -> "Bytes"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT32 -> "UInt32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM -> "Enum"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED32 -> "SFixed32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED64 -> "SFixed64"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT32 -> "SInt32"
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT64 -> "SInt64"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES -> "bytes"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_UINT32 -> "uint32"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM -> "enum"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED32 -> "sfixed32"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SFIXED64 -> "sfixed64"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT32 -> "sint32"
+            DescriptorProtos.FieldDescriptorProto.Type.TYPE_SINT64 -> "sint64"
             null -> throw UnsupportedOperationException("Unknown field type.")
         }
     }
@@ -596,66 +594,47 @@ open class FieldGenerator constructor(override val parent: MessageGenerator, des
         }
     }
 
-    open fun applyToComputeSizeFun(builder: FunSpec.Builder) {
-        val element = getElementByProtoName(descriptor.typeName)
-        if (descriptor.isOptional) {
-            builder.beginControlFlow("if($hasFunName())")
-        }
-
-        when {
-            element is MapEntryGenerator -> {
-                builder.addStatement("result·+=·%T.sizeOf(${descriptor.number},·this.%N)", element.kotlinType, kotlinName)
-            }
-            customType && isPacked -> {
-                builder.addStatement("result·+=·%T.of${getTypeName()}(${descriptor.number},·this.%N.map·{ it.raw() })", Size::class, kotlinName)
-            }
-            isPacked -> {
-                builder.addStatement("result·+=·%T.of${getTypeName()}(${descriptor.number},·this.%N)", Size::class, kotlinName)
-            }
-            customType && descriptor.isRepeated -> {
-                builder.addStatement("result·+=·this.%N.sumBy{ %T.of${getTypeName()}(${descriptor.number},·it.raw()) }", kotlinName, Size::class)
-            }
-            descriptor.isRepeated -> {
-                builder.addStatement("result·+=·this.%N.sumBy{ %T.of${getTypeName()}(${descriptor.number},·it) }", kotlinName, Size::class)
-            }
-            customType -> {
-                builder.addStatement("result·+=·%T.of${getTypeName()}(${descriptor.number},·this.%N?.raw())", Size::class, kotlinName)
-            }
-            else -> {
-                builder.addStatement("result·+=·%T.of${getTypeName()}(${descriptor.number},·this.%N)", Size::class, kotlinName)
-            }
-        }
-        if (descriptor.isOptional) {
-            builder.endControlFlow()
-        }
-    }
-
     open fun applyToWriteFieldsFun(builder: FunSpec.Builder) {
         val element = getElementByProtoName(descriptor.typeName)
         if (descriptor.isOptional) {
             builder.beginControlFlow("if($hasFunName())")
         }
         when {
+            customType && descriptor.isScalar && isPacked -> {
+                builder.addStatement("writer.tag(${WireType.tagOf(descriptor.number, WireType.LENGTH_DELIMITED)}).beginLd().apply{ this@${parent.implName}.%N.forEach { ${getProtoType()}(it.raw()) } }.endLd()", kotlinName)
+            }
+            descriptor.isScalar && isPacked -> {
+                builder.addStatement("writer.tag(${WireType.tagOf(descriptor.number, WireType.LENGTH_DELIMITED)}).beginLd().apply{ this@${parent.implName}.%N.forEach { ${getProtoType()}(it) } }.endLd()", kotlinName)
+            }
+            customType && descriptor.isScalar && descriptor.isRepeated -> {
+                builder.addStatement("this.%N.forEach { writer.tag(${WireType.tagOf(descriptor.number, WireType.getWireType(descriptor.wireType))}).${getProtoType()}(it.raw()) }", kotlinName)
+            }
+            descriptor.isScalar && descriptor.isRepeated -> {
+                builder.addStatement("this.%N.forEach { writer.tag(${WireType.tagOf(descriptor.number, WireType.getWireType(descriptor.wireType))}).${getProtoType()}(it) }", kotlinName)
+            }
+            customType && descriptor.isScalar -> {
+                builder.addStatement("this.%N?.let { writer.tag(${WireType.tagOf(descriptor.number, WireType.getWireType(descriptor.wireType))}).${getProtoType()}(it.raw()) }", kotlinName)
+            }
+            descriptor.isScalar -> {
+                builder.addStatement("writer.tag(${WireType.tagOf(descriptor.number, WireType.getWireType(descriptor.wireType))}).${getProtoType()}(this.%N)", kotlinName)
+            }
             element is MapEntryGenerator -> {
-                builder.addStatement("%T.writeMap(output,·${descriptor.number},·this.%N)", element.kotlinType, kotlinName)
+                builder.addStatement("this.%N.forEach { k, v -> writer.tag(${WireType.tagOf(descriptor.number, WireType.LENGTH_DELIMITED)}).beginLd().tag(${WireType.tagOf(element.keyField.descriptor.number, WireType.valueOf(element.keyField.descriptor.wireType))}).${element.keyField.getProtoType()}(k).tag(${WireType.tagOf(element.valueField.descriptor.number, WireType.valueOf(element.valueField.descriptor.wireType))}).${element.valueField.getProtoType()}(v).endLd() }", kotlinName)
             }
-            customType && isPacked -> {
-                builder.addStatement("%T.write${getTypeName()}(output,·${descriptor.number},·this.%N.map·{ it.raw() })", ProtoWriter::class, kotlinName)
+            element is MessageGenerator && descriptor.isRepeated -> {
+                builder.addStatement("this.%N.forEach { writer.tag(${WireType.tagOf(descriptor.number, WireType.getWireType(descriptor.wireType))}).${getProtoType()}(it) }", kotlinName)
             }
-            isPacked -> {
-                builder.addStatement("%T.write${getTypeName()}(output,·${descriptor.number},·this.%N)", ProtoWriter::class, kotlinName)
+            element is MessageGenerator -> {
+                builder.addStatement("writer.tag(${WireType.tagOf(descriptor.number, WireType.getWireType(descriptor.wireType))}).${getProtoType()}(this.%N)", kotlinName)
             }
-            customType && descriptor.isRepeated -> {
-                builder.addStatement("this.%N.forEach{ %T.write${getTypeName()}(output,·${descriptor.number},·it.raw()) }", kotlinName, ProtoWriter::class)
+            element is EnumGenerator && isPacked -> {
+                builder.addStatement("writer.tag(${WireType.tagOf(descriptor.number, WireType.LENGTH_DELIMITED)}).beginLd().apply{ this@${parent.implName}.%N.forEach { int32(it.number) } }.endLd()", kotlinName)
             }
-            descriptor.isRepeated -> {
-                builder.addStatement("this.%N.forEach{ %T.write${getTypeName()}(output,·${descriptor.number},·it) }", kotlinName, ProtoWriter::class)
+            element is EnumGenerator && descriptor.isRepeated -> {
+                builder.addStatement("this.%N.forEach { writer.tag(${WireType.tagOf(descriptor.number, WireType.getWireType(descriptor.wireType))}).int32(it.number) }", kotlinName)
             }
-            customType -> {
-                builder.addStatement("%T.write${getTypeName()}(output,·${descriptor.number},·this.%N?.raw())", ProtoWriter::class, kotlinName)
-            }
-            else -> {
-                builder.addStatement("%T.write${getTypeName()}(output,·${descriptor.number},·this.%N)", ProtoWriter::class, kotlinName)
+            element is EnumGenerator -> {
+                builder.addStatement("writer.tag(${WireType.tagOf(descriptor.number, WireType.getWireType(descriptor.wireType))}).int32(this.%N.number)", kotlinName)
             }
         }
         if (descriptor.isOptional) {
@@ -665,64 +644,60 @@ open class FieldGenerator constructor(override val parent: MessageGenerator, des
 
     open fun applyToReadFieldFun(builder: FunSpec.Builder) {
         val element = getElementByProtoName(descriptor.typeName)
-        var readBlock = buildCodeBlock {
+        builder.addStatement("${descriptor.number} -> %L", buildCodeBlock {
             when {
+                customType && descriptor.isScalar && descriptor.wireType == WireType.VARINT.ordinal && descriptor.isRepeated -> {
+                    add("reader.packed(wire) { this.%N += %T.wrapRaw(it.${getProtoType()}()) }", kotlinName, kotlinType)
+                }
+                descriptor.isScalar && descriptor.wireType == WireType.VARINT.ordinal && descriptor.isRepeated -> {
+                    add("reader.packed(wire) { this.%N += it.${getProtoType()}() }", kotlinName)
+                }
+                customType && descriptor.wireType == WireType.VARINT.ordinal && descriptor.isScalar -> {
+                    add("reader.packed(wire) { this.%N = %T.wrapRaw(it.${getProtoType()}()) }", kotlinName, kotlinType)
+                }
+                descriptor.isScalar && descriptor.wireType == WireType.VARINT.ordinal -> {
+                    add("reader.packed(wire) { this.%N = it.${getProtoType()}() }", kotlinName)
+                }
+                customType && descriptor.isScalar && descriptor.isRepeated -> {
+                    add("this.%N += %T.wrapRaw(reader.${getProtoType()}())", kotlinName, kotlinType)
+                }
+                descriptor.isScalar && descriptor.isRepeated -> {
+                    add("this.%N += reader.${getProtoType()}()", kotlinName)
+                }
+                customType && descriptor.isScalar -> {
+                    add("this.%N = %T.wrapRaw(reader.${getProtoType()}())", kotlinName, kotlinType)
+                }
+                descriptor.isScalar -> {
+                    add("this.%N = reader.${getProtoType()}()", kotlinName)
+                }
                 element is MapEntryGenerator -> {
-                    add("%T.readPair(input, input.readInt32())", element.kotlinType)
+                    when {
+                        element.valueField.descriptor.isScalar -> add("reader.mapEntry({ it.${element.keyField.getProtoType()}() }, { it.${element.valueField.getProtoType()}() }) { k, v -> this.%N[k] = v }", kotlinName)
+                        element.valueField.descriptor.typeName == WellKnownTypes.ANY_TYPENAME -> add("reader.mapEntry({ it.${element.keyField.getProtoType()}() }, { it.any() }) { k, v -> this.%N[k] = v }", kotlinName)
+                        element.valueField.typeElement is MessageGenerator -> add("reader.mapEntry({ it.${element.keyField.getProtoType()}() }, { %T.parse(reader, reader.int32()) }) { k, v -> this.%N[k] = v }", element.valueField.kotlinType, kotlinName)
+                        element.valueField.typeElement is EnumGenerator -> add("reader.mapEntry({ it.${element.keyField.getProtoType()}() }, { %T(reader.int32()) }) { k, v -> this.%N[k] = v }", element.valueField.kotlinType, kotlinName)
+                    }
                 }
-                getTypeName() == "Message" -> {
-                    add("%T.readMessage(input,·%T::class.java,·field,·wire,·input.readInt32())",
-                        ProtoReader::class, kotlinType)
+                descriptor.typeName == WellKnownTypes.ANY_TYPENAME && descriptor.isRepeated -> {
+                    add("this.%N += reader.any()", kotlinName)
                 }
-                getTypeName() == "Any" -> {
-                    add("%T.readAny(input,·field,·wire,·input.readInt32())",
-                        ProtoReader::class)
+                descriptor.typeName == WellKnownTypes.ANY_TYPENAME -> {
+                    add("this.%N = reader.any()", kotlinName)
                 }
-                descriptor.isRepeated && getTypeName() == "Enum" -> {
-                    add("%T.readEnumList(input,·%T::class.java,·field,·wire)",
-                        ProtoReader::class, kotlinType)
+                element is MessageGenerator && descriptor.isRepeated -> {
+                    add("this.%N += %T.newMutable().apply { readFrom(reader) }", kotlinName, kotlinType)
                 }
-                descriptor.canPack && descriptor.isRepeated -> {
-                    add("%T.read${getTypeName()}List(input,·field,·wire)", ProtoReader::class)
+                element is MessageGenerator -> {
+                    add("this.%N = %T.newMutable().apply { readFrom(reader) }", kotlinName, kotlinType)
                 }
-                getTypeName() == "Enum" -> {
-                    add("%T.readEnum(input,·%T::class.java,·field,·wire)",
-                        ProtoReader::class, kotlinType)
+                element is EnumGenerator && descriptor.isRepeated -> {
+                    add("reader.packed(wire) { this.%N += %T.fromNumber(it.int32()) ?: %T.values().first() }", kotlinName, kotlinType, kotlinType)
                 }
-                else -> {
-                    add("%T.read${getTypeName()}(input,·field,·wire)",
-                        ProtoReader::class)
-                }
-            }
-        }
-
-        if (customType) {
-            readBlock = when {
-                descriptor.isRepeated && getTypeName() == "Enum" -> buildCodeBlock {
-                    add("%L.map·{ %T.wrapRaw(it) }", readBlock, kotlinType)
-                }
-                descriptor.canPack && descriptor.isRepeated -> buildCodeBlock {
-                    add("%L.map·{ %T.wrapRaw(it) }", readBlock, kotlinType)
-                }
-                else -> buildCodeBlock {
-                    add("%T.wrapRaw(%L)", kotlinType, readBlock)
+                element is EnumGenerator -> {
+                    add("this.%N = %T(reader.int32())", kotlinName, kotlinType)
                 }
             }
-        }
-
-        readBlock = when {
-            descriptor.isRepeated -> buildCodeBlock {
-                add("this.%N·+=·%L", kotlinName, readBlock)
-            }
-            descriptor.canPack -> buildCodeBlock {
-                add("%L?.let·{ this.%N·=·it }", readBlock, kotlinName)
-            }
-            else -> buildCodeBlock {
-                add("this.%N·=·%L", kotlinName, readBlock)
-            }
-        }
-
-        builder.addStatement("%L -> %L", descriptor.number, readBlock)
+        })
     }
 
     open fun applyToComputeHashCode(builder: FunSpec.Builder) {

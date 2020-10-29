@@ -2,7 +2,7 @@ package com.bybutter.sisyphus.starter.grpc.transcoding.codec
 
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoSupport
-import com.google.protobuf.CodedInputStream
+import com.bybutter.sisyphus.protobuf.coded.Reader
 import kotlin.reflect.full.companionObjectInstance
 import org.reactivestreams.Publisher
 import org.springframework.core.ResolvableType
@@ -58,7 +58,7 @@ class ProtobufDecoder : ProtobufSupport(), Decoder<Message<*, *>> {
 }
 
 private class StreamingMessageIterator(private val buffer: DataBuffer, private val elementType: ResolvableType, private val maxMessageSize: Int) : Iterator<Message<*, *>> {
-    private val input = CodedInputStream.newInstance(buffer.asInputStream())
+    private val input = Reader(buffer.asInputStream())
 
     override fun hasNext(): Boolean {
         if (input.isAtEnd) {
@@ -68,7 +68,7 @@ private class StreamingMessageIterator(private val buffer: DataBuffer, private v
     }
 
     override fun next(): Message<*, *> {
-        val size = input.readInt32()
+        val size = input.int32()
         if (maxMessageSize in 1 until size) {
             throw DataBufferLimitException(
                     "The number of bytes to read for message ($maxMessageSize) exceeds the configured limit ($maxMessageSize)")

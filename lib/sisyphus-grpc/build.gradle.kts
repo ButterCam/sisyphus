@@ -10,16 +10,13 @@ description = "Sisyphus customized gRPC runtime for Kotlin coroutine"
 
 dependencies {
     api(project(":lib:sisyphus-protobuf"))
+    api(project(":proto:sisyphus-grpc-protos"))
     api(Dependencies.Grpc.stub)
     api(Dependencies.Grpc.kotlin)
     api(Dependencies.Kotlin.Coroutines.reactor)
-    api(Dependencies.Kotlin.Coroutines.guava)
-    api(Dependencies.Proto.base)
-    api(project(":proto:sisyphus-grpc-protos"))
 
     implementation(project(":lib:sisyphus-jackson"))
     implementation(project(":lib:sisyphus-common"))
-    implementation(Dependencies.Grpc.proto)
     implementation(Dependencies.Kotlin.reflect)
 
     proto(platform(project(":sisyphus-dependencies")))

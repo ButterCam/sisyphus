@@ -1,8 +1,8 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.google.protobuf.CodedInputStream
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import java.io.ByteArrayInputStream
@@ -11,7 +11,6 @@ import java.util.LinkedList
 
 abstract class ProtoSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>>(val fullName: String) : Metadata.BinaryMarshaller<T>, MethodDescriptor.Marshaller<T> {
     abstract val descriptor: DescriptorProto
-    // val fields: List<DescriptorProtos.FieldDescriptorProto> = _fields
 
     @InternalProtoApi
     abstract fun newMutable(): TM
@@ -84,22 +83,22 @@ abstract class ProtoSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>>(val 
     }
 
     fun parse(input: InputStream, size: Int): T {
-        return parse(CodedInputStream.newInstance(input), size)
+        return parse(Reader(input), size)
     }
 
     fun parse(data: ByteArray, from: Int = 0, to: Int = data.size): T {
-        return parse(CodedInputStream.newInstance(data, from, to - from), to - from)
+        return parse(Reader(data.inputStream(from, to - from)), to - from)
     }
 
     @OptIn(InternalProtoApi::class)
-    fun parse(input: CodedInputStream, size: Int): T {
-        return newMutable().apply { readFrom(input, size) } as T
+    fun parse(reader: Reader, size: Int): T {
+        return newMutable().apply { readFrom(reader, size) } as T
     }
 
     @OptIn(InternalProtoApi::class)
-    fun parse(input: CodedInputStream, size: Int, block: TM.() -> Unit): T {
+    inline fun parse(reader: Reader, size: Int, block: TM.() -> Unit): T {
         return newMutable().apply {
-            readFrom(input, size)
+            readFrom(reader, size)
             block()
         } as T
     }

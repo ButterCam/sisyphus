@@ -3,6 +3,7 @@ rootProject.name = "sisyphus"
 include("lib:sisyphus-common")
 include("lib:sisyphus-dto")
 include("lib:sisyphus-jackson")
+include("lib:sisyphus-jackson-protobuf")
 include("lib:sisyphus-protobuf")
 include("lib:sisyphus-grpc")
 
