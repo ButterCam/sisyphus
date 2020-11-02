@@ -1,7 +1,9 @@
 import com.bybutter.sisyphus.project.gradle.SisyphusProjectPlugin
 import com.github.benmanes.gradle.versions.VersionsPlugin
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaLibraryPlugin
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
@@ -15,6 +17,11 @@ val Project.next: Project
         pluginManager.apply(SisyphusProjectPlugin::class.java)
 
         kotlin.managedDependencies
+
+        tasks.withType(JavaCompile::class.java) {
+            sourceCompatibility = JavaVersion.VERSION_1_8.majorVersion
+            targetCompatibility = JavaVersion.VERSION_1_8.majorVersion
+        }
 
         dependencies {
             add("testImplementation", Dependencies.junit)
@@ -52,6 +59,11 @@ val Project.proto: Project
         group = "com.bybutter.sisyphus.proto"
 
         managedDependencies
+
+        tasks.withType(JavaCompile::class.java) {
+            sourceCompatibility = JavaVersion.VERSION_1_8.majorVersion
+            targetCompatibility = JavaVersion.VERSION_1_8.majorVersion
+        }
 
         pluginManager.apply(JavaLibraryPlugin::class.java)
         pluginManager.apply(SisyphusProjectPlugin::class.java)

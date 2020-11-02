@@ -45,11 +45,14 @@ class Reader(private val inputStream: InputStream) {
             return result
         }
         if (isAtEnd) throw EOFException("Unexpected end of Protobuf input stream")
-        if (currentByte == -2) {
-            inputStream.readNBytes(result, 0, count)
-        } else {
+
+        var toRead = count
+        if (currentByte != -2) {
             result[0] = currentByte.toByte()
-            inputStream.readNBytes(result, 1, count - 1)
+            toRead--
+        }
+        while(toRead > 0) {
+            toRead -= inputStream.read(result, count - toRead, toRead)
         }
         readBytes += count
         currentByte = inputStream.read()
