@@ -6,7 +6,6 @@ import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.Any
 import java.io.EOFException
 import java.io.InputStream
-import java.nio.charset.Charset
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class Reader(private val inputStream: InputStream) {
@@ -173,7 +172,7 @@ class Reader(private val inputStream: InputStream) {
 
     fun string(): String {
         val len = int32()
-        return readNByte(len).toString(Charset.defaultCharset())
+        return readNByte(len).toString(Charsets.UTF_8)
     }
 
     fun bytes(): ByteArray {
