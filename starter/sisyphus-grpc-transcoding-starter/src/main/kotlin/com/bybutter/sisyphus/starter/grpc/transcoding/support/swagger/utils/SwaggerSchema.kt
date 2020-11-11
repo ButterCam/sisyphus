@@ -1,15 +1,34 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.primitives.BoolValue
+import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
+import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
+import com.bybutter.sisyphus.protobuf.primitives.Duration
 import com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.EnumValueOptions
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
+import com.bybutter.sisyphus.protobuf.primitives.FieldMask
+import com.bybutter.sisyphus.protobuf.primitives.FloatValue
+import com.bybutter.sisyphus.protobuf.primitives.Int32Value
+import com.bybutter.sisyphus.protobuf.primitives.Int64Value
+import com.bybutter.sisyphus.protobuf.primitives.ListValue
+import com.bybutter.sisyphus.protobuf.primitives.StringValue
+import com.bybutter.sisyphus.protobuf.primitives.Struct
+import com.bybutter.sisyphus.protobuf.primitives.Timestamp
+import com.bybutter.sisyphus.protobuf.primitives.UInt32Value
+import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
+import com.bybutter.sisyphus.protobuf.primitives.Value
+import com.bybutter.sisyphus.protobuf.primitives.invoke
+import com.bybutter.sisyphus.protobuf.primitives.now
+import com.bybutter.sisyphus.protobuf.primitives.string
 import com.bybutter.sisyphus.protobuf.string
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerRouterFunction
 import com.google.protobuf.DescriptorProtos
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.BooleanSchema
+import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.NumberSchema
 import io.swagger.v3.oas.models.media.ObjectSchema
@@ -32,8 +51,35 @@ object SwaggerSchema {
                 // Whether the field is decorated by 'repeated'.
                 val repeated = field.label == FieldDescriptorProto.Label.REPEATED
                 val fieldSchema = if (field.type == FieldDescriptorProto.Type.MESSAGE) {
-                    subTypeNames.add(field.typeName.trim('.'))
-                    ObjectSchema().`$ref`(SwaggerRouterFunction.COMPONENTS_SCHEMAS_PREFIX + field.typeName.trim('.'))
+                    val typeName = field.typeName.trim('.')
+                    when (typeName) {
+                        FieldMask.fullName -> StringSchema().example("*")
+                        Timestamp.fullName -> StringSchema().example(Timestamp.now().string())
+                        Duration.fullName -> StringSchema().example(Duration.invoke(100).string())
+                        Struct.fullName -> ObjectSchema()
+                        Value.fullName -> ComposedSchema()
+                                .addOneOfItem(ObjectSchema())
+                                .addOneOfItem(BooleanSchema())
+                                .addOneOfItem(NumberSchema())
+                                .addOneOfItem(StringSchema())
+                                .addOneOfItem(ArraySchema())
+                        ListValue.fullName -> ArraySchema()
+                        DoubleValue.fullName -> NumberSchema()
+                        FloatValue.fullName -> NumberSchema()
+                        Int64Value.fullName -> NumberSchema()
+                        UInt64Value.fullName -> NumberSchema()
+                        Int32Value.fullName -> NumberSchema()
+                        UInt32Value.fullName -> NumberSchema()
+                        BoolValue.fullName -> BooleanSchema()
+                        StringValue.fullName -> StringSchema()
+                        BytesValue.fullName -> StringSchema()
+                        ListValue.fullName -> ArraySchema()
+                        FieldMask.fullName -> StringSchema()
+                        else -> {
+                            subTypeNames.add(typeName)
+                            ObjectSchema().`$ref`(SwaggerRouterFunction.COMPONENTS_SCHEMAS_PREFIX + field.typeName.trim('.'))
+                        }
+                    }
                 } else {
                     fetchSchema(field.type, field.typeName)
                 }

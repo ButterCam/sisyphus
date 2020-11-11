@@ -1,6 +1,10 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.protobuf.primitives.Duration
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
+import com.bybutter.sisyphus.protobuf.primitives.FieldMask
+import com.bybutter.sisyphus.protobuf.primitives.Timestamp
+import com.bybutter.sisyphus.protobuf.primitives.invoke
 import com.bybutter.sisyphus.security.base64Decode
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -40,6 +44,18 @@ class ValueNode : PatcherNode {
             FieldDescriptorProto.Type.STRING -> values
             FieldDescriptorProto.Type.BYTES -> values.map { it.base64Decode() }
             FieldDescriptorProto.Type.ENUM -> values.map { ProtoEnum(it, ProtoTypes.getClassByProtoName(field.typeName) as Class<ProtoEnum>) }
+            FieldDescriptorProto.Type.MESSAGE -> {
+                when (field.typeName.substring(1)) {
+                    FieldMask.fullName -> values.map {
+                        FieldMask {
+                            this.paths += it.split(",").map { it.trim() }
+                        }
+                    }
+                    Timestamp.fullName -> values.map { Timestamp(it) }
+                    Duration.fullName -> values.map { Duration(it) }
+                    else -> throw IllegalStateException()
+                }
+            }
             else -> throw IllegalStateException()
         }
 
