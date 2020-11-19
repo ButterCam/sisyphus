@@ -2,9 +2,9 @@ package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.collection.contentEquals
 import com.bybutter.sisyphus.collection.firstNotNull
+import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.google.protobuf.CodedOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import kotlin.reflect.KProperty
@@ -17,7 +17,6 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
         ProtoTypes
     }
 
-    private var sizeCache: Int = -1
     private var hashCodeCache: Int = 0
 
     private val _unknownFields = UnknownFields()
@@ -60,7 +59,6 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
     }
 
     fun invalidCache() {
-        sizeCache = -1
         hashCodeCache = 0
     }
 
@@ -74,15 +72,6 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
 
     override fun support(): ProtoSupport<T, TM> {
         return _support
-    }
-
-    override fun size(): Int {
-        if (sizeCache >= 0) {
-            return sizeCache
-        }
-
-        sizeCache = computeSize() + _extensions.values.sumBy { it.size() } + unknownFields().size
-        return sizeCache
     }
 
     override fun hashCode(): Int {
@@ -119,9 +108,7 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
 
     override fun toProto(): ByteArray {
         return ByteArrayOutputStream().use {
-            val coded = CodedOutputStream.newInstance(it)
-            writeTo(coded)
-            coded.flush()
+            writeTo(it)
             it.toByteArray()
         }
     }
@@ -178,13 +165,11 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
         return true
     }
 
-    protected abstract fun computeSize(): Int
-
     protected abstract fun computeHashCode(): Int
 
     protected abstract fun equals(other: T): Boolean
 
-    protected abstract fun writeFields(output: CodedOutputStream)
+    protected abstract fun writeFields(writer: Writer)
 
     fun fieldInfo(name: String): FieldDescriptorProto? {
         return _support.fieldInfo(name)
@@ -195,28 +180,23 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
     }
 
     override fun writeTo(output: OutputStream) {
-        val coded = CodedOutputStream.newInstance(output)
-        writeTo(coded)
-        coded.flush()
+        val writer = Writer()
+        writeTo(writer)
+        writer.writeTo(output)
     }
 
-    override fun writeTo(output: CodedOutputStream) {
-        writeFields(output)
+    override fun writeTo(writer: Writer) {
+        writeFields(writer)
         for ((_, extension) in _extensions) {
-            extension.writeTo(output)
+            extension.writeTo(writer)
         }
-        unknownFields().writeTo(output)
+        unknownFields().writeTo(writer)
     }
 
     override fun writeDelimitedTo(output: OutputStream) {
-        val coded = CodedOutputStream.newInstance(output)
-        writeDelimitedTo(coded)
-        coded.flush()
-    }
-
-    override fun writeDelimitedTo(output: CodedOutputStream) {
-        output.writeInt32NoTag(size())
-        writeTo(output)
+        val writer = Writer()
+        writeTo(writer)
+        writer.ld().writeTo(output)
     }
 
     protected abstract fun <T> getFieldInCurrent(fieldName: String): T

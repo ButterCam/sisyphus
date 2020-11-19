@@ -6,10 +6,10 @@ import com.bybutter.sisyphus.protobuf.AbstractMutableMessage
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoSupport
+import com.bybutter.sisyphus.protobuf.coded.Reader
+import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.MessageOptions
-import com.google.protobuf.CodedInputStream
-import com.google.protobuf.CodedOutputStream
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -181,6 +181,7 @@ open class MessageGenerator(override val parent: ProtobufElement, val descriptor
                             child.applyToType(this)
                             addType(child.generate())
                         }
+                        is MapEntryGenerator -> {}
                         is MessageGenerator -> {
                             addType(child.generate())
                         }
@@ -210,6 +211,7 @@ open class MessageGenerator(override val parent: ProtobufElement, val descriptor
                         is FieldGenerator -> {
                             child.applyToMutable(this)
                         }
+                        is MapEntryGenerator -> {}
                         is MessageGenerator -> {
                             addType(child.generateMutable())
                         }
@@ -234,6 +236,7 @@ open class MessageGenerator(override val parent: ProtobufElement, val descriptor
                         is FieldGenerator -> {
                             child.applyToImpl(this)
                         }
+                        is MapEntryGenerator -> {}
                         is MessageGenerator -> {
                             addType(child.generateImpl())
                         }
@@ -520,23 +523,6 @@ open class MessageGenerator(override val parent: ProtobufElement, val descriptor
                     .build()
             )
             .addFunction(
-                FunSpec.builder("computeSize")
-                    .addModifiers(KModifier.OVERRIDE)
-                    .returns(Int::class)
-                    .addStatement("var result = 0")
-                    .apply {
-                        for (child in children) {
-                            when (child) {
-                                is FieldGenerator -> {
-                                    child.applyToComputeSizeFun(this)
-                                }
-                            }
-                        }
-                    }
-                    .addStatement("return result")
-                    .build()
-            )
-            .addFunction(
                 FunSpec.builder("computeHashCode")
                     .addModifiers(KModifier.OVERRIDE)
                     .returns(Int::class)
@@ -556,7 +542,7 @@ open class MessageGenerator(override val parent: ProtobufElement, val descriptor
             .addFunction(
                 FunSpec.builder("writeFields")
                     .addModifiers(KModifier.OVERRIDE)
-                    .addParameter("output", CodedOutputStream::class)
+                    .addParameter("writer", Writer::class)
                     .apply {
                         for (child in children) {
                             when (child) {
@@ -571,9 +557,10 @@ open class MessageGenerator(override val parent: ProtobufElement, val descriptor
             .addFunction(
                 FunSpec.builder("readField")
                     .addModifiers(KModifier.OVERRIDE)
-                    .addParameter("input", CodedInputStream::class)
+                    .addParameter("reader", Reader::class)
                     .addParameter("field", Int::class)
                     .addParameter("wire", Int::class)
+                    .addAnnotation(INTERNAL_PROTO_API)
                     .returns(Boolean::class)
                     .beginControlFlow("when(field)")
                     .apply {
@@ -605,6 +592,7 @@ open class MessageGenerator(override val parent: ProtobufElement, val descriptor
                         is FieldGenerator -> {
                             child.applyToSupport(this)
                         }
+                        is MapEntryGenerator -> {}
                         is MessageGenerator -> {
                             addType(child.generateSupport())
                         }

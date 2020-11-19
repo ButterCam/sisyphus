@@ -81,7 +81,8 @@ object Dependencies {
     object Proto {
         private const val group = "com.google.protobuf"
 
-        const val base = "$group:protobuf-java"
+        const val base = "$group:protobuf-java:3.13.0"
+        const val lite = "$group:protobuf-javalite"
         const val apiCompiler = "com.google.api:api-compiler"
         const val grpcProto = "com.google.api.grpc:proto-google-common-protos"
     }

@@ -11,7 +11,6 @@ dependencies {
     api(project(":lib:sisyphus-protobuf"))
     api(project(":middleware:sisyphus-grpc-client"))
     api(project(":middleware:sisyphus-configuration-artifact"))
-    implementation(Dependencies.Grpc.stub)
     compileOnly(Dependencies.Spring.Boot.actuator)
     runtimeOnly(Dependencies.Grpc.netty)
 }

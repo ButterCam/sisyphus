@@ -1,5 +1,7 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.protobuf.coded.Reader
+import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
@@ -20,31 +22,35 @@ import com.bybutter.sisyphus.protobuf.primitives.Int64Value
 import com.bybutter.sisyphus.protobuf.primitives.StringValue
 import com.bybutter.sisyphus.protobuf.primitives.UInt32Value
 import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
-import com.google.protobuf.CodedInputStream
-import com.google.protobuf.WireFormat
 
 abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
     support: ProtoSupport<T, TM>
 ) : AbstractMessage<T, TM>(support), MutableMessage<T, TM> {
 
-    abstract fun readField(input: CodedInputStream, field: Int, wire: Int): Boolean
+    @InternalProtoApi
+    protected abstract fun readField(reader: Reader, field: Int, wire: Int): Boolean
 
-    override fun readFrom(input: CodedInputStream, size: Int) {
-        val current = input.totalBytesRead
-        while (!input.isAtEnd && input.totalBytesRead - current < size) {
-            val tag = input.readTag()
-            val number = WireFormat.getTagFieldNumber(tag)
-            val wireType = WireFormat.getTagWireType(tag)
-            if (!readField(input, number, wireType)) {
-                if (!_extensions.values.any { it.readField(input, number, wireType) }) {
-                    unknownFields().readFrom(input, number, wireType)
+    @OptIn(InternalProtoApi::class)
+    override fun readFrom(reader: Reader, size: Int) {
+        val current = reader.readBytes
+        while (!reader.isAtEnd && reader.readBytes - current < size) {
+            val tag = reader.tag()
+            val number = WireType.getFieldNumber(tag)
+            val wireType = WireType.getWireType(tag).ordinal
+            if (!readField(reader, number, wireType)) {
+                if (!_extensions.values.any { it.readField(reader, number, wireType) }) {
+                    unknownFields().readFrom(reader, number, wireType)
                 }
             }
         }
 
-        if (size != Int.MAX_VALUE && input.totalBytesRead - current != size) {
+        if (size != Int.MAX_VALUE && reader.readBytes - current != size) {
             throw IllegalStateException("Wrong message data at position $current with length $size.")
         }
+    }
+
+    override fun readFrom(reader: Reader) {
+        return readFrom(reader, reader.int32())
     }
 
     override fun copyFrom(message: Message<*, *>) {

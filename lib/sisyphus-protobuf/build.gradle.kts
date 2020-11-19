@@ -8,14 +8,9 @@ plugins {
 description = "Sisyphus customized Protobuf runtime for Kotlin"
 
 dependencies {
-    implementation(project(":lib:sisyphus-jackson"))
     api(project(":lib:sisyphus-common"))
-
-    implementation(Dependencies.Grpc.proto)
-    implementation(Dependencies.Kotlin.Coroutines.guava)
-    api(Dependencies.Kotlin.Coroutines.reactor)
-    api(Dependencies.Proto.base)
     api(project(":proto:sisyphus-protos"))
+    api(Dependencies.Grpc.api)
 
     proto(platform(project(":sisyphus-dependencies")))
     proto(Dependencies.Proto.base)
