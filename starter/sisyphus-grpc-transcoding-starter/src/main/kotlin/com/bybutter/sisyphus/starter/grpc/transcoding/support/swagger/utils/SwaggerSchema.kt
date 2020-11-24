@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.hasString
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
@@ -108,16 +109,7 @@ object SwaggerSchema {
             FieldDescriptorProto.Type.ENUM -> {
                 // Use StringSchema if the enum contains string extensions, otherwise use IntegerSchema
                 val enumValueDescriptions = (ProtoTypes.getDescriptorBySymbol(typeName) as EnumDescriptorProto).value
-                val enumValues = mutableListOf<String>()
-                val hasOptions = enumValueDescriptions.lastOrNull()?.hasOptions() ?: false
-                enumValueDescriptions.forEach { description ->
-                    if (hasOptions) enumValues.add(EnumValueOptions.parse(description.options!!.toProto()).string) else enumValues.add(description.number.toString())
-                }
-                if (hasOptions) StringSchema()._enum(enumValues) else IntegerSchema().format("int32").apply {
-                    for (value in enumValues) {
-                        addEnumItem(value.toInt())
-                    }
-                }
+                StringSchema()._enum(enumValueDescriptions.map { it.name })
             }
             else -> StringSchema()
         }
