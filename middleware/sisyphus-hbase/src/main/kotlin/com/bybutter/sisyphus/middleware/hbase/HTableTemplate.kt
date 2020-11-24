@@ -68,7 +68,7 @@ abstract class HTableTemplate<TKey : Any, TValue : Any> : HTemplate<TKey, TValue
         connection.getTable(TableName.valueOf(table)).use {
             val getRequests = keys.map { Get(rowKeyConverter.convert(it)) }
             return it.get(getRequests).filter { it.row != null }.associate {
-                val keyMap = keys.associate { rowKeyConverter.convert(it).hashWrapper() to it }
+                val keyMap = keys.associate { rowKeyConverter.convert(it)?.hashWrapper() to it }
                 (keyMap[it.row.hashWrapper()]
                         ?: throw RuntimeException("Key value not found.")) to tableModelConverter.convert(it)
             }

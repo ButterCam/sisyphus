@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.type.TypeFactory
 
 interface ValueConverter<T> {
-    fun convert(value: T): ByteArray
+    fun convert(value: T): ByteArray?
 
     fun convertBack(value: ByteArray): T
 }

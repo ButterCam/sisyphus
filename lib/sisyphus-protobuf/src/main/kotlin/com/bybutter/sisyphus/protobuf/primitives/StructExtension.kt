@@ -4,23 +4,29 @@ import com.bybutter.sisyphus.protobuf.Message
 
 operator fun Struct.Companion.invoke(vararg pairs: Pair<String, kotlin.Any?>): Struct {
     return Struct {
-        fields += pairs.associate { it.first to toStructValue(it.second) }
+        fields += pairs.associate { it.first to wrapValue(it.second) }
     }
 }
 
 operator fun Struct.Companion.invoke(data: Map<String, kotlin.Any?>): Struct {
     return Struct {
-        fields += data.entries.associate { it.key to toStructValue(it.value) }
+        fields += data.entries.associate { it.key to wrapValue(it.value) }
     }
 }
 
 operator fun Struct.Companion.invoke(data: Collection<Pair<String, kotlin.Any?>>): Struct {
     return Struct {
-        fields += data.associate { it.first to toStructValue(it.second) }
+        fields += data.associate { it.first to wrapValue(it.second) }
     }
 }
 
-private fun toStructValue(value: kotlin.Any?): Value {
+fun Struct.unwrapToMap(): Map<String, kotlin.Any?> {
+    return this.fields.mapValues {
+        unwrapValue(it.value)
+    }
+}
+
+private fun wrapValue(value: kotlin.Any?): Value {
     return when (value) {
         is Number -> {
             Value {
@@ -45,7 +51,7 @@ private fun toStructValue(value: kotlin.Any?): Value {
         is List<*> -> {
             Value {
                 kind = Value.Kind.ListValue(ListValue {
-                    values += value.map { toStructValue(it) }
+                    values += value.map { wrapValue(it) }
                 })
             }
         }
@@ -73,6 +79,23 @@ private fun toStructValue(value: kotlin.Any?): Value {
             }
         }
         else -> throw UnsupportedOperationException("Unsupported struct value.")
+    }
+}
+
+private fun unwrapValue(value: Value): kotlin.Any? {
+    return when {
+        value.hasListValue() -> {
+            value.listValue?.values?.map {
+                unwrapValue(it)
+            }
+        }
+        value.hasStructValue() -> {
+            value.structValue?.fields?.mapValues { unwrapValue(it.value) }
+        }
+        value.hasStringValue() -> value.stringValue
+        value.hasNumberValue() -> value.numberValue
+        value.hasBoolValue() -> value.boolValue
+        else -> null
     }
 }
 

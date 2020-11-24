@@ -10,8 +10,7 @@ data class MessageQueueProperty(
     val password: String,
     val vhost: String,
     val exchange: String?,
-    val queue: String?,
-    val errorQueue: String?
+    val queue: String?
 )
 
 data class MessageQueueProperties(

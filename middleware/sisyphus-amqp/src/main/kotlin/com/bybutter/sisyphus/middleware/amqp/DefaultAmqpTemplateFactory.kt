@@ -17,8 +17,7 @@ open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
             property.queue?.let {
                 this.setDefaultReceiveQueue(it)
             }
-
-            this.setExchange(property.exchange ?: "")
+            this.exchange = property.exchange ?: ""
             this.messageConverter = Jackson2JsonMessageConverter(Json.mapper)
         }
     }
