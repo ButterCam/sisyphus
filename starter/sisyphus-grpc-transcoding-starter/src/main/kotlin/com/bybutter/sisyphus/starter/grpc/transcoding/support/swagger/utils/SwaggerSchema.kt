@@ -1,14 +1,12 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
-import com.bybutter.sisyphus.protobuf.hasString
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
 import com.bybutter.sisyphus.protobuf.primitives.Duration
 import com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto
-import com.bybutter.sisyphus.protobuf.primitives.EnumValueOptions
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldMask
 import com.bybutter.sisyphus.protobuf.primitives.FloatValue
