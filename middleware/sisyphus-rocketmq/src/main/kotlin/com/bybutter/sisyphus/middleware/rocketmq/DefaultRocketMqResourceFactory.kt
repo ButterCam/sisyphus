@@ -59,11 +59,11 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
                 AllocateMessageQueueAveragely())
         }.apply {
             this.namesrvAddr = chooseNameServerAddr(consumerProperty)
-            if (consumerProperty.groupId != null) {
-                this.consumerGroup = consumerProperty.groupId
-            }
             if (consumerProperty.accessChannel != null) {
                 this.accessChannel = consumerProperty.accessChannel
+            }
+            if (metadata.groupId.isNotEmpty()) {
+                this.consumerGroup = metadata.groupId
             }
             this.subscribe(metadata.topic, if (metadata.filterType == ExpressionType.TAG) MessageSelector.byTag(metadata.filter) else MessageSelector.bySql(metadata.filter))
             val converter = metadata.converter.instance()

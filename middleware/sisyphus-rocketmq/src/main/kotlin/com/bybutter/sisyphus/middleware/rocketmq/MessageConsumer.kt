@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component
 annotation class MessageConsumer(
     val type: ConsumerType,
     val topic: String,
+    val groupId: String = "",
     val filter: String = "*",
     val filterType: String = ExpressionType.TAG,
     val converter: KClass<out MessageConverter<*>> = MessageConverter.Companion::class
