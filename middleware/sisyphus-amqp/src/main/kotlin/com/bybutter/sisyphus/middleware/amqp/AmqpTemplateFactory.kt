@@ -5,6 +5,4 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory
 
 interface AmqpTemplateFactory {
     fun createTemplate(property: MessageQueueProperty): AmqpTemplate
-
-    fun createConnectionFactory(property: MessageQueueProperty): ConnectionFactory
 }
