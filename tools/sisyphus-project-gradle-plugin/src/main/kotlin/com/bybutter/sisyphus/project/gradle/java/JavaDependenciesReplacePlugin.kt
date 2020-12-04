@@ -11,7 +11,7 @@ class JavaDependenciesReplacePlugin : Plugin<Project> {
             it.resolutionStrategy.eachDependency { detail ->
                 sisyphusManagedDependencies["${detail.requested.group}:${detail.requested.name}"]?.let { moduleStringNotation ->
                     detail.useVersion(moduleStringNotation.version)
-                    detail.because("This dependencies version set by Sisyphus")
+                    detail.because("The version of current dependency managed by Sisyphus")
                 }
             }
         }
