@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.middleware.jdbc
 
+import javax.sql.DataSource
 import kotlin.streams.toList
 import org.jooq.Configuration
 import org.jooq.ExecuteListenerProvider
@@ -7,6 +8,7 @@ import org.jooq.ExecutorProvider
 import org.jooq.RecordListenerProvider
 import org.jooq.RecordMapperProvider
 import org.jooq.RecordUnmapperProvider
+import org.jooq.SQLDialect
 import org.jooq.TransactionListenerProvider
 import org.jooq.TransactionProvider
 import org.jooq.VisitListenerProvider
@@ -51,7 +53,7 @@ class SpringJooqConfigurationAdapter : JooqConfigInterceptor {
 
     override val qualifier: Class<*>? = null
 
-    override fun intercept(configuration: Configuration): Configuration {
+    override fun intercept(datasource: DataSource, dialect: SQLDialect, configuration: Configuration): Configuration {
         transactionProvider.ifAvailable { configuration.set(it) }
         recordMapperProvider.ifAvailable { configuration.set(it) }
         recordUnmapperProvider.ifAvailable { configuration.set(it) }

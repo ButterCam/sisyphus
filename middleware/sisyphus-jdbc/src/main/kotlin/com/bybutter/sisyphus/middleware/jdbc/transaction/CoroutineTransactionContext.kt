@@ -19,12 +19,13 @@ class CoroutineTransactionContext(transactionActive: Boolean = true) :
 
     private val connectionHandle = ConcurrentHashMap<DataSource, ConnectionHandle>()
 
-    fun getConnection(dataSource: DataSource): Connection {
+    fun getConnection(dataSource: DataSource, init: (Connection).() -> Unit = {}): Connection {
         if (!transactionActive) return dataSource.connection
 
         return connectionHandle.getOrPut(dataSource) {
             val result = ConnectionHandle(dataSource.connection)
             result.autoCommit = false
+            result.init()
             result
         }.refer()
     }
