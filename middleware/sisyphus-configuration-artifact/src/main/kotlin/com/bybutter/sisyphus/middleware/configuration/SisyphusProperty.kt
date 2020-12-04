@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.middleware.configuration
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class SisyphusProperty(
+    val environment: String,
     @NestedConfigurationProperty
     val repositories: Map<String, Repository> = mapOf(),
     @NestedConfigurationProperty
