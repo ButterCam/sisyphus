@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.project.gradle
 
 import org.gradle.api.Project
+import org.gradle.api.internal.artifacts.dsl.ParsedModuleStringNotation
 
 open class SisyphusExtension(val project: Project) {
     var version: String
@@ -26,6 +27,8 @@ open class SisyphusExtension(val project: Project) {
     var snapshotRepositories: MutableList<String> = mutableListOf("snapshot")
 
     var dockerPublishRegistries: MutableList<String> = mutableListOf()
+
+    var managedDependencies: MutableMap<String, ParsedModuleStringNotation> = mutableMapOf()
 
     val signKeyName: String?
 
@@ -58,13 +61,18 @@ open class SisyphusExtension(val project: Project) {
         }
 
         dependencyRepositories = (project.findProperty("sisyphus.dependency.repositories") as? String)?.split(',')?.toMutableList()
-            ?: dependencyRepositories
+                ?: dependencyRepositories
         releaseRepositories = (project.findProperty("sisyphus.release.repositories") as? String)?.split(',')?.toMutableList()
-            ?: releaseRepositories
+                ?: releaseRepositories
         snapshotRepositories = (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
-            ?: snapshotRepositories
+                ?: snapshotRepositories
         dockerPublishRegistries = (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
-            ?: dockerPublishRegistries
+                ?: dockerPublishRegistries
+
+        managedDependencies = (project.findProperty("sisyphus.dependency.overriding") as? String)?.split(',')?.associate {
+            val moduleStringNotation = ParsedModuleStringNotation(it, null)
+            "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
+        }?.toMutableMap() ?: managedDependencies
 
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
     }
