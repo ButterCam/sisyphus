@@ -13,7 +13,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-      - uses: ButterCam/setup-sisyphus-build@v1.0.2
+      - uses: ButterCam/setup-sisyphus-build@master
         with:
           dependency-repositories: local,central,snapshot,portal
           snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
