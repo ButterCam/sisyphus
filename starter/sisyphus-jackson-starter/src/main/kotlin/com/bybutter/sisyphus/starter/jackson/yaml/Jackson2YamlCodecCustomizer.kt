@@ -20,7 +20,7 @@ class Jackson2YamlCodecCustomizer : CodecCustomizer {
     }
 
     override fun customize(configurer: CodecConfigurer) {
-        configurer.customCodecs().register(EncoderHttpMessageWriter(Jackson2YamlEncoder(Yaml.mapper)))
-        configurer.customCodecs().register(DecoderHttpMessageReader(Jackson2YamlDecoder(Yaml.mapper)))
+        configurer.customCodecs().register(EncoderHttpMessageWriter(Jackson2YamlEncoder(Yaml.mapper, *DEFAULT_YAML_MIME_TYPES)))
+        configurer.customCodecs().register(DecoderHttpMessageReader(Jackson2YamlDecoder(Yaml.mapper, *DEFAULT_YAML_MIME_TYPES)))
     }
 }

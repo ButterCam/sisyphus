@@ -7,7 +7,6 @@ import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
 import com.bybutter.sisyphus.protobuf.primitives.Duration
 import com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto
-import com.bybutter.sisyphus.protobuf.primitives.EnumValueOptions
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldMask
 import com.bybutter.sisyphus.protobuf.primitives.FloatValue
@@ -108,16 +107,7 @@ object SwaggerSchema {
             FieldDescriptorProto.Type.ENUM -> {
                 // Use StringSchema if the enum contains string extensions, otherwise use IntegerSchema
                 val enumValueDescriptions = (ProtoTypes.getDescriptorBySymbol(typeName) as EnumDescriptorProto).value
-                val enumValues = mutableListOf<String>()
-                val hasOptions = enumValueDescriptions.lastOrNull()?.hasOptions() ?: false
-                enumValueDescriptions.forEach { description ->
-                    if (hasOptions) enumValues.add(EnumValueOptions.parse(description.options!!.toProto()).string) else enumValues.add(description.number.toString())
-                }
-                if (hasOptions) StringSchema()._enum(enumValues) else IntegerSchema().format("int32").apply {
-                    for (value in enumValues) {
-                        addEnumItem(value.toInt())
-                    }
-                }
+                StringSchema()._enum(enumValueDescriptions.map { it.name })
             }
             else -> StringSchema()
         }

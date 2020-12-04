@@ -9,7 +9,6 @@ data class RocketMqConsumerProperty(
     val publicNameServerAddr: String,
     val aclAccessKey: String? = null,
     val aclSecretKey: String? = null,
-    val groupId: String? = null,
     val enableTrace: Boolean = false,
     val traceTopic: String? = null,
     val accessChannel: AccessChannel? = null

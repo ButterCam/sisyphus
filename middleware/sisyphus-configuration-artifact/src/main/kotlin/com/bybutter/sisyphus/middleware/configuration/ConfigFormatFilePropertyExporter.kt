@@ -12,10 +12,17 @@ abstract class ConfigFormatFilePropertyExporter : FileConfigPropertyExporter() {
 
     open val formats: Collection<String> = listOf("properties", "yaml", "yml")
 
-    final override val files: Collection<String> by lazy {
-        names.flatMap { name ->
-            formats.map { format ->
-                "$name.$format"
+    override fun getFiles(environment: String): Iterable<String> {
+        return mutableListOf<String>().apply {
+            for (name in names) {
+                for (format in formats) {
+                    add("$name.$format")
+                }
+                if (environment.isNotEmpty()) {
+                    for (format in formats) {
+                        add("$name-$environment.$format")
+                    }
+                }
             }
         }
     }

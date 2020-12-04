@@ -65,7 +65,7 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         }
         return interceptors.fold(config) { c, h ->
             if (h.qualifier == null || h.qualifier == qualifier) {
-                h.intercept(c)
+                h.intercept(datasource, dialect, c)
             } else {
                 c
             }
