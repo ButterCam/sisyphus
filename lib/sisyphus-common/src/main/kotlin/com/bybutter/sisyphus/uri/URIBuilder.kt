@@ -64,7 +64,7 @@ class URIBuilder {
 
     private fun parseQuery(query: String): MutableMap<String, MutableList<String>> {
         return query.split('&').asSequence().mapNotNull {
-            val data = it.split('=')
+            val data = it.split("=", limit = 2)
             if (data.size != 2) return@mapNotNull null
             data[0].urlDecode() to data[1].urlDecode()
         }.groupBy { it.first }.mapValues {
