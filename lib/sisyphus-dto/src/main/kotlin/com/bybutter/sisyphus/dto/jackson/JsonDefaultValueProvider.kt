@@ -13,6 +13,6 @@ class JsonDefaultValueProvider : DefaultValueProvider<Any?> {
         param: String,
         property: KProperty<Any?>
     ): Any? {
-        return Json.deserialize(param, property.returnType.javaType.jvm)
+        return Json.deserialize(param, property.returnType.javaType)
     }
 }
