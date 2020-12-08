@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.dto.jackson
 import com.bybutter.sisyphus.dto.DefaultValueProvider
 import com.bybutter.sisyphus.dto.ModelProxy
 import com.bybutter.sisyphus.jackson.Json
-import com.bybutter.sisyphus.reflect.jvm
 import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.javaType
 
