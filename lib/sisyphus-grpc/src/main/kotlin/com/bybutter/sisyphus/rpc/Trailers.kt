@@ -16,7 +16,7 @@ fun <T> trailers(key: Metadata.Key<T>, value: T) {
     Trailers.CUSTOM_TAILS_KEY.get()?.put(key, value)
 }
 
-fun <T> trailers(key: String, value: String) {
+fun trailers(key: String, value: String) {
     Trailers.CUSTOM_TAILS_KEY.get()?.put(Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER), value)
 }
 
