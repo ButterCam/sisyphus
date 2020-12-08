@@ -17,14 +17,21 @@ fun JsonNode.toProto(): Value = Value {
                 }
             }
         }
-        this@toProto.isTextual -> {
-            stringValue = this@toProto.textValue()
-        }
         this@toProto.isNumber -> {
             numberValue = this@toProto.doubleValue()
         }
         this@toProto.isBoolean -> {
             boolValue = this@toProto.booleanValue()
+        }
+        this@toProto.isTextual -> {
+            val text = this@toProto.textValue()
+            text.toDoubleOrNull()?.let {
+                numberValue = it
+            } ?: text.toBooleanOrNull()?.let {
+                boolValue = it
+            } ?: run {
+                stringValue = text
+            }
         }
         this@toProto.isNull -> {
             nullValue = NullValue.NULL_VALUE
@@ -36,5 +43,13 @@ fun JsonNode.toProto(): Value = Value {
 fun ObjectNode.toProto(): Struct = Struct {
     for ((field, node) in this@toProto.fields()) {
         fields[field] = node.toProto()
+    }
+}
+
+fun String.toBooleanOrNull(): Boolean? {
+    return if (this.equals("true", true) || this.equals("false", true)) {
+        this.toBoolean()
+    } else {
+        null
     }
 }
