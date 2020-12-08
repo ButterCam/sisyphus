@@ -62,12 +62,12 @@ fun Status.toGrpcStatus(cause: Throwable? = null): io.grpc.Status {
 }
 
 private fun extractStatusDetails(details: MutableList<Message<*, *>>, throwable: Throwable? = null) {
-    details += debugInfo
+    details += Debug.debugInfo
     throwable?.extractStatusDetails(details)
 }
 
 private fun Throwable.extractStatusDetails(list: MutableList<Message<*, *>>) {
-    if (debugEnabled) {
+    if (Debug.debugEnabled) {
         list += DebugInfo {
             detail = "${this@extractStatusDetails.javaClass}(${this@extractStatusDetails.message})"
             stackEntries += this@extractStatusDetails.stackTrace.map { it.toString() }
