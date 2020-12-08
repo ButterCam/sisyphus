@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.support.metrics
 
+import com.bybutter.sisyphus.starter.grpc.support.RequestLogger
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
@@ -14,7 +15,7 @@ import org.springframework.context.annotation.Bean
 @ConditionalOnClass(name = ["io.micrometer.core.instrument.MeterRegistry"])
 class SisyphusMetricsAutoConfiguration {
     @Bean
-    fun micrometerInterceptor(registry: MeterRegistry): MicrometerTimerInterceptor {
-        return MicrometerTimerInterceptor(registry)
+    fun micrometerRequestLogger(registry: MeterRegistry): RequestLogger {
+        return MicrometerRequestLogger(registry)
     }
 }
