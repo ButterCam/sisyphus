@@ -51,19 +51,18 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
         }
 
         return if (consumerProperty.enableTrace) {
-            DefaultMQPushConsumer(MixAll.DEFAULT_CONSUMER_GROUP, hook,
-                AllocateMessageQueueAveragely(),
-                true, consumerProperty.traceTopic)
+            DefaultMQPushConsumer(metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
+                    ?: MixAll.DEFAULT_CONSUMER_GROUP, hook,
+                    AllocateMessageQueueAveragely(),
+                    true, consumerProperty.traceTopic)
         } else {
-            DefaultMQPushConsumer(MixAll.DEFAULT_CONSUMER_GROUP, hook,
-                AllocateMessageQueueAveragely())
+            DefaultMQPushConsumer(metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
+                    ?: MixAll.DEFAULT_CONSUMER_GROUP, hook,
+                    AllocateMessageQueueAveragely())
         }.apply {
             this.namesrvAddr = chooseNameServerAddr(consumerProperty)
             if (consumerProperty.accessChannel != null) {
                 this.accessChannel = consumerProperty.accessChannel
-            }
-            if (metadata.groupId.isNotEmpty()) {
-                this.consumerGroup = metadata.groupId
             }
             this.subscribe(metadata.topic, if (metadata.filterType == ExpressionType.TAG) MessageSelector.byTag(metadata.filter) else MessageSelector.bySql(metadata.filter))
             val converter = metadata.converter.instance()
