@@ -45,7 +45,14 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
             context = Debug.initDebug(context)
         }
 
-        return Contexts.interceptCall(context, SisyphusGrpcServerCall(call, headers, uniqueLoggers), headers, next)
+        return try {
+            Contexts.interceptCall(context, SisyphusGrpcServerCall(call, headers, uniqueLoggers), headers, next)
+        } catch (e: Exception) {
+            Trailers.CUSTOM_TAILS_KEY.get(context)?.let {
+                call.sendHeaders(it)
+            }
+            throw e
+        }
     }
 
     private class SisyphusGrpcServerCall<ReqT, RespT>(call: ServerCall<ReqT, RespT>, private val headers: Metadata, private val loggers: List<RequestLogger>) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
