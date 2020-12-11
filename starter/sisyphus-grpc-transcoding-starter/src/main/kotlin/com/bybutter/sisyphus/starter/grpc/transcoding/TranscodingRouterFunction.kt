@@ -21,7 +21,7 @@ class TranscodingRouterFunction private constructor(
     private val channel by lazy {
         // Create channel for localhost gRpc server.
         // We create channel lazily, because get server port will cause exceptions before server started.
-        ManagedChannelBuilder.forTarget("localhost:${server.port}").usePlaintext().build()
+        ManagedChannelBuilder.forTarget("localhost:${server.port}").usePlaintext().maxInboundMetadataSize(1024 * 1024).build()
     }
 
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
