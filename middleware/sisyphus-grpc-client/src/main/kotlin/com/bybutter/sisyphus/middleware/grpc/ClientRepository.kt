@@ -34,7 +34,7 @@ interface ClientRepository : Ordered {
             result = interceptor.intercept(result)
         }
 
-        return result.withInterceptors(*interceptors.toList().toTypedArray())
+        return result.withInterceptors(*interceptors.reversed().toTypedArray())
     }
 
     fun createGrpcChannel(target: String, builderInterceptors: Iterable<ChannelBuilderInterceptor>, lifecycle: ManagedChannelLifecycle): Channel {

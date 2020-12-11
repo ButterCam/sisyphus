@@ -4,7 +4,6 @@ import com.bybutter.sisyphus.starter.grpc.ServiceRegistrar
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerProperty
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerRouterFunction
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication.SwaggerValidate
-import com.bybutter.sisyphus.starter.webflux.CorsConfigurationSourceRegistrar
 import io.grpc.Server
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -15,6 +14,7 @@ import org.springframework.context.EnvironmentAware
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar
 import org.springframework.core.env.Environment
 import org.springframework.core.type.AnnotationMetadata
+import org.springframework.http.HttpMethod
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsConfigurationSource
 import org.springframework.web.cors.reactive.CorsWebFilter
@@ -41,17 +41,17 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
 
     private val swaggerProperty by lazy {
         Binder.get(environment)
-            .bind("swagger", SwaggerProperty::class.java)
-            .orElse(null) ?: SwaggerProperty()
+                .bind("swagger", SwaggerProperty::class.java)
+                .orElse(null) ?: SwaggerProperty()
     }
 
     override fun registerBeanDefinitions(importingClassMetadata: AnnotationMetadata, registry: BeanDefinitionRegistry) {
         // Find the [EnableHttpToGrpcTranscoding] annotation.
         val enableAnnotation = importingClassMetadata.getAnnotationAttributes(EnableHttpToGrpcTranscoding::class.java.name)
-            ?: return
+                ?: return
         // Get the enabled transcoding service in [EnableHttpToGrpcTranscoding] annotation.
         val enableServices = (enableAnnotation[EnableHttpToGrpcTranscoding::services.name] as? Array<String>)?.asList()
-            ?: listOf()
+                ?: listOf()
         registerSwaggerRouterFunction(registry, enableServices)
         registerRouterFunction(registry, enableServices)
         registerTranscodingCorsConfigSource(registry, enableServices)
@@ -96,10 +96,10 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(CorsConfigurationSource::class.java) {
             val server = (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
 
-            // Try to get the default CORS config, all CORS result will based on this.
-            val corsConfig = registry.getBeansOfType(CorsConfiguration::class.java).values.firstOrNull()
-            // Use default base CORS config, it support all CORS hosts.
-                ?: CorsConfigurationSourceRegistrar.defaultCorsConfig
+            // Try to get the default transcoding cors configuration factory form spring application context
+            val corsConfig = registry.getBeansOfType(TranscodingCorsConfigurationFactory::class.java).values.firstOrNull()
+            // Or the default implementation when not existed.
+                    ?: TranscodingCorsConfigurationFactory.Default
             // Create CORS config source for transcoding.
             TranscodingCorsConfigurationSource(server, corsConfig, enableServices)
         }
@@ -111,12 +111,14 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
      */
     private fun registerSwaggerCorsConfigSource(registry: BeanDefinitionRegistry) {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(CorsConfigurationSource::class.java) {
-            // Try to get the default CORS config, all CORS result will based on this.
-            val corsConfig = (registry as ConfigurableListableBeanFactory).getBeansOfType(CorsConfiguration::class.java).values.firstOrNull()
-            // Use default base CORS config, it support all CORS hosts.
-                ?: CorsConfigurationSourceRegistrar.defaultCorsConfig
             UrlBasedCorsConfigurationSource().apply {
-                registerCorsConfiguration(swaggerProperty.path, corsConfig)
+                registerCorsConfiguration(swaggerProperty.path, CorsConfiguration().apply {
+                    addAllowedHeader(CorsConfiguration.ALL)
+                    addAllowedOrigin(CorsConfiguration.ALL)
+                    addAllowedMethod(HttpMethod.OPTIONS)
+                    addAllowedMethod(HttpMethod.HEAD)
+                    addAllowedMethod(HttpMethod.GET)
+                })
             }
         }
         registry.registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_SWAGGER_CORS_CONFIG, definitionBuilder.beanDefinition)

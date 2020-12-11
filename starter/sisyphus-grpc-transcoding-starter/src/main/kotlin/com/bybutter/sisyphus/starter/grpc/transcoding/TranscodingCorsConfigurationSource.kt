@@ -17,11 +17,11 @@ import org.springframework.web.server.ServerWebExchange
 /**
  * CORS config source for gRPC transcoding.
  */
-class TranscodingCorsConfigurationSource(server: Server, baseConfiguration: CorsConfiguration, enableServices: Collection<String> = listOf()) : CorsConfigurationSource {
+class TranscodingCorsConfigurationSource(server: Server, private val configurationFactory: TranscodingCorsConfigurationFactory, enableServices: Collection<String> = listOf()) : CorsConfigurationSource {
     private val corsConfigurations = mutableMapOf<String, CorsConfiguration>()
 
     init {
-        registerServer(server, baseConfiguration, enableServices)
+        registerServer(server, enableServices)
     }
 
     override fun getCorsConfiguration(exchange: ServerWebExchange): CorsConfiguration? {
@@ -35,25 +35,25 @@ class TranscodingCorsConfigurationSource(server: Server, baseConfiguration: Cors
         return corsConfigurations[pattern]
     }
 
-    private fun registerServer(server: Server, baseConfiguration: CorsConfiguration, enableServices: Collection<String>) {
+    private fun registerServer(server: Server, enableServices: Collection<String>) {
         val services = enableServices.toSet()
 
         // Resister all enable service in gRPC server.
         for (service in server.services) {
             if (services.isEmpty() || services.contains(service.serviceDescriptor.name)) {
-                registerService(service, baseConfiguration)
+                registerService(service)
             }
         }
     }
 
-    private fun registerService(service: ServerServiceDefinition, baseConfiguration: CorsConfiguration) {
+    private fun registerService(service: ServerServiceDefinition) {
         // Resister all method in gRPC service.
         for (method in service.methods) {
-            registerMethod(method, baseConfiguration)
+            registerMethod(method)
         }
     }
 
-    private fun registerMethod(method: ServerMethodDefinition<*, *>, baseConfiguration: CorsConfiguration) {
+    private fun registerMethod(method: ServerMethodDefinition<*, *>) {
         // Ensure method proto registered.
         val proto = ProtoTypes.getDescriptorBySymbol(method.methodDescriptor.fullMethodName) as? MethodDescriptorProto
                 ?: return
@@ -61,46 +61,46 @@ class TranscodingCorsConfigurationSource(server: Server, baseConfiguration: Cors
         // Ensure http rule existed.
         val httpRule = proto.options?.http ?: return
 
-        registerRule(httpRule, baseConfiguration)
+        registerRule(httpRule, method)
     }
 
-    private fun registerRule(rule: HttpRule, baseConfiguration: CorsConfiguration) {
+    private fun registerRule(rule: HttpRule, method: ServerMethodDefinition<*, *>) {
         rule.pattern?.let {
-            registerPattern(it, baseConfiguration)
+            registerPattern(it, method)
         }
 
         for (additionalBinding in rule.additionalBindings) {
-            registerRule(rule, baseConfiguration)
+            registerRule(rule, method)
         }
     }
 
-    private fun registerPattern(pattern: HttpRule.Pattern<*>, baseConfiguration: CorsConfiguration) {
-        val method: HttpMethod
+    private fun registerPattern(pattern: HttpRule.Pattern<*>, method: ServerMethodDefinition<*, *>) {
+        val httpMethod: HttpMethod
         val pathTemplate: PathTemplate
 
         when (pattern) {
             is HttpRule.Pattern.Get -> {
-                method = HttpMethod.GET
+                httpMethod = HttpMethod.GET
                 pathTemplate = PathTemplate.create(pattern.value)
             }
             is HttpRule.Pattern.Post -> {
-                method = HttpMethod.POST
+                httpMethod = HttpMethod.POST
                 pathTemplate = PathTemplate.create(pattern.value)
             }
             is HttpRule.Pattern.Put -> {
-                method = HttpMethod.PUT
+                httpMethod = HttpMethod.PUT
                 pathTemplate = PathTemplate.create(pattern.value)
             }
             is HttpRule.Pattern.Patch -> {
-                method = HttpMethod.PATCH
+                httpMethod = HttpMethod.PATCH
                 pathTemplate = PathTemplate.create(pattern.value)
             }
             is HttpRule.Pattern.Delete -> {
-                method = HttpMethod.DELETE
+                httpMethod = HttpMethod.DELETE
                 pathTemplate = PathTemplate.create(pattern.value)
             }
             is HttpRule.Pattern.Custom -> {
-                method = HttpMethod.valueOf(pattern.value.kind)
+                httpMethod = HttpMethod.valueOf(pattern.value.kind)
                 pathTemplate = PathTemplate.create(pattern.value.path)
             }
             else -> throw UnsupportedOperationException("Unknown http rule pattern")
@@ -109,19 +109,9 @@ class TranscodingCorsConfigurationSource(server: Server, baseConfiguration: Cors
         val normalizedPattern = pathTemplate.withoutVars().toString()
 
         val config = corsConfigurations.getOrPut(normalizedPattern) {
-            // Create a copy of CORS configuration. The [CorsConfiguration(CorsConfiguration other)] can't be used
-            // in this case, because it will refer the list instance for new config, it cause the reference leak.
-            CorsConfiguration().apply {
-                // Set the property will create a copy of list.
-                allowedOrigins = baseConfiguration.allowedOrigins
-                allowedMethods = baseConfiguration.allowedMethods
-                allowedHeaders = baseConfiguration.allowedHeaders
-                exposedHeaders = baseConfiguration.exposedHeaders
-                allowCredentials = baseConfiguration.allowCredentials
-                maxAge = baseConfiguration.maxAge
-            }
+            configurationFactory.getConfiguration(method, pattern, normalizedPattern)
         }
 
-        config.addAllowedMethod(method)
+        config.addAllowedMethod(httpMethod)
     }
 }

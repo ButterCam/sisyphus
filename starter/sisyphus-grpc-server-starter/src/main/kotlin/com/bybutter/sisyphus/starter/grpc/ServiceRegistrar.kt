@@ -58,7 +58,7 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
             }
 
             val interceptors = BeanUtils.getBeans<ServerInterceptor>(beanFactory)
-            for ((_, interceptor) in interceptors) {
+            for (interceptor in interceptors.values.reversed()) {
                 builder = builder.intercept(interceptor)
             }
 
