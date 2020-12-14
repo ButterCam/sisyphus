@@ -339,7 +339,7 @@ open class FieldGenerator constructor(override val parent: MessageGenerator, des
                                 .addStatement("field = value")
                                 .apply {
                                     if (valueType.isNullable) {
-                                        addStatement("if(value != null) _$hasFunName = true")
+                                        addStatement("_$hasFunName = value != null")
                                     } else {
                                         addStatement("_$hasFunName = true")
                                     }
