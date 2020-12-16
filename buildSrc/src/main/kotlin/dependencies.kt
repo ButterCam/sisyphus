@@ -141,6 +141,10 @@ object Dependencies {
     const val rocketMqAcl = "org.apache.rocketmq:rocketmq-acl"
 
     const val mongo = "org.mongodb:mongodb-driver-reactivestreams"
+
+    const val seata = "io.seata:seata-spring-boot-starter"
+
+    const val seataGrpc = "io.seata:seata-grpc"
 }
 
 val Project.managedDependencies: Project

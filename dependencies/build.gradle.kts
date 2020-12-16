@@ -60,5 +60,7 @@ dependencies {
         api("org.mongodb:mongodb-driver-reactivestreams:4.2.3")
         api("org.reflections:reflections:0.9.12")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.4.5")
+        api("io.seata:seata-grpc:1.4.1")
+        api("io.seata:seata-spring-boot-starter:1.4.1")
     }
 }

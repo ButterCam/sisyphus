@@ -14,6 +14,8 @@ dependencies {
     runtimeOnly(Dependencies.postgresql)
 
     compileOnly(project(":lib:sisyphus-dsl"))
+    api(Dependencies.seata)
+    api(Dependencies.seataGrpc)
 
     testImplementation(Dependencies.h2)
     testImplementation(project(":lib:sisyphus-dsl"))
