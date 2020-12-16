@@ -74,6 +74,6 @@ class ApiLinterRunner {
     }
 
     companion object {
-        const val API_LINTER_DEFAULT_VERSION = "1.1.0"
+        const val API_LINTER_DEFAULT_VERSION = "1.9.0"
     }
 }
