@@ -144,7 +144,6 @@ class BbCodeBuilder {
 
     fun color(color: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
         return tag("color", color, block)
-
     }
 
     override fun toString(): String {
