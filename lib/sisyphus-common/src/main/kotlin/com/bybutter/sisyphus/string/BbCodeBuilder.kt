@@ -3,19 +3,47 @@ package com.bybutter.sisyphus.string
 class BbCodeBuilder {
     private val builder: StringBuilder = StringBuilder()
 
+    fun tag(value: String, parameter: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
+        builder.append('[')
+        builder.append(value)
+        builder.append('=')
+        builder.append(parameter)
+        builder.append(']')
+        block()
+        builder.append("[/")
+        builder.append(value)
+        builder.append(']')
+        return this
+    }
+
+    fun tag(value: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
+        builder.append('[')
+        builder.append(value)
+        builder.append(']')
+        block()
+        builder.append("[/")
+        builder.append(value)
+        builder.append(']')
+        return this
+    }
+
     fun ln(): BbCodeBuilder {
         builder.appendln()
         return this
     }
 
+    private fun escape(value: String): String {
+        return value.replace("[", "\\[")
+            .replace("]", "\\]")
+    }
+
     fun text(value: String): BbCodeBuilder {
-        builder.append(value)
+        builder.append(escape(value))
         return this
     }
 
     fun textLn(value: String): BbCodeBuilder {
-        builder.appendln(value)
-        return this
+        return text(value).ln()
     }
 
     fun b(value: String): BbCodeBuilder {
@@ -23,9 +51,9 @@ class BbCodeBuilder {
     }
 
     fun bold(value: String): BbCodeBuilder {
-        text("[b]")
-        text(value)
-        return text("[/b]")
+        return tag("b") {
+            text(value)
+        }
     }
 
     fun b(block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
@@ -33,9 +61,7 @@ class BbCodeBuilder {
     }
 
     fun bold(block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
-        text("[b]")
-        block()
-        return text("[/b]")
+        return tag("b", block)
     }
 
     fun i(value: String): BbCodeBuilder {
@@ -43,9 +69,9 @@ class BbCodeBuilder {
     }
 
     fun italic(value: String): BbCodeBuilder {
-        text("[i]")
-        text(value)
-        return text("[/i]")
+        return tag("i") {
+            text(value)
+        }
     }
 
     fun i(block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
@@ -53,9 +79,7 @@ class BbCodeBuilder {
     }
 
     fun italic(block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
-        text("[i]")
-        block()
-        return text("[/i]")
+        return tag("i", block)
     }
 
     fun u(value: String): BbCodeBuilder {
@@ -63,9 +87,9 @@ class BbCodeBuilder {
     }
 
     fun underscore(value: String): BbCodeBuilder {
-        text("[u]")
-        text(value)
-        return text("[/u]")
+        return tag("u") {
+            text(value)
+        }
     }
 
     fun u(block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
@@ -73,26 +97,23 @@ class BbCodeBuilder {
     }
 
     fun underscore(block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
-        text("[u]")
-        block()
-        return text("[/u]")
+        return tag("u", block)
     }
 
     fun url(url: String, value: String? = null): BbCodeBuilder {
-        if (value == null) {
-            text("[url]")
-            text(url)
+        return if (value == null) {
+            tag("url") {
+                text(url)
+            }
         } else {
-            text("[url=$url]")
-            text(value)
+            tag("url", url) {
+                text(value)
+            }
         }
-        return text("[/url]")
     }
 
     fun url(url: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
-        text("[url=$url]")
-        block()
-        return text("[/url]")
+        return tag("url", url, block)
     }
 
     fun img(url: String): BbCodeBuilder {
@@ -100,33 +121,29 @@ class BbCodeBuilder {
     }
 
     fun image(url: String): BbCodeBuilder {
-        text("[img]")
-        text(url)
-        return text("[/img]")
+        return tag("img") {
+            text(url)
+        }
     }
 
     fun size(size: Int, value: String): BbCodeBuilder {
-        text("[size=$size]")
-        text(value)
-        return text("[/size]")
+        return tag("size", size.toString()) {
+            text(value)
+        }
     }
 
     fun size(size: Int, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
-        text("[size=$size]")
-        block()
-        return text("[/size]")
+        return tag("size", size.toString(), block)
     }
 
     fun color(color: String, value: String): BbCodeBuilder {
-        text("[color=$color]")
-        text(value)
-        return text("[/color]")
+        return tag("color", color) {
+            text(value)
+        }
     }
 
     fun color(color: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
-        text("[color=$color]")
-        block()
-        return text("[/color]")
+        return tag("color", color, block)
     }
 
     override fun toString(): String {
