@@ -62,14 +62,14 @@ class URIBuilder {
         this.scheme = scheme
     }
 
-    private fun parseQuery(query: String): MutableMap<String, MutableList<String>> {
-        return query.split('&').asSequence().mapNotNull {
+    private fun parseQuery(query: String?): MutableMap<String, MutableList<String>> {
+        return query?.split('&')?.asSequence()?.mapNotNull {
             val data = it.split("=", limit = 2)
             if (data.size != 2) return@mapNotNull null
             data[0].urlDecode() to data[1].urlDecode()
-        }.groupBy { it.first }.mapValues {
+        }?.groupBy { it.first }?.mapValues {
             it.value.map { it.second }.toMutableList()
-        }.toMutableMap()
+        }?.toMutableMap() ?: return mutableMapOf()
     }
 
     fun setScheme(scheme: String): URIBuilder {
