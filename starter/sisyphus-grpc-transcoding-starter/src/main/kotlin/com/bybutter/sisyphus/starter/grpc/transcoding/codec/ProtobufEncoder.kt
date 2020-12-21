@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.protobuf.Message
 import java.io.IOException
 import org.reactivestreams.Publisher
 import org.springframework.core.ResolvableType
+import org.springframework.core.codec.AbstractEncoder
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferFactory
 import org.springframework.core.io.buffer.DataBufferUtils
@@ -13,17 +14,9 @@ import org.springframework.util.MimeType
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-class ProtobufEncoder : ProtobufSupport(), HttpMessageEncoder<Message<*, *>> {
-    override fun getEncodableMimeTypes(): List<MimeType> {
-        return ProtobufCodecCustomizer.MIME_TYPES
-    }
-
+class ProtobufEncoder(vararg mimeTypes: MimeType) : AbstractEncoder<Message<*, *>>(*mimeTypes), HttpMessageEncoder<Message<*, *>> {
     override fun getStreamingMediaTypes(): List<MediaType> {
         return ProtobufCodecCustomizer.STREAM_MIME_TYPES
-    }
-
-    override fun canEncode(elementType: ResolvableType, mimeType: MimeType?): Boolean {
-        return Message::class.java.isAssignableFrom(elementType.toClass()) && supportsMimeType(mimeType)
     }
 
     override fun encode(

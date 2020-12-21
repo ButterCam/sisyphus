@@ -3,8 +3,6 @@ package com.bybutter.sisyphus.starter.jackson.yaml
 import com.bybutter.sisyphus.jackson.Yaml
 import org.springframework.boot.web.codec.CodecCustomizer
 import org.springframework.http.codec.CodecConfigurer
-import org.springframework.http.codec.DecoderHttpMessageReader
-import org.springframework.http.codec.EncoderHttpMessageWriter
 import org.springframework.util.MimeType
 
 class Jackson2YamlCodecCustomizer : CodecCustomizer {
@@ -20,7 +18,7 @@ class Jackson2YamlCodecCustomizer : CodecCustomizer {
     }
 
     override fun customize(configurer: CodecConfigurer) {
-        configurer.customCodecs().register(EncoderHttpMessageWriter(Jackson2YamlEncoder(Yaml.mapper, *DEFAULT_YAML_MIME_TYPES)))
-        configurer.customCodecs().register(DecoderHttpMessageReader(Jackson2YamlDecoder(Yaml.mapper, *DEFAULT_YAML_MIME_TYPES)))
+        configurer.customCodecs().register(Jackson2YamlEncoder(Yaml.mapper, *DEFAULT_YAML_MIME_TYPES))
+        configurer.customCodecs().register(Jackson2YamlDecoder(Yaml.mapper, *DEFAULT_YAML_MIME_TYPES))
     }
 }
