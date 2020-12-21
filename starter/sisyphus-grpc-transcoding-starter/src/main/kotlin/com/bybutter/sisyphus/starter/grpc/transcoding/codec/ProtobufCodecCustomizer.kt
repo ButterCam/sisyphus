@@ -25,7 +25,7 @@ class ProtobufCodecCustomizer : CodecCustomizer {
     }
 
     override fun customize(configurer: CodecConfigurer) {
-        configurer.customCodecs().register(ProtobufEncoder(*MIME_TYPES))
-        configurer.customCodecs().register(ProtobufDecoder(*MIME_TYPES))
+        configurer.customCodecs().registerWithDefaultConfig(ProtobufEncoder(*MIME_TYPES))
+        configurer.customCodecs().registerWithDefaultConfig(ProtobufDecoder(*MIME_TYPES))
     }
 }
