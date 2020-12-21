@@ -14,11 +14,11 @@ import javax.sql.DataSource
 
 abstract class AbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) :
     DslContextFactory {
+    private val dataSources: MutableMap<Class<*>, DataSource> = hashMapOf()
     final override fun createContext(qualifier: Class<*>, property: JdbcDatabaseProperty): DSLContext {
         val url = buildJdbcUrl(property)
-        val datasource = createDatasource(url, property)
-        val dataSourceProxy = DataSourceProxy(datasource)
-        return DSL.using(createConfiguration(qualifier, dataSourceProxy, JDBCUtils.dialect(url), configInterceptors))
+        val dataSource = createDatasource(qualifier, property)
+        return DSL.using(createConfiguration(qualifier, dataSource, JDBCUtils.dialect(url), configInterceptors))
     }
 
     protected open fun buildJdbcUrl(property: JdbcDatabaseProperty): String {
@@ -61,6 +61,14 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
                 }
             }
         )
+    }
+
+    override fun createDatasource(qualifier: Class<*>, property: JdbcDatabaseProperty): DataSource {
+        return dataSources.getOrPut(qualifier) {
+            val url = buildJdbcUrl(property)
+            val datasource = createDatasource(url, property)
+            DataSourceProxy(datasource)
+        }
     }
 
     protected open fun createConfiguration(

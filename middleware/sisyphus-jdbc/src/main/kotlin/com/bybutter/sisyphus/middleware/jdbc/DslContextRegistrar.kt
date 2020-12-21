@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.middleware.jdbc
 
+import javax.sql.DataSource
 import org.jooq.DSLContext
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
@@ -43,6 +44,14 @@ class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwar
             }.beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
+
+            val dataSourceName = "$BEAN_NAME_PREFIX:$name:DataSource"
+            val dataSourceDefinition = BeanDefinitionBuilder.genericBeanDefinition(DataSource::class.java) {
+                val factory = beanFactory.getBean(DslContextFactory::class.java)
+                factory.createDatasource(property.qualifier, property)
+            }.beanDefinition
+            dataSourceDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
+            registry.registerBeanDefinition(dataSourceName, dataSourceDefinition)
         }
     }
 

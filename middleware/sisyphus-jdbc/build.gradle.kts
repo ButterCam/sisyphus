@@ -14,8 +14,9 @@ dependencies {
     runtimeOnly(Dependencies.postgresql)
 
     compileOnly(project(":lib:sisyphus-dsl"))
-    api(Dependencies.seata)
-    api(Dependencies.seataGrpc)
+    api(Dependencies.seata) {
+        exclude("org.springframework", "spring-webmvc")
+    }
 
     testImplementation(Dependencies.h2)
     testImplementation(project(":lib:sisyphus-dsl"))

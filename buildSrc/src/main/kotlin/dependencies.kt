@@ -142,9 +142,7 @@ object Dependencies {
 
     const val mongo = "org.mongodb:mongodb-driver-reactivestreams"
 
-    const val seata = "io.seata:seata-spring-boot-starter"
-
-    const val seataGrpc = "io.seata:seata-grpc"
+    const val seata = "io.seata:seata-all:1.4.1"
 }
 
 val Project.managedDependencies: Project
