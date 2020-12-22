@@ -7,6 +7,9 @@ import io.seata.rm.datasource.DataSourceProxy
 import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
+import org.jooq.conf.RenderNameCase
+import org.jooq.conf.RenderQuotedNames
+import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.jooq.impl.DefaultConfiguration
 import org.jooq.tools.jdbc.JDBCUtils
@@ -77,9 +80,13 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         dialect: SQLDialect,
         interceptors: List<JooqConfigInterceptor>
     ): Configuration {
+        val settings = Settings()
+        settings.renderNameCase = RenderNameCase.AS_IS
+        settings.renderQuotedNames = RenderQuotedNames.NEVER
         val config: Configuration = DefaultConfiguration().apply {
             set(dialect)
             set(TransactionDelegatingDataSource(datasource))
+            set(settings)
         }
         return interceptors.fold(config) { c, h ->
             if (h.qualifier == null || h.qualifier == qualifier) {
