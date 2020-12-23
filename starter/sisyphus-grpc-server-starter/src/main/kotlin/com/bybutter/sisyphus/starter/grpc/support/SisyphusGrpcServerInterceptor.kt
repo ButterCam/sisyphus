@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.support
 
+import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.rpc.Debug
 import com.bybutter.sisyphus.rpc.STATUS_META_KEY
 import com.bybutter.sisyphus.rpc.StatusException
@@ -10,6 +11,7 @@ import com.bybutter.sisyphus.string.randomString
 import io.grpc.Context
 import io.grpc.Contexts
 import io.grpc.ForwardingServerCall
+import io.grpc.ForwardingServerCallListener
 import io.grpc.Metadata
 import io.grpc.ServerCall
 import io.grpc.ServerCallHandler
@@ -34,7 +36,11 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
         }
     }
 
-    override fun <ReqT : Any, RespT : Any> interceptCall(call: ServerCall<ReqT, RespT>, headers: Metadata, next: ServerCallHandler<ReqT, RespT>): ServerCall.Listener<ReqT> {
+    override fun <ReqT : Any, RespT : Any> interceptCall(
+        call: ServerCall<ReqT, RespT>,
+        headers: Metadata,
+        next: ServerCallHandler<ReqT, RespT>
+    ): ServerCall.Listener<ReqT> {
         val requestId = headers.get(REQUEST_ID_META_KEY) ?: randomString(12)
 
         var context = Trailers.initTrailers(Context.current()) {
@@ -45,8 +51,12 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
             context = Debug.initDebug(context)
         }
 
+        context = context.withValue(RequestLogger.REQUEST_CONTEXT_KEY, RequestInfo(headers))
+
         return try {
-            Contexts.interceptCall(context, SisyphusGrpcServerCall(call, headers, uniqueLoggers), headers, next)
+            Contexts.interceptCall(context, SisyphusGrpcServerCall(call, uniqueLoggers), headers) { call, headers ->
+                SisyphusGrpcServerCallListener(next.startCall(call, headers))
+            }
         } catch (e: Exception) {
             Trailers.CUSTOM_TAILS_KEY.get(context)?.let {
                 call.sendHeaders(it)
@@ -55,12 +65,24 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
         }
     }
 
-    private class SisyphusGrpcServerCall<ReqT, RespT>(call: ServerCall<ReqT, RespT>, private val headers: Metadata, private val loggers: List<RequestLogger>) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
+    private class SisyphusGrpcServerCall<ReqT, RespT>(
+        call: ServerCall<ReqT, RespT>,
+        private val loggers: List<RequestLogger>
+    ) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
         private val requestNanoTime = System.nanoTime()
 
         override fun close(status: Status, trailers: Metadata) {
-            Trailers.CUSTOM_TAILS_KEY.get().let { trailers.merge(it) }
-            logRequest(status, trailers)
+            Trailers.CUSTOM_TAILS_KEY.get()?.let { trailers.merge(it) }
+
+            val cause = status.cause
+            if (cause is StatusException) {
+                trailers.merge(cause.trailers)
+            }
+
+            RequestLogger.REQUEST_CONTEXT_KEY.get().apply {
+                outputTrailers = trailers
+                logRequest(status, this)
+            }
 
             if (Debug.debugEnabled) {
                 return closeWithStatus(status, trailers)
@@ -73,12 +95,19 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
             return closeWithStatus(status, trailers)
         }
 
-        private fun logRequest(status: Status, trailers: Metadata) {
+        override fun sendMessage(message: RespT) {
+            RequestLogger.REQUEST_CONTEXT_KEY.get()?.outputMessage?.apply {
+                this += message as Message<*, *>
+            }
+            super.sendMessage(message)
+        }
+
+        private fun logRequest(status: Status, requestInfo: RequestInfo) {
             val cost = System.nanoTime() - requestNanoTime
 
             try {
                 for (logger in loggers) {
-                    logger.log(this, headers, status, trailers, cost)
+                    logger.log(this, requestInfo, status, cost)
                 }
             } catch (e: Exception) {
                 // Ignore
@@ -86,11 +115,6 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
         }
 
         private fun closeWithStatus(status: Status, trailers: Metadata) {
-            val cause = status.cause
-            if (cause is StatusException) {
-                trailers.merge(cause.trailers)
-            }
-
             val resolvedStatus = com.bybutter.sisyphus.rpc.Status.fromGrpcStatus(status)
             trailers.put(STATUS_META_KEY, resolvedStatus)
 
@@ -98,8 +122,19 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
         }
     }
 
+    private class SisyphusGrpcServerCallListener<T>(listener: ServerCall.Listener<T>) :
+        ForwardingServerCallListener.SimpleForwardingServerCallListener<T>(listener) {
+        override fun onMessage(message: T) {
+            RequestLogger.REQUEST_CONTEXT_KEY.get()?.inputMessage?.apply {
+                this += message as Message<*, *>
+            }
+            super.onMessage(message)
+        }
+    }
+
     companion object {
-        val REQUEST_ID_META_KEY: Metadata.Key<String> = Metadata.Key.of("X-Request-Id", Metadata.ASCII_STRING_MARSHALLER)
+        val REQUEST_ID_META_KEY: Metadata.Key<String> =
+            Metadata.Key.of("X-Request-Id", Metadata.ASCII_STRING_MARSHALLER)
         val DEBUG_META_KEY: Metadata.Key<String> = Metadata.Key.of("X-Debug-Token", Metadata.ASCII_STRING_MARSHALLER)
     }
 }
