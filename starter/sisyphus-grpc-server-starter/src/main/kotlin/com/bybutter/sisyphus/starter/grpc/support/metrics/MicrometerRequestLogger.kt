@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.support.metrics
 
+import com.bybutter.sisyphus.starter.grpc.support.RequestInfo
 import com.bybutter.sisyphus.starter.grpc.support.RequestLogger
 import io.grpc.Metadata
 import io.grpc.ServerCall
@@ -15,8 +16,8 @@ import java.time.Duration
 class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogger {
     override val id: String = MicrometerRequestLogger::class.java.typeName
 
-    override fun log(call: ServerCall<*, *>, metadata: Metadata, status: Status, trailers: Metadata, cost: Long) {
-        val host = metadata.get(HOST_METADATA_KEY)?.toString()
+    override fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long) {
+        val host = requestInfo.inputHeader.get(HOST_METADATA_KEY)?.toString()
         val costDuration = Duration.ofNanos(cost)
 
         registry.timer("sisyphus_grpc_requests",

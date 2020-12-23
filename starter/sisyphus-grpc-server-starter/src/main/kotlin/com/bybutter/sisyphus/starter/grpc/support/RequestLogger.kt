@@ -1,5 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc.support
 
+import com.bybutter.sisyphus.protobuf.Message
+import io.grpc.Context
 import io.grpc.Metadata
 import io.grpc.ServerCall
 import io.grpc.Status
@@ -12,19 +14,31 @@ import org.springframework.stereotype.Component
 interface RequestLogger {
     val id: String
 
-    fun log(call: ServerCall<*, *>, metadata: Metadata, status: Status, trailers: Metadata, cost: Long)
+    fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long)
+
+    companion object {
+        val REQUEST_CONTEXT_KEY: Context.Key<RequestInfo> = Context.key("sisyphus-request")
+    }
 }
+
+data class RequestInfo(
+    var inputHeader: Metadata,
+    var outputHeader: Metadata? = null,
+    val inputMessage: MutableList<Message<*, *>> = mutableListOf(),
+    val outputMessage: MutableList<Message<*, *>> = mutableListOf(),
+    var outputTrailers: Metadata? = null
+)
 
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
 open class DefaultRequestLogger : RequestLogger {
     override val id: String = RequestLogger::class.java.typeName
 
-    override fun log(call: ServerCall<*, *>, metadata: Metadata, status: Status, trailers: Metadata, cost: Long) {
+    override fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long) {
         if (status.isOk) {
-            logger.info("[${status.code}] ${call.methodDescriptor.fullMethodName}(${trailers.get(SisyphusGrpcServerInterceptor.REQUEST_ID_META_KEY)}) +${getCostString(cost)}")
+            logger.info("[${status.code}] ${call.methodDescriptor.fullMethodName}(${requestInfo.outputTrailers?.get(SisyphusGrpcServerInterceptor.REQUEST_ID_META_KEY)}) +${getCostString(cost)}")
         } else {
-            logger.error("[${status.code}] ${call.methodDescriptor.fullMethodName}(${trailers.get(SisyphusGrpcServerInterceptor.REQUEST_ID_META_KEY)}) +${getCostString(cost)}", status.cause)
+            logger.error("[${status.code}] ${call.methodDescriptor.fullMethodName}(${requestInfo.outputTrailers?.get(SisyphusGrpcServerInterceptor.REQUEST_ID_META_KEY)}) +${getCostString(cost)}", status.cause)
         }
     }
 
