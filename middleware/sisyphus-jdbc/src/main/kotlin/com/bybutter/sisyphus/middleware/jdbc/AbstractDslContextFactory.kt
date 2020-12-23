@@ -70,7 +70,11 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         return dataSources.getOrPut(qualifier) {
             val url = buildJdbcUrl(property)
             val datasource = createDatasource(url, property)
-            DataSourceProxy(datasource)
+            if (property.enableSeataTransaction) {
+                DataSourceProxy(datasource)
+            }else{
+                datasource
+            }
         }
     }
 

@@ -13,10 +13,10 @@ import org.springframework.context.annotation.Configuration
 @ComponentScan(basePackageClasses = [SisyphusJdbcAutoConfiguration::class])
 class SisyphusJdbcAutoConfiguration {
 
-    @Value("\${sisyphus.seata.applicationId}")
+    @Value("\${sisyphus.seata.applicationId:default}")
     private lateinit var applicationId: String
 
-    @Value("\${sisyphus.seata.txServiceGroup}")
+    @Value("\${sisyphus.seata.txServiceGroup:default}")
     private lateinit var txServiceGroup: String
 
     @Bean
