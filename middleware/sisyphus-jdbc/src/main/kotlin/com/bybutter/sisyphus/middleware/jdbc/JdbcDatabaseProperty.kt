@@ -10,7 +10,7 @@ data class JdbcDatabaseProperty(
     @NestedConfigurationProperty
     val poolConfig: ConnectionPoolProperty? = null,
     val qualifier: Class<*>,
-    val enableSeataTransaction: Boolean = true
+    val enableSeataTransaction: Boolean = false
 )
 
 data class ConnectionPoolProperty(
