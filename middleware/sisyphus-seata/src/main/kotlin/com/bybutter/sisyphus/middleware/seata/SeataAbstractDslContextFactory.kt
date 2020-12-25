@@ -7,6 +7,7 @@ import com.bybutter.sisyphus.middleware.jdbc.transaction.TransactionDelegatingDa
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.seata.rm.datasource.DataSourceProxy
+import javax.sql.DataSource
 import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
@@ -16,7 +17,6 @@ import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.jooq.impl.DefaultConfiguration
 import org.jooq.tools.jdbc.JDBCUtils
-import javax.sql.DataSource
 
 abstract class SeataAbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) : DslContextFactory {
     private val dataSources: MutableMap<Class<*>, DataSource> = hashMapOf()
