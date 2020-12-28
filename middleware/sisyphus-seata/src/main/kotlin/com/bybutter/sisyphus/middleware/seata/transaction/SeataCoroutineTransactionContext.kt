@@ -21,7 +21,7 @@ class SeataCoroutineTransactionContext(private val xid: String? = RootContext.ge
 
     override fun updateThreadContext(context: CoroutineContext): String? {
         return RootContext.getXID().apply {
-            if (xid != null) RootContext.bind(xid!!)
+            if (xid != null) RootContext.bind(xid)
         }
     }
 }
