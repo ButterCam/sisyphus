@@ -121,6 +121,16 @@ object Dependencies {
         const val wagonHttp = "$group.wagon:wagon-http"
     }
 
+    object Alibaba {
+        object Sentinel {
+            private const val group = "com.alibaba.csp"
+            const val GrpcAdapter = "$group:sentinel-grpc-adapter"
+            const val SentinelTransport = "$group:sentinel-transport-simple-http"
+            const val SentinelFlowControl = "$group:sentinel-parameter-flow-control"
+            const val SentinelDatasource = "$group:sentinel-datasource-redis"
+        }
+    }
+
     const val elastic5 = "org.elasticsearch.client:transport"
 
     const val mysql = "mysql:mysql-connector-java"
