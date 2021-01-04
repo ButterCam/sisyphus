@@ -11,9 +11,7 @@ import com.bybutter.sisyphus.middleware.sentinel.persistence.FileDataSourceInit
 import com.bybutter.sisyphus.middleware.sentinel.persistence.RedisDataSourceInit
 import com.bybutter.sisyphus.rpc.Code
 import com.bybutter.sisyphus.rpc.StatusException
-import io.lettuce.core.RedisClient
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
-import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
@@ -87,5 +85,4 @@ class SentinelRegister : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
         }.beanDefinition
         registry.registerBeanDefinition(sentinelProperties, sentinelPropertiesDefinition)
     }
-
 }
