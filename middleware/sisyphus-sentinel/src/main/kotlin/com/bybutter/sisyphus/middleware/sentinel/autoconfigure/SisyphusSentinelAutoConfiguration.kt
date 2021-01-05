@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ComponentScan
 @AutoConfigureAfter(name = ["com.bybutter.sisyphus.middleware.redis.SisyphusRedisAutoConfiguration"])
 class SisyphusSentinelAutoConfiguration {
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(value = [SentinelTemplateFactory::class])
     fun defaultSentinelTemplateFactory(): SentinelTemplateFactory {
         return DefaultSentinelTemplateFactory()
     }
