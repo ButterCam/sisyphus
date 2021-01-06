@@ -22,10 +22,10 @@ fun <T : Record> SelectLimitStep<T>.withPaging(pageToken: String, pageSize: Int,
 }
 
 inline fun <T : Record, reified R> SelectLimitStep<T>.withTypePaging(pageToken: String, pageSize: Int, needTotal: Boolean = true): Page<R> {
-    return withTypePaging(R::class.java, pageToken, pageSize, needTotal)
+    return withTypePaging(R::class.java, pageToken, pageSize, needTotal) as Page<R>
 }
 
-fun <T : Record, R> SelectLimitStep<T>.withTypePaging(target: Class<R>, pageToken: String, pageSize: Int, needTotal: Boolean = true): Page<R> {
+fun <T : Record> SelectLimitStep<T>.withTypePaging(target: Class<*>, pageToken: String, pageSize: Int, needTotal: Boolean = true): Page<*> {
     val offset = OffsetPaging(pageToken)?.offset
     val size = if (pageSize in 1..30) {
         pageSize
