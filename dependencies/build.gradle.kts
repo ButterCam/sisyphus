@@ -60,7 +60,17 @@ dependencies {
         api("org.mongodb:mongodb-driver-reactivestreams:4.2.3")
         api("org.reflections:reflections:0.9.12")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.4.5")
+        api("io.seata:seata-common:1.4.1")
+        api("io.seata:seata-config-core:1.4.1")
+        api("io.seata:seata-core:1.4.1")
+        api("io.seata:seata-rm:1.4.1")
+        api("io.seata:seata-rm-datasource:1.4.1")
+        api("io.seata:seata-sqlparser-core:1.4.1")
+        api("io.seata:seata-sqlparser-druid:1.4.1")
+        api("io.seata:seata-spring:1.4.1")
+        api("io.seata:seata-tm:1.4.1")
+        api("io.seata:seata-serializer-seata:1.4.1")
+        api("io.seata:seata-serializer-protobuf:1.4.1")
         api("io.seata:seata-grpc:1.4.1")
-        api("io.seata:seata-spring-boot-starter:1.4.1")
     }
 }

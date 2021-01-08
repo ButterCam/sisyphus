@@ -142,7 +142,21 @@ object Dependencies {
 
     const val mongo = "org.mongodb:mongodb-driver-reactivestreams"
 
-    const val seata = "io.seata:seata-all:1.4.1"
+    object Seata {
+        private const val group = "io.seata"
+        const val common = "$group:seata-common"
+        const val config = "$group:seata-config-core"
+        const val core = "$group:seata-core"
+        const val rm = "$group:seata-rm"
+        const val rmDatasource = "$group:seata-rm-datasource"
+        const val sqlparserCore = "$group:seata-sqlparser-core"
+        const val sqlparserDruid = "$group:seata-sqlparser-druid"
+        const val seataSpring = "$group:seata-spring"
+        const val tm = "$group:seata-tm"
+        const val serializerSeata = "$group:seata-serializer-seata"
+        const val serializerProtobuf = "$group:seata-serializer-protobuf"
+        const val grpc = "$group:seata-grpc"
+    }
 }
 
 val Project.managedDependencies: Project
