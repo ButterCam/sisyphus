@@ -4,7 +4,7 @@ plugins {
     `java-library`
 }
 
-description = "Middleware for using RocketMQ in Sisyphus Project"
+description = "Middleware for using seata in Sisyphus Project"
 
 dependencies {
     implementation(project(":lib:sisyphus-common"))
