@@ -17,6 +17,7 @@ include("tools:sisyphus-api-linter-runner")
 
 include("middleware:sisyphus-configuration-artifact")
 include("middleware:sisyphus-jdbc")
+include("middleware:sisyphus-mongo")
 include("middleware:sisyphus-redis")
 include("middleware:sisyphus-amqp")
 include("middleware:sisyphus-rocketmq")
