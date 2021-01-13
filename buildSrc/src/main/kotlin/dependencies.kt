@@ -15,6 +15,7 @@ object Dependencies {
             const val reactor = "$group:kotlinx-coroutines-reactor"
             const val guava = "$group:kotlinx-coroutines-guava"
             const val jdk = "$group:kotlinx-coroutines-jdk8"
+            const val reactive = "$group:kotlinx-coroutines-reactive"
         }
     }
 
@@ -73,6 +74,11 @@ object Dependencies {
             const val jackson = "$group:spring-boot-starter-json"
 
             const val actuator = "$group:spring-boot-starter-actuator"
+        }
+
+        object Data {
+            private const val group = "org.springframework.data"
+            const val mongo = "$group:spring-data-mongodb"
         }
     }
 
@@ -154,6 +160,8 @@ object Dependencies {
     const val rocketMq = "org.apache.rocketmq:rocketmq-client"
 
     const val rocketMqAcl = "org.apache.rocketmq:rocketmq-acl"
+
+    const val mongo = "org.mongodb:mongodb-driver-reactivestreams"
 }
 
 val Project.managedDependencies: Project

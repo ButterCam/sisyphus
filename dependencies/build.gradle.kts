@@ -59,5 +59,6 @@ dependencies {
         api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.0")
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.0")
         api("com.google.protobuf:protobuf-javalite:3.13.0")
+        api("org.mongodb:mongodb-driver-reactivestreams:4.1.1")
     }
 }
