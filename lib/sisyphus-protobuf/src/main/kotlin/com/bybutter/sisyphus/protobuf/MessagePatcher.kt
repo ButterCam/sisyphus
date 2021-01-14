@@ -43,16 +43,18 @@ class ValueNode : PatcherNode {
             FieldDescriptorProto.Type.BOOL -> values.map { it.toBoolean() }
             FieldDescriptorProto.Type.STRING -> values
             FieldDescriptorProto.Type.BYTES -> values.map { it.base64Decode() }
-            FieldDescriptorProto.Type.ENUM -> values.map { ProtoEnum(it, ProtoTypes.getClassByProtoName(field.typeName) as Class<ProtoEnum>) }
+            FieldDescriptorProto.Type.ENUM -> values.map {
+                (ProtoTypes.findSupport(field.typeName) as EnumSupport<*>).invoke(it)
+            }
             FieldDescriptorProto.Type.MESSAGE -> {
                 when (field.typeName.substring(1)) {
-                    FieldMask.fullName -> values.map {
+                    FieldMask.name -> values.map {
                         FieldMask {
                             this.paths += it.split(",").map { it.trim() }
                         }
                     }
-                    Timestamp.fullName -> values.map { Timestamp(it) }
-                    Duration.fullName -> values.map { Duration(it) }
+                    Timestamp.name -> values.map { Timestamp(it) }
+                    Duration.name -> values.map { Duration(it) }
                     else -> throw IllegalStateException()
                 }
             }
@@ -161,7 +163,7 @@ class MessagePatcher : PatcherNode {
 
     @OptIn(InternalProtoApi::class)
     fun asMessage(type: String): Message<*, *> {
-        return ProtoTypes.ensureSupportByProtoName(type).newMutable().apply {
+        return (ProtoTypes.findSupport(type) as MessageSupport<*, *>).newMutable().apply {
             applyTo(this)
         }
     }

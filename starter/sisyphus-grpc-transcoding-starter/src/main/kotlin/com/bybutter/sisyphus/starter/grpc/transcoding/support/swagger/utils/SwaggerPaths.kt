@@ -2,7 +2,7 @@ package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
 import com.bybutter.sisyphus.api.HttpRule
 import com.bybutter.sisyphus.api.resource.PathTemplate
-import com.bybutter.sisyphus.protobuf.ProtoSupport
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.google.protobuf.DescriptorProtos
@@ -19,7 +19,7 @@ object SwaggerPaths {
     /**
      * Build Paths based on request method.
      * */
-    fun fetchPaths(httpRule: HttpRule, inputTypeProto: ProtoSupport<*, *>, inputTypeFields: MutableList<FieldDescriptorProto>, operation: Operation, paths: Paths): Paths {
+    fun fetchPaths(httpRule: HttpRule, inputTypeProto: MessageSupport<*, *>, inputTypeFields: MutableList<FieldDescriptorProto>, operation: Operation, paths: Paths): Paths {
         when (httpRule.pattern) {
             is HttpRule.Pattern.Get -> {
                 val requestUrlMap = fetchRequestUrl(httpRule.get)
@@ -126,7 +126,7 @@ object SwaggerPaths {
     /**
      *  Add path params and query params to operation.
      * */
-    private fun fetchOperation(url: String, pathParamList: List<String>, inputTypeProto: ProtoSupport<*, *>, fieldDescriptionList: List<FieldDescriptorProto>, operation: Operation): Operation {
+    private fun fetchOperation(url: String, pathParamList: List<String>, inputTypeProto: MessageSupport<*, *>, fieldDescriptionList: List<FieldDescriptorProto>, operation: Operation): Operation {
         val fileDescriptor = ProtoTypes.getFileContainingSymbol(inputTypeProto.fullName)
         val path = listOf(DescriptorProtos.FileDescriptorProto.MESSAGE_TYPE_FIELD_NUMBER,
                 fileDescriptor?.messageType?.indexOf(inputTypeProto.descriptor),

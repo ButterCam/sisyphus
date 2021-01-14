@@ -1,24 +1,25 @@
 package com.bybutter.sisyphus.protobuf.primitives
 
+import com.bybutter.sisyphus.protobuf.EnumSupport
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 
 fun DescriptorProto.toType(typeName: String): Type {
     return Type {
-        val fileInfo = ProtoTypes.getFileDescriptorByName(typeName)
+        val support = ProtoTypes.findSupport(typeName) as MessageSupport<*, *>
         this.name = this@toType.name
-        this.fields += this@toType.field.map { it.toField() }
-        this.fields += ProtoTypes.getTypeExtensions(typeName).mapNotNull { ProtoTypes.getExtensionDescriptor(typeName, it)?.toField() }
+        for (fieldDescriptor in support.fieldDescriptors) {
+            this.fields += fieldDescriptor.toField()
+        }
         this.oneofs += this@toType.oneofDecl.map { it.name }
         this@toType.options?.let {
             this.options += it.toOptions()
         }
-        this.sourceContext = fileInfo?.let {
-            SourceContext {
-                this.fileName = it.name
-            }
+        this.sourceContext = SourceContext {
+            this.fileName = support.file().name
         }
-        this.syntax = when (fileInfo?.syntax) {
+        this.syntax = when (support.file().descriptor.syntax) {
             "proto3" -> Syntax.PROTO3
             else -> Syntax.PROTO2
         }
@@ -57,18 +58,16 @@ fun FieldDescriptorProto.toField(): Field {
 
 fun EnumDescriptorProto.toEnum(typeName: String): Enum {
     return Enum {
-        val fileInfo = ProtoTypes.getFileDescriptorByName(typeName)
+        val support = ProtoTypes.findSupport(typeName) as EnumSupport<*>
         this.name = this@toEnum.name
         this.enumvalue += this@toEnum.value.map { it.toEnumValue() }
         this@toEnum.options?.let {
             this.options += it.toOptions()
         }
-        this.sourceContext = fileInfo?.let {
-            SourceContext {
-                this.fileName = it.name
-            }
+        this.sourceContext = SourceContext {
+            this.fileName = support.file().name
         }
-        this.syntax = when (fileInfo?.syntax) {
+        this.syntax = when (support.file().descriptor.syntax) {
             "proto3" -> Syntax.PROTO3
             else -> Syntax.PROTO2
         }

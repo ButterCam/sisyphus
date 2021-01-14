@@ -6,7 +6,7 @@ import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessagePatcher
 import com.bybutter.sisyphus.protobuf.MutableMessage
-import com.bybutter.sisyphus.protobuf.ProtoSupport
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
@@ -31,7 +31,7 @@ class TranscodingMethodRouterFunction private constructor(
     private val rule: HttpRule
 ) : RouterFunction<ServerResponse>, HandlerFunction<ServerResponse> {
     private val requestPredicate = HttpRulePredicate(rule)
-    private val inputSupport: ProtoSupport<*, *> = ProtoTypes.ensureSupportByProtoName(proto.inputType)
+    private val inputSupport: MessageSupport<*, *> = ProtoTypes.ensureSupportByProtoName(proto.inputType)
     private val bodyClass: Class<*>?
 
     init {

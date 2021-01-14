@@ -10,10 +10,10 @@ description = "Plugin for compiling proto files with Gradle in Sisyphus Framewor
 
 dependencies {
     implementation(project(":lib:sisyphus-common"))
-    implementation(project(":lib:sisyphus-grpc"))
     implementation(project(":lib:sisyphus-jackson"))
     implementation(project(":tools:sisyphus-protoc"))
     implementation(project(":tools:sisyphus-api-linter-runner"))
+    compileOnly("com.android.tools.build:gradle")
 
     implementation(Dependencies.Kotlin.reflect)
     implementation(Dependencies.Kotlin.plugin)

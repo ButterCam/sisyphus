@@ -1,16 +1,24 @@
 package com.bybutter.sisyphus.protobuf.gradle
 
 import com.bybutter.sisyphus.io.replaceExtensionName
-import com.bybutter.sisyphus.protobuf.ProtoFileMeta
-import com.bybutter.sisyphus.protobuf.compiler.ProtobufGenerateContext
+import com.bybutter.sisyphus.protobuf.compiler.ProtobufCompiler
+import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
+import com.bybutter.sisyphus.protobuf.compiler.generator.CodeGenerators
+import com.bybutter.sisyphus.protobuf.compiler.generator.rpc.CoroutineServiceGenerator
+import com.bybutter.sisyphus.protobuf.compiler.generator.rpc.CoroutineServiceMethodGenerator
 import com.google.protobuf.DescriptorProtos
+import com.squareup.kotlinpoet.TypeSpec
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.nio.charset.Charset
+import java.nio.file.CopyOption
+import java.nio.file.StandardCopyOption
 
 open class ProtoGenerateTask : DefaultTask() {
     @get:InputDirectory
@@ -25,7 +33,8 @@ open class ProtoGenerateTask : DefaultTask() {
     @get:OutputDirectory
     lateinit var resourceOutput: File
 
-    private val protobufGenerateContext = ProtobufGenerateContext()
+    @get:Internal
+    lateinit var protobuf: ProtobufExtension
 
     @TaskAction
     fun generateKotlin() {
@@ -52,24 +61,67 @@ open class ProtoGenerateTask : DefaultTask() {
 
         val sourceFile = protoPath.resolve("protosrc")
         val source = if (sourceFile.exists()) {
-            sourceFile.readLines().toSet()
+            sourceFile.readLines().mapNotNull {
+                val map = it.split('=')
+                if (map.size == 2) {
+                    map[0] to map[1]
+                } else {
+                    null
+                }
+            }.associate { it }
         } else {
-            setOf()
+            mapOf()
         }
 
-        val result = protobufGenerateContext.generate(desc, source, mapping)
+        val compiler = ProtobufCompiler(protobuf.plugins.toCodeGenerators())
+            .withProtos(desc)
+            .shading(mapping)
 
-        for (generateResult in result) {
-            generateResult.file.writeTo(output.toPath())
-            generateResult.implFile.writeTo(implOutput.toPath())
+        val fileSupports = StringBuilder()
 
-            val descFile = Paths.get(resourceOutput.toPath().toString(), generateResult.descriptor.name.replaceExtensionName("proto", "pb"))
-            Files.createDirectories(descFile.parent)
-            Files.write(descFile, generateResult.descriptor.toProto())
+        for ((sourceProto, external) in source) {
+            val result = compiler.generate(sourceProto)
+            result.files[0].writeTo(output.toPath())
+            result.files[1].writeTo(implOutput.toPath())
+
+            val descPbFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.name.replaceExtensionName("proto", "pb"))
+            Files.createDirectories(descPbFile.parent)
+            Files.write(descPbFile, result.descriptor.toByteArray())
+
+            if(external == "external") {
+                val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.name)
+                val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
+                Files.createDirectories(sourceProtoFile.parent)
+                Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
+            }
+
+            val fileSupport = result.files[1].members.first {
+                val spec = it as? TypeSpec ?: return@first false
+                spec.superclass.equals(RuntimeTypes.FILE_SUPPORT)
+            } as TypeSpec
+            fileSupports.appendln("${result.files[1].packageName}.${fileSupport.name}")
         }
 
-        val fileMetas = Paths.get(resourceOutput.toPath().toString(), "META-INF/services/${ProtoFileMeta::class.java.name}")
+        val fileMetas = Paths.get(resourceOutput.toPath().toString(), "META-INF/services/${RuntimeTypes.FILE_SUPPORT.canonicalName}")
         Files.createDirectories(fileMetas.parent)
-        Files.write(fileMetas, result.map { it.fileMeta })
+        Files.write(fileMetas, fileSupports.toString().toByteArray(Charset.defaultCharset()))
+    }
+
+    companion object {
+        private fun ProtoCompilerPlugins.toCodeGenerators(): CodeGenerators {
+            return CodeGenerators().apply {
+                for (buildInPlugin in this@toCodeGenerators.buildInPlugins) {
+                    when(buildInPlugin) {
+                        BuildInPlugin.BASIC_GENERATOR -> basic()
+                        BuildInPlugin.COROUTINE_SERVICE_GENERATOR -> coroutineService()
+                        BuildInPlugin.RXJAVA_SERVICE_GENERATOR -> TODO()
+                        BuildInPlugin.RESOURCE_NAME_GENERATOR -> resourceName()
+                        BuildInPlugin.GENERATORS_FROM_SPI -> spi()
+                    }
+                }
+                register(this@toCodeGenerators.plugins)
+            }
+        }
+
     }
 }

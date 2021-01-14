@@ -12,8 +12,8 @@ import java.time.format.DateTimeParseException
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.sign
-import proto.internal.com.bybutter.sisyphus.protobuf.primitives.MutableDuration
-import proto.internal.com.bybutter.sisyphus.protobuf.primitives.MutableTimestamp
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableDuration
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableTimestamp
 
 private const val nanosPerSecond = 1000000000L
 

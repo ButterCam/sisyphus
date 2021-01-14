@@ -8,7 +8,7 @@ description = "Starter for build application with Protobuf type server in Sisyph
 
 dependencies {
     api(project(":lib:sisyphus-protobuf"))
-    api(project(":lib:sisyphus-grpc"))
+    api(project(":lib:sisyphus-grpc-coroutine"))
     api(project(":lib:sisyphus-common"))
     api(project(":starter:sisyphus-webflux-starter"))
     implementation(Dependencies.Grpc.stub)

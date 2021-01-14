@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.protobuf.primitives
 
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 
 /**
@@ -18,5 +19,5 @@ fun Message<*, *>.toAny(): Any {
  * Unwrap any.
  */
 fun Any.toMessage(): Message<*, *> {
-    return ProtoTypes.ensureSupportByTypeUrl(this.typeUrl).parse(this.value)
+    return (ProtoTypes.findSupport(this.typeUrl) as MessageSupport<*, *>).parse(this.value)
 }
