@@ -35,7 +35,7 @@ interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
 
     fun fieldDescriptor(fieldNumber: Int): FieldDescriptorProto
 
-    fun support(): ProtoSupport<T, TM>
+    fun support(): MessageSupport<T, TM>
 
     operator fun iterator(): Iterator<Pair<FieldDescriptorProto, Any?>>
 
@@ -104,6 +104,8 @@ interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
     fun writeTo(writer: Writer)
 
     fun writeDelimitedTo(output: OutputStream)
+
+    fun extensions(): Map<Int, MessageExtension<*>>
 
     fun unknownFields(): UnknownFields
 }

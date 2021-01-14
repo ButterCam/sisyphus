@@ -1,21 +1,13 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.collection.firstNotNull
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.BOOL
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.BYTES
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.DOUBLE
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.FLOAT
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.INT32
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.INT64
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.MESSAGE
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.STRING
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.UINT32
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.UINT64
+import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.*
 import com.bybutter.sisyphus.protobuf.primitives.FloatValue
 import com.bybutter.sisyphus.protobuf.primitives.Int32Value
 import com.bybutter.sisyphus.protobuf.primitives.Int64Value
@@ -23,12 +15,8 @@ import com.bybutter.sisyphus.protobuf.primitives.StringValue
 import com.bybutter.sisyphus.protobuf.primitives.UInt32Value
 import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 
-abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
-    support: ProtoSupport<T, TM>
-) : AbstractMessage<T, TM>(support), MutableMessage<T, TM> {
-
-    @InternalProtoApi
-    protected abstract fun readField(reader: Reader, field: Int, wire: Int): Boolean
+abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : AbstractMessage<T, TM>(),
+    MutableMessage<T, TM> {
 
     @OptIn(InternalProtoApi::class)
     override fun readFrom(reader: Reader, size: Int) {
@@ -38,8 +26,14 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
             val number = WireType.getFieldNumber(tag)
             val wireType = WireType.getWireType(tag).ordinal
             if (!readField(reader, number, wireType)) {
-                if (!_extensions.values.any { it.readField(reader, number, wireType) }) {
+                val extension = support().extensions.firstOrNull {
+                    it.descriptor.number == number
+                } as? ExtensionSupport<Any>
+
+                if(extension == null) {
                     unknownFields().readFrom(reader, number, wireType)
+                } else {
+                    _extensions[number] = extension.read(reader, number, wireType, _extensions[number] as? MessageExtension<Any>)
                 }
             }
         }
@@ -66,6 +60,10 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
             return setFieldInCurrent(fieldName, value)
         }
         throw UnsupportedOperationException("Set field not support nested field.")
+    }
+
+    override fun <T> set(fieldNumber: Int, value: T) {
+        return setFieldInCurrent(fieldNumber, value)
     }
 
     override fun clear(fieldName: String): Any? {
@@ -99,52 +97,44 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
         return null
     }
 
-    protected abstract fun <T> setFieldInCurrent(fieldName: String, value: T)
-
-    protected abstract fun clearFieldInCurrent(fieldName: String): Any?
+    override fun clear(fieldNumber: Int): Any? {
+        return clearFieldInCurrent(fieldNumber)
+    }
 
     protected fun <T> setFieldInExtensions(name: String, value: T) {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(name) != null }
-                        ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
-
-        extension[name] = value
-        invalidCache()
+        val fieldNumber = support().fieldInfo(name)?.number
+            ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
+        setFieldInExtensions(fieldNumber, value)
     }
 
     protected fun <T> setFieldInExtensions(number: Int, value: T) {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(number) != null }
-                        ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
-
-        extension[number] = value
-        invalidCache()
+        if(value == null) {
+            clearFieldInCurrent(number)
+            return
+        }
+        val extension = support().extensions.firstOrNull { it.descriptor.number == number } as? ExtensionSupport<T>
+                ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
+        _extensions[number] = extension.wrap(value)
     }
 
     protected fun clearFieldInExtensions(name: String): Any? {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(name) != null } ?: return null
+        val fieldNumber = fieldDescriptor(name).number
 
-        invalidCache()
-        return extension.clear(name)
+        return clearFieldInExtensions(fieldNumber)
     }
 
     protected fun clearFieldInExtensions(number: Int): Any? {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(number) != null } ?: return null
-
-        invalidCache()
-        return extension.clear(number)
-    }
-
-    protected fun clearAllFieldInExtensions() {
-        for ((_, extension) in _extensions) {
-            extension.clear()
+        return _extensions[number]?.value?.also {
+            _extensions.remove(number)
         }
     }
 
+    protected fun clearAllFieldInExtensions() {
+        _extensions.clear()
+    }
+
     private fun copyFrom(message: Message<*, *>, keepOriginalValues: Boolean = false) {
-        for (source in message.descriptor().field) {
+        for (source in message.support().fieldDescriptors) {
             val target = this.fieldDescriptorOrNull(source.name) ?: continue
 
             if (keepOriginalValues && this.has(source.name)) continue
@@ -192,4 +182,15 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
             else -> null
         }
     }
+
+    @InternalProtoApi
+    protected abstract fun readField(reader: Reader, field: Int, wire: Int): Boolean
+
+    protected abstract fun <T> setFieldInCurrent(fieldName: String, value: T)
+
+    protected abstract fun <T> setFieldInCurrent(fieldNumber: Int, value: T)
+
+    protected abstract fun clearFieldInCurrent(fieldName: String): Any?
+
+    protected abstract fun clearFieldInCurrent(fieldNumber: Int): Any?
 }

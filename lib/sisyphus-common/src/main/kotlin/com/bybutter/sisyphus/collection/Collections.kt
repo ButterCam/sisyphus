@@ -62,13 +62,9 @@ fun <T> List<T>.contentEquals(other: List<T>?): Boolean {
         return false
     }
 
-    for ((index, parameter) in withIndex()) {
-        if (parameter != other[index]) {
-            return false
-        }
+    return this.zip(other).all {
+        it.first == it.second
     }
-
-    return true
 }
 
 fun <TKey, TValue> Map<TKey, TValue>.contentEquals(other: Map<TKey, TValue>?): Boolean {

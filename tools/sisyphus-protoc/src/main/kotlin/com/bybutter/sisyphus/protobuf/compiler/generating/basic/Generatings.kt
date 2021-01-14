@@ -1,0 +1,17 @@
+package com.bybutter.sisyphus.protobuf.compiler.generating.basic
+
+interface ApiGenerating
+
+interface ImplementationGenerating
+
+interface ImplementationFunctionGenerating
+
+interface MutableGenerating
+
+interface SupportGenerating
+
+interface ClientGenerating
+
+interface OptionGenerating
+
+interface OptionSupportGenerating

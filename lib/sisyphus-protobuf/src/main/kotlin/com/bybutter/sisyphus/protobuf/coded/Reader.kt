@@ -2,6 +2,7 @@ package com.bybutter.sisyphus.protobuf.coded
 
 import com.bybutter.sisyphus.data.decodeZigZag
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.Any
 import java.io.EOFException
@@ -44,11 +45,14 @@ class Reader(private val inputStream: InputStream) {
             return result
         }
         if (isAtEnd) throw EOFException("Unexpected end of Protobuf input stream")
-        if (currentByte == -2) {
-            inputStream.readNBytes(result, 0, count)
-        } else {
+
+        var toRead = count
+        if (currentByte != -2) {
             result[0] = currentByte.toByte()
-            inputStream.readNBytes(result, 1, count - 1)
+            toRead--
+        }
+        while (toRead > 0) {
+            toRead -= inputStream.read(result, count - toRead, toRead)
         }
         readBytes += count
         currentByte = inputStream.read()
@@ -185,7 +189,7 @@ class Reader(private val inputStream: InputStream) {
             it.tag()
             val typeUrl = it.string()
             it.tag()
-            val support = ProtoTypes.getSupportByTypeUrl(typeUrl) ?: return Any {
+            val support = ProtoTypes.findSupport(typeUrl) as? MessageSupport<*, *> ?: return Any {
                 this.typeUrl = typeUrl
                 this.value = it.bytes()
             }
