@@ -13,7 +13,11 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
 import kotlin.reflect.KClass
 
-fun CodeBlock.Builder.beginScope(controlFlow: String, vararg args: Any?, block: CodeBlock.Builder.() -> Unit = {}): CodeBlock.Builder {
+fun CodeBlock.Builder.beginScope(
+    controlFlow: String,
+    vararg args: Any?,
+    block: CodeBlock.Builder.() -> Unit = {}
+): CodeBlock.Builder {
     beginControlFlow(controlFlow, *args)
     block()
     endControlFlow()

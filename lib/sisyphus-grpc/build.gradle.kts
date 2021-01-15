@@ -17,10 +17,6 @@ dependencies {
 }
 
 protobuf {
-    plugins {
-        basic()
-    }
-
     packageMapping(
         "google.api" to "com.bybutter.sisyphus.api",
         "google.cloud.audit" to "com.bybutter.sisyphus.cloud.audit",

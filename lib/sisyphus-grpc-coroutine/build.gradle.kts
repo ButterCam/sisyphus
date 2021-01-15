@@ -17,7 +17,4 @@ dependencies {
 }
 
 protobuf {
-    plugins {
-        coroutine()
-    }
 }
