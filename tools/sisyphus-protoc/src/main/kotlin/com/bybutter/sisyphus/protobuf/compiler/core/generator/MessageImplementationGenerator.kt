@@ -39,7 +39,7 @@ import com.squareup.kotlinpoet.buildCodeBlock
 import kotlin.reflect.KProperty
 
 class MessageSupportFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("support") {
@@ -58,7 +58,7 @@ class MessageSupportFunctionGenerator :
 }
 
 class MessageMergeWithFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("mergeWith") {
@@ -73,7 +73,7 @@ class MessageMergeWithFunctionGenerator :
 }
 
 class MessageCloneMutableFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("cloneMutable") {
@@ -91,7 +91,7 @@ class MessageCloneMutableFunctionGenerator :
 }
 
 class MessageClearFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("clear") {
@@ -108,7 +108,7 @@ class MessageClearFunctionGenerator :
 }
 
 class MessageClearFieldInCurrentFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("clearFieldInCurrent") {
@@ -170,7 +170,7 @@ class MessageClearFieldInCurrentFunctionGenerator :
 }
 
 class MessageFieldClearFieldInCurrentFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageClearInCurrentFunctionGeneratingState> {
+    GroupedGenerator<MessageClearInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageClearInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
@@ -192,7 +192,7 @@ class MessageFieldClearFieldInCurrentFunctionGenerator :
 }
 
 class MessageGetFieldInCurrentFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("getFieldInCurrent") {
@@ -258,7 +258,7 @@ class MessageGetFieldInCurrentFunctionGenerator :
 }
 
 class MessageFieldGetFieldInCurrentFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageGetInCurrentFunctionGeneratingState> {
+    GroupedGenerator<MessageGetInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageGetInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             addStatement("%L this.%N", state.target.branch, state.descriptor.name())
@@ -268,7 +268,7 @@ class MessageFieldGetFieldInCurrentFunctionGenerator :
 }
 
 class MessageGetPropertyFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("getProperty") {
@@ -330,7 +330,7 @@ class MessageGetPropertyFunctionGenerator :
 }
 
 class MessageFieldGetPropertyFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageGetPropertyFunctionGeneratingState> {
+    GroupedGenerator<MessageGetPropertyFunctionGeneratingState> {
     override fun generate(state: MessageGetPropertyFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             addStatement("%L %T::%N", state.target.branch, state.descriptor.parent.className(), state.descriptor.name())
@@ -340,7 +340,7 @@ class MessageFieldGetPropertyFunctionGenerator :
 }
 
 class MessageSetFieldInCurrentFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("setFieldInCurrent") {
@@ -404,7 +404,7 @@ class MessageSetFieldInCurrentFunctionGenerator :
 }
 
 class MessageFieldSetFieldInCurrentFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageSetFieldInCurrentFunctionGeneratingState> {
+    GroupedGenerator<MessageSetFieldInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageSetFieldInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
@@ -430,7 +430,7 @@ class MessageFieldSetFieldInCurrentFunctionGenerator :
 }
 
 class MessageHasFieldInCurrentFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("hasFieldInCurrent") {
@@ -492,7 +492,7 @@ class MessageHasFieldInCurrentFunctionGenerator :
 }
 
 class MessageFieldHasFieldInCurrentFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageHasFieldInCurrentFunctionGeneratingState> {
+    GroupedGenerator<MessageHasFieldInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageHasFieldInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
@@ -506,7 +506,7 @@ class MessageFieldHasFieldInCurrentFunctionGenerator :
 }
 
 class MessageEqualsMessageFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("equalsMessage") {
@@ -526,7 +526,7 @@ class MessageEqualsMessageFunctionGenerator :
 }
 
 class MessageFieldEqualsFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageEqualsFunctionGeneratingState> {
+    GroupedGenerator<MessageEqualsFunctionGeneratingState> {
     override fun generate(state: MessageEqualsFunctionGeneratingState): Boolean {
         state.target.apply {
             when (state.descriptor.descriptor.label) {
@@ -558,7 +558,7 @@ class MessageFieldEqualsFunctionGenerator :
 }
 
 class MessageComputeHashCodeFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("computeHashCode") {
@@ -578,7 +578,7 @@ class MessageComputeHashCodeFunctionGenerator :
 }
 
 class MessageFieldComputeHashCodeFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageHashCodeFunctionGeneratingState> {
+    GroupedGenerator<MessageHashCodeFunctionGeneratingState> {
     override fun generate(state: MessageHashCodeFunctionGeneratingState): Boolean {
         state.target.apply {
             when (state.descriptor.descriptor.label) {
@@ -619,7 +619,7 @@ class MessageFieldComputeHashCodeFunctionGenerator :
 }
 
 class MessageWriteFieldsFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("writeFields") {
@@ -638,7 +638,7 @@ class MessageWriteFieldsFunctionGenerator :
 }
 
 class MessageFieldWriteFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageWriteFieldsFunctionGeneratingState> {
+    GroupedGenerator<MessageWriteFieldsFunctionGeneratingState> {
     override fun generate(state: MessageWriteFieldsFunctionGeneratingState): Boolean {
         state.target.apply {
             val message = state.descriptor.descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE
@@ -736,7 +736,7 @@ class MessageFieldWriteFunctionGenerator :
 }
 
 class MessageReadFieldFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("readField") {
@@ -763,7 +763,7 @@ class MessageReadFieldFunctionGenerator :
 }
 
 class MessageFieldReadFunctionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageReadFieldFunctionGeneratingState> {
+    GroupedGenerator<MessageReadFieldFunctionGeneratingState> {
     override fun generate(state: MessageReadFieldFunctionGeneratingState): Boolean {
         state.target.apply {
             val message = state.descriptor.descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE

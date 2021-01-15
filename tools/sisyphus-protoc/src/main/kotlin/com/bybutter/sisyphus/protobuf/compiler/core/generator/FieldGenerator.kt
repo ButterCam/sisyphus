@@ -24,8 +24,7 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 
-class MessageInterfaceFieldGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageInterfaceGeneratingState> {
+class MessageInterfaceFieldGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         for (field in state.descriptor.fields) {
             state.target.property(field.name(), field.fieldType()) {
@@ -49,7 +48,7 @@ class MessageInterfaceFieldGenerator :
 }
 
 class MutableMessageInterfaceFieldGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MutableMessageInterfaceGeneratingState> {
+    GroupedGenerator<MutableMessageInterfaceGeneratingState> {
     override fun generate(state: MutableMessageInterfaceGeneratingState): Boolean {
         for (field in state.descriptor.fields) {
             state.target.property(field.name(), field.mutableFieldType()) {
@@ -74,7 +73,7 @@ class MutableMessageInterfaceFieldGenerator :
 }
 
 class MessageImplementationFieldGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         for (field in state.descriptor.fields) {
             FieldImplementationGeneratingState(state, field, state.target).advance()
@@ -84,7 +83,7 @@ class MessageImplementationFieldGenerator :
 }
 
 class MessageImplementationFieldBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<FieldImplementationGeneratingState> {
+    GroupedGenerator<FieldImplementationGeneratingState> {
     override fun generate(state: FieldImplementationGeneratingState): Boolean {
         val isPrimitive = when (state.descriptor.descriptor.type) {
             DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES -> false

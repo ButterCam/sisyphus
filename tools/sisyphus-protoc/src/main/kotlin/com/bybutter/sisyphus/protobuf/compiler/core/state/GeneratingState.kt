@@ -15,13 +15,14 @@ interface ChildGeneratingState<TDesc : DescriptorNode<*>, TTarget> : GeneratingS
 fun GeneratingState<*, *>.advance() {
     var state = this
 
-    while (true) {
+    loop@while (true) {
         when (state) {
             is ChildGeneratingState<*, *> -> {
                 state = state.parent
             }
             is FileGeneratingState -> {
                 state.compiler.generators.advance(this)
+                break@loop
             }
             else -> throw IllegalStateException("Root file state not found.")
         }

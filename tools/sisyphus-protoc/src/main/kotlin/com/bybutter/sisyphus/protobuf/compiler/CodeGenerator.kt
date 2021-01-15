@@ -97,6 +97,7 @@ interface DependentGenerator<T : GeneratingState<*, *>> : CodeGenerator<T> {
 
 class CodeGenerators {
     private val generators = mutableListOf<CodeGenerator<*>>()
+    private val targetType = mutableMapOf<CodeGenerator<*>, Class<*>>()
 
     fun register(generator: CodeGenerator<*>): CodeGenerators {
         return register(listOf(generator))
@@ -229,30 +230,29 @@ class CodeGenerators {
         val handledGroup = mutableSetOf<String>()
 
         loop@ for (generator in generators) {
-            val targetState = when (val type = generator.javaClass.getTypeArgument(
-                CodeGenerator::class.java,
-                0
-            )) {
-                is Class<*> -> type
-                is ParameterizedType -> type.rawType as Class<*>
-                else -> TODO()
+            val targetState = targetType.getOrPut(generator) {
+                when (val type = generator.javaClass.getTypeArgument(
+                    CodeGenerator::class.java,
+                    0
+                )) {
+                    is Class<*> -> type
+                    is ParameterizedType -> type.rawType as Class<*>
+                    else -> TODO()
+                }
             }
-            if (!targetState.isInstance(state)) continue
 
+            if (!targetState.isInstance(state)) continue
             when (generator) {
                 is GroupedGenerator<*> -> {
                     if (handledGroup.contains(generator.group)) {
                         continue@loop
                     }
-                    if (generator.uncheckedCast<CodeGenerator<GeneratingState<*, *>>>()
-                            .generate(state)
-                    ) {
+                    if (generator.uncheckedCast<CodeGenerator<GeneratingState<*, *>>>().generate(state)) {
                         handledGroup += generator.group
                     }
                 }
                 else -> {
-                    generator.uncheckedCast<CodeGenerator<GeneratingState<*, *>>>()
-                        .generate(state)
+                    generator.uncheckedCast<CodeGenerator<GeneratingState<*, *>>>().generate(state)
                 }
             }
         }
