@@ -8,7 +8,7 @@ import com.squareup.kotlinpoet.FileSpec
 class ProtobufCompiler(
     files: DescriptorProtos.FileDescriptorSet,
     packageShading: Map<String, String> = mapOf(),
-    val generators: com.bybutter.sisyphus.protobuf.compiler.CodeGenerators = com.bybutter.sisyphus.protobuf.compiler.CodeGenerators()
+    val generators: CodeGenerators = CodeGenerators()
 ) {
     val descriptorSet = FileDescriptorSet(files, packageShading)
 

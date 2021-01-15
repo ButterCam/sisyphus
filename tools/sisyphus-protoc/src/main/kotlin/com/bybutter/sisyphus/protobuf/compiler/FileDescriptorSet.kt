@@ -42,8 +42,9 @@ class FileDescriptorSet(
         }
 
         for (child in children) {
-            if (!normalized.startsWith(child.descriptor.`package`)) continue
-            val subNames = normalized.substringAfter(child.descriptor.`package`)
+            val packageName = ".${child.descriptor.`package`}"
+            if (!normalized.startsWith(packageName)) continue
+            val subNames = normalized.substringAfter(packageName)
             if (subNames.isNotEmpty() && !subNames.startsWith('.')) continue
             val part = listOf(child.descriptor.`package`) + subNames.substring(1).split('.')
             return child.findDescriptor(part, 0) ?: continue

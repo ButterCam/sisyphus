@@ -32,7 +32,7 @@ import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 class OneOfInterfaceGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageInterfaceGeneratingState> {
+    GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
             state.target.property(
@@ -49,7 +49,7 @@ class OneOfInterfaceGenerator :
 }
 
 class OneofValueBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<OneofValueTypeGeneratingState> {
+    GroupedGenerator<OneofValueTypeGeneratingState> {
     override fun generate(state: OneofValueTypeGeneratingState): Boolean {
         state.target.apply {
             this implements RuntimeTypes.ONE_OF_VALUE.parameterizedBy(TypeVariableName("T"))
@@ -76,7 +76,7 @@ class OneofValueBasicGenerator :
 }
 
 class OneOfMutableInterfaceGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MutableMessageInterfaceGeneratingState> {
+    GroupedGenerator<MutableMessageInterfaceGeneratingState> {
     override fun generate(state: MutableMessageInterfaceGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
             state.target.property(
@@ -92,7 +92,7 @@ class OneOfMutableInterfaceGenerator :
 }
 
 class OneOfImplementationGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
             state.target.property(
@@ -108,8 +108,8 @@ class OneOfImplementationGenerator :
     }
 }
 
-class OneofFieldImplementationInterceptorGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<FieldImplementationGeneratingState>,
-    com.bybutter.sisyphus.protobuf.compiler.SortableGenerator<FieldImplementationGeneratingState> {
+class OneofFieldImplementationInterceptorGenerator : GroupedGenerator<FieldImplementationGeneratingState>,
+    SortableGenerator<FieldImplementationGeneratingState> {
     override val group: String get() = MessageImplementationFieldBasicGenerator::class.java.canonicalName
     override val order: Int = -1000
 
@@ -161,7 +161,6 @@ class OneofFieldImplementationInterceptorGenerator : com.bybutter.sisyphus.proto
             addStatement(
                 "return %N is %T",
                 oneOf.fieldName(),
-                oneOf.fieldName(),
                 oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
             )
         }
@@ -171,7 +170,6 @@ class OneofFieldImplementationInterceptorGenerator : com.bybutter.sisyphus.proto
             returns(state.descriptor.fieldType().copy(true))
             beginControlFlow(
                 "return (%N as? %T)?.value?.also",
-                oneOf.fieldName(),
                 oneOf.fieldName(),
                 oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
             )

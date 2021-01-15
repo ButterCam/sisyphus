@@ -41,7 +41,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import kotlin.reflect.KProperty
 
-class ExtensionApiGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ApiFileGeneratingState> {
+class ExtensionApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             ExtensionGeneratingState(state, extension, state.target).advance()
@@ -51,7 +51,7 @@ class ExtensionApiGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGen
 }
 
 class NestedExtensionApiGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageCompanionGeneratingState> {
+    GroupedGenerator<MessageCompanionGeneratingState> {
     override fun generate(state: MessageCompanionGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             ExtensionGeneratingState(state, extension, state.target).advance()
@@ -61,7 +61,7 @@ class NestedExtensionApiGenerator :
 }
 
 class ExtensionSupportGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<InternalFileGeneratingState> {
+    GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             state.target.addType(kObject(extension.supportName()) {
@@ -73,7 +73,7 @@ class ExtensionSupportGenerator :
 }
 
 class NestedExtensionSupportGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageSupportGeneratingState> {
+    GroupedGenerator<MessageSupportGeneratingState> {
     override fun generate(state: MessageSupportGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             state.target.addType(kObject(extension.supportName()) {
@@ -85,7 +85,7 @@ class NestedExtensionSupportGenerator :
 }
 
 class ExtensionDefinitionGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ExtensionGeneratingState> {
+    GroupedGenerator<ExtensionGeneratingState> {
     override fun generate(state: ExtensionGeneratingState): Boolean {
         val property = kProperty(state.descriptor.descriptor.jsonName, state.descriptor.fieldType()) {
             receiver(state.descriptor.extendee().className())
@@ -152,7 +152,7 @@ class ExtensionDefinitionGenerator :
 }
 
 class ExtensionSupportBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ExtensionSupportGeneratingState> {
+    GroupedGenerator<ExtensionSupportGeneratingState> {
     override fun generate(state: ExtensionSupportGeneratingState): Boolean {
         state.target.apply {
             val fieldType = state.descriptor.mutableFieldType().copy(false)
@@ -184,7 +184,7 @@ class ExtensionSupportBasicGenerator :
 
             when (val parent = state.descriptor.parent) {
                 is MessageDescriptor -> {
-                    property("parent", parent.className()) {
+                    property("parent", parent.className().nestedClass("Companion")) {
                         this += KModifier.OVERRIDE
                         getter {
                             addStatement("return %T", parent.className())

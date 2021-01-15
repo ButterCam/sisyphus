@@ -29,9 +29,10 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.buildCodeBlock
 
-class MessageApiGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ApiFileGeneratingState> {
+class MessageApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (message in state.descriptor.messages) {
+            if(message.mapEntry()) continue
             state.target.addType(kInterface(message.name()) {
                 MessageInterfaceGeneratingState(state, message, this).advance()
             })
@@ -41,8 +42,7 @@ class MessageApiGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGener
     }
 }
 
-class MessageInterfaceBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageInterfaceGeneratingState> {
+class MessageInterfaceBasicGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         state.target.apply {
             this implements RuntimeTypes.MESSAGE.parameterizedBy(
@@ -52,6 +52,7 @@ class MessageInterfaceBasicGenerator :
             addKdoc(state.descriptor.document())
 
             for (message in state.descriptor.messages) {
+                if(message.mapEntry()) continue
                 state.target.addType(kInterface(message.name()) {
                     MessageInterfaceGeneratingState(state, message, this).advance()
                 })
@@ -67,9 +68,11 @@ class MessageInterfaceBasicGenerator :
     }
 }
 
-class MessageInternalGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<InternalFileGeneratingState> {
+class MessageInternalGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         for (message in state.descriptor.messages) {
+            if(message.mapEntry()) continue
+
             state.target.addType(kInterface(message.mutableName()) {
                 MutableMessageInterfaceGeneratingState(state, message, this).advance()
             })
@@ -87,7 +90,7 @@ class MessageInternalGenerator : com.bybutter.sisyphus.protobuf.compiler.Grouped
 }
 
 class MutableMessageInterfaceBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MutableMessageInterfaceGeneratingState> {
+    GroupedGenerator<MutableMessageInterfaceGeneratingState> {
     override fun generate(state: MutableMessageInterfaceGeneratingState): Boolean {
         state.target.apply {
             this implements RuntimeTypes.MUTABLE_MESSAGE.parameterizedBy(
@@ -97,6 +100,7 @@ class MutableMessageInterfaceBasicGenerator :
             this implements state.descriptor.className()
 
             for (message in state.descriptor.messages) {
+                if(message.mapEntry()) continue
                 state.target.addType(kInterface(message.mutableName()) {
                     MutableMessageInterfaceGeneratingState(state, message, this).advance()
                 })
@@ -107,7 +111,7 @@ class MutableMessageInterfaceBasicGenerator :
 }
 
 class MessageImplementationBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageImplementationGeneratingState> {
+    GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             this += KModifier.INTERNAL
@@ -119,6 +123,7 @@ class MessageImplementationBasicGenerator :
             this implements state.descriptor.mutableClassName()
 
             for (message in state.descriptor.messages) {
+                if(message.mapEntry()) continue
                 state.target.addType(kClass(message.implementationName()) {
                     MessageImplementationGeneratingState(state, message, this).advance()
                 })
@@ -128,8 +133,7 @@ class MessageImplementationBasicGenerator :
     }
 }
 
-class MessageSupportBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageSupportGeneratingState> {
+class MessageSupportBasicGenerator : GroupedGenerator<MessageSupportGeneratingState> {
     override fun generate(state: MessageSupportGeneratingState): Boolean {
         state.target.apply {
             this += KModifier.OPEN
@@ -205,6 +209,7 @@ class MessageSupportBasicGenerator :
             }
 
             for (message in state.descriptor.messages) {
+                if(message.mapEntry()) continue
                 state.target.addType(kClass(message.supportName()) {
                     MessageSupportGeneratingState(state, message, this).advance()
                 })

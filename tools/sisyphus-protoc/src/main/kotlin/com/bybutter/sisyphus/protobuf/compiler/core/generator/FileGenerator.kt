@@ -17,7 +17,7 @@ import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.squareup.kotlinpoet.KModifier
 
-class ApiFileGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<FileGeneratingState> {
+class ApiFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
         state.target += kFile(state.descriptor.packageName(), state.descriptor.kotlinFileName()) {
             ApiFileGeneratingState(state, state.descriptor, this).advance()
@@ -26,7 +26,7 @@ class ApiFileGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerato
     }
 }
 
-class InternalFileGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<FileGeneratingState> {
+class InternalFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
         state.target += kFile(state.descriptor.internalPackageName(), state.descriptor.kotlinFileName()) {
             InternalFileGeneratingState(state, state.descriptor, this).advance()
@@ -35,7 +35,7 @@ class InternalFileGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGen
     }
 }
 
-class FileSupportGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<InternalFileGeneratingState> {
+class FileSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         state.target.addType(kObject(state.descriptor.fileMetadataName()) {
             this extends RuntimeTypes.FILE_SUPPORT

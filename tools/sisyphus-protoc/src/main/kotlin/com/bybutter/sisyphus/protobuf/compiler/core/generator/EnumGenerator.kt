@@ -9,7 +9,6 @@ import com.bybutter.sisyphus.protobuf.compiler.constructor
 import com.bybutter.sisyphus.protobuf.compiler.core.state.ApiFileGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.EnumGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.EnumSupportGeneratingState
-import com.bybutter.sisyphus.protobuf.compiler.core.state.EnumValueGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.InternalFileGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageInterfaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageSupportGeneratingState
@@ -24,10 +23,11 @@ import com.bybutter.sisyphus.protobuf.compiler.property
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 
-class EnumApiGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ApiFileGeneratingState> {
+class EnumApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
             state.target.addType(kEnum(enum.name()) {
@@ -39,7 +39,7 @@ class EnumApiGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerato
     }
 }
 
-class NestedEnumGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageInterfaceGeneratingState> {
+class NestedEnumGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
             state.target.addType(kEnum(enum.name()) {
@@ -51,7 +51,7 @@ class NestedEnumGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGener
     }
 }
 
-class EnumBasicGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<EnumGeneratingState> {
+class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
     override fun generate(state: EnumGeneratingState): Boolean {
         state.target.apply {
             this implements RuntimeTypes.PROTO_ENUM
@@ -74,14 +74,17 @@ class EnumBasicGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenera
             }
 
             for (value in state.descriptor.values) {
-                EnumValueGeneratingState(state, value, this).advance()
+                state.target.addEnumConstant(value.name(), TypeSpec.anonymousClassBuilder()
+                    .addSuperclassConstructorParameter("%L", value.descriptor.number)
+                    .addSuperclassConstructorParameter("%S", value.descriptor.name)
+                    .build())
             }
         }
         return true
     }
 }
 
-class EnumSupportGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<InternalFileGeneratingState> {
+class EnumSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
             state.target.addType(kClass(enum.supportName()) {
@@ -92,8 +95,7 @@ class EnumSupportGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGene
     }
 }
 
-class NestedEnumSupportGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<MessageSupportGeneratingState> {
+class NestedEnumSupportGenerator : GroupedGenerator<MessageSupportGeneratingState> {
     override fun generate(state: MessageSupportGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
             state.target.addType(kClass(enum.supportName()) {
@@ -104,7 +106,7 @@ class NestedEnumSupportGenerator :
     }
 }
 
-class EnumSupportBasicGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<EnumSupportGeneratingState> {
+class EnumSupportBasicGenerator : GroupedGenerator<EnumSupportGeneratingState> {
     override fun generate(state: EnumSupportGeneratingState): Boolean {
         state.target.apply {
             this += KModifier.ABSTRACT
@@ -131,7 +133,7 @@ class EnumSupportBasicGenerator : com.bybutter.sisyphus.protobuf.compiler.Groupe
                     }
                 }
                 is MessageDescriptor -> {
-                    property("parent", parent.className()) {
+                    property("parent", parent.className().nestedClass("Companion")) {
                         this += KModifier.OVERRIDE
                         getter {
                             addStatement("return %T", parent.className())
@@ -167,3 +169,4 @@ class EnumSupportBasicGenerator : com.bybutter.sisyphus.protobuf.compiler.Groupe
         return true
     }
 }
+
