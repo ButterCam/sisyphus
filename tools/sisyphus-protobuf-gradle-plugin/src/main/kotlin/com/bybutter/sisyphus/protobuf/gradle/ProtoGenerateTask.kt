@@ -1,23 +1,20 @@
 package com.bybutter.sisyphus.protobuf.gradle
 
 import com.bybutter.sisyphus.io.replaceExtensionName
+import com.bybutter.sisyphus.protobuf.compiler.CodeGenerators
 import com.bybutter.sisyphus.protobuf.compiler.ProtobufCompiler
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
-import com.bybutter.sisyphus.protobuf.compiler.generator.CodeGenerators
-import com.bybutter.sisyphus.protobuf.compiler.generator.rpc.CoroutineServiceGenerator
-import com.bybutter.sisyphus.protobuf.compiler.generator.rpc.CoroutineServiceMethodGenerator
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.TypeSpec
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 import java.nio.charset.Charset
-import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
 open class ProtoGenerateTask : DefaultTask() {
@@ -73,10 +70,7 @@ open class ProtoGenerateTask : DefaultTask() {
             mapOf()
         }
 
-        val compiler = ProtobufCompiler(protobuf.plugins.toCodeGenerators())
-            .withProtos(desc)
-            .shading(mapping)
-
+        val compiler = ProtobufCompiler(desc, mapping, protobuf.plugins.toCodeGenerators())
         val fileSupports = StringBuilder()
 
         for ((sourceProto, external) in source) {
@@ -84,12 +78,15 @@ open class ProtoGenerateTask : DefaultTask() {
             result.files[0].writeTo(output.toPath())
             result.files[1].writeTo(implOutput.toPath())
 
-            val descPbFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.name.replaceExtensionName("proto", "pb"))
+            val descPbFile = Paths.get(
+                resourceOutput.toPath().toString(),
+                result.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
+            )
             Files.createDirectories(descPbFile.parent)
-            Files.write(descPbFile, result.descriptor.toByteArray())
+            Files.write(descPbFile, result.descriptor.descriptor.toByteArray())
 
-            if(external == "external") {
-                val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.name)
+            if (external == "external") {
+                val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.descriptor.name)
                 val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
                 Files.createDirectories(sourceProtoFile.parent)
                 Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
@@ -97,12 +94,15 @@ open class ProtoGenerateTask : DefaultTask() {
 
             val fileSupport = result.files[1].members.first {
                 val spec = it as? TypeSpec ?: return@first false
-                spec.superclass.equals(RuntimeTypes.FILE_SUPPORT)
+                spec.superclass == RuntimeTypes.FILE_SUPPORT
             } as TypeSpec
             fileSupports.appendln("${result.files[1].packageName}.${fileSupport.name}")
         }
 
-        val fileMetas = Paths.get(resourceOutput.toPath().toString(), "META-INF/services/${RuntimeTypes.FILE_SUPPORT.canonicalName}")
+        val fileMetas = Paths.get(
+            resourceOutput.toPath().toString(),
+            "META-INF/services/${RuntimeTypes.FILE_SUPPORT.canonicalName}"
+        )
         Files.createDirectories(fileMetas.parent)
         Files.write(fileMetas, fileSupports.toString().toByteArray(Charset.defaultCharset()))
     }
@@ -111,7 +111,7 @@ open class ProtoGenerateTask : DefaultTask() {
         private fun ProtoCompilerPlugins.toCodeGenerators(): CodeGenerators {
             return CodeGenerators().apply {
                 for (buildInPlugin in this@toCodeGenerators.buildInPlugins) {
-                    when(buildInPlugin) {
+                    when (buildInPlugin) {
                         BuildInPlugin.BASIC_GENERATOR -> basic()
                         BuildInPlugin.COROUTINE_SERVICE_GENERATOR -> coroutineService()
                         BuildInPlugin.RXJAVA_SERVICE_GENERATOR -> TODO()

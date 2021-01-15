@@ -1,6 +1,6 @@
 package com.bybutter.sisyphus.protobuf.gradle
 
-import com.bybutter.sisyphus.protobuf.compiler.generator.CodeGenerator
+import com.bybutter.sisyphus.protobuf.compiler.CodeGenerator
 import com.bybutter.sisyphus.reflect.instance
 import kotlin.reflect.KClass
 

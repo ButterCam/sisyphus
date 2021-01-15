@@ -14,7 +14,16 @@ open class ProtocRunner(val version: String = "3.11.4") {
         }
 
         val outputFile = Files.createTempFile("out", ".pb")
-        val result = Protoc.runProtoc(arrayOf("-v$version", "-o$outputFile", "-I$protoPath", "--include_imports", "--include_source_info", *source.toTypedArray()), System.out, System.out)
+        val result = Protoc.runProtoc(
+            arrayOf(
+                "-v$version",
+                "-o$outputFile",
+                "-I$protoPath",
+                "--include_imports",
+                "--include_source_info",
+                *source.toTypedArray()
+            ), System.out, System.out
+        )
         if (result != 0) {
             throw IllegalStateException("Protoc return '$result' with not zero value.")
         }

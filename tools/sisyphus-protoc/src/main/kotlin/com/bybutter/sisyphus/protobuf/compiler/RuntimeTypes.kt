@@ -30,7 +30,8 @@ object RuntimeTypes {
 
     val DESCRIPTOR_PROTO = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.primitives.DescriptorProto")
 
-    val SERVICE_DESCRIPTOR_PROTO = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto")
+    val SERVICE_DESCRIPTOR_PROTO =
+        ClassName.bestGuess("com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto")
 
     val FIELD_DESCRIPTOR_PROTO = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto")
 

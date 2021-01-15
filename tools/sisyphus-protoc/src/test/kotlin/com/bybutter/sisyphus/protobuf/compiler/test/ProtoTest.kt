@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.protobuf.compiler.test
 import com.bybutter.sisyphus.io.toUnixPath
 import com.bybutter.sisyphus.protobuf.compiler.ProtobufCompiler
 import com.bybutter.sisyphus.protobuf.compiler.ProtocRunner
-import com.bybutter.sisyphus.protobuf.compiler.generator.CodeGenerators
+import com.bybutter.sisyphus.protobuf.compiler.CodeGenerators
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
@@ -26,11 +26,13 @@ class ProtoTest {
             }
         })
 
-        val context = ProtobufCompiler(CodeGenerators().coroutineService())
-            .withProtos(ProtocRunner.generate(protoPath.toFile(), source))
-
+        val desc = ProtocRunner.generate(protoPath.toFile(), source)
+        val compiler = ProtobufCompiler(desc, mapOf(
+            "com.google.protobuf" to "com.bybutter.sisyphus.protobuf.primitives",
+            "com.google.protobuf.compiler" to "com.bybutter.sisyphus.protobuf.compiler"
+        ), CodeGenerators().coroutineService())
         for (s in source) {
-            val result = context.generate(s)
+            val result = compiler.generate(s)
             for (file in result.files) {
                 file.writeTo(Paths.get(System.getProperty("user.dir"), "src/test/java"))
             }
