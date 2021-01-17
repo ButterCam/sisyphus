@@ -9,8 +9,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageParentRegisterG
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageRegisterGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
 
-class MessageParentRegisterGenerator :
-    GroupedGenerator<FileParentRegisterGeneratingState> {
+class MessageParentRegisterGenerator : GroupedGenerator<FileParentRegisterGeneratingState> {
     override fun generate(state: FileParentRegisterGeneratingState): Boolean {
         for (message in state.descriptor.messages) {
             MessageRegisterGeneratingState(state, message, state.target).advance()
@@ -19,8 +18,7 @@ class MessageParentRegisterGenerator :
     }
 }
 
-class NestMessageParentRegisterGenerator :
-    GroupedGenerator<MessageParentRegisterGeneratingState> {
+class NestMessageParentRegisterGenerator : GroupedGenerator<MessageParentRegisterGeneratingState> {
     override fun generate(state: MessageParentRegisterGeneratingState): Boolean {
         for (message in state.descriptor.messages) {
             MessageRegisterGeneratingState(state, message, state.target).advance()
@@ -29,8 +27,7 @@ class NestMessageParentRegisterGenerator :
     }
 }
 
-class EnumParentRegisterGenerator :
-    GroupedGenerator<FileParentRegisterGeneratingState> {
+class EnumParentRegisterGenerator : GroupedGenerator<FileParentRegisterGeneratingState> {
     override fun generate(state: FileParentRegisterGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
             EnumRegisterGeneratingState(state, enum, state.target).advance()
@@ -39,8 +36,7 @@ class EnumParentRegisterGenerator :
     }
 }
 
-class NestEnumParentRegisterGenerator :
-    GroupedGenerator<MessageParentRegisterGeneratingState> {
+class NestEnumParentRegisterGenerator : GroupedGenerator<MessageParentRegisterGeneratingState> {
     override fun generate(state: MessageParentRegisterGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
             EnumRegisterGeneratingState(state, enum, state.target).advance()
@@ -49,8 +45,7 @@ class NestEnumParentRegisterGenerator :
     }
 }
 
-class ExtensionParentRegisterGenerator :
-    GroupedGenerator<FileParentRegisterGeneratingState> {
+class ExtensionParentRegisterGenerator : GroupedGenerator<FileParentRegisterGeneratingState> {
     override fun generate(state: FileParentRegisterGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             ExtensionRegisterGeneratingState(state, extension, state.target).advance()
@@ -59,8 +54,7 @@ class ExtensionParentRegisterGenerator :
     }
 }
 
-class NestExtensionParentRegisterGenerator :
-    GroupedGenerator<MessageParentRegisterGeneratingState> {
+class NestExtensionParentRegisterGenerator : GroupedGenerator<MessageParentRegisterGeneratingState> {
     override fun generate(state: MessageParentRegisterGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             ExtensionRegisterGeneratingState(state, extension, state.target).advance()
@@ -69,8 +63,7 @@ class NestExtensionParentRegisterGenerator :
     }
 }
 
-class MessageRegisterGenerator :
-    GroupedGenerator<MessageRegisterGeneratingState> {
+class MessageRegisterGenerator : GroupedGenerator<MessageRegisterGeneratingState> {
     override fun generate(state: MessageRegisterGeneratingState): Boolean {
         if (state.descriptor.mapEntry()) return false
         state.target.addStatement("%T.register(%T)", RuntimeTypes.PROTO_TYPES, state.descriptor.className())
@@ -85,8 +78,7 @@ class EnumRegisterGenerator : GroupedGenerator<EnumRegisterGeneratingState> {
     }
 }
 
-class ExtensionRegisterGenerator :
-    GroupedGenerator<ExtensionRegisterGeneratingState> {
+class ExtensionRegisterGenerator : GroupedGenerator<ExtensionRegisterGeneratingState> {
     override fun generate(state: ExtensionRegisterGeneratingState): Boolean {
         state.target.addStatement("%T.register(%T)", RuntimeTypes.PROTO_TYPES, state.descriptor.supportClassName())
         return true

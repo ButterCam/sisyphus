@@ -75,7 +75,7 @@ class ValueNode : PatcherNode {
         if (propertyType != null && propertyType.isSubclassOf(CustomProtoType::class)) {
             result = result.map {
                 val support = (propertyType.companionObjectInstance as CustomProtoTypeSupport<*, Any>)
-                support.wrapRaw(it)
+                support(it)
             }
         }
 

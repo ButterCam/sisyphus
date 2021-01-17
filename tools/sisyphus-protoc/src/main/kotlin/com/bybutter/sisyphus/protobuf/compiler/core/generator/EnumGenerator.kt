@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.protobuf.compiler.core.generator
 import com.bybutter.sisyphus.protobuf.compiler.FileDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.MessageDescriptor
+import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.bybutter.sisyphus.protobuf.compiler.companion
 import com.bybutter.sisyphus.protobuf.compiler.constructor
@@ -145,7 +146,7 @@ class EnumSupportBasicGenerator : GroupedGenerator<EnumSupportGeneratingState> {
             property("descriptor", RuntimeTypes.ENUM_DESCRIPTOR_PROTO) {
                 this += KModifier.OVERRIDE
                 delegate(buildCodeBlock {
-                    beginControlFlow("%M", MemberName("kotlin", "lazy"))
+                    beginControlFlow("%M", RuntimeMethods.LAZY)
                     when (val parent = state.descriptor.parent) {
                         is FileDescriptor -> {
                             addStatement(

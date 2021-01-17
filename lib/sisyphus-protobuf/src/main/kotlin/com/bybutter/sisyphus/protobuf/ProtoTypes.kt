@@ -39,10 +39,13 @@ object ProtoTypes {
     }
 
     fun getProtoNameByTypeUrl(url: String): String {
-        return url.substringAfterLast("/")
+        return ".${url.substringAfterLast("/")}"
     }
 
     fun getTypeUrlByProtoName(name: String, host: String = "type.bybutter.com"): String {
+        if (name.startsWith(".")) {
+            return "$host/${name.substring(1)}"
+        }
         return "$host/$name"
     }
 
@@ -50,6 +53,10 @@ object ProtoTypes {
         if (name.contains('/')) {
             return protoToSupportMap[getProtoNameByTypeUrl(name)]
         }
-        return protoToSupportMap[name.trim('.')]
+        return protoToSupportMap[name]
+    }
+
+    fun services(): List<ServiceSupport> {
+        return protoToSupportMap.values.filterIsInstance<ServiceSupport>()
     }
 }

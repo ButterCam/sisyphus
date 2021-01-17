@@ -6,9 +6,9 @@ import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.ClassName
 
 class OneofFieldDescriptor(
-    val parent: MessageDescriptor,
+    override val parent: MessageDescriptor,
     override val descriptor: DescriptorProtos.OneofDescriptorProto
-) : DescriptorNode<DescriptorProtos.OneofDescriptorProto> {
+) : DescriptorNode<DescriptorProtos.OneofDescriptorProto>() {
     fun oneOfClassName(): ClassName {
         return parent.className().nestedClass(oneOfName())
     }

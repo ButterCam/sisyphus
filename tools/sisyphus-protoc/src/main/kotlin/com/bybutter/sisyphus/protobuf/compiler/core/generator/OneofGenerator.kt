@@ -9,6 +9,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldImplementationGen
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageImplementationGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageInterfaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MutableMessageInterfaceGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.OneofKindTypeGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.OneofValueTypeGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
 import com.bybutter.sisyphus.protobuf.compiler.defaultValue
@@ -31,8 +32,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.buildCodeBlock
 
-class OneOfInterfaceGenerator :
-    GroupedGenerator<MessageInterfaceGeneratingState> {
+class OneofInterfaceGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
             state.target.property(
@@ -48,35 +48,47 @@ class OneOfInterfaceGenerator :
     }
 }
 
-class OneofValueBasicGenerator :
-    GroupedGenerator<OneofValueTypeGeneratingState> {
+class OneofValueBasicGenerator : GroupedGenerator<OneofValueTypeGeneratingState> {
     override fun generate(state: OneofValueTypeGeneratingState): Boolean {
         state.target.apply {
             this implements RuntimeTypes.ONE_OF_VALUE.parameterizedBy(TypeVariableName("T"))
             this.addTypeVariable(TypeVariableName("T"))
 
-            for (field in state.descriptor.parent.fields) {
-                if (field.oneof() == state.descriptor) {
-                    type(field.descriptor.name.toPascalCase()) {
-                        this += KModifier.DATA
-                        this implements state.descriptor.oneOfClassName().parameterizedBy(field.elementType())
-                        constructor {
-                            addParameter("value", field.elementType())
-                        }
-                        property("value", field.elementType()) {
-                            this += KModifier.OVERRIDE
-                            initializer("value")
-                        }
-                    }
-                }
+        }
+        return true
+    }
+}
+
+class OneofKindTypeGenerator: GroupedGenerator<OneofValueTypeGeneratingState> {
+    override fun generate(state: OneofValueTypeGeneratingState): Boolean {
+        for (field in state.descriptor.parent.fields) {
+            if (field.oneof() == state.descriptor) {
+                OneofKindTypeGeneratingState(state, field, state.target).advance()
             }
         }
         return true
     }
 }
 
-class OneOfMutableInterfaceGenerator :
-    GroupedGenerator<MutableMessageInterfaceGeneratingState> {
+class OneofKindTypeBasicGenerator : GroupedGenerator<OneofKindTypeGeneratingState> {
+    override fun generate(state: OneofKindTypeGeneratingState): Boolean {
+        val oneof = state.descriptor.oneof() ?: return false
+        state.target.type(state.descriptor.descriptor.name.toPascalCase()) {
+            this += KModifier.DATA
+            this implements oneof.oneOfClassName().parameterizedBy(state.descriptor.elementType())
+            constructor {
+                addParameter("value", state.descriptor.elementType())
+            }
+            property("value", state.descriptor.elementType()) {
+                this += KModifier.OVERRIDE
+                initializer("value")
+            }
+        }
+        return true
+    }
+}
+
+class OneofMutableInterfaceGenerator : GroupedGenerator<MutableMessageInterfaceGeneratingState> {
     override fun generate(state: MutableMessageInterfaceGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
             state.target.property(
@@ -91,8 +103,7 @@ class OneOfMutableInterfaceGenerator :
     }
 }
 
-class OneOfImplementationGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class OneofImplementationGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
             state.target.property(

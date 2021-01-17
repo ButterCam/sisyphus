@@ -17,9 +17,9 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 open class MessageFieldDescriptor(
-    val parent: MessageDescriptor,
+    override val parent: MessageDescriptor,
     override val descriptor: DescriptorProtos.FieldDescriptorProto
-) : DescriptorNode<DescriptorProtos.FieldDescriptorProto> {
+) : DescriptorNode<DescriptorProtos.FieldDescriptorProto>() {
     fun path(): List<Int> {
         return parent.path() + DescriptorProtos.DescriptorProto.FIELD_FIELD_NUMBER + parent.descriptor.fieldList.indexOf(
             descriptor

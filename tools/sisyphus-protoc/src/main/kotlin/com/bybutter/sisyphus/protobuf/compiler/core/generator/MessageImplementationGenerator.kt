@@ -38,8 +38,7 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock
 import kotlin.reflect.KProperty
 
-class MessageSupportFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageSupportFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("support") {
@@ -57,8 +56,7 @@ class MessageSupportFunctionGenerator :
     }
 }
 
-class MessageMergeWithFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageMergeWithFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("mergeWith") {
@@ -72,8 +70,7 @@ class MessageMergeWithFunctionGenerator :
     }
 }
 
-class MessageCloneMutableFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageCloneMutableFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("cloneMutable") {
@@ -90,8 +87,7 @@ class MessageCloneMutableFunctionGenerator :
     }
 }
 
-class MessageClearFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageClearFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("clear") {
@@ -107,8 +103,7 @@ class MessageClearFunctionGenerator :
     }
 }
 
-class MessageClearFieldInCurrentFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("clearFieldInCurrent") {
@@ -116,6 +111,10 @@ class MessageClearFieldInCurrentFunctionGenerator :
                 addParameter("fieldName", String::class)
                 returns(ANY.copy(true))
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return clearFieldInExtensions(fieldName)")
+                        return@buildCodeBlock
+                    }
                     beginScope("return when(fieldName)") {
                         for (field in state.descriptor.fields) {
                             if (field.descriptor.name != field.descriptor.jsonName) {
@@ -150,6 +149,10 @@ class MessageClearFieldInCurrentFunctionGenerator :
                 addParameter("fieldNumber", Int::class)
                 returns(ANY.copy(true))
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return clearFieldInExtensions(fieldNumber)")
+                        return@buildCodeBlock
+                    }
                     beginScope("return when(fieldNumber)") {
                         for (field in state.descriptor.fields) {
                             MessageClearInCurrentFunctionGeneratingState(
@@ -169,8 +172,7 @@ class MessageClearFieldInCurrentFunctionGenerator :
     }
 }
 
-class MessageFieldClearFieldInCurrentFunctionGenerator :
-    GroupedGenerator<MessageClearInCurrentFunctionGeneratingState> {
+class MessageFieldClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageClearInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageClearInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
@@ -191,8 +193,7 @@ class MessageFieldClearFieldInCurrentFunctionGenerator :
     }
 }
 
-class MessageGetFieldInCurrentFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("getFieldInCurrent") {
@@ -201,33 +202,36 @@ class MessageGetFieldInCurrentFunctionGenerator :
                 addParameter("fieldName", String::class)
                 returns(TypeVariableName("T"))
                 addCode(buildCodeBlock {
-                    beginControlFlow("return when(fieldName)")
-                    for (field in state.descriptor.fields) {
-                        if (field.descriptor.name != field.descriptor.jsonName) {
-                            MessageGetInCurrentFunctionGeneratingState(
-                                state, field, WhenBranchBuilder(
-                                    buildCodeBlock {
-                                        add(
-                                            "%S, %S ->",
-                                            field.descriptor.name,
-                                            field.descriptor.jsonName
-                                        )
-                                    }, this
-                                )
-                            ).advance()
-                        } else {
-                            MessageGetInCurrentFunctionGeneratingState(
-                                state, field, WhenBranchBuilder(
-                                    buildCodeBlock {
-                                        add("%S ->", field.descriptor.name)
-                                    }, this
-                                )
-                            ).advance()
-                        }
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return getFieldInExtensions(fieldName)")
+                        return@buildCodeBlock
                     }
-                    addStatement("else -> getFieldInExtensions<T>(fieldName)")
-                    unindent()
-                    add("}.%M()\n", RuntimeMethods.UNCHECK_CAST)
+                    beginScope("return when(fieldName)") {
+                        for (field in state.descriptor.fields) {
+                            if (field.descriptor.name != field.descriptor.jsonName) {
+                                MessageGetInCurrentFunctionGeneratingState(
+                                    state, field, WhenBranchBuilder(
+                                        buildCodeBlock {
+                                            add(
+                                                "%S, %S ->",
+                                                field.descriptor.name,
+                                                field.descriptor.jsonName
+                                            )
+                                        }, this
+                                    )
+                                ).advance()
+                            } else {
+                                MessageGetInCurrentFunctionGeneratingState(
+                                    state, field, WhenBranchBuilder(
+                                        buildCodeBlock {
+                                            add("%S ->", field.descriptor.name)
+                                        }, this
+                                    )
+                                ).advance()
+                            }
+                        }
+                        addStatement("else -> getFieldInExtensions(fieldName)")
+                    }
                 })
             }
 
@@ -237,19 +241,22 @@ class MessageGetFieldInCurrentFunctionGenerator :
                 addParameter("fieldNumber", Int::class)
                 returns(TypeVariableName("T"))
                 addCode(buildCodeBlock {
-                    beginControlFlow("return when(fieldNumber)")
-                    for (field in state.descriptor.fields) {
-                        MessageGetInCurrentFunctionGeneratingState(
-                            state, field, WhenBranchBuilder(
-                                buildCodeBlock {
-                                    add("${field.descriptor.number} ->")
-                                }, this
-                            )
-                        ).advance()
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return getFieldInExtensions(fieldNumber)")
+                        return@buildCodeBlock
                     }
-                    addStatement("else -> getFieldInExtensions<T>(fieldNumber)")
-                    unindent()
-                    add("}.%M()\n", RuntimeMethods.UNCHECK_CAST)
+                    beginScope("return when(fieldNumber)") {
+                        for (field in state.descriptor.fields) {
+                            MessageGetInCurrentFunctionGeneratingState(
+                                state, field, WhenBranchBuilder(
+                                    buildCodeBlock {
+                                        add("${field.descriptor.number} ->")
+                                    }, this
+                                )
+                            ).advance()
+                        }
+                        addStatement("else -> getFieldInExtensions(fieldNumber)")
+                    }
                 })
             }
         }
@@ -257,18 +264,16 @@ class MessageGetFieldInCurrentFunctionGenerator :
     }
 }
 
-class MessageFieldGetFieldInCurrentFunctionGenerator :
-    GroupedGenerator<MessageGetInCurrentFunctionGeneratingState> {
+class MessageFieldGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageGetInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageGetInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
-            addStatement("%L this.%N", state.target.branch, state.descriptor.name())
+            addStatement("%L this.%N.%M()", state.target.branch, state.descriptor.name(), RuntimeMethods.UNCHECK_CAST)
         }
         return true
     }
 }
 
-class MessageGetPropertyFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageGetPropertyFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("getProperty") {
@@ -276,6 +281,10 @@ class MessageGetPropertyFunctionGenerator :
                 addParameter("fieldName", String::class)
                 returns(KProperty::class.asClassName().parameterizedBy(TypeVariableName("*")).copy(true))
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return getPropertyInExtensions(fieldName)")
+                        return@buildCodeBlock
+                    }
                     beginScope("return when(fieldName)") {
                         for (field in state.descriptor.fields) {
                             if (field.descriptor.name != field.descriptor.jsonName) {
@@ -310,6 +319,10 @@ class MessageGetPropertyFunctionGenerator :
                 addParameter("fieldNumber", Int::class)
                 returns(KProperty::class.asClassName().parameterizedBy(TypeVariableName("*")).copy(true))
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return getPropertyInExtensions(fieldNumber)")
+                        return@buildCodeBlock
+                    }
                     beginScope("return when(fieldNumber)") {
                         for (field in state.descriptor.fields) {
                             MessageGetPropertyFunctionGeneratingState(
@@ -329,8 +342,7 @@ class MessageGetPropertyFunctionGenerator :
     }
 }
 
-class MessageFieldGetPropertyFunctionGenerator :
-    GroupedGenerator<MessageGetPropertyFunctionGeneratingState> {
+class MessageFieldGetPropertyFunctionGenerator : GroupedGenerator<MessageGetPropertyFunctionGeneratingState> {
     override fun generate(state: MessageGetPropertyFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             addStatement("%L %T::%N", state.target.branch, state.descriptor.parent.className(), state.descriptor.name())
@@ -339,8 +351,7 @@ class MessageFieldGetPropertyFunctionGenerator :
     }
 }
 
-class MessageSetFieldInCurrentFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("setFieldInCurrent") {
@@ -349,6 +360,10 @@ class MessageSetFieldInCurrentFunctionGenerator :
                 addParameter("fieldName", String::class)
                 addParameter("value", TypeVariableName("T"))
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("setFieldInExtensions(fieldName, value)")
+                        return@buildCodeBlock
+                    }
                     beginScope("when(fieldName)") {
                         for (field in state.descriptor.fields) {
                             if (field.descriptor.name != field.descriptor.jsonName) {
@@ -384,6 +399,10 @@ class MessageSetFieldInCurrentFunctionGenerator :
                 addParameter("fieldNumber", Int::class)
                 addParameter("value", TypeVariableName("T"))
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("setFieldInExtensions(fieldNumber, value)")
+                        return@buildCodeBlock
+                    }
                     beginScope("when(fieldNumber)") {
                         for (field in state.descriptor.fields) {
                             MessageSetFieldInCurrentFunctionGeneratingState(
@@ -403,8 +422,7 @@ class MessageSetFieldInCurrentFunctionGenerator :
     }
 }
 
-class MessageFieldSetFieldInCurrentFunctionGenerator :
-    GroupedGenerator<MessageSetFieldInCurrentFunctionGeneratingState> {
+class MessageFieldSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageSetFieldInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageSetFieldInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
@@ -429,8 +447,7 @@ class MessageFieldSetFieldInCurrentFunctionGenerator :
     }
 }
 
-class MessageHasFieldInCurrentFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("hasFieldInCurrent") {
@@ -438,6 +455,10 @@ class MessageHasFieldInCurrentFunctionGenerator :
                 addParameter("fieldName", String::class)
                 returns(Boolean::class)
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return hasFieldInExtensions(fieldName)")
+                        return@buildCodeBlock
+                    }
                     beginScope("return when(fieldName)") {
                         for (field in state.descriptor.fields) {
                             if (field.descriptor.name != field.descriptor.jsonName) {
@@ -472,6 +493,10 @@ class MessageHasFieldInCurrentFunctionGenerator :
                 addParameter("fieldNumber", Int::class)
                 returns(Boolean::class)
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return hasFieldInExtensions(fieldNumber)")
+                        return@buildCodeBlock
+                    }
                     beginScope("return when(fieldNumber)") {
                         for (field in state.descriptor.fields) {
                             MessageHasFieldInCurrentFunctionGeneratingState(
@@ -491,8 +516,7 @@ class MessageHasFieldInCurrentFunctionGenerator :
     }
 }
 
-class MessageFieldHasFieldInCurrentFunctionGenerator :
-    GroupedGenerator<MessageHasFieldInCurrentFunctionGeneratingState> {
+class MessageFieldHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageHasFieldInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageHasFieldInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
@@ -505,8 +529,7 @@ class MessageFieldHasFieldInCurrentFunctionGenerator :
     }
 }
 
-class MessageEqualsMessageFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageEqualsMessageFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("equalsMessage") {
@@ -525,8 +548,7 @@ class MessageEqualsMessageFunctionGenerator :
     }
 }
 
-class MessageFieldEqualsFunctionGenerator :
-    GroupedGenerator<MessageEqualsFunctionGeneratingState> {
+class MessageFieldEqualsFunctionGenerator : GroupedGenerator<MessageEqualsFunctionGeneratingState> {
     override fun generate(state: MessageEqualsFunctionGeneratingState): Boolean {
         state.target.apply {
             when (state.descriptor.descriptor.label) {
@@ -557,15 +579,18 @@ class MessageFieldEqualsFunctionGenerator :
     }
 }
 
-class MessageComputeHashCodeFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageComputeHashCodeFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("computeHashCode") {
                 this += KModifier.OVERRIDE
                 returns(Int::class)
-                addStatement("var result = this.javaClass.hashCode()")
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return this.javaClass.hashCode()")
+                        return@buildCodeBlock
+                    }
+                    addStatement("var result = this.javaClass.hashCode()")
                     for (field in state.descriptor.fields) {
                         MessageHashCodeFunctionGeneratingState(state, field, this).advance()
                     }
@@ -577,8 +602,7 @@ class MessageComputeHashCodeFunctionGenerator :
     }
 }
 
-class MessageFieldComputeHashCodeFunctionGenerator :
-    GroupedGenerator<MessageHashCodeFunctionGeneratingState> {
+class MessageFieldComputeHashCodeFunctionGenerator : GroupedGenerator<MessageHashCodeFunctionGeneratingState> {
     override fun generate(state: MessageHashCodeFunctionGeneratingState): Boolean {
         state.target.apply {
             when (state.descriptor.descriptor.label) {
@@ -604,12 +628,12 @@ class MessageFieldComputeHashCodeFunctionGenerator :
                                 addStatement("result·=·result·*·31·+·key.hashCode()")
                                 addStatement("result·=·result·*·31·+·value.hashCode()")
                             }
+                            return true
                         }
-                    } else {
-                        beginScope("for (value in %N)", state.descriptor.name()) {
-                            addStatement("result·=·result·*·37·+·${state.descriptor.descriptor.number}")
-                            addStatement("result·=·result·*·31·+·value.hashCode()")
-                        }
+                    }
+                    beginScope("for (value in %N)", state.descriptor.name()) {
+                        addStatement("result·=·result·*·37·+·${state.descriptor.descriptor.number}")
+                        addStatement("result·=·result·*·31·+·value.hashCode()")
                     }
                 }
             }
@@ -618,8 +642,7 @@ class MessageFieldComputeHashCodeFunctionGenerator :
     }
 }
 
-class MessageWriteFieldsFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageWriteFieldsFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("writeFields") {
@@ -637,8 +660,7 @@ class MessageWriteFieldsFunctionGenerator :
     }
 }
 
-class MessageFieldWriteFunctionGenerator :
-    GroupedGenerator<MessageWriteFieldsFunctionGeneratingState> {
+class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFunctionGeneratingState> {
     override fun generate(state: MessageWriteFieldsFunctionGeneratingState): Boolean {
         state.target.apply {
             val message = state.descriptor.descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE
@@ -674,7 +696,7 @@ class MessageFieldWriteFunctionGenerator :
                             WireFormat.FieldType.values()[typeDescriptor.fields.first { it.descriptor.number == 2 }.descriptor.type.ordinal]
 
                         addStatement(
-                            "this.%N.forEach { k, v -> writer.tag(${
+                            "this.%N.forEach { (k, v) -> writer.tag(${
                                 makeTag(
                                     state.descriptor.descriptor.number,
                                     WireFormat.WIRETYPE_LENGTH_DELIMITED
@@ -735,8 +757,7 @@ class MessageFieldWriteFunctionGenerator :
     }
 }
 
-class MessageReadFieldFunctionGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageReadFieldFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             function("readField") {
@@ -748,11 +769,15 @@ class MessageReadFieldFunctionGenerator :
                 returns(Boolean::class)
 
                 addCode(buildCodeBlock {
+                    if(state.descriptor.fields.isEmpty()) {
+                        addStatement("return false")
+                        return@buildCodeBlock
+                    }
                     beginScope("when(field)") {
                         for (field in state.descriptor.fields) {
                             MessageReadFieldFunctionGeneratingState(state, field, this).advance()
                         }
-                        addStatement("else -> return true")
+                        addStatement("else -> return false")
                     }
                     addStatement("return true")
                 })
@@ -762,8 +787,7 @@ class MessageReadFieldFunctionGenerator :
     }
 }
 
-class MessageFieldReadFunctionGenerator :
-    GroupedGenerator<MessageReadFieldFunctionGeneratingState> {
+class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunctionGeneratingState> {
     override fun generate(state: MessageReadFieldFunctionGeneratingState): Boolean {
         state.target.apply {
             val message = state.descriptor.descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE

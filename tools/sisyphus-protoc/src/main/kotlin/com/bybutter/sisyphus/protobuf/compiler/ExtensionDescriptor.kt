@@ -9,9 +9,9 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.MemberName.Companion.member
 
 class ExtensionDescriptor(
-    val parent: DescriptorNode<*>,
+    override val parent: DescriptorNode<*>,
     override val descriptor: DescriptorProtos.FieldDescriptorProto
-) : DescriptorNode<DescriptorProtos.FieldDescriptorProto> {
+) : DescriptorNode<DescriptorProtos.FieldDescriptorProto>() {
     fun supportName(): String {
         return "${this.descriptor.jsonName.toPascalCase()}ExtensionSupportFor${extendee().descriptor.name}"
     }

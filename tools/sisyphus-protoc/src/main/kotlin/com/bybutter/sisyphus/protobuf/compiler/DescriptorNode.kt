@@ -1,42 +1,51 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
-interface DescriptorNode<T> {
-    val descriptor: T
+abstract class DescriptorNode<T> {
+    abstract val parent: DescriptorNode<*>
+
+    abstract val descriptor: T
+
+    private var children = listOf<DescriptorNode<*>>()
+
+    fun resolve() {
+        val children = mutableListOf<DescriptorNode<*>>()
+        resolveChildren(children)
+        for (child in children) {
+            child.resolve()
+        }
+        this.children = children
+    }
+
+    protected open fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
+         DescriptorResolver.resolve(this, children)
+    }
+
+    fun children(): List<DescriptorNode<*>> {
+        return children
+    }
 }
 
 fun DescriptorNode<*>.file(): FileDescriptor {
-    var state: Any? = this
+    var state: DescriptorNode<*> = this
     while (true) {
         state = when (state) {
             is FileDescriptor -> return state
-            is MessageDescriptor -> state.parent
-            is MessageFieldDescriptor -> state.parent
-            is OneofFieldDescriptor -> state.parent
-            is EnumDescriptor -> state.parent
-            is EnumValueDescriptor -> state.parent
             is ServiceDescriptor -> return state.parent
             is MethodDescriptor -> return state.parent.parent
-            is ExtensionDescriptor -> state.parent
-            else -> throw IllegalStateException("Unknown descriptor")
+            else -> state.parent
         }
     }
 }
 
 fun DescriptorNode<*>.fileSet(): FileDescriptorSet {
-    var state: Any? = this
+    var state: DescriptorNode<*> = this
     while (true) {
         state = when (state) {
             is FileDescriptorSet -> return state
             is FileDescriptor -> return state.parent
-            is MessageDescriptor -> state.parent
-            is MessageFieldDescriptor -> state.parent
-            is OneofFieldDescriptor -> state.parent
-            is EnumDescriptor -> state.parent
-            is EnumValueDescriptor -> state.parent
             is ServiceDescriptor -> return state.parent.parent
             is MethodDescriptor -> return state.parent.parent.parent
-            is ExtensionDescriptor -> state.parent
-            else -> throw IllegalStateException("Unknown descriptor")
+            else -> state.parent
         }
     }
 }

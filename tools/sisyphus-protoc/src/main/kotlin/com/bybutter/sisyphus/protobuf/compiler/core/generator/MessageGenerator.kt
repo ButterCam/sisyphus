@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.protobuf.compiler.core.generator
 import com.bybutter.sisyphus.protobuf.compiler.FileDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.MessageDescriptor
+import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.bybutter.sisyphus.protobuf.compiler.annotation
 import com.bybutter.sisyphus.protobuf.compiler.companion
@@ -89,8 +90,7 @@ class MessageInternalGenerator : GroupedGenerator<InternalFileGeneratingState> {
     }
 }
 
-class MutableMessageInterfaceBasicGenerator :
-    GroupedGenerator<MutableMessageInterfaceGeneratingState> {
+class MutableMessageInterfaceBasicGenerator : GroupedGenerator<MutableMessageInterfaceGeneratingState> {
     override fun generate(state: MutableMessageInterfaceGeneratingState): Boolean {
         state.target.apply {
             this implements RuntimeTypes.MUTABLE_MESSAGE.parameterizedBy(
@@ -110,8 +110,7 @@ class MutableMessageInterfaceBasicGenerator :
     }
 }
 
-class MessageImplementationBasicGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageImplementationBasicGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         state.target.apply {
             this += KModifier.INTERNAL
@@ -175,7 +174,7 @@ class MessageSupportBasicGenerator : GroupedGenerator<MessageSupportGeneratingSt
             property("descriptor", RuntimeTypes.DESCRIPTOR_PROTO) {
                 this += KModifier.OVERRIDE
                 delegate(buildCodeBlock {
-                    beginControlFlow("%M", MemberName("kotlin", "lazy"))
+                    beginControlFlow("%M", RuntimeMethods.LAZY)
                     when (val parent = state.descriptor.parent) {
                         is FileDescriptor -> {
                             addStatement(

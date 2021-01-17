@@ -4,6 +4,8 @@ import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.annotation
 import com.bybutter.sisyphus.protobuf.compiler.clearFunction
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldImplementationGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldInterfaceGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldMutableInterafaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageImplementationGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageInterfaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MutableMessageInterfaceGeneratingState
@@ -27,53 +29,64 @@ import com.squareup.kotlinpoet.asTypeName
 class MessageInterfaceFieldGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         for (field in state.descriptor.fields) {
-            state.target.property(field.name(), field.fieldType()) {
-                addKdoc(field.document())
-                if (field.descriptor.options?.deprecated == true) {
-                    annotation(Deprecated::class.asClassName()) {
-                        addMember("message = %S", "${field.name()} has been marked as deprecated")
-                    }
+            FieldInterfaceGeneratingState(state, field, state.target).advance()
+        }
+        return true
+    }
+}
+
+class MessageInterfaceFieldBasicGenerator: GroupedGenerator<FieldInterfaceGeneratingState> {
+    override fun generate(state: FieldInterfaceGeneratingState): Boolean {
+        state.target.property(state.descriptor.name(), state.descriptor.fieldType()) {
+            addKdoc(state.descriptor.document())
+            if (state.descriptor.descriptor.options?.deprecated == true) {
+                annotation(Deprecated::class.asClassName()) {
+                    addMember("message = %S", "${state.descriptor.name()} has been marked as deprecated")
                 }
             }
+        }
 
-            if (field.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
-                state.target.function(field.hasFunction()) {
-                    this += KModifier.ABSTRACT
-                    returns(Boolean::class)
-                }
+        if (state.descriptor.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
+            state.target.function(state.descriptor.hasFunction()) {
+                this += KModifier.ABSTRACT
+                returns(Boolean::class)
             }
         }
         return true
     }
 }
 
-class MutableMessageInterfaceFieldGenerator :
-    GroupedGenerator<MutableMessageInterfaceGeneratingState> {
+class MutableMessageInterfaceFieldGenerator : GroupedGenerator<MutableMessageInterfaceGeneratingState> {
     override fun generate(state: MutableMessageInterfaceGeneratingState): Boolean {
         for (field in state.descriptor.fields) {
-            state.target.property(field.name(), field.mutableFieldType()) {
-                this += KModifier.OVERRIDE
-                if (field.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
-                    mutable()
-                }
-            }
+            FieldMutableInterafaceGeneratingState(state, field, state.target).advance()
+        }
+        return true
+    }
+}
 
-            if (field.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
-                state.target.function(field.clearFunction()) {
-                    this += KModifier.ABSTRACT
-                    returns(
-                        field.fieldType()
-                            .copy(field.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)
-                    )
-                }
+class MutableMessageInterfaceBasicFieldGenerator: GroupedGenerator<FieldMutableInterafaceGeneratingState> {
+    override fun generate(state: FieldMutableInterafaceGeneratingState): Boolean {
+        state.target.property(state.descriptor.name(), state.descriptor.mutableFieldType()) {
+            this += KModifier.OVERRIDE
+            if (state.descriptor.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
+                mutable()
+            }
+        }
+
+        if (state.descriptor.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
+            state.target.function(state.descriptor.clearFunction()) {
+                this += KModifier.ABSTRACT
+                returns(
+                    state.descriptor.fieldType().copy(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)
+                )
             }
         }
         return true
     }
 }
 
-class MessageImplementationFieldGenerator :
-    GroupedGenerator<MessageImplementationGeneratingState> {
+class MessageImplementationFieldGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         for (field in state.descriptor.fields) {
             FieldImplementationGeneratingState(state, field, state.target).advance()
@@ -82,8 +95,7 @@ class MessageImplementationFieldGenerator :
     }
 }
 
-class MessageImplementationFieldBasicGenerator :
-    GroupedGenerator<FieldImplementationGeneratingState> {
+class MessageImplementationFieldBasicGenerator : GroupedGenerator<FieldImplementationGeneratingState> {
     override fun generate(state: FieldImplementationGeneratingState): Boolean {
         val isPrimitive = when (state.descriptor.descriptor.type) {
             DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES -> false

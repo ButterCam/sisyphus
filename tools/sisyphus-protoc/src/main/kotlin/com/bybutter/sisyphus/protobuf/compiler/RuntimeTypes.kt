@@ -66,6 +66,14 @@ object RuntimeTypes {
     val READER = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.coded.Reader")
 
     val PROTO_TYPES = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.ProtoTypes")
+
+    val RESOURCE_NAME = ClassName.bestGuess("com.bybutter.sisyphus.api.ResourceName")
+
+    val ABSTRACT_RESOURCE_NAME = ClassName.bestGuess("com.bybutter.sisyphus.api.AbstractResourceName")
+
+    val RESOURCE_NAME_SUPPORT = ClassName.bestGuess("com.bybutter.sisyphus.api.ResourceNameSupport")
+
+    val UNKNOWN_RESOURCE_NAME = ClassName.bestGuess("com.bybutter.sisyphus.api.UnknownResourceName")
 }
 
 object RuntimeMethods {
@@ -74,4 +82,6 @@ object RuntimeMethods {
     val CONTENT_EQUALS = MemberName("com.bybutter.sisyphus.collection", "contentEquals")
 
     val MARSHALLER = MemberName("com.bybutter.sisyphus.rpc", "marshaller")
+
+    val LAZY = MemberName("kotlin", "lazy")
 }

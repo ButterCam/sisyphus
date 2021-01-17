@@ -13,6 +13,7 @@ dependencies {
 
     implementation(Dependencies.protoc)
     implementation(Dependencies.Proto.grpcProto)
+    implementation("com.google.api:api-common")
 
     testImplementation(project(":lib:sisyphus-grpc-coroutine"))
 }

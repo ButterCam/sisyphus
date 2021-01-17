@@ -1,7 +1,9 @@
 package com.bybutter.sisyphus.protobuf.compiler.rpc
 
+import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
+import com.bybutter.sisyphus.protobuf.compiler.beginScope
 import com.bybutter.sisyphus.protobuf.compiler.companion
 import com.bybutter.sisyphus.protobuf.compiler.constructor
 import com.bybutter.sisyphus.protobuf.compiler.core.state.ApiFileGeneratingState
@@ -25,7 +27,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.flow.Flow
 
-class CoroutineServiceGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ApiFileGeneratingState> {
+class CoroutineServiceGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (service in state.descriptor.services) {
             state.target.addType(kClass(service.name()) {
@@ -36,8 +38,7 @@ class CoroutineServiceGenerator : com.bybutter.sisyphus.protobuf.compiler.Groupe
     }
 }
 
-class CoroutineServiceBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ServiceGeneratingState> {
+class CoroutineServiceBasicGenerator : GroupedGenerator<ServiceGeneratingState> {
     override fun generate(state: ServiceGeneratingState): Boolean {
         state.target.apply {
             this += KModifier.ABSTRACT
@@ -103,7 +104,7 @@ class CoroutineServiceBasicGenerator :
     }
 }
 
-class CoroutineClientBasicGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ClientGeneratingState> {
+class CoroutineClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
     override fun generate(state: ClientGeneratingState): Boolean {
         state.target.apply {
             this extends RuntimeTypes.ABSTRACT_COROUTINE_STUB.parameterizedBy(
@@ -147,7 +148,7 @@ class CoroutineClientBasicGenerator : com.bybutter.sisyphus.protobuf.compiler.Gr
     }
 }
 
-class CoroutineClientMethodGenerator : com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ClientGeneratingState> {
+class CoroutineClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
     override fun generate(state: ClientGeneratingState): Boolean {
         for (method in state.descriptor.methods) {
             state.target.function(method.name()) {
@@ -203,13 +204,12 @@ class CoroutineClientMethodGenerator : com.bybutter.sisyphus.protobuf.compiler.G
     }
 }
 
-class CoroutineServiceMethodGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ServiceGeneratingState> {
+class CoroutineServiceMethodGenerator : GroupedGenerator<ServiceGeneratingState> {
     override fun generate(state: ServiceGeneratingState): Boolean {
         for (method in state.descriptor.methods) {
-            state.target.function(state.descriptor.name()) {
+            state.target.function(method.name()) {
                 this += KModifier.ABSTRACT
-                addKdoc(state.descriptor.document())
+                addKdoc(method.document())
 
                 if (method.descriptor.serverStreaming) {
                     returns(Flow::class.asClassName().parameterizedBy(method.outputMessage().className()))
@@ -229,8 +229,7 @@ class CoroutineServiceMethodGenerator :
     }
 }
 
-class CoroutineServiceSupportGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<InternalFileGeneratingState> {
+class CoroutineServiceSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         for (service in state.descriptor.services) {
             state.target.addType(kClass(service.supportName()) {
@@ -241,8 +240,7 @@ class CoroutineServiceSupportGenerator :
     }
 }
 
-class CoroutineServiceSupportBasicGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ServiceSupportGeneratingState> {
+class CoroutineServiceSupportBasicGenerator : GroupedGenerator<ServiceSupportGeneratingState> {
     override fun generate(state: ServiceSupportGeneratingState): Boolean {
         state.target.apply {
             this extends RuntimeTypes.SERVICE_SUPPORT
@@ -265,7 +263,7 @@ class CoroutineServiceSupportBasicGenerator :
             property("descriptor", RuntimeTypes.SERVICE_DESCRIPTOR_PROTO) {
                 this += KModifier.OVERRIDE
                 delegate(buildCodeBlock {
-                    beginControlFlow("%M", MemberName("kotlin", "lazy"))
+                    beginControlFlow("%M", RuntimeMethods.LAZY)
                     addStatement(
                         "%T.descriptor.service.first{ it.name == %S }",
                         state.descriptor.parent.fileMetadataClassName(),
@@ -276,13 +274,15 @@ class CoroutineServiceSupportBasicGenerator :
             }
 
             property("serviceDescriptor", RuntimeTypes.SERVICE_DESCRIPTOR) {
-                initializer(buildCodeBlock {
-                    add("%T.newBuilder(name)\n", RuntimeTypes.SERVICE_DESCRIPTOR)
-                    for (method in state.descriptor.methods) {
-                        add(".addMethod(%L)\n", method.name())
+                delegate(buildCodeBlock {
+                    beginScope("%M", RuntimeMethods.LAZY) {
+                        add("%T.newBuilder(name)\n", RuntimeTypes.SERVICE_DESCRIPTOR)
+                        for (method in state.descriptor.methods) {
+                            add(".addMethod(%L)\n", method.name())
+                        }
+                        add(".setSchemaDescriptor(%T)\n", state.descriptor.className())
+                        add(".build()\n")
                     }
-                    add(".setSchemaDescriptor(%T)\n", state.descriptor.className())
-                    add(".build()\n")
                 })
             }
         }
@@ -290,8 +290,7 @@ class CoroutineServiceSupportBasicGenerator :
     }
 }
 
-class CoroutineServiceSupportMethodGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ServiceSupportGeneratingState> {
+class CoroutineServiceSupportMethodGenerator : GroupedGenerator<ServiceSupportGeneratingState> {
     override fun generate(state: ServiceSupportGeneratingState): Boolean {
         for (method in state.descriptor.methods) {
             state.target.property(
@@ -342,8 +341,7 @@ class CoroutineServiceSupportMethodGenerator :
     }
 }
 
-class CoroutineServiceParentRegisterGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<FileParentRegisterGeneratingState> {
+class CoroutineServiceParentRegisterGenerator : GroupedGenerator<FileParentRegisterGeneratingState> {
     override fun generate(state: FileParentRegisterGeneratingState): Boolean {
         for (service in state.descriptor.services) {
             ServiceRegisterGeneratingState(state, service, state.target).advance()
@@ -352,10 +350,9 @@ class CoroutineServiceParentRegisterGenerator :
     }
 }
 
-class CoroutineServiceRegisterGenerator :
-    com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator<ServiceRegisterGeneratingState> {
+class CoroutineServiceRegisterGenerator : GroupedGenerator<ServiceRegisterGeneratingState> {
     override fun generate(state: ServiceRegisterGeneratingState): Boolean {
-        state.target.addStatement("%T.register(%T)", RuntimeTypes.PROTO_TYPES, state.descriptor.supportClassName())
+        state.target.addStatement("%T.register(%T)", RuntimeTypes.PROTO_TYPES, state.descriptor.className())
         return true
     }
 }

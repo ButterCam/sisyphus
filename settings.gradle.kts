@@ -8,7 +8,7 @@ include("lib:sisyphus-protobuf")
 include("lib:sisyphus-grpc")
 include("lib:sisyphus-grpc-coroutine")
 include("lib:sisyphus-grpc-rxjava")
-include("lib:sisyphus-grpc-util")
+include("lib:sisyphus-grpc-service-util")
 
 include("tools:sisyphus-protoc")
 include("tools:sisyphus-project-gradle-plugin")
