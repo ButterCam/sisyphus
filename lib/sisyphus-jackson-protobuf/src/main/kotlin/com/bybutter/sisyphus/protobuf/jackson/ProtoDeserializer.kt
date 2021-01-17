@@ -174,7 +174,7 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
     private fun readCustom(type: JavaType, p: JsonParser, ctxt: DeserializationContext): CustomProtoType<*> {
         val support = type.rawClass.kotlin.companionObjectInstance as CustomProtoTypeSupport<CustomProtoType<Any?>, Any?>
         val raw = readAny(support.rawType.javaType, p, ctxt)
-        return support.wrapRaw(raw)
+        return support(raw)
     }
 
     @OptIn(InternalProtoApi::class)

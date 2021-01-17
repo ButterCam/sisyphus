@@ -6,33 +6,46 @@ import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.ClassName
 
 class MessageDescriptor(
-    val parent: DescriptorNode<*>,
+    override val parent: DescriptorNode<*>,
     override val descriptor: DescriptorProtos.DescriptorProto
-) : DescriptorNode<DescriptorProtos.DescriptorProto> {
-    val fields: List<MessageFieldDescriptor> = descriptor.fieldList.map {
-        MessageFieldDescriptor(this, it)
+) : DescriptorNode<DescriptorProtos.DescriptorProto>() {
+    init {
+        fileSet().registerLookup(fullProtoName(), this)
     }
 
-    val oneofs: List<OneofFieldDescriptor> = descriptor.oneofDeclList.map {
-        OneofFieldDescriptor(this, it)
+    override fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
+        children += descriptor.fieldList.map {
+            MessageFieldDescriptor(this, it)
+        }
+        children += descriptor.nestedTypeList.map {
+            MessageDescriptor(this, it)
+        }
+        children += descriptor.enumTypeList.map {
+            EnumDescriptor(this, it)
+        }
+        children += descriptor.extensionList.map {
+            ExtensionDescriptor(this, it)
+        }
+        children += descriptor.oneofDeclList.map {
+            OneofFieldDescriptor(this, it)
+        }
+        super.resolveChildren(children)
     }
 
-    val messages: List<MessageDescriptor> = descriptor.nestedTypeList.map {
-        MessageDescriptor(this, it)
-    }
+    val fields: List<MessageFieldDescriptor> get() = children().filterIsInstance<MessageFieldDescriptor>()
 
-    val enums: List<EnumDescriptor> = descriptor.enumTypeList.map {
-        EnumDescriptor(this, it)
-    }
+    val oneofs: List<OneofFieldDescriptor> get() = children().filterIsInstance<OneofFieldDescriptor>()
 
-    val extensions: List<ExtensionDescriptor> = descriptor.extensionList.map {
-        ExtensionDescriptor(this, it)
-    }
+    val messages: List<MessageDescriptor> get() = children().filterIsInstance<MessageDescriptor>()
+
+    val enums: List<EnumDescriptor> get() = children().filterIsInstance<EnumDescriptor>()
+
+    val extensions: List<ExtensionDescriptor> get() = children().filterIsInstance<ExtensionDescriptor>()
 
     fun fullProtoName(): String {
         return when (val parent = this.parent) {
             is MessageDescriptor -> "${parent.fullProtoName()}.${descriptor.name}"
-            is FileDescriptor -> "${parent.descriptor.`package`}.${descriptor.name}"
+            is FileDescriptor -> ".${parent.descriptor.`package`}.${descriptor.name}"
             else -> TODO()
         }
     }

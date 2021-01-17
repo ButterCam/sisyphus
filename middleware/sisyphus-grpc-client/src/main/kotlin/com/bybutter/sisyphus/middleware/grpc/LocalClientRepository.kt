@@ -1,8 +1,6 @@
 package com.bybutter.sisyphus.middleware.grpc
 
 import com.bybutter.sisyphus.rpc.CallOptionsInterceptor
-import com.bybutter.sisyphus.rpc.GrpcServerConstants
-import com.bybutter.sisyphus.rpc.RpcService
 import com.bybutter.sisyphus.spring.BeanUtils
 import io.grpc.CallOptions
 import io.grpc.ClientInterceptor
@@ -10,7 +8,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBean
 import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
-import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.core.env.Environment
 
 class LocalClientRepository : ClientRepository {
@@ -30,14 +27,12 @@ class LocalClientRepository : ClientRepository {
         for (serviceName in beanFactory.getBeanNamesForAnnotation(RpcServiceImpl::class.java)) {
             val serviceBeanDefinition = beanFactory.getBeanDefinition(serviceName)
             val serviceClass = Class.forName(serviceBeanDefinition.beanClassName)
-            val rpcService = AnnotationUtils.findAnnotation(serviceClass, RpcService::class.java) ?: continue
-            val service = rpcService.client.java.declaringClass
-            val stub = getStubFromService(service)
-            val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(rpcService.client.java as Class<Any>) {
+            val stub = getClientFromService(serviceClass.superclass)
+            val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(stub as Class<Any>) {
                 interceptStub(createGrpcClient(stub, localChannel, optionsInterceptors.values, CallOptions.DEFAULT), builderInterceptors.values, clientInterceptors.values)
             }
             beanDefinitionList.add(clientBeanDefinition.beanDefinition)
-        }
+        } 
         return beanDefinitionList
     }
 }

@@ -37,6 +37,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementat
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementationFieldBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementationFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceBasicGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceFieldBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInternalGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageMergeWithFunctionGenerator
@@ -47,6 +48,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSetFieldInC
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSupportBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSupportFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageWriteFieldsFunctionGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceBasicFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestEnumParentRegisterGenerator
@@ -56,12 +58,26 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumGenerato
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumSupportGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionApiGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionSupportGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneOfImplementationGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneOfInterfaceGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneOfMutableInterfaceGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofImplementationGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofInterfaceGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofMutableInterfaceGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofFieldImplementationInterceptorGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofKindTypeBasicGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofKindTypeGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofValueBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.state.GeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.MessageResourceNameGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameBasicGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameCompanionBasicGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameImplementationFieldGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameImplementationGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameInterfaceFieldGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMessageFieldReadFunctionGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMessageFieldWriteFunctionGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMutableInterfaceFieldGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameOneofImplementationFieldGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameOneofKindTypeBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineClientBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineClientMethodGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceBasicGenerator
@@ -72,6 +88,12 @@ import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceRegisterGener
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportMethodGenerator
+import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceApiFileGenerator
+import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceFileSupportGenerator
+import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceGenerator
+import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceInternalFileGenerator
+import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceSupportBasicGenerator
+import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceSupportGenerator
 import com.bybutter.sisyphus.reflect.getTypeArgument
 import com.bybutter.sisyphus.reflect.uncheckedCast
 import com.bybutter.sisyphus.spi.ServiceLoader
@@ -161,7 +183,9 @@ class CodeGenerators {
         register(MessageApiGenerator())
         register(MessageInterfaceBasicGenerator())
         register(MessageInternalGenerator())
+        register(MessageInterfaceFieldBasicGenerator())
         register(MutableMessageInterfaceBasicGenerator())
+        register(MutableMessageInterfaceBasicFieldGenerator())
         register(MessageImplementationBasicGenerator())
         register(MessageSupportBasicGenerator())
         register(MessageSupportFunctionGenerator())
@@ -186,10 +210,12 @@ class CodeGenerators {
         register(MessageFieldWriteFunctionGenerator())
         register(MessageReadFieldFunctionGenerator())
         register(MessageFieldReadFunctionGenerator())
-        register(OneOfInterfaceGenerator())
+        register(OneofInterfaceGenerator())
         register(OneofValueBasicGenerator())
-        register(OneOfMutableInterfaceGenerator())
-        register(OneOfImplementationGenerator())
+        register(OneofKindTypeGenerator())
+        register(OneofKindTypeBasicGenerator())
+        register(OneofMutableInterfaceGenerator())
+        register(OneofImplementationGenerator())
         register(OneofFieldImplementationInterceptorGenerator())
         register(MessageParentRegisterGenerator())
         register(NestMessageParentRegisterGenerator())
@@ -204,20 +230,46 @@ class CodeGenerators {
     }
 
     fun resourceName(): CodeGenerators {
+        register(ResourceNameGenerator())
+        register(MessageResourceNameGenerator())
+        register(ResourceNameBasicGenerator())
+        register(ResourceNameImplementationGenerator())
+        register(ResourceNameCompanionBasicGenerator())
+        register(ResourceNameInterfaceFieldGenerator())
+        register(ResourceNameMutableInterfaceFieldGenerator())
+        register(ResourceNameImplementationFieldGenerator())
+        register(ResourceNameOneofImplementationFieldGenerator())
+        register(ResourceNameOneofKindTypeBasicGenerator())
+        register(ResourceNameMessageFieldWriteFunctionGenerator())
+        register(ResourceNameMessageFieldReadFunctionGenerator())
         return this
     }
 
     fun coroutineService(): CodeGenerators {
         register(CoroutineServiceGenerator())
+        register(CoroutineServiceSupportGenerator())
+
         register(CoroutineServiceBasicGenerator())
         register(CoroutineClientBasicGenerator())
         register(CoroutineClientMethodGenerator())
         register(CoroutineServiceMethodGenerator())
-        register(CoroutineServiceSupportGenerator())
         register(CoroutineServiceSupportBasicGenerator())
         register(CoroutineServiceSupportMethodGenerator())
         register(CoroutineServiceParentRegisterGenerator())
         register(CoroutineServiceRegisterGenerator())
+        return this
+    }
+
+    fun separatedCoroutineService(): CodeGenerators {
+        register(SeparatedCoroutineServiceGenerator())
+        register(SeparatedCoroutineServiceSupportGenerator())
+
+        register(SeparatedCoroutineServiceApiFileGenerator())
+        register(SeparatedCoroutineServiceInternalFileGenerator())
+        register(SeparatedCoroutineServiceFileSupportGenerator())
+        register(SeparatedCoroutineServiceSupportBasicGenerator())
+
+        coroutineService()
         return this
     }
 

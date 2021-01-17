@@ -4,12 +4,21 @@ import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.ClassName
 
 class EnumDescriptor(
-    val parent: DescriptorNode<*>,
+    override val parent: DescriptorNode<*>,
     override val descriptor: DescriptorProtos.EnumDescriptorProto
-) : DescriptorNode<DescriptorProtos.EnumDescriptorProto> {
-    val values: List<EnumValueDescriptor> = descriptor.valueList.map {
-        EnumValueDescriptor(this, it)
+) : DescriptorNode<DescriptorProtos.EnumDescriptorProto>() {
+    init {
+        fileSet().registerLookup(fullProtoName(), this)
     }
+
+    override fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
+        children += descriptor.valueList.map {
+            EnumValueDescriptor(this, it)
+        }
+        super.resolveChildren(children)
+    }
+
+    val values: List<EnumValueDescriptor> get() = children().filterIsInstance<EnumValueDescriptor>()
 
     fun name(): String {
         return descriptor.name
@@ -46,7 +55,7 @@ class EnumDescriptor(
     fun fullProtoName(): String {
         return when (val parent = this.parent) {
             is MessageDescriptor -> "${parent.fullProtoName()}.${descriptor.name}"
-            is FileDescriptor -> "${parent.descriptor.`package`}.${descriptor.name}"
+            is FileDescriptor -> ".${parent.descriptor.`package`}.${descriptor.name}"
             else -> TODO()
         }
     }

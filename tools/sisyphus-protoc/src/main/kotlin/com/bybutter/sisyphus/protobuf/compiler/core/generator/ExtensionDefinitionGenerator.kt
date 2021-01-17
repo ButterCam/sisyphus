@@ -50,8 +50,7 @@ class ExtensionApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
     }
 }
 
-class NestedExtensionApiGenerator :
-    GroupedGenerator<MessageCompanionGeneratingState> {
+class NestedExtensionApiGenerator : GroupedGenerator<MessageCompanionGeneratingState> {
     override fun generate(state: MessageCompanionGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             ExtensionGeneratingState(state, extension, state.target).advance()
@@ -60,8 +59,7 @@ class NestedExtensionApiGenerator :
     }
 }
 
-class ExtensionSupportGenerator :
-    GroupedGenerator<InternalFileGeneratingState> {
+class ExtensionSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             state.target.addType(kObject(extension.supportName()) {
@@ -72,8 +70,7 @@ class ExtensionSupportGenerator :
     }
 }
 
-class NestedExtensionSupportGenerator :
-    GroupedGenerator<MessageSupportGeneratingState> {
+class NestedExtensionSupportGenerator : GroupedGenerator<MessageSupportGeneratingState> {
     override fun generate(state: MessageSupportGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
             state.target.addType(kObject(extension.supportName()) {
@@ -84,8 +81,7 @@ class NestedExtensionSupportGenerator :
     }
 }
 
-class ExtensionDefinitionGenerator :
-    GroupedGenerator<ExtensionGeneratingState> {
+class ExtensionDefinitionGenerator : GroupedGenerator<ExtensionGeneratingState> {
     override fun generate(state: ExtensionGeneratingState): Boolean {
         val property = kProperty(state.descriptor.descriptor.jsonName, state.descriptor.fieldType()) {
             receiver(state.descriptor.extendee().className())
@@ -151,8 +147,7 @@ class ExtensionDefinitionGenerator :
     }
 }
 
-class ExtensionSupportBasicGenerator :
-    GroupedGenerator<ExtensionSupportGeneratingState> {
+class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGeneratingState> {
     override fun generate(state: ExtensionSupportGeneratingState): Boolean {
         state.target.apply {
             val fieldType = state.descriptor.mutableFieldType().copy(false)

@@ -10,10 +10,12 @@ class ProtobufCompiler(
     packageShading: Map<String, String> = mapOf(),
     val generators: CodeGenerators = CodeGenerators()
 ) {
-    val descriptorSet = FileDescriptorSet(files, packageShading)
+    val descriptorSet = FileDescriptorSet(files, packageShading).apply {
+        resolve()
+    }
 
     fun generate(file: String): ProtoCompileResult {
-        val fileDescriptor = descriptorSet.children.firstOrNull { it.descriptor.name == file }
+        val fileDescriptor = descriptorSet.files.firstOrNull { it.descriptor.name == file }
             ?: throw IllegalArgumentException("Proto file '$file' not imported.")
         val result = mutableListOf<FileSpec>()
         FileGeneratingState(this, fileDescriptor, result).advance()

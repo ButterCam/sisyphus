@@ -62,5 +62,6 @@ dependencies {
         api("org.mongodb:mongodb-driver-reactivestreams:4.1.1")
         api("com.android.tools.build:gradle:4.1.0")
         api("com.salesforce.servicelibs:rxgrpc-stub:1.0.1")
+        api("com.google.api:api-common:1.10.1")
     }
 }

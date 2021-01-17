@@ -75,8 +75,6 @@ open class ProtoGenerateTask : DefaultTask() {
 
         for ((sourceProto, external) in source) {
             val result = compiler.generate(sourceProto)
-            result.files[0].writeTo(output.toPath())
-            result.files[1].writeTo(implOutput.toPath())
 
             val descPbFile = Paths.get(
                 resourceOutput.toPath().toString(),
@@ -92,11 +90,22 @@ open class ProtoGenerateTask : DefaultTask() {
                 Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
             }
 
-            val fileSupport = result.files[1].members.first {
-                val spec = it as? TypeSpec ?: return@first false
-                spec.superclass == RuntimeTypes.FILE_SUPPORT
-            } as TypeSpec
-            fileSupports.appendln("${result.files[1].packageName}.${fileSupport.name}")
+            for (file in result.files) {
+                var internal = false
+                for (member in file.members) {
+                    val spec = member as? TypeSpec ?: continue
+                    if (spec.superclass == RuntimeTypes.FILE_SUPPORT) {
+                        fileSupports.appendln("${file.packageName}.${spec.name}")
+                        internal = true
+                    }
+                }
+
+                if (internal) {
+                    result.files[1].writeTo(implOutput.toPath())
+                } else {
+                    result.files[0].writeTo(output.toPath())
+                }
+            }
         }
 
         val fileMetas = Paths.get(
@@ -114,6 +123,7 @@ open class ProtoGenerateTask : DefaultTask() {
                     when (buildInPlugin) {
                         BuildInPlugin.BASIC_GENERATOR -> basic()
                         BuildInPlugin.COROUTINE_SERVICE_GENERATOR -> coroutineService()
+                        BuildInPlugin.SEPARATED_COROUTINE_SERVICE_GENERATOR -> separatedCoroutineService()
                         BuildInPlugin.RXJAVA_SERVICE_GENERATOR -> TODO()
                         BuildInPlugin.RESOURCE_NAME_GENERATOR -> resourceName()
                         BuildInPlugin.GENERATORS_FROM_SPI -> spi()

@@ -6,15 +6,20 @@ import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.ClassName
 
 class ServiceDescriptor(
-    val parent: FileDescriptor,
+    override val parent: FileDescriptor,
     override val descriptor: DescriptorProtos.ServiceDescriptorProto
-) : DescriptorNode<DescriptorProtos.ServiceDescriptorProto> {
-    val methods: List<MethodDescriptor> = descriptor.methodList.map {
-        MethodDescriptor(this, it)
+) : DescriptorNode<DescriptorProtos.ServiceDescriptorProto>() {
+    override fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
+        children += descriptor.methodList.map {
+            MethodDescriptor(this, it)
+        }
+        super.resolveChildren(children)
     }
 
+    val methods: List<MethodDescriptor> get() = children().filterIsInstance<MethodDescriptor>()
+
     fun fullProtoName(): String {
-        return "${file().descriptor.`package`}.${descriptor.name}"
+        return ".${file().descriptor.`package`}.${descriptor.name}"
     }
 
     fun name(): String {

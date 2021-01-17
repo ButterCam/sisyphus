@@ -6,9 +6,9 @@ import com.bybutter.sisyphus.string.toCamelCase
 import com.google.protobuf.DescriptorProtos
 
 class MethodDescriptor(
-    val parent: ServiceDescriptor,
+    override val parent: ServiceDescriptor,
     override val descriptor: DescriptorProtos.MethodDescriptorProto
-) : DescriptorNode<DescriptorProtos.MethodDescriptorProto> {
+) : DescriptorNode<DescriptorProtos.MethodDescriptorProto>() {
     fun name(): String {
         return descriptor.name.toCamelCase()
     }
