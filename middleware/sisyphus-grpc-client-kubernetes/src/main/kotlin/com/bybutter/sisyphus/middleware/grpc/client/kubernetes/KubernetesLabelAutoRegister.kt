@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.jackson.toJson
 import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
 import com.bybutter.sisyphus.middleware.grpc.client.kubernetes.support.PatchOperateType
 import com.bybutter.sisyphus.middleware.grpc.client.kubernetes.support.ServiceLabelPatch
+import com.bybutter.sisyphus.rpc.AbstractCoroutineServerImpl
 import io.kubernetes.client.custom.V1Patch
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.CoreV1Api
@@ -75,7 +76,7 @@ class KubernetesLabelAutoRegister : ApplicationListener<ApplicationReadyEvent>, 
                 ?: mutableMapOf()).filter { it.key.startsWith("sisyphus/") }
         val serviceLabelPatchList = mutableSetOf<ServiceLabelPatch>()
         for ((_, serverService) in serverServices) {
-            val serviceName = "${rpcServiceAnnotation.parent}.${rpcServiceAnnotation.value}"
+            val serviceName = (serverService as AbstractCoroutineServerImpl).support().name
             if (enableServices.isEmpty() || enableServices.contains(serviceName)) {
                 val labelKey = "sisyphus~1$serviceName"
                 val labelValue = environment.getProperty(GrpcServerConstants.GRPC_PORT_PROPERTY, Int::class.java, GrpcServerConstants.DEFAULT_GRPC_PORT).toString()

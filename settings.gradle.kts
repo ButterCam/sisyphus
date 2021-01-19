@@ -30,6 +30,7 @@ include("middleware:sisyphus-grpc-client-kubernetes")
 include("starter:sisyphus-jackson-starter")
 include("starter:sisyphus-webflux-starter")
 include("starter:sisyphus-grpc-server-starter")
+include("starter:sisyphus-grpc-kubernetes-server-starter")
 include("starter:sisyphus-grpc-transcoding-starter")
 include("starter:sisyphus-protobuf-type-server-starter")
 

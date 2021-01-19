@@ -1,7 +1,9 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
+import com.bybutter.sisyphus.starter.grpc.ServiceConfig
 import io.grpc.ManagedChannelBuilder
 import io.grpc.Server
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -14,8 +16,8 @@ import reactor.core.publisher.Mono
  * provided Http+Json to gRpc+protobuf transcoding.
  */
 class TranscodingRouterFunction private constructor(
-    private val server: Server,
-    private val serviceRouters: List<RouterFunction<ServerResponse>>
+        private val server: Server,
+        private val serviceRouters: List<RouterFunction<ServerResponse>>
 ) : RouterFunction<ServerResponse> {
 
     private val channel by lazy {
@@ -35,12 +37,12 @@ class TranscodingRouterFunction private constructor(
         return Flux.fromIterable(serviceRouters).concatMap {
             it.route(request)
         }.next().switchIfEmpty(
-            Mono.create<HandlerFunction<ServerResponse>> {
-                // Clear the attributes if we can't transcode current http request to gRpc.
-                request.attributes().clear()
-                request.attributes() += oldAttributes
-                it.success()
-            }
+                Mono.create<HandlerFunction<ServerResponse>> {
+                    // Clear the attributes if we can't transcode current http request to gRpc.
+                    request.attributes().clear()
+                    request.attributes() += oldAttributes
+                    it.success()
+                }
         )
     }
 
