@@ -18,10 +18,6 @@ import org.springframework.core.env.Environment
 @AutoConfigureBefore(SisyphusGrpcClientAutoConfiguration::class)
 @ComponentScan(basePackageClasses = [SisyphusGrpcServerAutoConfiguration::class])
 class SisyphusGrpcServerAutoConfiguration {
-
-    @Autowired
-    private lateinit var environment: Environment
-
     @Bean
     fun serviceConfig(channelInterceptors: List<ChannelBuilderInterceptor> = listOf()): ServiceConfig {
         val localPort = environment.getProperty("server.grpc.port", Int::class.java, 9090)
