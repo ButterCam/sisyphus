@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.project.gradle
 
 import com.bybutter.sisyphus.project.gradle.java.JavaBaseProjectPlugin
-import com.bybutter.sisyphus.project.gradle.java.JavaDependenciesReplacePlugin
 import com.bybutter.sisyphus.project.gradle.java.JavaLibraryProjectPlugin
 import com.bybutter.sisyphus.project.gradle.java.JavaPlatformProjectPlugin
 import com.bybutter.sisyphus.project.gradle.publishing.ProjectContactsPlugin
@@ -21,7 +20,6 @@ class SisyphusProjectPlugin : Plugin<Project> {
         target.pluginManager.apply(JavaBaseProjectPlugin::class.java)
         target.pluginManager.apply(JavaLibraryProjectPlugin::class.java)
         target.pluginManager.apply(JavaPlatformProjectPlugin::class.java)
-        target.pluginManager.apply(JavaDependenciesReplacePlugin::class.java)
         target.pluginManager.apply(ProjectPublishingPlugin::class.java)
         target.pluginManager.apply(ProjectContactsPlugin::class.java)
         target.pluginManager.apply(ProjectLicensePlugin::class.java)
