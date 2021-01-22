@@ -16,6 +16,5 @@ class JavaLibraryProjectPlugin : Plugin<Project> {
         target.tryApplyPluginClass("nebula.plugin.publishing.maven.MavenPublishPlugin")
         target.tryApplyPluginClass("nebula.plugin.publishing.publications.JavadocJarPlugin")
         target.tryApplyPluginClass("nebula.plugin.publishing.publications.SourceJarPlugin")
-        target.pluginManager.apply(JavaDependenciesReplacePlugin::class.java)
     }
 }
