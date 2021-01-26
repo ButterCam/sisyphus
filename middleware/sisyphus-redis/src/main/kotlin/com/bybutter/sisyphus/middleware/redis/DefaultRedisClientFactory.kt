@@ -11,8 +11,8 @@ open class DefaultRedisClientFactory : RedisClientFactory {
     }
 
     protected open fun createRedisClient(host: String, port: Int, property: RedisProperty): RedisClient {
-        return clients.getOrPut("$host:$port") {
-            RedisClient.create(RedisURI.Builder.redis(host, port).withPassword(property.password).withDatabase(property.database ?: 0).build())
+        return clients.getOrPut("$host:$port:${property.database}") {
+            RedisClient.create(RedisURI.Builder.redis(host, port).withPassword(property.password).withDatabase(property.database).build())
         }
     }
 }
