@@ -26,10 +26,10 @@ jobs:
       - uses: ButterCam/setup-sisyphus-build@v1
         with:
           dependency-repositories: local,central,jcenter,portal,snapshot
-          snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
+          snapshot-url: https://s01.oss.sonatype.org/content/repositories/snapshots
           snapshot-username: ${{ secrets.OSSRH_USERNAME }}
           snapshot-password: ${{ secrets.OSSRH_PASSWORD }}
-          release-url: https://oss.sonatype.org/service/local/staging/deploy/maven2
+          release-url: https://s01.oss.sonatype.org/service/local/staging/deploy/maven2
           release-username: ${{ secrets.OSSRH_USERNAME }}
           release-password: ${{ secrets.OSSRH_PASSWORD }}
           gradle-portal-key: ${{ secrets.GRADLE_PUBLISH_KEY }}
