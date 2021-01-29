@@ -98,7 +98,7 @@ class CoroutineServiceBasicGenerator : GroupedGenerator<ServiceGeneratingState> 
             function("support") {
                 this += KModifier.OVERRIDE
                 returns(state.descriptor.className().nestedClass("Companion"))
-                addStatement("return ")
+                addStatement("return %T", state.descriptor.className())
             }
 
             companion {
@@ -153,7 +153,7 @@ class CoroutineClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
             function("support") {
                 this += KModifier.OVERRIDE
                 returns(state.descriptor.className().nestedClass("Companion"))
-                addStatement("return ")
+                addStatement("return %T", state.descriptor.className())
             }
         }
         return true

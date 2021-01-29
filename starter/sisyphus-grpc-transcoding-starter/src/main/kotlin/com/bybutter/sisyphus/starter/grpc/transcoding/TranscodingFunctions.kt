@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
-import com.bybutter.sisyphus.api.resource.PathTemplate
 import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
 import io.grpc.Channel

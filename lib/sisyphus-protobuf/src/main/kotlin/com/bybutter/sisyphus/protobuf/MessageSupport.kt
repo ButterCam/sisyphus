@@ -6,7 +6,7 @@ import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import java.io.InputStream
 import java.util.LinkedList
 
-abstract class MessageSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>>: ProtoSupport<DescriptorProto> {
+abstract class MessageSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>> : ProtoSupport<DescriptorProto> {
     @InternalProtoApi
     abstract fun newMutable(): TM
 

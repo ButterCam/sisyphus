@@ -1,11 +1,9 @@
 package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.collection.contentEquals
-import com.bybutter.sisyphus.collection.takeWhen
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.coded.Writer
-import java.io.ByteArrayOutputStream
 
 abstract class UnknownField<T> {
     abstract val tag: Int

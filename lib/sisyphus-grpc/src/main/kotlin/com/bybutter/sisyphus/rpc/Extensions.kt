@@ -30,7 +30,7 @@ private class MessageMarshallerImpl<T : Message<T, TM>, TM : MutableMessage<T, T
     }
 }
 
-private class EnumMarshallerImpl<T: ProtoEnum>(private val support: EnumSupport<T>): Metadata.AsciiMarshaller<T> {
+private class EnumMarshallerImpl<T : ProtoEnum>(private val support: EnumSupport<T>) : Metadata.AsciiMarshaller<T> {
     override fun toAsciiString(value: T): String {
         return value.proto
     }
@@ -38,7 +38,6 @@ private class EnumMarshallerImpl<T: ProtoEnum>(private val support: EnumSupport<
     override fun parseAsciiString(serialized: String): T {
         return support(serialized)
     }
-
 }
 
 fun <T : Message<T, TM>, TM : MutableMessage<T, TM>> MessageSupport<T, TM>.marshaller(): MessageMarshaller<T, TM> {

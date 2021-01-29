@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.middleware.grpc.client.kubernetes
+package com.bybutter.sisyphus.starter.grpc.kubernetes
 
 import org.springframework.context.annotation.Import
 

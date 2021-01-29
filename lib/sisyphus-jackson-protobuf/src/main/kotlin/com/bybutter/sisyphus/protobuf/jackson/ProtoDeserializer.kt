@@ -6,9 +6,8 @@ import com.bybutter.sisyphus.protobuf.CustomProtoTypeSupport
 import com.bybutter.sisyphus.protobuf.EnumSupport
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.MutableMessage
-import com.bybutter.sisyphus.protobuf.ProtoEnum
 import com.bybutter.sisyphus.protobuf.MessageSupport
+import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
@@ -49,7 +48,6 @@ import kotlin.UnsupportedOperationException
 import kotlin.apply
 import kotlin.let
 import kotlin.reflect.full.companionObjectInstance
-import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.jvm.javaType
 import kotlin.toUInt
 import kotlin.toULong

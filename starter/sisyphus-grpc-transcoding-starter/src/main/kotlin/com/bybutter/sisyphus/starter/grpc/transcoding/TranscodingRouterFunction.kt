@@ -1,9 +1,13 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
+import com.bybutter.sisyphus.starter.grpc.LocalClientRepository.Companion.LOCAL_CHANNEL_BEAN_NAME
 import com.bybutter.sisyphus.starter.grpc.ServiceConfig
+import io.grpc.Channel
 import io.grpc.ManagedChannelBuilder
 import io.grpc.Server
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -18,12 +22,14 @@ import reactor.core.publisher.Mono
 class TranscodingRouterFunction private constructor(
         private val server: Server,
         private val serviceRouters: List<RouterFunction<ServerResponse>>
-) : RouterFunction<ServerResponse> {
+) : RouterFunction<ServerResponse>, ApplicationContextAware {
+
+    private lateinit var applicationContext: ApplicationContext
 
     private val channel by lazy {
         // Create channel for localhost gRpc server.
         // We create channel lazily, because get server port will cause exceptions before server started.
-        ManagedChannelBuilder.forTarget("localhost:${server.port}").usePlaintext().maxInboundMetadataSize(1024 * 1024).build()
+        applicationContext.getBean(LOCAL_CHANNEL_BEAN_NAME) as Channel
     }
 
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
@@ -61,5 +67,9 @@ class TranscodingRouterFunction private constructor(
 
             return TranscodingRouterFunction(server, serviceRouters)
         }
+    }
+
+    override fun setApplicationContext(applicationContext: ApplicationContext) {
+        this.applicationContext = applicationContext
     }
 }
