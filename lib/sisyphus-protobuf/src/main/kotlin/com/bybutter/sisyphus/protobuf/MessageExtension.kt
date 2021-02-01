@@ -43,7 +43,7 @@ class MessageExtensionImpl<T>(override val value: T, private val support: Extens
         var result = support().javaClass.hashCode()
         result = result * 37 + number()
 
-        when(value) {
+        when (value) {
             is Map<*, *> -> value.forEach {
                 result = result * 31 + it.key.hashCode()
                 result = result * 31 + it.value.hashCode()
@@ -57,12 +57,12 @@ class MessageExtensionImpl<T>(override val value: T, private val support: Extens
     }
 
     override fun equals(other: Any?): Boolean {
-        if(other !is MessageExtensionImpl<*>) return false
-        if(this.support() != other.support()) return false
-        if(this.value != other.value) return false
-        when(value) {
+        if (other !is MessageExtensionImpl<*>) return false
+        if (this.support() != other.support()) return false
+        if (this.value != other.value) return false
+        when (value) {
             is Map<*, *> -> value.contentEquals(other.value.uncheckedCast())
-            is List<*> ->value.contentEquals(other.value as List<*>)
+            is List<*> -> value.contentEquals(other.value as List<*>)
             else -> value == other.value
         }
         return true

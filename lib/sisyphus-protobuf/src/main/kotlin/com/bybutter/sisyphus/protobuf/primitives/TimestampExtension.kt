@@ -1,6 +1,8 @@
 package com.bybutter.sisyphus.protobuf.primitives
 
 import com.bybutter.sisyphus.protobuf.invoke
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableDuration
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableTimestamp
 import com.bybutter.sisyphus.string.leftPadding
 import com.bybutter.sisyphus.string.rightPadding
 import java.math.BigInteger
@@ -12,8 +14,6 @@ import java.time.format.DateTimeParseException
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.sign
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableDuration
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableTimestamp
 
 private const val nanosPerSecond = 1000000000L
 

@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.rpc
 
+import com.bybutter.sisyphus.protobuf.ServiceSupport
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.Metadata
@@ -16,6 +17,8 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
     private val _optionsInterceptors: MutableList<CallOptionsInterceptor> = optionsInterceptors.toMutableList()
 
     val optionsInterceptors: List<CallOptionsInterceptor> get() = _optionsInterceptors
+
+    abstract fun support(): ServiceSupport
 
     fun withOptionsInterceptor(interceptor: CallOptionsInterceptor): T {
         return build(channel, optionsInterceptors + interceptor, callOptions)

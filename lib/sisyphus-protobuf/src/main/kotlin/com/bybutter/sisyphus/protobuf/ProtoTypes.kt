@@ -56,6 +56,10 @@ object ProtoTypes {
         return protoToSupportMap[name]
     }
 
+    fun findMessageSupport(name: String): MessageSupport<*,*> {
+        return findSupport(name) as MessageSupport<*,*>
+    }
+
     fun services(): List<ServiceSupport> {
         return protoToSupportMap.values.filterIsInstance<ServiceSupport>()
     }

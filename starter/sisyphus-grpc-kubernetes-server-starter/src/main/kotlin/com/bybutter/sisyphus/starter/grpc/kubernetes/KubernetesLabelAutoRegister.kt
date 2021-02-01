@@ -1,9 +1,11 @@
-package com.bybutter.sisyphus.middleware.grpc.client.kubernetes
+package com.bybutter.sisyphus.starter.grpc.kubernetes
 
 import com.bybutter.sisyphus.jackson.toJson
 import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
 import com.bybutter.sisyphus.middleware.grpc.client.kubernetes.support.PatchOperateType
 import com.bybutter.sisyphus.middleware.grpc.client.kubernetes.support.ServiceLabelPatch
+import com.bybutter.sisyphus.rpc.AbstractCoroutineServerImpl
+import com.bybutter.sisyphus.starter.grpc.ServiceConfig
 import io.kubernetes.client.custom.V1Patch
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.CoreV1Api
@@ -18,7 +20,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.context.EnvironmentAware
 import org.springframework.context.annotation.ImportAware
-import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.core.env.Environment
 import org.springframework.core.type.AnnotationMetadata
 
@@ -75,10 +76,10 @@ class KubernetesLabelAutoRegister : ApplicationListener<ApplicationReadyEvent>, 
                 ?: mutableMapOf()).filter { it.key.startsWith("sisyphus/") }
         val serviceLabelPatchList = mutableSetOf<ServiceLabelPatch>()
         for ((_, serverService) in serverServices) {
-            val serviceName = "${rpcServiceAnnotation.parent}.${rpcServiceAnnotation.value}"
+            val serviceName = (serverService as AbstractCoroutineServerImpl).support().name
             if (enableServices.isEmpty() || enableServices.contains(serviceName)) {
                 val labelKey = "sisyphus~1$serviceName"
-                val labelValue = environment.getProperty(GrpcServerConstants.GRPC_PORT_PROPERTY, Int::class.java, GrpcServerConstants.DEFAULT_GRPC_PORT).toString()
+                val labelValue = beanFactory.getBean(ServiceConfig::class.java).serverPort.toString()
                 generateKubernetesLabelPatch(override, labels, labelKey, labelValue)?.let {
                     serviceLabelPatchList.add(it)
                 }

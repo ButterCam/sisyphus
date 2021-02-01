@@ -39,7 +39,7 @@ object RuntimeTypes {
 
     val ENUM_DESCRIPTOR_PROTO = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto")
 
-    val ABSTRACT_COROUTINE_SERVER_IMPL = ClassName.bestGuess("io.grpc.kotlin.AbstractCoroutineServerImpl")
+    val ABSTRACT_COROUTINE_SERVER_IMPL = ClassName.bestGuess("com.bybutter.sisyphus.rpc.AbstractCoroutineServerImpl")
 
     val ABSTRACT_COROUTINE_STUB = ClassName.bestGuess("com.bybutter.sisyphus.rpc.AbstractCoroutineStub")
 

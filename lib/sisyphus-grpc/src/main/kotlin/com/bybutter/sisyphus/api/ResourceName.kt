@@ -50,11 +50,10 @@ abstract class AbstractResourceName(
     }
 
     override fun equals(other: Any?): Boolean {
-        if(other !is ResourceName) return false
+        if (other !is ResourceName) return false
         return other.value() == value()
     }
 }
-
 
 abstract class ResourceNameSupport<T : ResourceName> : CustomProtoTypeSupport<T, String> {
     override val rawType: Class<String>

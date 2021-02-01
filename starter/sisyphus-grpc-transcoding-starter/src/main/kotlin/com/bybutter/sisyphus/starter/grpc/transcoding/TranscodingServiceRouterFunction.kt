@@ -2,6 +2,7 @@ package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
+import com.bybutter.sisyphus.rpc.AbstractCoroutineServerImpl
 import io.grpc.ServerServiceDefinition
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
@@ -41,7 +42,7 @@ class TranscodingServiceRouterFunction private constructor(
 
         operator fun invoke(service: ServerServiceDefinition): RouterFunction<ServerResponse>? {
             // Ensure for the service proto.
-            val proto = ProtoTypes.getDescriptorBySymbol(service.serviceDescriptor.name) as? ServiceDescriptorProto
+            val proto = ProtoTypes.findSupport(service.serviceDescriptor.name)?.descriptor as? ServiceDescriptorProto
                     ?: return null
             val methodRouters = service.methods.mapNotNull { TranscodingMethodRouterFunction(it) }
             // Return null if no method routers created.

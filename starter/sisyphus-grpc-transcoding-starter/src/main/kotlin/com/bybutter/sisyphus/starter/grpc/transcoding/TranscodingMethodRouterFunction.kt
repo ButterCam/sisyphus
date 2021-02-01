@@ -31,13 +31,13 @@ class TranscodingMethodRouterFunction private constructor(
     private val rule: HttpRule
 ) : RouterFunction<ServerResponse>, HandlerFunction<ServerResponse> {
     private val requestPredicate = HttpRulePredicate(rule)
-    private val inputSupport: MessageSupport<*, *> = ProtoTypes.ensureSupportByProtoName(proto.inputType)
+    private val inputSupport: MessageSupport<*, *> = ProtoTypes.findMessageSupport(proto.inputType)
     private val bodyClass: Class<*>?
 
     init {
         bodyClass = when (rule.body) {
             "" -> null
-            "*" -> ProtoTypes.ensureClassByProtoName(proto.inputType)
+            "*" -> ProtoTypes.findMessageSupport(proto.inputType).javaClass
             else -> {
                 val field = inputSupport.fieldDescriptors.firstOrNull { it.name == rule.body }
                     ?: throw IllegalStateException("Wrong http rule options, input message not contains body field '${rule.body}'.")
@@ -58,7 +58,7 @@ class TranscodingMethodRouterFunction private constructor(
                     FieldDescriptorProto.Type.STRING -> String::class.java
                     FieldDescriptorProto.Type.BYTES -> ByteArray::class.java
                     FieldDescriptorProto.Type.ENUM,
-                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.ensureClassByProtoName(field.typeName)
+                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.findMessageSupport(proto.inputType).javaClass
                     else -> TODO()
                 }
             }
@@ -141,7 +141,7 @@ class TranscodingMethodRouterFunction private constructor(
             if (method.methodDescriptor.type != MethodDescriptor.MethodType.UNARY)
                 return null
             // Ensure method proto registered.
-            val proto = ProtoTypes.getDescriptorBySymbol(method.methodDescriptor.fullMethodName) as? MethodDescriptorProto
+            val proto = ProtoTypes.findSupport(method.methodDescriptor.fullMethodName)?.descriptor as? MethodDescriptorProto
                     ?: return null
             // Ensure http rule existed.
             val httpRule = proto.options?.http

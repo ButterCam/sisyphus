@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.protobuf
 
-import com.bybutter.sisyphus.collection.firstNotNull
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
@@ -30,7 +29,7 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
                     it.descriptor.number == number
                 } as? ExtensionSupport<Any>
 
-                if(extension == null) {
+                if (extension == null) {
                     unknownFields().readFrom(reader, number, wireType)
                 } else {
                     _extensions[number] = extension.read(reader, number, wireType, _extensions[number] as? MessageExtension<Any>)
@@ -108,7 +107,7 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
     }
 
     protected fun <T> setFieldInExtensions(number: Int, value: T) {
-        if(value == null) {
+        if (value == null) {
             clearFieldInCurrent(number)
             return
         }

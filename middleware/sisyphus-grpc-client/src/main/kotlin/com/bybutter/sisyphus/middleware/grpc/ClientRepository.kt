@@ -59,12 +59,12 @@ interface ClientRepository : Ordered {
         optionsInterceptors: Iterable<CallOptionsInterceptor>,
         callOptions: CallOptions
     ): AbstractStub<*> {
-        if (AbstractCoroutineStub::class.java.isAssignableFrom(target)) {
-            return target.getDeclaredConstructor(Channel::class.java, Iterable::class.java, CallOptions::class.java)
-                .newInstance(channel, optionsInterceptors, callOptions) as AbstractStub<*>
+        return if (AbstractCoroutineStub::class.java.isAssignableFrom(target)) {
+            target.getDeclaredConstructor(Channel::class.java, Iterable::class.java, CallOptions::class.java)
+                    .newInstance(channel, optionsInterceptors, callOptions) as AbstractStub<*>
         } else {
-            return target.getDeclaredConstructor(Channel::class.java, CallOptions::class.java)
-                .newInstance(channel, callOptions) as AbstractStub<*>
+            target.getDeclaredConstructor(Channel::class.java, CallOptions::class.java)
+                    .newInstance(channel, callOptions) as AbstractStub<*>
         }
     }
 }
