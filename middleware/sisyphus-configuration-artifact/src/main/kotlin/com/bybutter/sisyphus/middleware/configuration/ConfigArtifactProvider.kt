@@ -46,6 +46,10 @@ class ConfigArtifactProvider : EnvironmentPostProcessor, ApplicationListener<App
                     aether.registerGradlePortal()
                     null
                 }
+                "google" -> properties.repositories[repositoryKey] ?: run {
+                    aether.registerGoogle()
+                    null
+                }
                 else -> properties.repositories[repositoryKey]
             }
 

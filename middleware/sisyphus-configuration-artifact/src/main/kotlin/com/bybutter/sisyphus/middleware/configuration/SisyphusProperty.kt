@@ -12,7 +12,7 @@ data class SisyphusProperty(
     val config: SisyphusConfigArtifacts = SisyphusConfigArtifacts()
 )
 
-data class TargetRepositorySetting(val repositories: List<String> = listOf("local", "central", "jcenter", "portal"))
+data class TargetRepositorySetting(val repositories: List<String> = listOf("local", "central", "jcenter", "portal", "google"))
 
 data class Repository(
     val url: String,

@@ -56,6 +56,10 @@ internal fun RepositoryHandler.applyFromRepositoryKeys(repositories: Map<String,
                 this.gradlePluginPortal()
                 null
             }
+            "google" -> repositories[repositoryKey] ?: run {
+                this.google()
+                null
+            }
             else -> repositories[repositoryKey]
         }
 

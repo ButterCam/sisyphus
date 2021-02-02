@@ -20,7 +20,7 @@ open class SisyphusExtension(val project: Project) {
 
     var repositories: MutableMap<String, Repository> = hashMapOf()
 
-    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "jcenter", "portal")
+    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "jcenter", "portal", "google")
 
     var releaseRepositories: MutableList<String> = mutableListOf("release")
 
