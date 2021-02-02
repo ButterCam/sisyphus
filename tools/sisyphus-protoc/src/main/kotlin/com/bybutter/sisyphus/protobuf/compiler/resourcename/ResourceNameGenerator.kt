@@ -17,6 +17,7 @@ import com.bybutter.sisyphus.protobuf.compiler.kInterface
 import com.bybutter.sisyphus.protobuf.compiler.parameter
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
+import com.bybutter.sisyphus.string.toPascalCase
 import com.google.api.pathtemplate.PathTemplate
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LIST
@@ -185,6 +186,42 @@ class ResourceNameCompanionBasicGenerator : GroupedGenerator<ResourceNameCompani
                         addSuperclassConstructorParameter("name")
                     }.build())
                 })
+            }
+        }
+        return true
+    }
+}
+
+class ResourceNameCompanionInvokeGenerator : GroupedGenerator<ResourceNameCompanionGeneratingState> {
+    override fun generate(state: ResourceNameCompanionGeneratingState): Boolean {
+        state.target.apply {
+
+            for (template in state.descriptor.templates) {
+                val uniqueFields = template.vars() - state.descriptor.commonFields
+                val functionName = if (uniqueFields.isEmpty()) {
+                    "of"
+                } else {
+                    "of${template.vars().joinToString("And") { it.toPascalCase() }}"
+                }
+
+                function(functionName) {
+                    returns(state.descriptor.className())
+
+                    for (variable in template.vars()) {
+                        parameter(variable, String::class)
+                    }
+
+                    addCode(buildCodeBlock {
+                        add("return %T(mapOf(", state.descriptor.tempalteClassName(template))
+                        for ((index, field) in template.vars().withIndex()) {
+                            if (index > 0) {
+                                add(", ")
+                            }
+                            add("%S to %N", field, field)
+                        }
+                        add("))")
+                    })
+                }
             }
         }
         return true

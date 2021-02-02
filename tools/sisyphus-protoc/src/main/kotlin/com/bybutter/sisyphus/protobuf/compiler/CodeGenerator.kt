@@ -70,6 +70,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.GeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.MessageResourceNameGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameCompanionBasicGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameCompanionInvokeGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameImplementationFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameImplementationGenerator
@@ -244,6 +245,7 @@ class CodeGenerators {
         register(ResourceNameOneofKindTypeBasicGenerator())
         register(ResourceNameMessageFieldWriteFunctionGenerator())
         register(ResourceNameMessageFieldReadFunctionGenerator())
+        register(ResourceNameCompanionInvokeGenerator())
         return this
     }
 

@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.protobuf.compiler.resourcename
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.SortableGenerator
 import com.bybutter.sisyphus.protobuf.compiler.annotation
+import com.bybutter.sisyphus.protobuf.compiler.beginScope
 import com.bybutter.sisyphus.protobuf.compiler.clearFunction
 import com.bybutter.sisyphus.protobuf.compiler.constructor
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldReadFunctionGenerator
@@ -21,6 +22,7 @@ import com.bybutter.sisyphus.protobuf.compiler.function
 import com.bybutter.sisyphus.protobuf.compiler.getter
 import com.bybutter.sisyphus.protobuf.compiler.hasFunction
 import com.bybutter.sisyphus.protobuf.compiler.implements
+import com.bybutter.sisyphus.protobuf.compiler.mapEntry
 import com.bybutter.sisyphus.protobuf.compiler.name
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
@@ -248,15 +250,26 @@ class ResourceNameMessageFieldWriteFunctionGenerator : GroupedGenerator<MessageW
     override fun generate(state: MessageWriteFieldsFunctionGeneratingState): Boolean {
         ResourceFields.resource(state.descriptor) ?: return false
 
-        state.target.apply {
-            addStatement(
-                "this.%N?.let{ writer.tag(${
+        if(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
+            state.target.beginScope("for(value in this.%N)", state.descriptor.name()) {
+                addStatement(
+                    "writer.tag(%L).string(value.value())", makeTag(
+                        state.descriptor.descriptor.number,
+                        WireFormat.WIRETYPE_LENGTH_DELIMITED
+                    )
+                )
+            }
+        } else {
+            state.target.apply {
+                addStatement(
+                    "this.%N?.let{ writer.tag(%L).string(it.value()) }",
+                    state.descriptor.name(),
                     makeTag(
                         state.descriptor.descriptor.number,
                         WireFormat.WIRETYPE_LENGTH_DELIMITED
                     )
-                }).string(it.value()) }", state.descriptor.name()
-            )
+                )
+            }
         }
         return true
     }
@@ -271,11 +284,20 @@ class ResourceNameMessageFieldReadFunctionGenerator : GroupedGenerator<MessageRe
     override fun generate(state: MessageReadFieldFunctionGeneratingState): Boolean {
         val resource = ResourceFields.resource(state.descriptor) ?: return false
 
-        state.target.apply {
-            addStatement(
-                "${state.descriptor.descriptor.number} -> this.%N = %T(reader.string())",
-                state.descriptor.name(), resource.className()
-            )
+        if(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
+            state.target.apply {
+                addStatement(
+                    "${state.descriptor.descriptor.number} -> this.%N += %T(reader.string())",
+                    state.descriptor.name(), resource.className()
+                )
+            }
+        } else {
+            state.target.apply {
+                addStatement(
+                    "${state.descriptor.descriptor.number} -> this.%N = %T(reader.string())",
+                    state.descriptor.name(), resource.className()
+                )
+            }
         }
         return true
     }

@@ -18,7 +18,7 @@ object ResourceFields {
         if (field is MessageFieldDescriptor) {
             val nameField = field.parent.resource?.descriptor?.nameField?.takeIf { it.isNotEmpty() } ?: "name"
             if (field.descriptor.name == nameField) {
-                return field.parent.resource
+                field.parent.resource?.let { return it }
             }
         }
         val options = DescriptorProtos.FieldOptions.parseFrom(
