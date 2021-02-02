@@ -5,11 +5,13 @@ import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoEnum
+import com.bybutter.sisyphus.protobuf.primitives.Duration
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.StatusException
 import io.grpc.StatusRuntimeException
 import java.io.InputStream
+import java.util.concurrent.TimeUnit
 
 interface MessageMarshaller<T : Message<T, TM>, TM : MutableMessage<T, TM>> : MethodDescriptor.Marshaller<T>,
     Metadata.BinaryMarshaller<T>
@@ -83,4 +85,87 @@ operator fun Status.Companion.invoke(exception: Throwable): Status {
     }
 }
 
-val STATUS_META_KEY = Metadata.Key.of("grpc-status", Status.marshaller())
+val STATUS_META_KEY = Metadata.Key.of("grpc-status-bin", Status.marshaller())
+
+operator fun LocalizedMessage.Companion.invoke(locale: String, message: String): LocalizedMessage {
+    return LocalizedMessage {
+        this.locale = "zh-CN"
+        this.message = message
+    }
+}
+
+operator fun LocalizedMessage.Companion.invoke(message: String): LocalizedMessage {
+    return LocalizedMessage {
+        this.locale = "zh-CN"
+        this.message = message
+    }
+}
+
+operator fun Help.Companion.invoke(vararg links: Help.Link): Help {
+    return Help {
+        this.links += links.toList()
+    }
+}
+
+operator fun ResourceInfo.Companion.invoke(
+    resourceType: String,
+    resourceName: String,
+    description: String,
+    owner: String = ""
+): ResourceInfo {
+    return ResourceInfo {
+        this.resourceType = resourceType
+        this.resourceName = resourceName
+        this.description = description
+        this.owner = owner
+    }
+}
+
+operator fun RequestInfo.Companion.invoke(requestId: String, servingData: String = ""): RequestInfo {
+    return RequestInfo {
+        this.requestId = requestId
+        this.servingData = servingData
+    }
+}
+
+operator fun BadRequest.Companion.invoke(vararg violations: BadRequest.FieldViolation): BadRequest {
+    return BadRequest {
+        this.fieldViolations += violations.toList()
+    }
+}
+
+operator fun PreconditionFailure.Companion.invoke(vararg violations: PreconditionFailure.Violation): PreconditionFailure {
+    return PreconditionFailure {
+        this.violations += violations.toList()
+    }
+}
+
+operator fun QuotaFailure.Companion.invoke(vararg violations: QuotaFailure.Violation): QuotaFailure {
+    return QuotaFailure {
+        this.violations += violations.toList()
+    }
+}
+
+operator fun RetryInfo.Companion.invoke(retryDelay: Duration): RetryInfo {
+    return RetryInfo {
+        this.retryDelay = retryDelay
+    }
+}
+
+operator fun RetryInfo.Companion.invoke(number: Long, unit: TimeUnit = TimeUnit.SECONDS): RetryInfo {
+    return RetryInfo {
+        this.retryDelay = Duration {
+            seconds = unit.toSeconds(number)
+            nanos = (unit.toNanos(number) - TimeUnit.SECONDS.toNanos(seconds)).toInt()
+        }
+    }
+}
+
+operator fun DebugInfo.Companion.invoke(exception: Throwable): DebugInfo {
+    return DebugInfo {
+        exception.message?.let { this.detail = it }
+        this.stackEntries += exception.stackTrace.map {
+            it.toString()
+        }
+    }
+}

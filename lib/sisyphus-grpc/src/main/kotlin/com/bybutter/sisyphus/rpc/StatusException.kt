@@ -27,86 +27,80 @@ open class StatusException : RuntimeException {
 
     constructor(code: Status.Code, cause: Throwable) : this(code, cause.message, cause)
 
-    constructor(code: Status.Code, message: String? = null, cause: Throwable? = null) : super(message ?: code.name, cause) {
+    constructor(code: Status.Code, message: String? = null, cause: Throwable? = null) : super(
+        message ?: code.name,
+        cause
+    ) {
         this._code = code.value()
     }
 
     fun withLocalizedMessage(locale: String, message: String): StatusException {
-        withDetails(LocalizedMessage {
-            this.locale = locale
-            this.message = message
-        })
+        withDetails(LocalizedMessage(locale, message))
         return this
     }
 
     fun withLocalizedMessage(message: String): StatusException {
-        withLocalizedMessage("zh-CN", message)
+        withDetails(LocalizedMessage(message))
         return this
     }
 
     fun withHelps(vararg links: Help.Link): StatusException {
-        withDetails(Help {
-            this.links += links.toList()
-        })
+        withDetails(Help(*links))
         return this
     }
 
-    fun withResourceInfo(resourceType: String, resourceName: String, description: String, owner: String = ""): StatusException {
-        withDetails(ResourceInfo {
-            this.resourceType = resourceType
-            this.resourceName = resourceName
-            this.description = description
-            this.owner = owner
-        })
+    fun withResourceInfo(
+        resourceType: String,
+        resourceName: String,
+        description: String,
+        owner: String = ""
+    ): StatusException {
+        withDetails(ResourceInfo(resourceType, resourceName, description, owner))
         return this
     }
 
     fun withRequestInfo(requestId: String, servingData: String = ""): StatusException {
-        withDetails(RequestInfo {
-            this.requestId = requestId
-            this.servingData = servingData
-        })
+        withDetails(RequestInfo(requestId, servingData))
         return this
     }
 
     fun withBadRequest(vararg violations: BadRequest.FieldViolation): StatusException {
-        withDetails(BadRequest {
-            this.fieldViolations += violations.toList()
-        })
+        withDetails(BadRequest(*violations))
         return this
     }
 
     fun withPreconditionFailure(vararg violations: PreconditionFailure.Violation): StatusException {
-        withDetails(PreconditionFailure {
-            this.violations += violations.toList()
-        })
+        withDetails(PreconditionFailure(*violations))
         return this
     }
 
     fun withQuotaFailure(vararg violations: QuotaFailure.Violation): StatusException {
-        withDetails(QuotaFailure {
-            this.violations += violations.toList()
-        })
+        withDetails(QuotaFailure(*violations))
         return this
     }
 
     fun withRetryInfo(retryDelay: Duration): StatusException {
-        withDetails(RetryInfo {
-            this.retryDelay = retryDelay
-        })
+        withDetails(RetryInfo(retryDelay))
         return this
     }
 
     fun withRetryInfo(number: Long, unit: TimeUnit = TimeUnit.SECONDS): StatusException {
-        withRetryInfo(Duration {
-            seconds = unit.toSeconds(number)
-            nanos = (unit.toNanos(number) - TimeUnit.SECONDS.toNanos(seconds)).toInt()
-        })
+        withDetails(RetryInfo(number, unit))
         return this
     }
 
     fun withDetails(message: Message<*, *>): StatusException {
         _details += message
+        return this
+    }
+
+    fun withDetails(vararg messages: Message<*, *>): StatusException {
+        _details += messages.toList()
+        return this
+    }
+
+    fun withDetails(messages: Iterable<Message<*, *>>): StatusException {
+        _details += messages
         return this
     }
 
@@ -121,4 +115,5 @@ open class StatusException : RuntimeException {
     }
 }
 
-open class ClientStatusException(val status: Status, val trailers: Metadata) : RuntimeException(status.description, status.cause)
+open class ClientStatusException(val status: Status, val trailers: Metadata) :
+    RuntimeException(status.description, status.cause)

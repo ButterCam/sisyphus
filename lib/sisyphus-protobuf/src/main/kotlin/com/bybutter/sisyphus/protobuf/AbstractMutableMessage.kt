@@ -25,7 +25,7 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
             val wireType = WireType.getWireType(tag).ordinal
             if (!readField(reader, number, wireType)) {
                 val extension = support().extensions.firstOrNull {
-                    it.descriptor.number == number
+                    it.number == number
                 } as? ExtensionSupport<Any>
 
                 if (extension == null) {

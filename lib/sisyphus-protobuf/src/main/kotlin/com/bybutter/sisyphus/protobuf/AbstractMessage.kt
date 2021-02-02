@@ -77,7 +77,7 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     override fun typeUrl(): String {
-        return "types.bybutter.com/${support().name}"
+        return "types.bybutter.com/${support().name.substring(1)}"
     }
 
     override fun toProto(): ByteArray {

@@ -1,9 +1,8 @@
 package com.bybutter.sisyphus.middleware.jdbc.support.proto.filter
 
-import com.bybutter.sisyphus.api.filtering.FilterRuntime
-import com.bybutter.sisyphus.api.filtering.grammar.FilterParser
+import com.bybutter.sisyphus.dsl.filtering.FilterRuntime
+import com.bybutter.sisyphus.dsl.filtering.grammar.FilterParser
 import org.jooq.Condition
-import org.jooq.Field
 import org.jooq.impl.DSL
 
 abstract class JooqConditionBuilder(val runtime: FilterRuntime = FilterRuntime()) {
@@ -70,7 +69,7 @@ abstract class JooqConditionBuilder(val runtime: FilterRuntime = FilterRuntime()
                 }
             }
             null -> result
-            else -> TODO()
+            else -> null
         }
     }
 
@@ -96,31 +95,7 @@ abstract class JooqConditionBuilder(val runtime: FilterRuntime = FilterRuntime()
             }
         }
 
-        val field = left as? Field<Any?> ?: throw IllegalArgumentException("Left expr of restriction must be field.")
-        val right = visit(rest.right)
-        val rightValue = fieldValue(field, right)
-        return when (rest.op.text) {
-            "<=" -> field.le(rightValue)
-            "<" -> field.lt(rightValue)
-            ">=" -> field.ge(rightValue)
-            ">" -> field.gt(rightValue)
-            "=" -> {
-                field.eq(rightValue ?: return field.isNull)
-            }
-            "!=" -> {
-                field.ne(rightValue ?: return field.isNotNull)
-            }
-            ":" -> {
-                val rightString = right?.toString()
-                if (rightString == "*") return field.isNotNull
-                if (rightString == null) return field.isNull
-                if (rightString.startsWith("*") || rightString.endsWith("*")) {
-                    return field.like(rightString.replace('*', '%'))
-                }
-                field.eq(rightValue)
-            }
-            else -> TODO()
-        }
+        return buildCondition(left as String, rest.op.text, visit(rest.right) as String)
     }
 
     protected open fun visit(com: FilterParser.ComparableContext): Any? {
@@ -136,11 +111,10 @@ abstract class JooqConditionBuilder(val runtime: FilterRuntime = FilterRuntime()
         return runtime.invoke(function, com.argList()?.e?.map { visit(it) } ?: listOf())
     }
 
-    protected open fun visit(member: FilterParser.MemberContext): Any? {
+    protected open fun visit(member: FilterParser.MemberContext): String {
         val part = mutableListOf(visit(member.value()))
         part += member.e.map { visit(it) }
-        val fieldName = part.joinToString(".")
-        return field(fieldName) ?: fieldName
+        return part.joinToString(".")
     }
 
     protected open fun visit(field: FilterParser.FieldContext): String {
@@ -157,7 +131,7 @@ abstract class JooqConditionBuilder(val runtime: FilterRuntime = FilterRuntime()
             return value.text
         }
 
-        TODO()
+        return null
     }
 
     protected open fun visit(arg: FilterParser.ArgContext): Any? {
@@ -181,10 +155,5 @@ abstract class JooqConditionBuilder(val runtime: FilterRuntime = FilterRuntime()
         }
     }
 
-    abstract fun field(name: String): Field<*>?
-
-    open fun fieldValue(field: Field<*>, value: Any?): Any? {
-        if (value is Field<*>) return value
-        return value
-    }
+    abstract fun buildCondition(name: String, op: String, value: String): Condition?
 }

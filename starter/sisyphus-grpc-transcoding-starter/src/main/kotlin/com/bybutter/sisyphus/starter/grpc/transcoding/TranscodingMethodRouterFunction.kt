@@ -8,6 +8,7 @@ import com.bybutter.sisyphus.protobuf.MessagePatcher
 import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.ServiceSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
 import com.bybutter.sisyphus.reflect.uncheckedCast
@@ -133,9 +134,10 @@ class TranscodingMethodRouterFunction private constructor(
             if (method.methodDescriptor.type != MethodDescriptor.MethodType.UNARY)
                 return null
             // Ensure method proto registered.
-            val proto =
-                ProtoTypes.findSupport(method.methodDescriptor.fullMethodName)?.descriptor as? MethodDescriptorProto
-                    ?: return null
+            val service = ProtoTypes.findSupport(method.methodDescriptor.serviceName!!) as? ServiceSupport ?: return null
+            val proto = service.descriptor.method.firstOrNull {
+                it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
+            } ?: return null
             // Ensure http rule existed.
             val httpRule = proto.options?.http ?: return null
 

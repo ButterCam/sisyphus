@@ -40,17 +40,20 @@ class TranscodingRouterFunction private constructor(
         return Flux.fromIterable(serviceRouters).concatMap {
             it.route(request)
         }.next().switchIfEmpty(
-                Mono.create<HandlerFunction<ServerResponse>> {
-                    // Clear the attributes if we can't transcode current http request to gRpc.
-                    request.attributes().clear()
-                    request.attributes() += oldAttributes
-                    it.success()
-                }
+            Mono.create<HandlerFunction<ServerResponse>> {
+                // Clear the attributes if we can't transcode current http request to gRpc.
+                request.attributes().clear()
+                request.attributes() += oldAttributes
+                it.success()
+            }
         )
     }
 
     companion object {
-        operator fun invoke(server: Server, enableServices: Collection<String> = listOf()): RouterFunction<ServerResponse> {
+        operator fun invoke(
+            server: Server,
+            enableServices: Collection<String> = listOf()
+        ): RouterFunction<ServerResponse> {
             val enableServices = enableServices.toSet()
             val serviceRouters = server.services.mapNotNull {
                 if (enableServices.isEmpty() || enableServices.contains(it.serviceDescriptor.name)) {

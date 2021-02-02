@@ -6,6 +6,8 @@ import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import kotlin.reflect.KProperty
 
 abstract class ExtensionSupport<T> : ProtoSupport<FieldDescriptorProto> {
+    abstract val number: Int
+
     abstract val extendee: MessageSupport<*, *>
 
     abstract fun write(writer: Writer, value: T)

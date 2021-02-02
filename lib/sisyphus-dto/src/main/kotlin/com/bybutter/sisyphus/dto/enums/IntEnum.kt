@@ -21,7 +21,7 @@ interface IntEnum {
             val values = type.rawClass.enumConstants.map { it.uncheckedCast<T>() }
             return values.firstOrNull { it.number == value } ?: {
                 type.rawClass.declaredFields.filter { it.isEnumConstant && it.getDeclaredAnnotation(UnknownValue::class.java) != null }
-                        .map { it.get(null).uncheckedCast<T>() }.firstOrNull()
+                    .map { it.get(null).uncheckedCast<T>() }.firstOrNull()
             }()
         }
 
@@ -31,12 +31,12 @@ interface IntEnum {
 
         inline operator fun <reified T> invoke(value: Int): T where T : IntEnum {
             return valueOf(value)
-                    ?: throw IllegalArgumentException("Can't found value($value) for int enum(${T::class.java.name}).")
+                ?: throw IllegalArgumentException("Can't found value($value) for int enum(${T::class.java.name}).")
         }
 
         operator fun <T> invoke(value: Int, type: Class<T>): T where T : IntEnum {
             return valueOf(value, type)
-                    ?: throw IllegalArgumentException("Can't found value($value) for int enum(${type.name}).")
+                ?: throw IllegalArgumentException("Can't found value($value) for int enum(${type.name}).")
         }
     }
 }

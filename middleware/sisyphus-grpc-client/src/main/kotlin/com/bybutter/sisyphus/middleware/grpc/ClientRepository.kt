@@ -61,10 +61,10 @@ interface ClientRepository : Ordered {
     ): AbstractStub<*> {
         return if (AbstractCoroutineStub::class.java.isAssignableFrom(target)) {
             target.getDeclaredConstructor(Channel::class.java, Iterable::class.java, CallOptions::class.java)
-                    .newInstance(channel, optionsInterceptors, callOptions) as AbstractStub<*>
+                .newInstance(channel, optionsInterceptors, callOptions) as AbstractStub<*>
         } else {
             target.getDeclaredConstructor(Channel::class.java, CallOptions::class.java)
-                    .newInstance(channel, callOptions) as AbstractStub<*>
+                .newInstance(channel, callOptions) as AbstractStub<*>
         }
     }
 }

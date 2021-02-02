@@ -1,9 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc.support
 
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.rpc.STATUS_META_KEY
 import com.bybutter.sisyphus.rpc.StatusException
-import com.bybutter.sisyphus.rpc.invoke
 import io.grpc.Context
 import io.grpc.Contexts
 import io.grpc.ForwardingServerCall
@@ -65,11 +63,7 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
                 logRequest(status, this)
             }
 
-            if (status.isOk) {
-                return super.close(status, trailers)
-            }
-
-            return closeWithStatus(status, trailers)
+            return super.close(status, trailers)
         }
 
         override fun sendMessage(message: RespT) {
@@ -89,12 +83,6 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
             } catch (e: Exception) {
                 // Ignore
             }
-        }
-
-        private fun closeWithStatus(status: Status, trailers: Metadata) {
-            val resolvedStatus = com.bybutter.sisyphus.rpc.Status(status)
-            trailers.put(STATUS_META_KEY, resolvedStatus)
-            super.close(status, trailers)
         }
     }
 

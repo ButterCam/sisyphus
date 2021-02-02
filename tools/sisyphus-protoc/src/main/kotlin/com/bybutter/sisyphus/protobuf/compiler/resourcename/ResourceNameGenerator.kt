@@ -137,9 +137,16 @@ class ResourceNameCompanionBasicGenerator : GroupedGenerator<ResourceNameCompani
 
             property("patterns", LIST.parameterizedBy(PathTemplate::class.asTypeName())) {
                 this += KModifier.OVERRIDE
-                getter {
-                    addStatement("return listOf()")
-                }
+                initializer(buildCodeBlock {
+                    add("listOf(%L)", buildCodeBlock {
+                        for ((index, template) in state.descriptor.descriptor.patternList.withIndex()) {
+                            if (index != 0) {
+                                add(", ")
+                            }
+                            add("%T.create(%S)", PathTemplate::class, template)
+                        }
+                    })
+                })
             }
 
             property("plural", String::class) {

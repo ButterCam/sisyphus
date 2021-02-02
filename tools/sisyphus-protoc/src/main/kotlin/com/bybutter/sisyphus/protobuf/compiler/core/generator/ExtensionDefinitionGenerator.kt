@@ -153,6 +153,11 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
             val fieldType = state.descriptor.mutableFieldType().copy(false)
             this extends RuntimeTypes.EXTENSION_SUPPORT.parameterizedBy(fieldType)
 
+            property("number", Int::class) {
+                this += KModifier.OVERRIDE
+                initializer("%L", state.descriptor.descriptor.number)
+            }
+
             property("name", String::class) {
                 this += KModifier.OVERRIDE
                 getter {

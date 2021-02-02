@@ -127,10 +127,10 @@ open class ModelProxy constructor(
             val property = properties.getValue(name)
             for (validator in validators) {
                 val ex = validator.instance.verify(
-                        this,
-                        get(name),
-                        validator.raw.params,
-                        property
+                    this,
+                    get(name),
+                    validator.raw.params,
+                    property
                 )
                 if (ex != null) {
                     exception = ex

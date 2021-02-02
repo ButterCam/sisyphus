@@ -19,7 +19,6 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageWriteFieldsFunc
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
 import com.bybutter.sisyphus.protobuf.compiler.elementType
 import com.bybutter.sisyphus.protobuf.compiler.enumType
-import com.bybutter.sisyphus.protobuf.compiler.fieldType
 import com.bybutter.sisyphus.protobuf.compiler.function
 import com.bybutter.sisyphus.protobuf.compiler.hasFunction
 import com.bybutter.sisyphus.protobuf.compiler.mapEntry
@@ -63,7 +62,8 @@ class MessageMergeWithFunctionGenerator : GroupedGenerator<MessageImplementation
                 this += KModifier.OVERRIDE
                 addParameter("other", state.descriptor.className().copy(true))
                 addStatement("other ?: return")
-                addStatement("readFrom(Reader(other.toProto().inputStream()))")
+                addStatement("val proto = other.toProto()")
+                addStatement("readFrom(Reader(proto.inputStream()), proto.size)")
             }
         }
         return true
@@ -825,10 +825,17 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
 
                         when (valueType) {
                             WireFormat.FieldType.MESSAGE -> {
-                                addStatement(
-                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> this.%N[k]·=·v }",
-                                    valueDescriptor.elementType(), state.descriptor.name()
-                                )
+                                if (valueDescriptor.messageType()?.fullProtoName() == ".google.protobuf.Any") {
+                                    addStatement(
+                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { reader.any() }) { k,·v·-> this.%N[k]·=·v }",
+                                        state.descriptor.name()
+                                    )
+                                } else {
+                                    addStatement(
+                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> this.%N[k]·=·v }",
+                                        valueDescriptor.elementType(), state.descriptor.name()
+                                    )
+                                }
                             }
                             WireFormat.FieldType.ENUM -> {
                                 addStatement(

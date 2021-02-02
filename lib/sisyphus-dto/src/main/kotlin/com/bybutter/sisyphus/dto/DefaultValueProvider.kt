@@ -148,7 +148,10 @@ interface DefaultValueProvider<T> {
                     when {
                         IntEnum::class.isSuperclassOf(property.returnType.classifier.uncheckedCast()) -> {
                             if (param.toIntOrNull() != null) {
-                                IntEnum.valueOf(param.toInt(), property.returnType.jvmErasure.java.uncheckedCast<Class<IntEnum>>())
+                                IntEnum.valueOf(
+                                    param.toInt(),
+                                    property.returnType.jvmErasure.java.uncheckedCast<Class<IntEnum>>()
+                                )
                             } else {
                                 property.returnType.jvmErasure.java.enumConstants.firstOrNull {
                                     (it as Enum<*>).name == param
@@ -156,10 +159,13 @@ interface DefaultValueProvider<T> {
                             }
                         }
                         StringEnum::class.isSuperclassOf(property.returnType.classifier.uncheckedCast()) -> {
-                            StringEnum.valueOf(param, property.returnType.jvmErasure.java.uncheckedCast<Class<StringEnum>>())
-                                    ?: property.returnType.jvmErasure.java.enumConstants.firstOrNull {
-                                        (it as Enum<*>).name == param
-                                    }
+                            StringEnum.valueOf(
+                                param,
+                                property.returnType.jvmErasure.java.uncheckedCast<Class<StringEnum>>()
+                            )
+                                ?: property.returnType.jvmErasure.java.enumConstants.firstOrNull {
+                                    (it as Enum<*>).name == param
+                                }
                         }
                         else -> throw UnsupportedOperationException("Unsupported default value type(${property.returnType})(${proxy.`$type`}).")
                     }

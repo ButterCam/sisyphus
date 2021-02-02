@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
+import com.bybutter.sisyphus.spring.BeanUtils
 import com.bybutter.sisyphus.starter.grpc.ServiceRegistrar
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerProperty
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerRouterFunction
@@ -41,17 +42,18 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
 
     private val swaggerProperty by lazy {
         Binder.get(environment)
-                .bind("swagger", SwaggerProperty::class.java)
-                .orElse(null) ?: SwaggerProperty()
+            .bind("swagger", SwaggerProperty::class.java)
+            .orElse(null) ?: SwaggerProperty()
     }
 
     override fun registerBeanDefinitions(importingClassMetadata: AnnotationMetadata, registry: BeanDefinitionRegistry) {
         // Find the [EnableHttpToGrpcTranscoding] annotation.
-        val enableAnnotation = importingClassMetadata.getAnnotationAttributes(EnableHttpToGrpcTranscoding::class.java.name)
+        val enableAnnotation =
+            importingClassMetadata.getAnnotationAttributes(EnableHttpToGrpcTranscoding::class.java.name)
                 ?: return
         // Get the enabled transcoding service in [EnableHttpToGrpcTranscoding] annotation.
         val enableServices = (enableAnnotation[EnableHttpToGrpcTranscoding::services.name] as? Array<String>)?.asList()
-                ?: listOf()
+            ?: listOf()
         registerSwaggerRouterFunction(registry, enableServices)
         registerRouterFunction(registry, enableServices)
         registerTranscodingCorsConfigSource(registry, enableServices)
@@ -67,11 +69,15 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
      */
     private fun registerRouterFunction(registry: BeanDefinitionRegistry, enableServices: Collection<String>) {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(RouterFunction::class.java) {
-            val server = (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
+            val server =
+                (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
             TranscodingRouterFunction(server, enableServices)
         }
         definitionBuilder.addDependsOn(QUALIFIER_AUTO_CONFIGURED_GRPC_SWAGGER_ROUTER_FUNCTION)
-        registry.registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_TRANSCODING_ROUTER_FUNCTION, definitionBuilder.beanDefinition)
+        registry.registerBeanDefinition(
+            QUALIFIER_AUTO_CONFIGURED_GRPC_TRANSCODING_ROUTER_FUNCTION,
+            definitionBuilder.beanDefinition
+        )
     }
 
     /**
@@ -80,10 +86,19 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
     private fun registerSwaggerRouterFunction(registry: BeanDefinitionRegistry, enableServices: Collection<String>) {
         BeanDefinitionBuilder.genericBeanDefinition(SwaggerValidate::class.java)
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(RouterFunction::class.java) {
-            val server = (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
-            SwaggerRouterFunction(server, enableServices, (registry as ConfigurableListableBeanFactory).getBeansOfType(SwaggerValidate::class.java).values.first(), swaggerProperty)
+            val server =
+                (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
+            SwaggerRouterFunction(
+                server,
+                enableServices,
+                (registry as ConfigurableListableBeanFactory).getBeansOfType(SwaggerValidate::class.java).values.first(),
+                swaggerProperty
+            )
         }
-        registry.registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_SWAGGER_ROUTER_FUNCTION, definitionBuilder.beanDefinition)
+        registry.registerBeanDefinition(
+            QUALIFIER_AUTO_CONFIGURED_GRPC_SWAGGER_ROUTER_FUNCTION,
+            definitionBuilder.beanDefinition
+        )
     }
 
     /**
@@ -92,18 +107,26 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
      * @param enableServices Collection<String> the name of services which need to enable CORS in transcoding.
      * Empty list for all supported services.
      */
-    private fun registerTranscodingCorsConfigSource(registry: BeanDefinitionRegistry, enableServices: Collection<String>) {
+    private fun registerTranscodingCorsConfigSource(
+        registry: BeanDefinitionRegistry,
+        enableServices: Collection<String>
+    ) {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(CorsConfigurationSource::class.java) {
-            val server = (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
+            val server =
+                (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
 
-            // Try to get the default transcoding cors configuration factory form spring application context
-            val corsConfig = registry.getBeansOfType(TranscodingCorsConfigurationFactory::class.java).values.firstOrNull()
-            // Or the default implementation when not existed.
-                    ?: TranscodingCorsConfigurationFactory.Default
             // Create CORS config source for transcoding.
-            TranscodingCorsConfigurationSource(server, corsConfig, enableServices)
+            TranscodingCorsConfigurationSource(
+                server,
+                // Try to get the default transcoding cors configuration factory form spring application context
+                BeanUtils.getSortedBeans(registry, TranscodingCorsConfigurationInterceptor::class.java).values,
+                enableServices
+            )
         }
-        registry.registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_TRANSCODING_CORS_CONFIG, definitionBuilder.beanDefinition)
+        registry.registerBeanDefinition(
+            QUALIFIER_AUTO_CONFIGURED_GRPC_TRANSCODING_CORS_CONFIG,
+            definitionBuilder.beanDefinition
+        )
     }
 
     /**
@@ -121,7 +144,10 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
                 })
             }
         }
-        registry.registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_SWAGGER_CORS_CONFIG, definitionBuilder.beanDefinition)
+        registry.registerBeanDefinition(
+            QUALIFIER_AUTO_CONFIGURED_GRPC_SWAGGER_CORS_CONFIG,
+            definitionBuilder.beanDefinition
+        )
     }
 
     companion object {

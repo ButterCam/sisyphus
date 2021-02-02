@@ -13,8 +13,8 @@ import io.grpc.ServerInterceptor
 import io.grpc.ServerServiceDefinition
 import io.grpc.ServerStreamTracer
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
@@ -28,16 +28,14 @@ import org.springframework.stereotype.Component
 class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     private lateinit var environment: Environment
 
-    @Autowired
-    private lateinit var serviceConfig: ServiceConfig
-
     override fun setEnvironment(environment: Environment) {
         this.environment = environment
     }
 
     override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
-            var builder = ServerBuilder.forPort(serviceConfig.serverPort)
+            val config = beanFactory.getBean<ServiceConfig>()
+            var builder = ServerBuilder.forPort(config.serverPort)
 
             val builderInterceptors = beanFactory.getBeansOfType(ServerBuilderInterceptor::class.java)
             for ((_, builderInterceptor) in builderInterceptors) {

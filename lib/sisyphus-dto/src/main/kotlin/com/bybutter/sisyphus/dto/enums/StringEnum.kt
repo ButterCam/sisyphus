@@ -21,7 +21,7 @@ interface StringEnum {
             val values = type.rawClass.enumConstants.map { it.uncheckedCast<T>() }
             return values.firstOrNull { it.value == value } ?: run {
                 type.rawClass.declaredFields.filter { it.isEnumConstant && it.getDeclaredAnnotation(UnknownValue::class.java) != null }
-                        .map { it.get(null).uncheckedCast<T>() }.firstOrNull()
+                    .map { it.get(null).uncheckedCast<T>() }.firstOrNull()
             }
         }
 
@@ -31,12 +31,12 @@ interface StringEnum {
 
         inline operator fun <reified T> invoke(value: String?): T where T : StringEnum {
             return valueOf(value)
-                    ?: throw IllegalArgumentException("Can't found value($value) for string enum(${T::class.java.name}).")
+                ?: throw IllegalArgumentException("Can't found value($value) for string enum(${T::class.java.name}).")
         }
 
         operator fun <T> invoke(value: String?, type: Class<T>): T where T : StringEnum {
             return valueOf(value, type)
-                    ?: throw IllegalArgumentException("Can't found value($value) for string enum(${type.name}).")
+                ?: throw IllegalArgumentException("Can't found value($value) for string enum(${type.name}).")
         }
     }
 }

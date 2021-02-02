@@ -19,7 +19,7 @@ import org.springframework.web.server.ServerWebExchange
  */
 class TranscodingCorsConfigurationSource(
     server: Server,
-    private val configurationFactory: TranscodingCorsConfigurationFactory,
+    private val interceptors: Iterable<TranscodingCorsConfigurationInterceptor>,
     enableServices: Collection<String> = listOf()
 ) : CorsConfigurationSource {
     private val corsConfigurations = mutableMapOf<String, CorsConfiguration>()
@@ -116,7 +116,14 @@ class TranscodingCorsConfigurationSource(
         val normalizedPattern = pathTemplate.withoutVars().toString()
 
         val config = corsConfigurations.getOrPut(normalizedPattern) {
-            configurationFactory.getConfiguration(method, pattern, normalizedPattern)
+            interceptors.fold(CorsConfiguration().apply {
+                addAllowedHeader(CorsConfiguration.ALL)
+                addAllowedOrigin(CorsConfiguration.ALL)
+                addAllowedMethod(HttpMethod.OPTIONS)
+                addAllowedMethod(HttpMethod.HEAD)
+            }) { config, interceptor ->
+                interceptor.intercept(config, method, pattern, normalizedPattern)
+            }
         }
 
         config.addAllowedMethod(httpMethod)
