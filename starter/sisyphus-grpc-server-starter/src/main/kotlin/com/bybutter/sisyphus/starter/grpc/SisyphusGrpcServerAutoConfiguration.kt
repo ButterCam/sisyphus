@@ -1,12 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc
 
-import com.bybutter.sisyphus.middleware.grpc.ChannelBuilderInterceptor
-import com.bybutter.sisyphus.middleware.grpc.ClientRegistrar
-import com.bybutter.sisyphus.middleware.grpc.ManagedChannelLifecycle
 import com.bybutter.sisyphus.middleware.grpc.SisyphusGrpcClientAutoConfiguration
-import io.grpc.ManagedChannelBuilder
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.getBean
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.context.EnvironmentAware
 import org.springframework.context.annotation.Bean

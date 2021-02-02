@@ -21,7 +21,7 @@ import com.squareup.kotlinpoet.KModifier
 
 class SeparatedCoroutineServiceApiFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
-        if(state.descriptor.services.isNotEmpty()) {
+        if (state.descriptor.services.isNotEmpty()) {
             state.target += kFile(state.descriptor.packageName(), state.descriptor.rpcKotlinFileName()) {
                 RpcApiFileGeneratingState(state, state.descriptor, this).advance()
             }
@@ -32,7 +32,7 @@ class SeparatedCoroutineServiceApiFileGenerator : GroupedGenerator<FileGeneratin
 
 class SeparatedCoroutineServiceInternalFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
-        if(state.descriptor.services.isNotEmpty()) {
+        if (state.descriptor.services.isNotEmpty()) {
             state.target += kFile(state.descriptor.internalPackageName(), state.descriptor.rpcKotlinFileName()) {
                 RpcInternalFileGeneratingState(state, state.descriptor, this).advance()
             }

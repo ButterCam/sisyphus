@@ -1,9 +1,9 @@
 package com.bybutter.sisyphus.protobuf.compiler.test
 
 import com.bybutter.sisyphus.io.toUnixPath
+import com.bybutter.sisyphus.protobuf.compiler.CodeGenerators
 import com.bybutter.sisyphus.protobuf.compiler.ProtobufCompiler
 import com.bybutter.sisyphus.protobuf.compiler.ProtocRunner
-import com.bybutter.sisyphus.protobuf.compiler.CodeGenerators
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path

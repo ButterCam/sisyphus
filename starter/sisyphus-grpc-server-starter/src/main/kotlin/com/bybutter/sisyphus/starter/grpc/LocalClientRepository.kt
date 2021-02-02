@@ -11,7 +11,6 @@ import com.bybutter.sisyphus.spring.BeanUtils
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientInterceptor
-import io.grpc.ManagedChannel
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBean

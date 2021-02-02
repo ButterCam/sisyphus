@@ -7,13 +7,13 @@ import com.bybutter.sisyphus.protobuf.primitives.ListValue
 import com.bybutter.sisyphus.protobuf.primitives.Struct
 import com.bybutter.sisyphus.protobuf.primitives.Timestamp
 import com.bybutter.sisyphus.protobuf.primitives.Value
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStruct
 import com.bybutter.sisyphus.protobuf.primitives.invoke
 import com.bybutter.sisyphus.security.base64Decode
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.isSubclassOf
-import proto.internal.com.bybutter.sisyphus.protobuf.primitives.MutableStruct
 
 interface PatcherNode {
     fun asField(field: FieldDescriptorProto, property: KProperty<*>): Any?

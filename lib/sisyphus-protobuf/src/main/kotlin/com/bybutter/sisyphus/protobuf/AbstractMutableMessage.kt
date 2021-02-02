@@ -6,7 +6,6 @@ import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto.Type.*
 import com.bybutter.sisyphus.protobuf.primitives.FloatValue
 import com.bybutter.sisyphus.protobuf.primitives.Int32Value
 import com.bybutter.sisyphus.protobuf.primitives.Int64Value
@@ -149,7 +148,7 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
                 }
             }
 
-            if (target.type == MESSAGE && target.typeName == WellKnownTypes.ANY_TYPENAME) {
+            if (target.type == FieldDescriptorProto.Type.MESSAGE && target.typeName == WellKnownTypes.ANY_TYPENAME) {
                 if (target.label == FieldDescriptorProto.Label.REPEATED) {
                     this[target.name] = if (source.label == FieldDescriptorProto.Label.REPEATED) {
                         message.get<List<Any>>(source.name).mapNotNull {
@@ -169,15 +168,15 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
 
     private fun buildTypeMessage(type: FieldDescriptorProto.Type, value: Any): Message<*, *>? {
         return when (type) {
-            DOUBLE -> DoubleValue { this.value = value as Double }
-            FLOAT -> FloatValue { this.value = value as Float }
-            INT64 -> Int64Value { this.value = value as Long }
-            UINT64 -> UInt64Value { this.value = value as ULong }
-            INT32 -> Int32Value { this.value = value as Int }
-            BOOL -> BoolValue { this.value = value as Boolean }
-            STRING -> StringValue { this.value = value as String }
-            BYTES -> BytesValue { this.value = value as ByteArray }
-            UINT32 -> UInt32Value { this.value = value as UInt }
+            FieldDescriptorProto.Type.DOUBLE -> DoubleValue { this.value = value as Double }
+            FieldDescriptorProto.Type.FLOAT -> FloatValue { this.value = value as Float }
+            FieldDescriptorProto.Type.INT64 -> Int64Value { this.value = value as Long }
+            FieldDescriptorProto.Type.UINT64 -> UInt64Value { this.value = value as ULong }
+            FieldDescriptorProto.Type.INT32 -> Int32Value { this.value = value as Int }
+            FieldDescriptorProto.Type.BOOL -> BoolValue { this.value = value as Boolean }
+            FieldDescriptorProto.Type.STRING -> StringValue { this.value = value as String }
+            FieldDescriptorProto.Type.BYTES -> BytesValue { this.value = value as ByteArray }
+            FieldDescriptorProto.Type.UINT32 -> UInt32Value { this.value = value as UInt }
             else -> null
         }
     }

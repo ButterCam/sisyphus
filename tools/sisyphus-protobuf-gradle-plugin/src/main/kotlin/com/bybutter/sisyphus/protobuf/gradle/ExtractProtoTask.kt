@@ -93,7 +93,7 @@ open class ExtractProtoTask : DefaultTask() {
     private fun addProtoInternal(name: String, value: ByteArray, file: Path, type: ProtoFileType) {
         if (type.source) {
             val protoName = name.toUnixPath()
-            sourceProtos[protoName] = if(type == ProtoFileType.EXTERNAL_SOURCE) "external" else "source"
+            sourceProtos[protoName] = if (type == ProtoFileType.EXTERNAL_SOURCE) "external" else "source"
             sourceFileMapping[protoName] = file.toString()
         }
         val targetFile = protoPath.toPath().resolve(name)

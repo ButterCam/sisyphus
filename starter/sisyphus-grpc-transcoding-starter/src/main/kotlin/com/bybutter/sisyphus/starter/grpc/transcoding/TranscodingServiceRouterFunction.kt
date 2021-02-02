@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
-import com.bybutter.sisyphus.rpc.AbstractCoroutineServerImpl
 import io.grpc.ServerServiceDefinition
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction

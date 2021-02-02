@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.protobuf.gradle
 
 import com.bybutter.sisyphus.string.toCamelCase
-import java.io.File
 import java.nio.file.Files
 import org.gradle.api.Plugin
 import org.gradle.api.Project

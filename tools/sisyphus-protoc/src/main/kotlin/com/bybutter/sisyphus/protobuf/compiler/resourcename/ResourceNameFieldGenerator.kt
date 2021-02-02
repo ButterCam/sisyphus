@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf.compiler.resourcename
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.SortableGenerator
 import com.bybutter.sisyphus.protobuf.compiler.annotation
-import com.bybutter.sisyphus.protobuf.compiler.beginScope
 import com.bybutter.sisyphus.protobuf.compiler.clearFunction
 import com.bybutter.sisyphus.protobuf.compiler.constructor
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldReadFunctionGenerator

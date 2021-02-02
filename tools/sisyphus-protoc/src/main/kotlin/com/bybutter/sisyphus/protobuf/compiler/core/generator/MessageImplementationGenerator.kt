@@ -111,7 +111,7 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
                 addParameter("fieldName", String::class)
                 returns(ANY.copy(true))
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return clearFieldInExtensions(fieldName)")
                         return@buildCodeBlock
                     }
@@ -149,7 +149,7 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
                 addParameter("fieldNumber", Int::class)
                 returns(ANY.copy(true))
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return clearFieldInExtensions(fieldNumber)")
                         return@buildCodeBlock
                     }
@@ -202,7 +202,7 @@ class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                 addParameter("fieldName", String::class)
                 returns(TypeVariableName("T"))
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return getFieldInExtensions(fieldName)")
                         return@buildCodeBlock
                     }
@@ -241,7 +241,7 @@ class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                 addParameter("fieldNumber", Int::class)
                 returns(TypeVariableName("T"))
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return getFieldInExtensions(fieldNumber)")
                         return@buildCodeBlock
                     }
@@ -281,7 +281,7 @@ class MessageGetPropertyFunctionGenerator : GroupedGenerator<MessageImplementati
                 addParameter("fieldName", String::class)
                 returns(KProperty::class.asClassName().parameterizedBy(TypeVariableName("*")).copy(true))
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return getPropertyInExtensions(fieldName)")
                         return@buildCodeBlock
                     }
@@ -319,7 +319,7 @@ class MessageGetPropertyFunctionGenerator : GroupedGenerator<MessageImplementati
                 addParameter("fieldNumber", Int::class)
                 returns(KProperty::class.asClassName().parameterizedBy(TypeVariableName("*")).copy(true))
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return getPropertyInExtensions(fieldNumber)")
                         return@buildCodeBlock
                     }
@@ -360,7 +360,7 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                 addParameter("fieldName", String::class)
                 addParameter("value", TypeVariableName("T"))
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("setFieldInExtensions(fieldName, value)")
                         return@buildCodeBlock
                     }
@@ -399,7 +399,7 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                 addParameter("fieldNumber", Int::class)
                 addParameter("value", TypeVariableName("T"))
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("setFieldInExtensions(fieldNumber, value)")
                         return@buildCodeBlock
                     }
@@ -455,7 +455,7 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                 addParameter("fieldName", String::class)
                 returns(Boolean::class)
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return hasFieldInExtensions(fieldName)")
                         return@buildCodeBlock
                     }
@@ -493,7 +493,7 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                 addParameter("fieldNumber", Int::class)
                 returns(Boolean::class)
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return hasFieldInExtensions(fieldNumber)")
                         return@buildCodeBlock
                     }
@@ -586,7 +586,7 @@ class MessageComputeHashCodeFunctionGenerator : GroupedGenerator<MessageImplemen
                 this += KModifier.OVERRIDE
                 returns(Int::class)
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return this.javaClass.hashCode()")
                         return@buildCodeBlock
                     }
@@ -769,7 +769,7 @@ class MessageReadFieldFunctionGenerator : GroupedGenerator<MessageImplementation
                 returns(Boolean::class)
 
                 addCode(buildCodeBlock {
-                    if(state.descriptor.fields.isEmpty()) {
+                    if (state.descriptor.fields.isEmpty()) {
                         addStatement("return false")
                         return@buildCodeBlock
                     }

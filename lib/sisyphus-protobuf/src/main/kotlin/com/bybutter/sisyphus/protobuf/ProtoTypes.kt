@@ -56,8 +56,16 @@ object ProtoTypes {
         return protoToSupportMap[name]
     }
 
-    fun findMessageSupport(name: String): MessageSupport<*,*> {
-        return findSupport(name) as MessageSupport<*,*>
+    fun findMessageSupport(name: String): MessageSupport<*, *> {
+        return findSupport(name) as MessageSupport<*, *>
+    }
+
+    fun findEnumSupport(name: String): EnumSupport<*> {
+        return findSupport(name) as EnumSupport<*>
+    }
+
+    fun findServiceSupport(name: String): ServiceSupport {
+        return findSupport(name) as ServiceSupport
     }
 
     fun services(): List<ServiceSupport> {

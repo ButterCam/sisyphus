@@ -1,11 +1,8 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.starter.grpc.LocalClientRepository.Companion.LOCAL_CHANNEL_BEAN_NAME
-import com.bybutter.sisyphus.starter.grpc.ServiceConfig
 import io.grpc.Channel
-import io.grpc.ManagedChannelBuilder
 import io.grpc.Server
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.web.reactive.function.server.HandlerFunction
@@ -20,8 +17,8 @@ import reactor.core.publisher.Mono
  * provided Http+Json to gRpc+protobuf transcoding.
  */
 class TranscodingRouterFunction private constructor(
-        private val server: Server,
-        private val serviceRouters: List<RouterFunction<ServerResponse>>
+    private val server: Server,
+    private val serviceRouters: List<RouterFunction<ServerResponse>>
 ) : RouterFunction<ServerResponse>, ApplicationContextAware {
 
     private lateinit var applicationContext: ApplicationContext

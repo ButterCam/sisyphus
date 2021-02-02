@@ -26,14 +26,13 @@ import com.bybutter.sisyphus.protobuf.compiler.kInterface
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.buildCodeBlock
 
 class MessageApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (message in state.descriptor.messages) {
-            if(message.mapEntry()) continue
+            if (message.mapEntry()) continue
             state.target.addType(kInterface(message.name()) {
                 MessageInterfaceGeneratingState(state, message, this).advance()
             })
@@ -53,7 +52,7 @@ class MessageInterfaceBasicGenerator : GroupedGenerator<MessageInterfaceGenerati
             addKdoc(state.descriptor.document())
 
             for (message in state.descriptor.messages) {
-                if(message.mapEntry()) continue
+                if (message.mapEntry()) continue
                 state.target.addType(kInterface(message.name()) {
                     MessageInterfaceGeneratingState(state, message, this).advance()
                 })
@@ -72,7 +71,7 @@ class MessageInterfaceBasicGenerator : GroupedGenerator<MessageInterfaceGenerati
 class MessageInternalGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         for (message in state.descriptor.messages) {
-            if(message.mapEntry()) continue
+            if (message.mapEntry()) continue
 
             state.target.addType(kInterface(message.mutableName()) {
                 MutableMessageInterfaceGeneratingState(state, message, this).advance()
@@ -100,7 +99,7 @@ class MutableMessageInterfaceBasicGenerator : GroupedGenerator<MutableMessageInt
             this implements state.descriptor.className()
 
             for (message in state.descriptor.messages) {
-                if(message.mapEntry()) continue
+                if (message.mapEntry()) continue
                 state.target.addType(kInterface(message.mutableName()) {
                     MutableMessageInterfaceGeneratingState(state, message, this).advance()
                 })
@@ -122,7 +121,7 @@ class MessageImplementationBasicGenerator : GroupedGenerator<MessageImplementati
             this implements state.descriptor.mutableClassName()
 
             for (message in state.descriptor.messages) {
-                if(message.mapEntry()) continue
+                if (message.mapEntry()) continue
                 state.target.addType(kClass(message.implementationName()) {
                     MessageImplementationGeneratingState(state, message, this).advance()
                 })
@@ -208,7 +207,7 @@ class MessageSupportBasicGenerator : GroupedGenerator<MessageSupportGeneratingSt
             }
 
             for (message in state.descriptor.messages) {
-                if(message.mapEntry()) continue
+                if (message.mapEntry()) continue
                 state.target.addType(kClass(message.supportName()) {
                     MessageSupportGeneratingState(state, message, this).advance()
                 })

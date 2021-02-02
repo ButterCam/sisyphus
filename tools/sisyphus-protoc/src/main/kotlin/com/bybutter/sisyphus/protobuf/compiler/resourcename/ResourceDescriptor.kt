@@ -3,27 +3,13 @@ package com.bybutter.sisyphus.protobuf.compiler.resourcename
 import com.bybutter.sisyphus.protobuf.compiler.DescriptorNode
 import com.bybutter.sisyphus.protobuf.compiler.FileDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.MessageDescriptor
-import com.bybutter.sisyphus.protobuf.compiler.defaultValue
-import com.bybutter.sisyphus.protobuf.compiler.elementType
 import com.bybutter.sisyphus.protobuf.compiler.fileSet
-import com.bybutter.sisyphus.protobuf.compiler.mapEntry
 import com.bybutter.sisyphus.string.plural
 import com.bybutter.sisyphus.string.singular
 import com.bybutter.sisyphus.string.toPascalCase
 import com.google.api.ResourceDescriptor
-import com.google.api.ResourceProto
 import com.google.api.pathtemplate.PathTemplate
-import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.LIST
-import com.squareup.kotlinpoet.MAP
-import com.squareup.kotlinpoet.MUTABLE_LIST
-import com.squareup.kotlinpoet.MUTABLE_MAP
-import com.squareup.kotlinpoet.ParameterizedTypeName
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.TypeName
-import com.squareup.kotlinpoet.buildCodeBlock
 
 class ResourceDescriptor(
     override val parent: DescriptorNode<*>,

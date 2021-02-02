@@ -6,6 +6,7 @@ import com.bybutter.sisyphus.protobuf.compiler.clearFunction
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldImplementationGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldInterfaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldMutableInterafaceGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageCompanionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageImplementationGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageInterfaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MutableMessageInterfaceGeneratingState
@@ -21,6 +22,7 @@ import com.bybutter.sisyphus.protobuf.compiler.name
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.bybutter.sisyphus.protobuf.compiler.setter
+import com.bybutter.sisyphus.string.toScreamingSnakeCase
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.asClassName
@@ -35,7 +37,7 @@ class MessageInterfaceFieldGenerator : GroupedGenerator<MessageInterfaceGenerati
     }
 }
 
-class MessageInterfaceFieldBasicGenerator: GroupedGenerator<FieldInterfaceGeneratingState> {
+class MessageInterfaceFieldBasicGenerator : GroupedGenerator<FieldInterfaceGeneratingState> {
     override fun generate(state: FieldInterfaceGeneratingState): Boolean {
         state.target.property(state.descriptor.name(), state.descriptor.fieldType()) {
             addKdoc(state.descriptor.document())
@@ -65,7 +67,7 @@ class MutableMessageInterfaceFieldGenerator : GroupedGenerator<MutableMessageInt
     }
 }
 
-class MutableMessageInterfaceBasicFieldGenerator: GroupedGenerator<FieldMutableInterafaceGeneratingState> {
+class MutableMessageInterfaceBasicFieldGenerator : GroupedGenerator<FieldMutableInterafaceGeneratingState> {
     override fun generate(state: FieldMutableInterafaceGeneratingState): Boolean {
         state.target.property(state.descriptor.name(), state.descriptor.mutableFieldType()) {
             this += KModifier.OVERRIDE
@@ -186,6 +188,23 @@ class MessageImplementationFieldBasicGenerator : GroupedGenerator<FieldImplement
                         endControlFlow()
                     }
                 }
+            }
+        }
+        return true
+    }
+}
+
+class MessageCompanionFieldNameConstGenerator : GroupedGenerator<MessageCompanionGeneratingState> {
+    override fun generate(state: MessageCompanionGeneratingState): Boolean {
+        for (field in state.descriptor.fields) {
+            state.target.property("${field.descriptor.name}_field_name".toScreamingSnakeCase(), String::class) {
+                this += KModifier.CONST
+                initializer("%S", field.descriptor.name)
+            }
+
+            state.target.property("${field.descriptor.name}_field_number".toScreamingSnakeCase(), Int::class) {
+                this += KModifier.CONST
+                initializer(field.descriptor.number.toString())
             }
         }
         return true

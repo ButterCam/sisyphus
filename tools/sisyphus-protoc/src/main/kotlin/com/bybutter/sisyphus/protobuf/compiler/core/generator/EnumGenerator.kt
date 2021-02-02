@@ -22,7 +22,6 @@ import com.bybutter.sisyphus.protobuf.compiler.kEnum
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
@@ -170,4 +169,3 @@ class EnumSupportBasicGenerator : GroupedGenerator<EnumSupportGeneratingState> {
         return true
     }
 }
-

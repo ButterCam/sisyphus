@@ -40,7 +40,7 @@ class FileDescriptorSet(
         return lookup(proto) as? EnumDescriptor
     }
 
-    fun lookup(name: String) : DescriptorNode<*>? {
+    fun lookup(name: String): DescriptorNode<*>? {
         return lookupTable[name]
     }
 

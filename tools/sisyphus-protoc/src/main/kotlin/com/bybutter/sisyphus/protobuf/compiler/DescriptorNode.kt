@@ -17,7 +17,7 @@ abstract class DescriptorNode<T> {
     }
 
     protected open fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
-         DescriptorResolver.resolve(this, children)
+        DescriptorResolver.resolve(this, children)
     }
 
     fun children(): List<DescriptorNode<*>> {

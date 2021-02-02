@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.protobuf.compiler.core.state
 
 import com.bybutter.sisyphus.protobuf.compiler.EnumDescriptor
-import com.bybutter.sisyphus.protobuf.compiler.EnumValueDescriptor
 import com.squareup.kotlinpoet.TypeSpec
 
 class EnumGeneratingState(

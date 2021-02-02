@@ -19,7 +19,6 @@ import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.bybutter.sisyphus.string.toCamelCase
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock

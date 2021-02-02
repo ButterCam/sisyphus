@@ -19,6 +19,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageApiGenerato
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageClearFieldInCurrentFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageClearFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageCloneMutableFunctionGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageCompanionFieldNameConstGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageComputeHashCodeFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageEqualsMessageFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldClearFieldInCurrentFunctionGenerator
@@ -58,12 +59,12 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumGenerato
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumSupportGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionApiGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionSupportGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofFieldImplementationInterceptorGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofImplementationGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofInterfaceGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofMutableInterfaceGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofFieldImplementationInterceptorGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofKindTypeBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofKindTypeGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofMutableInterfaceGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofValueBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.state.GeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.MessageResourceNameGenerator
@@ -189,6 +190,7 @@ class CodeGenerators {
         register(MessageImplementationBasicGenerator())
         register(MessageSupportBasicGenerator())
         register(MessageSupportFunctionGenerator())
+        register(MessageCompanionFieldNameConstGenerator())
         register(MessageMergeWithFunctionGenerator())
         register(MessageCloneMutableFunctionGenerator())
         register(MessageClearFunctionGenerator())

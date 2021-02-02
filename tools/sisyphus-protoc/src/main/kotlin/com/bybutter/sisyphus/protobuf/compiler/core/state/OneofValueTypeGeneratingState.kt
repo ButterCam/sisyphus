@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.protobuf.compiler.core.state
 
-import com.bybutter.sisyphus.protobuf.compiler.MessageDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.MessageFieldDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.OneofFieldDescriptor
 import com.squareup.kotlinpoet.TypeSpec

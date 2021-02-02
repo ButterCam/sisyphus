@@ -53,13 +53,12 @@ class OneofValueBasicGenerator : GroupedGenerator<OneofValueTypeGeneratingState>
         state.target.apply {
             this implements RuntimeTypes.ONE_OF_VALUE.parameterizedBy(TypeVariableName("T"))
             this.addTypeVariable(TypeVariableName("T"))
-
         }
         return true
     }
 }
 
-class OneofKindTypeGenerator: GroupedGenerator<OneofValueTypeGeneratingState> {
+class OneofKindTypeGenerator : GroupedGenerator<OneofValueTypeGeneratingState> {
     override fun generate(state: OneofValueTypeGeneratingState): Boolean {
         for (field in state.descriptor.parent.fields) {
             if (field.oneof() == state.descriptor) {

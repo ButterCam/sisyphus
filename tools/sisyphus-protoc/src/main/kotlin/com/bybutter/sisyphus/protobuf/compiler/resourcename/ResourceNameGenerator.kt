@@ -104,7 +104,7 @@ class ResourceNameImplementationGenerator : GroupedGenerator<ResourceNameGenerat
                     this += KModifier.OVERRIDE
                     returns(PathTemplate::class)
 
-                    addStatement("return support().patterns[${index}]")
+                    addStatement("return support().patterns[$index]")
                 }
 
                 for (field in template.vars()) {
