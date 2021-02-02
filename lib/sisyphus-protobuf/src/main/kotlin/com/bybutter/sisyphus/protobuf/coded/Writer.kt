@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.protobuf.coded
 import com.bybutter.sisyphus.data.encodeZigZag
 import com.bybutter.sisyphus.data.varintSize
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.protobuf.ProtoEnum
 import com.bybutter.sisyphus.protobuf.primitives.Any
 import java.io.OutputStream
 import java.util.Deque
@@ -93,6 +94,10 @@ class Writer(private val parent: Writer? = null) {
 
     fun string(string: String): Writer {
         return bytes(string.toByteArray())
+    }
+
+    fun enum(enum: ProtoEnum): Writer {
+        return int32(enum.number)
     }
 
     fun message(message: Message<*, *>?): Writer {

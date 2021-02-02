@@ -31,14 +31,14 @@ data class RequestInfo(
 
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
-open class DefaultRequestLogger : RequestLogger {
+class DefaultRequestLogger : RequestLogger {
     override val id: String = RequestLogger::class.java.typeName
 
     override fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long) {
         if (status.isOk) {
-            logger.info("[${status.code}] ${call.methodDescriptor.fullMethodName}(${requestInfo.outputTrailers?.get(SisyphusGrpcServerInterceptor.REQUEST_ID_META_KEY)}) +${getCostString(cost)}")
+            logger.info("[${status.code}] ${call.methodDescriptor.fullMethodName} +${getCostString(cost)}")
         } else {
-            logger.error("[${status.code}] ${call.methodDescriptor.fullMethodName}(${requestInfo.outputTrailers?.get(SisyphusGrpcServerInterceptor.REQUEST_ID_META_KEY)}) +${getCostString(cost)}", status.cause)
+            logger.error("[${status.code}] ${call.methodDescriptor.fullMethodName} +${getCostString(cost)}", status.cause)
         }
     }
 

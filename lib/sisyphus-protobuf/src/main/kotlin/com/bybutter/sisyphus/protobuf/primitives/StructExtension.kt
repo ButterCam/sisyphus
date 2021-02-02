@@ -1,8 +1,8 @@
 package com.bybutter.sisyphus.protobuf.primitives
 
 import com.bybutter.sisyphus.protobuf.Message
-import proto.internal.com.bybutter.sisyphus.protobuf.primitives.MutableListValue
-import proto.internal.com.bybutter.sisyphus.protobuf.primitives.MutableStruct
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableListValue
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStruct
 
 operator fun Struct.Companion.invoke(vararg pairs: Pair<String, kotlin.Any?>): Struct {
     return Struct {

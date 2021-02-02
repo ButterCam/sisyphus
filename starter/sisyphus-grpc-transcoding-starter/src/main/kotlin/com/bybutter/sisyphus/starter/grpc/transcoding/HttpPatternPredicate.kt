@@ -1,7 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.api.HttpRule
-import com.bybutter.sisyphus.api.resource.PathTemplate
+import com.google.api.pathtemplate.PathTemplate
 import org.springframework.http.HttpMethod
 import org.springframework.web.reactive.function.server.RequestPredicate
 import org.springframework.web.reactive.function.server.RequestPredicates

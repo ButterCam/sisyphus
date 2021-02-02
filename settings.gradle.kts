@@ -6,9 +6,8 @@ include("lib:sisyphus-jackson")
 include("lib:sisyphus-jackson-protobuf")
 include("lib:sisyphus-protobuf")
 include("lib:sisyphus-grpc")
-
-include("proto:sisyphus-protos")
-include("proto:sisyphus-grpc-protos")
+include("lib:sisyphus-grpc-coroutine")
+include("lib:sisyphus-grpc-service-util")
 
 include("tools:sisyphus-protoc")
 include("tools:sisyphus-project-gradle-plugin")

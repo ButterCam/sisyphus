@@ -1,17 +1,15 @@
 package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.collection.contentEquals
-import com.bybutter.sisyphus.collection.firstNotNull
 import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
+import com.bybutter.sisyphus.reflect.uncheckedCast
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import kotlin.reflect.KProperty
 
-abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
-    protected val _support: ProtoSupport<T, TM>
-) : Message<T, TM> {
+abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Message<T, TM> {
     init {
         // Initialize [ProtoTypes] class to read all proto info
         ProtoTypes
@@ -22,20 +20,10 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
     private val _unknownFields = UnknownFields()
 
     @OptIn(InternalProtoApi::class)
-    protected val _extensions = hashMapOf<String, AbstractMutableMessage<*, *>>()
-        get() {
-            if (field.size < _support.extensions.size) {
-                for (extension in _support.extensions) {
-                    if (!field.containsKey(extension.fullName)) {
-                        field[extension.fullName] = _unknownFields.exportExtension(extension) as AbstractMutableMessage<*, *>
-                    }
-                }
-            }
-            return field
-        }
+    protected val _extensions = mutableMapOf<Int, MessageExtension<*>>()
 
     override fun fieldDescriptors(): List<FieldDescriptorProto> {
-        return _support.fieldDescriptors
+        return support().fieldDescriptors
     }
 
     override fun fieldDescriptor(fieldName: String): FieldDescriptorProto {
@@ -45,21 +33,15 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
 
     override fun fieldDescriptor(fieldNumber: Int): FieldDescriptorProto {
         return fieldDescriptorOrNull(fieldNumber)
-                ?: throw IllegalArgumentException("Message not contains field definition of '$fieldNumber'.")
+            ?: throw IllegalArgumentException("Message not contains field definition of '$fieldNumber'.")
     }
 
     override fun fieldDescriptorOrNull(fieldName: String): FieldDescriptorProto? {
-        return _support.fieldInfo(fieldName)
-                ?: _extensions.values.firstNotNull { it.fieldInfo(fieldName) }
+        return support().fieldInfo(fieldName)
     }
 
     override fun fieldDescriptorOrNull(fieldNumber: Int): FieldDescriptorProto? {
-        return _support.fieldInfo(fieldNumber)
-                ?: _extensions.values.firstNotNull { it.fieldInfo(fieldNumber) }
-    }
-
-    fun invalidCache() {
-        hashCodeCache = 0
+        return support().fieldInfo(fieldNumber)
     }
 
     override fun iterator(): Iterator<Pair<FieldDescriptorProto, Any?>> {
@@ -67,18 +49,10 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
     }
 
     override fun descriptor(): DescriptorProto {
-        return _support.descriptor
-    }
-
-    override fun support(): ProtoSupport<T, TM> {
-        return _support
+        return support().descriptor
     }
 
     override fun hashCode(): Int {
-        if (hashCodeCache != 0) {
-            return hashCodeCache
-        }
-
         var result = computeHashCode()
         for (extension in _extensions) {
             result = result * 43 + extension.hashCode()
@@ -95,15 +69,15 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
 
         val message = other as AbstractMessage<*, *>
 
-        return equals(other as T) && _extensions.contentEquals(message._extensions) && unknownFields() == message.unknownFields()
+        return equalsMessage(other as T) && _extensions.contentEquals(message._extensions) && unknownFields() == message.unknownFields()
     }
 
     override fun type(): String {
-        return _support.fullName
+        return support().name
     }
 
     override fun typeUrl(): String {
-        return "types.bybutter.com/${_support.fullName}"
+        return "types.bybutter.com/${support().name}"
     }
 
     override fun toProto(): ByteArray {
@@ -113,8 +87,16 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
         }
     }
 
+    @OptIn(InternalProtoApi::class)
     override fun clone(): T {
-        return invoke { }
+        return cloneMutable().uncheckedCast()
+    }
+
+    @OptIn(InternalProtoApi::class)
+    override fun unionOf(other: T?): T {
+        return cloneMutable().apply {
+            mergeWith(other)
+        }.uncheckedCast()
     }
 
     override fun <T> get(fieldName: String): T {
@@ -133,6 +115,10 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
             }
         }
         return target as T
+    }
+
+    override fun <T> get(fieldNumber: Int): T {
+        return getFieldInCurrent(fieldNumber)
     }
 
     override fun has(fieldName: String): Boolean {
@@ -165,18 +151,16 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
         return true
     }
 
-    protected abstract fun computeHashCode(): Int
-
-    protected abstract fun equals(other: T): Boolean
-
-    protected abstract fun writeFields(writer: Writer)
+    override fun has(fieldNumber: Int): Boolean {
+        return hasFieldInCurrent(fieldNumber)
+    }
 
     fun fieldInfo(name: String): FieldDescriptorProto? {
-        return _support.fieldInfo(name)
+        return support().fieldInfo(name)
     }
 
     fun fieldInfo(number: Int): FieldDescriptorProto? {
-        return _support.fieldInfo(number)
+        return support().fieldInfo(number)
     }
 
     override fun writeTo(output: OutputStream) {
@@ -187,8 +171,8 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
 
     override fun writeTo(writer: Writer) {
         writeFields(writer)
-        for ((_, extension) in _extensions) {
-            extension.writeTo(writer)
+        for (extension in _extensions) {
+            extension.value.writeTo(writer)
         }
         unknownFields().writeTo(writer)
     }
@@ -199,57 +183,58 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>>(
         writer.ld().writeTo(output)
     }
 
-    protected abstract fun <T> getFieldInCurrent(fieldName: String): T
-
-    protected abstract fun hasFieldInCurrent(fieldName: String): Boolean
-
     protected fun <T> getFieldInExtensions(name: String): T {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(name) != null }
-                        ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
-
-        return extension[name]
+        val number = support().fieldInfo(name)?.number ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
+        return getFieldInExtensions(number)
     }
 
     protected fun <T> getFieldInExtensions(number: Int): T {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(number) != null }
-                        ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
-
-        return extension[number]
+        val extensions = support().extensions.firstOrNull { it.descriptor.number == number } ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
+        return (_extensions[number]?.value ?: extensions.default()).uncheckedCast()
     }
 
     protected fun getPropertyInExtensions(name: String): KProperty<*>? {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(name) != null } ?: return null
-
-        return extension.getProperty(name)
+        val extension = support().extensions.firstOrNull { it.descriptor.name == name || it.descriptor.jsonName == name }
+            ?: return null
+        return extension.getProperty()
     }
 
     protected fun getPropertyInExtensions(number: Int): KProperty<*>? {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(number) != null } ?: return null
-
-        return extension.getProperty(number)
+        val extension = support().extensions.firstOrNull { it.descriptor.number == number }
+            ?: return null
+        return extension.getProperty()
     }
 
     protected fun hasFieldInExtensions(name: String): Boolean {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(name) != null } ?: return false
-
-        return extension.has(name)
+        val number = support().fieldInfo(name)?.number ?: return false
+        return hasFieldInExtensions(number)
     }
 
     protected fun hasFieldInExtensions(number: Int): Boolean {
-        val extension =
-                _extensions.values.firstOrNull { it.fieldInfo(number) != null } ?: return false
-
-        return extension.has(number)
+        return _extensions[number] != null
     }
 
     override fun unknownFields(): UnknownFields {
         return _unknownFields
     }
+
+    override fun extensions(): Map<Int, MessageExtension<*>> {
+        return _extensions
+    }
+
+    protected abstract fun computeHashCode(): Int
+
+    protected abstract fun equalsMessage(other: T): Boolean
+
+    protected abstract fun writeFields(writer: Writer)
+
+    protected abstract fun <T> getFieldInCurrent(fieldName: String): T
+
+    protected abstract fun <T> getFieldInCurrent(fieldNumber: Int): T
+
+    protected abstract fun hasFieldInCurrent(fieldName: String): Boolean
+
+    protected abstract fun hasFieldInCurrent(fieldNumber: Int): Boolean
 }
 
 private class MessageIterator(private val message: Message<*, *>) : Iterator<Pair<FieldDescriptorProto, Any?>> {

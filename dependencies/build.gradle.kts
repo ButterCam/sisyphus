@@ -60,5 +60,8 @@ dependencies {
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.0")
         api("com.google.protobuf:protobuf-javalite:3.13.0")
         api("org.mongodb:mongodb-driver-reactivestreams:4.1.1")
+        api("com.android.tools.build:gradle:4.1.0")
+        api("com.salesforce.servicelibs:rxgrpc-stub:1.0.1")
+        api("com.google.api:api-common:1.10.1")
     }
 }
