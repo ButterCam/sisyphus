@@ -428,12 +428,12 @@ class MessageFieldSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageS
             if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
                 beginScope("%L", state.target.branch) {
                     addStatement("this.%N.clear()", state.descriptor.name())
-                    if(state.descriptor.mapEntry() == null) {
+                    if (state.descriptor.mapEntry() == null) {
                         addStatement(
                             "this.%N.addAll(value.%M())", state.descriptor.name(),
                             RuntimeMethods.UNCHECK_CAST
                         )
-                    }else {
+                    } else {
                         addStatement(
                             "this.%N.putAll(value.%M())", state.descriptor.name(),
                             RuntimeMethods.UNCHECK_CAST

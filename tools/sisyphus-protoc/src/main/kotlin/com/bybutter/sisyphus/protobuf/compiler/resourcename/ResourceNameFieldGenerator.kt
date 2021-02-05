@@ -22,7 +22,6 @@ import com.bybutter.sisyphus.protobuf.compiler.function
 import com.bybutter.sisyphus.protobuf.compiler.getter
 import com.bybutter.sisyphus.protobuf.compiler.hasFunction
 import com.bybutter.sisyphus.protobuf.compiler.implements
-import com.bybutter.sisyphus.protobuf.compiler.mapEntry
 import com.bybutter.sisyphus.protobuf.compiler.name
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
@@ -250,7 +249,7 @@ class ResourceNameMessageFieldWriteFunctionGenerator : GroupedGenerator<MessageW
     override fun generate(state: MessageWriteFieldsFunctionGeneratingState): Boolean {
         ResourceFields.resource(state.descriptor) ?: return false
 
-        if(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
+        if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
             state.target.beginScope("for(value in this.%N)", state.descriptor.name()) {
                 addStatement(
                     "writer.tag(%L).string(value.value())", makeTag(
@@ -284,7 +283,7 @@ class ResourceNameMessageFieldReadFunctionGenerator : GroupedGenerator<MessageRe
     override fun generate(state: MessageReadFieldFunctionGeneratingState): Boolean {
         val resource = ResourceFields.resource(state.descriptor) ?: return false
 
-        if(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
+        if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
             state.target.apply {
                 addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N += %T(reader.string())",
