@@ -66,8 +66,8 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
 
 1. **System requirement**
 
-    - Gradle 6.7+
-    - JDK 11+
+   - Gradle 6.7+
+   - JDK 11+
 
 2. **Configure Sisyphus with gradle.properties**
 
