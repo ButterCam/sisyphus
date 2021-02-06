@@ -121,7 +121,7 @@ object Dependencies {
         const val wagonHttp = "$group.wagon:wagon-http"
     }
 
-    const val elastic5 = "org.elasticsearch.client:transport"
+    const val elastic = "org.elasticsearch.client:elasticsearch-rest-client"
 
     const val mysql = "mysql:mysql-connector-java"
 

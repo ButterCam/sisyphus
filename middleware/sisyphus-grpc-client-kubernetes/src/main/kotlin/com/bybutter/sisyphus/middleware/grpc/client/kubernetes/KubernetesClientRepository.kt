@@ -66,6 +66,7 @@ class KubernetesClientRepository : ClientRepository {
                     null,
                     null,
                     null,
+                    null,
                     null
                 )
             } catch (e: ApiException) {

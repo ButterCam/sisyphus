@@ -95,7 +95,7 @@ open class ProtoGenerateTask : DefaultTask() {
                 for (member in file.members) {
                     val spec = member as? TypeSpec ?: continue
                     if (spec.superclass == RuntimeTypes.FILE_SUPPORT) {
-                        fileSupports.appendln("${file.packageName}.${spec.name}")
+                        fileSupports.appendLine("${file.packageName}.${spec.name}")
                         internal = true
                     }
                 }
