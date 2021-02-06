@@ -5,6 +5,8 @@
 Sisyphus is the way how we provide backend services. It integrates all tools and libraries needed for designing API
 which follows the [Google API Improvement Proposals](https://aip.bybutter.com).
 
+[中文文档](doc/zh-cn/ReadMe.md)
+
 ## We are rolling a huge boulder
 
 Due to analyzing product documents completely, it is not particularly difficult to write an exquisite and easy-to-use
