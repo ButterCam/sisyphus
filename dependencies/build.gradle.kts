@@ -31,7 +31,7 @@ dependencies {
         api("io.kubernetes:client-java:9.0.2")
         api("io.netty:netty-tcnative-boringssl-static:2.0.34.Final")
         api("org.apache.maven.wagon:wagon-http:3.4.1")
-        api("org.junit.jupiter:junit-jupiter:5.6.2")
+        api("org.junit.jupiter:junit-jupiter:5.7.1")
         api("org.reflections:reflections:0.9.12")
         api("com.squareup.okhttp3:okhttp:4.8.1")
         api("com.squareup.retrofit2:retrofit:2.9.0")
