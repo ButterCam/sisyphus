@@ -30,7 +30,7 @@ dependencies {
         api("com.github.os72:protoc-jar:3.11.4")
         api("io.kubernetes:client-java:9.0.2")
         api("io.netty:netty-tcnative-boringssl-static:2.0.36.Final")
-        api("org.apache.maven.wagon:wagon-http:3.4.1")
+        api("org.apache.maven.wagon:wagon-http:3.4.2")
         api("org.junit.jupiter:junit-jupiter:5.7.1")
         api("org.reflections:reflections:0.9.12")
         api("com.squareup.okhttp3:okhttp:4.8.1")
