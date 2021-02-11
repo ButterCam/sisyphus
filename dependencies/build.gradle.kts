@@ -24,7 +24,7 @@ dependencies {
 
     constraints {
         api("com.squareup:kotlinpoet:1.6.0")
-        api("org.elasticsearch.client:transport:5.6.3")
+        api("org.elasticsearch.client:transport:7.11.0")
         api("com.aliyun.hbase:alihbase-client:2.8.1")
         api("org.reflections:reflections:0.9.12")
         api("com.github.os72:protoc-jar:3.11.4")
