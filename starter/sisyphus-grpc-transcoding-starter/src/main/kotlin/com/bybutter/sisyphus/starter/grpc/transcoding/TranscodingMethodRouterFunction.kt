@@ -18,6 +18,7 @@ import io.grpc.ClientCall
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.ServerMethodDefinition
+import org.springframework.http.HttpHeaders
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -123,6 +124,10 @@ class TranscodingMethodRouterFunction private constructor(
     private fun prepareHeader(request: ServerRequest): Metadata {
         val header = Metadata()
         for ((key, values) in request.headers().asHttpHeaders()) {
+            if(key.toLowerCase() == HttpHeaders.USER_AGENT.toLowerCase()) {
+                header.put(Metadata.Key.of("X-${HttpHeaders.USER_AGENT}", Metadata.ASCII_STRING_MARSHALLER), values.joinToString(","))
+                continue
+            }
             header.put(Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER), values.joinToString(","))
         }
         return header
