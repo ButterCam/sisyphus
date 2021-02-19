@@ -131,7 +131,7 @@ class TranscodingMethodRouterFunction private constructor(
     private fun prepareHeader(request: ServerRequest): Metadata {
         val header = Metadata()
         for ((key, values) in request.headers().asHttpHeaders()) {
-            if(key.toLowerCase() == HttpHeaders.USER_AGENT.toLowerCase()) {
+            if (key.toLowerCase() == HttpHeaders.USER_AGENT.toLowerCase()) {
                 header.put(Metadata.Key.of("X-${HttpHeaders.USER_AGENT}", Metadata.ASCII_STRING_MARSHALLER), values.joinToString(","))
                 continue
             }
