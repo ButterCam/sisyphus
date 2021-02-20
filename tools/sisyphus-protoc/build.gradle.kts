@@ -15,5 +15,8 @@ dependencies {
     implementation(Dependencies.Proto.grpcProto)
     implementation("com.google.api:api-common")
 
+    implementation("io.reactivex.rxjava2:rxjava:2.2.20")
+
     testImplementation(project(":lib:sisyphus-grpc-coroutine"))
+    testImplementation(project(":lib:sisyphus-grpc-rxjava"))
 }

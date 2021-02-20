@@ -124,7 +124,8 @@ open class ProtoGenerateTask : DefaultTask() {
                         BuildInPlugin.BASIC_GENERATOR -> basic()
                         BuildInPlugin.COROUTINE_SERVICE_GENERATOR -> coroutineService()
                         BuildInPlugin.SEPARATED_COROUTINE_SERVICE_GENERATOR -> separatedCoroutineService()
-                        BuildInPlugin.RXJAVA_SERVICE_GENERATOR -> TODO()
+                        BuildInPlugin.RXJAVA_SERVICE_GENERATOR -> rxjavaClient()
+                        BuildInPlugin.SEPARATED_RXJAVA_SERVICE_GENERATOR -> separatedRxjavaClient()
                         BuildInPlugin.RESOURCE_NAME_GENERATOR -> resourceName()
                         BuildInPlugin.GENERATORS_FROM_SPI -> spi()
                     }

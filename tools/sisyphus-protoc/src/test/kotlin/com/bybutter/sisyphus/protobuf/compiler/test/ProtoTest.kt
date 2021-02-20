@@ -4,13 +4,13 @@ import com.bybutter.sisyphus.io.toUnixPath
 import com.bybutter.sisyphus.protobuf.compiler.CodeGenerators
 import com.bybutter.sisyphus.protobuf.compiler.ProtobufCompiler
 import com.bybutter.sisyphus.protobuf.compiler.ProtocRunner
+import org.junit.jupiter.api.Test
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
-import org.junit.jupiter.api.Test
 
 class ProtoTest {
     @Test
