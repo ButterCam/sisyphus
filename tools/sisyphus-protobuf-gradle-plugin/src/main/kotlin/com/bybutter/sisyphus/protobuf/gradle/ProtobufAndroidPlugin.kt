@@ -173,6 +173,7 @@ class ProtobufAndroidPlugin : Plugin<Project> {
                 it.resourceOutput = resourceOutputDir
                 it.group = "proto"
                 it.description = "Generate protos for '${sourceSet.name}' source set."
+                it.protobuf = extension
 
                 it.dependsOn(extractTask)
             }.get()

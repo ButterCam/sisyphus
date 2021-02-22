@@ -74,10 +74,12 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
             }
 
             for (value in state.descriptor.values) {
-                state.target.addEnumConstant(value.name(), TypeSpec.anonymousClassBuilder()
-                    .addSuperclassConstructorParameter("%L", value.descriptor.number)
-                    .addSuperclassConstructorParameter("%S", value.descriptor.name)
-                    .build())
+                state.target.addEnumConstant(
+                    value.name(), TypeSpec.anonymousClassBuilder()
+                        .addSuperclassConstructorParameter("%L", value.descriptor.number)
+                        .addSuperclassConstructorParameter("%S", value.descriptor.name)
+                        .build()
+                )
             }
         }
         return true

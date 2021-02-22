@@ -1,106 +1,15 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ApiFileGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumApiGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumSupportBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumSupportGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionApiGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionDefinitionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionSupportBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionSupportGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileSupportGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.InternalFileGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageApiGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageClearFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageClearFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageCloneMutableFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageCompanionFieldNameConstGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageComputeHashCodeFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageEqualsMessageFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldClearFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldComputeHashCodeFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldEqualsFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldGetFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldGetPropertyFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldHasFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldReadFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldSetFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldWriteFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageGetFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageGetPropertyFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageHasFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementationBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementationFieldBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementationFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceFieldBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInternalGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageMergeWithFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageReadFieldFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSetFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSupportBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSupportFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageWriteFieldsFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceBasicFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestEnumParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestExtensionParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestMessageParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumSupportGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionApiGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionSupportGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofFieldImplementationInterceptorGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofImplementationGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofInterfaceGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofKindTypeBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofKindTypeGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofMutableInterfaceGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofValueBasicGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.*
 import com.bybutter.sisyphus.protobuf.compiler.core.state.GeneratingState
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.MessageResourceNameGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameCompanionBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameCompanionInvokeGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameImplementationFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameImplementationGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameInterfaceFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMessageFieldReadFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMessageFieldWriteFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMutableInterfaceFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameOneofImplementationFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameOneofKindTypeBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineClientBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineClientMethodGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceMethodGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportMethodGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceApiFileGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceFileSupportGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceInternalFileGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceSupportBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceSupportGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.*
+import com.bybutter.sisyphus.protobuf.compiler.rpc.*
+import com.bybutter.sisyphus.protobuf.compiler.rxjava.*
 import com.bybutter.sisyphus.reflect.getTypeArgument
 import com.bybutter.sisyphus.reflect.uncheckedCast
 import com.bybutter.sisyphus.spi.ServiceLoader
 import java.lang.reflect.ParameterizedType
-import java.util.Stack
+import java.util.*
 
 interface CodeGenerator<T : GeneratingState<*, *>> {
     fun generate(state: T): Boolean
@@ -191,7 +100,6 @@ class CodeGenerators {
         register(MessageImplementationBasicGenerator())
         register(MessageSupportBasicGenerator())
         register(MessageSupportFunctionGenerator())
-        register(MessageCompanionFieldNameConstGenerator())
         register(MessageMergeWithFunctionGenerator())
         register(MessageCloneMutableFunctionGenerator())
         register(MessageClearFunctionGenerator())
@@ -213,6 +121,7 @@ class CodeGenerators {
         register(MessageFieldWriteFunctionGenerator())
         register(MessageReadFieldFunctionGenerator())
         register(MessageFieldReadFunctionGenerator())
+        register(MessageCompanionFieldNameConstGenerator())
         register(OneofInterfaceGenerator())
         register(OneofValueBasicGenerator())
         register(OneofKindTypeGenerator())
@@ -274,6 +183,23 @@ class CodeGenerators {
         register(SeparatedCoroutineServiceSupportBasicGenerator())
 
         coroutineService()
+        return this
+    }
+
+    fun rxjavaClient(): CodeGenerators {
+        register(RxClientGenerator())
+
+        register(RxClientBasicGenerator())
+        register(RxClientMethodGenerator())
+
+        return this
+    }
+
+    fun separatedRxjavaClient(): CodeGenerators {
+        register(SeparatedRxClientApiFileGenerator())
+        register(SeparatedRxClientGenerator())
+
+        rxjavaClient()
         return this
     }
 

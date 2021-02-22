@@ -80,7 +80,8 @@ class MutableMessageInterfaceBasicFieldGenerator : GroupedGenerator<FieldMutable
             state.target.function(state.descriptor.clearFunction()) {
                 this += KModifier.ABSTRACT
                 returns(
-                    state.descriptor.fieldType().copy(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)
+                    state.descriptor.fieldType()
+                        .copy(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)
                 )
             }
         }

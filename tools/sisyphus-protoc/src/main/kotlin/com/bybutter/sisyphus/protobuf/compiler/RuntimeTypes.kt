@@ -43,6 +43,14 @@ object RuntimeTypes {
 
     val ABSTRACT_COROUTINE_STUB = ClassName.bestGuess("com.bybutter.sisyphus.rpc.AbstractCoroutineStub")
 
+    val ABSTRACT_REACTIVE_STUB = ClassName.bestGuess("com.bybutter.sisyphus.rpc.AbstractReactiveStub")
+
+    val SINGLE = ClassName.bestGuess("io.reactivex.Single")
+
+    val FLOWABLE = ClassName.bestGuess("io.reactivex.Flowable")
+
+    val COMPLETABLE = ClassName.bestGuess("io.reactivex.Completable")
+
     val CALL_OPTIONS_INTERCEPTOR = ClassName.bestGuess("com.bybutter.sisyphus.rpc.CallOptionsInterceptor")
 
     val SERVICE_DESCRIPTOR = ClassName.bestGuess("io.grpc.ServiceDescriptor")

@@ -64,6 +64,16 @@ data class ProtoCompilerPlugins(
         return this
     }
 
+    fun rxJava(): ProtoCompilerPlugins {
+        buildInPlugins += BuildInPlugin.RXJAVA_SERVICE_GENERATOR
+        return this
+    }
+
+    fun separatedRxJava(): ProtoCompilerPlugins {
+        buildInPlugins += BuildInPlugin.SEPARATED_RXJAVA_SERVICE_GENERATOR
+        return this
+    }
+
     fun resourceName(): ProtoCompilerPlugins {
         buildInPlugins += BuildInPlugin.RESOURCE_NAME_GENERATOR
         return this
@@ -113,6 +123,7 @@ enum class BuildInPlugin {
     COROUTINE_SERVICE_GENERATOR,
     SEPARATED_COROUTINE_SERVICE_GENERATOR,
     RXJAVA_SERVICE_GENERATOR,
+    SEPARATED_RXJAVA_SERVICE_GENERATOR,
     RESOURCE_NAME_GENERATOR,
     GENERATORS_FROM_SPI
 }
