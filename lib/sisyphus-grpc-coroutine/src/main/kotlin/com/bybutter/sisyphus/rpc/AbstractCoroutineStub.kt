@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.rpc
 import com.bybutter.sisyphus.protobuf.ServiceSupport
 import io.grpc.CallOptions
 import io.grpc.Channel
+import io.grpc.ClientInterceptors
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.kotlin.ClientCalls
@@ -12,7 +13,7 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
     channel: Channel,
     optionsInterceptors: Iterable<CallOptionsInterceptor>,
     options: CallOptions
-) : io.grpc.kotlin.AbstractCoroutineStub<T>(channel, options) {
+) : io.grpc.kotlin.AbstractCoroutineStub<T>(ClientInterceptors.intercept(channel, ClientExceptionResolver), options) {
 
     private val _optionsInterceptors: MutableList<CallOptionsInterceptor> = optionsInterceptors.toMutableList()
 

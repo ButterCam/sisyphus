@@ -1,6 +1,5 @@
-package com.bybutter.sisyphus.starter.grpc.support
+package com.bybutter.sisyphus.rpc
 
-import com.bybutter.sisyphus.rpc.ClientStatusException
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientCall
@@ -10,17 +9,14 @@ import io.grpc.ForwardingClientCallListener
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.Status
-import org.springframework.stereotype.Component
 
-@Component
-class SisyphusGrpcClientInterceptor : ClientInterceptor {
+object ClientExceptionResolver : ClientInterceptor {
     override fun <ReqT : Any, RespT : Any> interceptCall(
         method: MethodDescriptor<ReqT, RespT>,
         callOptions: CallOptions,
         next: Channel
     ): ClientCall<ReqT, RespT> {
-        return object :
-            ForwardingClientCall.SimpleForwardingClientCall<ReqT, RespT>(next.newCall(method, callOptions)) {
+        return object : ForwardingClientCall.SimpleForwardingClientCall<ReqT, RespT>(next.newCall(method, callOptions)) {
             override fun start(responseListener: Listener<RespT>, headers: Metadata) {
                 super.start(object :
                     ForwardingClientCallListener.SimpleForwardingClientCallListener<RespT>(responseListener) {

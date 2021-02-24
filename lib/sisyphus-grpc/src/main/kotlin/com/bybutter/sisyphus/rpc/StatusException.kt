@@ -114,6 +114,3 @@ open class StatusException : RuntimeException {
         return this
     }
 }
-
-open class ClientStatusException(val status: Status, val trailers: Metadata) :
-    RuntimeException(status.description, status.cause)

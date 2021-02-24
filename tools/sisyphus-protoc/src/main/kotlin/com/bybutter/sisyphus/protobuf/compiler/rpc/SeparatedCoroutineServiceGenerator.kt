@@ -58,7 +58,10 @@ class SeparatedCoroutineServiceFileSupportGenerator : GroupedGenerator<RpcIntern
                 this += KModifier.OVERRIDE
                 delegate(buildCodeBlock {
                     beginScope("%M", RuntimeMethods.LAZY) {
-                        addStatement("readDescriptor(%S)", state.descriptor.descriptor.name.replaceExtensionName("proto", "pb"))
+                        addStatement(
+                            "readDescriptor(%S)",
+                            state.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
+                        )
                     }
                 })
             }

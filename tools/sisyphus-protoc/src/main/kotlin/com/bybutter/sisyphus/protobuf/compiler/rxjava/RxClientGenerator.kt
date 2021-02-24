@@ -100,24 +100,20 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                     addParameter("input", method.inputMessage().className())
                 }
 
-                parameter("metadata", RuntimeTypes.METADATA) {
-                    defaultValue("%T()", RuntimeTypes.METADATA)
-                }
-
                 val returnStatementPostfix = if (returnEmpty) ".ignoreElement()" else ""
 
                 when {
                     !method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
-                        addStatement("return unaryCall(${method.name()}, input, metadata)$returnStatementPostfix")
+                        addStatement("return unaryCall(${method.name()}, input)$returnStatementPostfix")
                     }
                     method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
-                        addStatement("return clientStreaming(${method.name()}, input, metadata)$returnStatementPostfix")
+                        addStatement("return clientStreaming(${method.name()}, input)$returnStatementPostfix")
                     }
                     !method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
-                        addStatement("return serverStreaming(${method.name()}, input, metadata)$returnStatementPostfix")
+                        addStatement("return serverStreaming(${method.name()}, input)$returnStatementPostfix")
                     }
                     method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
-                        addStatement("return bidiStreaming(${method.name()}, input, metadata)$returnStatementPostfix")
+                        addStatement("return bidiStreaming(${method.name()}, input)$returnStatementPostfix")
                     }
                 }
             }

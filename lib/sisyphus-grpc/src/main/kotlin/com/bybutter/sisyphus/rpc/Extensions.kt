@@ -74,10 +74,7 @@ operator fun Status.Companion.invoke(exception: Throwable): Status {
             code = exception.code
             exception.message?.let { message = it }
         }
-        is ClientStatusException -> Status {
-            code = exception.status.code.value()
-            exception.status.description?.let { message = it }
-        }
+        is ClientStatusException -> exception.status
         else -> Status {
             code = Code.INTERNAL.number
             exception.message?.let { message = it }

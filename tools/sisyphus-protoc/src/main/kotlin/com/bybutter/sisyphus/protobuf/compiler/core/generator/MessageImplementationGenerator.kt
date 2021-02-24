@@ -172,7 +172,8 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
     }
 }
 
-class MessageFieldClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageClearInCurrentFunctionGeneratingState> {
+class MessageFieldClearFieldInCurrentFunctionGenerator :
+    GroupedGenerator<MessageClearInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageClearInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
@@ -422,7 +423,8 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
     }
 }
 
-class MessageFieldSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageSetFieldInCurrentFunctionGeneratingState> {
+class MessageFieldSetFieldInCurrentFunctionGenerator :
+    GroupedGenerator<MessageSetFieldInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageSetFieldInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
@@ -522,7 +524,8 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
     }
 }
 
-class MessageFieldHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageHasFieldInCurrentFunctionGeneratingState> {
+class MessageFieldHasFieldInCurrentFunctionGenerator :
+    GroupedGenerator<MessageHasFieldInCurrentFunctionGeneratingState> {
     override fun generate(state: MessageHasFieldInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {

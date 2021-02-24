@@ -15,7 +15,7 @@ interface ChildGeneratingState<TDesc : DescriptorNode<*>, TTarget> : GeneratingS
 fun GeneratingState<*, *>.advance() {
     var state = this
 
-    loop@while (true) {
+    loop@ while (true) {
         when (state) {
             is ChildGeneratingState<*, *> -> {
                 state = state.parent
