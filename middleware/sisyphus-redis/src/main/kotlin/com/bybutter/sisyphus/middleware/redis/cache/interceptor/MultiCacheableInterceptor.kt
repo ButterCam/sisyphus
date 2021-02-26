@@ -12,7 +12,10 @@ import org.aopalliance.intercept.MethodInterceptor
 import org.aopalliance.intercept.MethodInvocation
 import org.springframework.cache.Cache
 
-class MultiCacheableInterceptor(private val redisCacheManager: MultiRedisCacheManager, private val evaluationContextInterceptorList: List<EvaluationContextInterceptor>) : MethodInterceptor, Serializable {
+class MultiCacheableInterceptor(
+    private val redisCacheManager: MultiRedisCacheManager,
+    private val evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+) : MethodInterceptor, Serializable {
 
     override fun invoke(invocation: MethodInvocation): Any? {
 
@@ -28,14 +31,32 @@ class MultiCacheableInterceptor(private val redisCacheManager: MultiRedisCacheMa
         }
     }
 
-    private fun normalCache(invocation: MethodInvocation, method: Method, multiCacheable: MultiCacheable, multiRedisCache: Cache?): Any? {
-        val key = generateNormalKey(invocation, multiCacheable.key, method, evaluationContextInterceptorList)?.toString() ?: return invocation.proceed()
+    private fun normalCache(
+        invocation: MethodInvocation,
+        method: Method,
+        multiCacheable: MultiCacheable,
+        multiRedisCache: Cache?
+    ): Any? {
+        val key =
+            generateNormalKey(invocation, multiCacheable.key, method, evaluationContextInterceptorList)?.toString()
+                ?: return invocation.proceed()
         return cache(key, invocation, multiRedisCache)
     }
 
-    private fun globalCache(invocation: MethodInvocation, method: Method, multiCacheable: MultiCacheable, multiRedisCache: Cache?): Any? {
-        val key = generateGlobalKey(invocation, multiCacheable.key, method, multiCacheable.remCount, evaluationContextInterceptorList)
-                ?: return invocation.proceed()
+    private fun globalCache(
+        invocation: MethodInvocation,
+        method: Method,
+        multiCacheable: MultiCacheable,
+        multiRedisCache: Cache?
+    ): Any? {
+        val key = generateGlobalKey(
+            invocation,
+            multiCacheable.key,
+            method,
+            multiCacheable.remCount,
+            evaluationContextInterceptorList
+        )
+            ?: return invocation.proceed()
         return cache(key, invocation, multiRedisCache)
     }
 
@@ -50,9 +71,15 @@ class MultiCacheableInterceptor(private val redisCacheManager: MultiRedisCacheMa
         }
     }
 
-    private fun batchCache(invocation: MethodInvocation, method: Method, multiCacheable: MultiCacheable, multiRedisCache: Cache?): Any? {
+    private fun batchCache(
+        invocation: MethodInvocation,
+        method: Method,
+        multiCacheable: MultiCacheable,
+        multiRedisCache: Cache?
+    ): Any? {
         // 如果key获取失败（在batch中有使用key赋值没有使用spEL表达式，多个）
-        val keys = generateBatchKey(invocation, multiCacheable.key, method, evaluationContextInterceptorList) ?: return invocation.proceed()
+        val keys = generateBatchKey(invocation, multiCacheable.key, method, evaluationContextInterceptorList)
+            ?: return invocation.proceed()
         val notHitKeys = mutableListOf<Any>()
         val returnValue = mutableListOf<Any>()
         for (key in keys) {

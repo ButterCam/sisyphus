@@ -30,7 +30,7 @@ data class Version(val major: Int, val minor: Int, val patch: Int) : Comparable<
      */
     fun isAtLeast(major: Int, minor: Int): Boolean =
         this.major > major || (this.major == major &&
-            this.minor >= minor)
+                this.minor >= minor)
 
     /**
      * Returns `true` if this version is not less than the version specified
@@ -38,8 +38,8 @@ data class Version(val major: Int, val minor: Int, val patch: Int) : Comparable<
      */
     fun isAtLeast(major: Int, minor: Int, patch: Int): Boolean =
         this.major > major || (this.major == major &&
-            (this.minor > minor || this.minor == minor &&
-                this.patch >= patch))
+                (this.minor > minor || this.minor == minor &&
+                        this.patch >= patch))
 
     companion object {
         fun parse(version: String): Version {

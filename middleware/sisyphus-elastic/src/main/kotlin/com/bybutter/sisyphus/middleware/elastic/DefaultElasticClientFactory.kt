@@ -23,7 +23,7 @@ open class DefaultElasticClientFactory : ElasticClientFactory {
         }
 
         return RestClient.builder(
-                HttpHost(host, port, property.protocol)
+            HttpHost(host, port, property.protocol)
         ).setHttpClientConfigCallback {
             if (credentialsProvider != null) {
                 it.setDefaultCredentialsProvider(credentialsProvider)

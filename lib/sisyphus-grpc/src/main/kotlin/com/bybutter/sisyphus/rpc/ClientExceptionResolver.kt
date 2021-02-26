@@ -16,7 +16,8 @@ object ClientExceptionResolver : ClientInterceptor {
         callOptions: CallOptions,
         next: Channel
     ): ClientCall<ReqT, RespT> {
-        return object : ForwardingClientCall.SimpleForwardingClientCall<ReqT, RespT>(next.newCall(method, callOptions)) {
+        return object :
+            ForwardingClientCall.SimpleForwardingClientCall<ReqT, RespT>(next.newCall(method, callOptions)) {
             override fun start(responseListener: Listener<RespT>, headers: Metadata) {
                 super.start(object :
                     ForwardingClientCallListener.SimpleForwardingClientCallListener<RespT>(responseListener) {

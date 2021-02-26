@@ -21,6 +21,6 @@ class StringEnumConverter constructor(val type: JavaType) : ValueConverter<Strin
     override fun convertBack(value: ByteArray): StringEnum {
         val stringValue = value.toString(Charset.defaultCharset())
         return StringEnum.valueOf(stringValue, type)
-                ?: throw RuntimeException("Invalid string enum value('$stringValue') for type '${type.typeName}'.")
+            ?: throw RuntimeException("Invalid string enum value('$stringValue') for type '${type.typeName}'.")
     }
 }

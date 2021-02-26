@@ -14,12 +14,12 @@ option (google.api.resource_definition) = {
 };
 
 message Resource {
-    option (google.api.resource) = {
-      type: "test.bybutter.com/Resource"
-      pattern: "resources/{resource}"
-    };
+  option (google.api.resource) = {
+    type: "test.bybutter.com/Resource"
+    pattern: "resources/{resource}"
+  };
 
-    string name = 1;
+  string name = 1;
 }
 
 message ResourceReference {

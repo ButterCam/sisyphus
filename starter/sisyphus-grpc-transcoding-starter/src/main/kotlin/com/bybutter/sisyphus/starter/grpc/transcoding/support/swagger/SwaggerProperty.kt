@@ -22,6 +22,7 @@ data class SwaggerProperty(
     @NestedConfigurationProperty
     val securitySchemes: Map<String, Scheme>? = null
 )
+
 /**
  * Swagger params.
  * The value of parameter 'position' must be one of path, query, header or cookie.
@@ -54,11 +55,13 @@ data class Info(
     @NestedConfigurationProperty
     val contact: Contact?
 )
+
 data class Contact(
     val name: String? = null,
     val url: String? = null,
     val email: String? = null
 )
+
 /**
  * Server info.
  * Used to build Swagger server.
@@ -76,6 +79,7 @@ data class ServerVariable(
     val default: String,
     val description: String?
 )
+
 /**
  * Security scheme.
  * Used to build Swagger security scheme.

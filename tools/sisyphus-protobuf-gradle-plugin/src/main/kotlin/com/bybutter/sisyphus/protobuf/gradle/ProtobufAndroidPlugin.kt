@@ -264,8 +264,8 @@ class ProtobufAndroidPlugin : Plugin<Project> {
 
     private val AndroidSourceSet.isTestSourceSet: Boolean
         get() = name == "test" ||
-            name.toLowerCase().contains("androidtest") ||
-            name.toLowerCase().contains("unittest")
+                name.toLowerCase().contains("androidtest") ||
+                name.toLowerCase().contains("unittest")
 
     private fun Project.protoApi(sourceSet: AndroidSourceSet): Configuration {
         return this.configurations.getByName(sourceSet.getProtoApiConfigurationName())

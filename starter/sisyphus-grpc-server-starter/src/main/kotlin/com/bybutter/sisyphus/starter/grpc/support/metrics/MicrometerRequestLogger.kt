@@ -20,7 +20,8 @@ class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogg
         val host = requestInfo.inputHeader.get(HOST_METADATA_KEY)?.toString()
         val costDuration = Duration.ofNanos(cost)
 
-        registry.timer("sisyphus_grpc_requests",
+        registry.timer(
+            "sisyphus_grpc_requests",
             "service", call.methodDescriptor.serviceName,
             "method", call.methodDescriptor.fullMethodName,
             "status", status.code.name,
@@ -28,7 +29,8 @@ class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogg
         ).record(costDuration)
 
         if (host != null && !host.startsWith("localhost")) {
-            registry.timer("sisyphus_grpc_incoming_requests",
+            registry.timer(
+                "sisyphus_grpc_incoming_requests",
                 "service", call.methodDescriptor.serviceName,
                 "method", call.methodDescriptor.fullMethodName,
                 "status", status.code.name,

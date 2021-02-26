@@ -14,7 +14,8 @@ import org.springframework.util.MimeType
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-class ProtobufEncoder(vararg mimeTypes: MimeType) : AbstractEncoder<Message<*, *>>(*mimeTypes), HttpMessageEncoder<Message<*, *>> {
+class ProtobufEncoder(vararg mimeTypes: MimeType) : AbstractEncoder<Message<*, *>>(*mimeTypes),
+    HttpMessageEncoder<Message<*, *>> {
     override fun getStreamingMediaTypes(): List<MediaType> {
         return ProtobufCodecCustomizer.STREAM_MIME_TYPES
     }
@@ -31,7 +32,13 @@ class ProtobufEncoder(vararg mimeTypes: MimeType) : AbstractEncoder<Message<*, *
         }
     }
 
-    override fun encodeValue(value: Message<*, *>, bufferFactory: DataBufferFactory, valueType: ResolvableType, mimeType: MimeType?, hints: MutableMap<String, Any>?): DataBuffer {
+    override fun encodeValue(
+        value: Message<*, *>,
+        bufferFactory: DataBufferFactory,
+        valueType: ResolvableType,
+        mimeType: MimeType?,
+        hints: MutableMap<String, Any>?
+    ): DataBuffer {
         return encodeValue(value, bufferFactory, false)
     }
 

@@ -20,6 +20,6 @@ internal inline fun <reified T> getDefaultTableModelConverter(): TableModelConve
 
 internal fun <T> getDefaultTableModelConverter(type: JavaType): TableModelConverter<T>? where T : DtoModel {
     val table = type.rawClass.getAnnotation(HTable::class.java)
-            ?: throw UnsupportedOperationException("Unsupported default table model convert for type'${type.typeName}'.")
+        ?: throw UnsupportedOperationException("Unsupported default table model convert for type'${type.typeName}'.")
     return DefaultTableModelConverter(type)
 }

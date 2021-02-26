@@ -29,8 +29,8 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
 
         val properties = beanFactory.getBeansOfType<RedisProperty>().toMutableMap()
         val elasticProperties = Binder.get(environment)
-                .bind("sisyphus", RedisProperties::class.java)
-                .orElse(null)?.redis ?: mapOf()
+            .bind("sisyphus", RedisProperties::class.java)
+            .orElse(null)?.redis ?: mapOf()
 
         properties += elasticProperties
 

@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.starter.grpc.support.reflection
 
-import com.bybutter.sisyphus.protobuf.FileSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1.ExtensionNumberResponse
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1.ExtensionRequest
@@ -49,13 +48,13 @@ class ReflectionService : ServerReflection() {
 
     private fun getFileByFileName(name: String): ServerReflectionResponse.MessageResponse.FileDescriptorResponse {
         return ServerReflectionResponse.MessageResponse.FileDescriptorResponse(FileDescriptorResponse {
-            this.fileDescriptorProto += (ProtoTypes.findSupport(name) as FileSupport).descriptor.toProto()
+            this.fileDescriptorProto += ProtoTypes.findFileSupport(name).descriptor.toProto()
         })
     }
 
     private fun getFileContainingSymbol(name: String): ServerReflectionResponse.MessageResponse.FileDescriptorResponse {
         return ServerReflectionResponse.MessageResponse.FileDescriptorResponse(FileDescriptorResponse {
-            ProtoTypes.findSupport(name)?.file()?.let {
+            ProtoTypes.findSupport(".$name")?.file()?.let {
                 this.fileDescriptorProto += it.descriptor.toProto()
             }
         })
@@ -63,7 +62,7 @@ class ReflectionService : ServerReflection() {
 
     private fun getFileContainingExtension(request: ExtensionRequest): ServerReflectionResponse.MessageResponse.FileDescriptorResponse {
         return ServerReflectionResponse.MessageResponse.FileDescriptorResponse(FileDescriptorResponse {
-            val message = ProtoTypes.findMessageSupport(request.containingType)
+            val message = ProtoTypes.findMessageSupport(".${request.containingType}")
             val extension = message.extensions.firstOrNull {
                 it.descriptor.number == request.extensionNumber
             }
@@ -77,7 +76,7 @@ class ReflectionService : ServerReflection() {
     private fun getAllExtensionNumbersOfType(name: String): ServerReflectionResponse.MessageResponse.AllExtensionNumbersResponse {
         return ServerReflectionResponse.MessageResponse.AllExtensionNumbersResponse(ExtensionNumberResponse {
             this.baseTypeName = name
-            val message = ProtoTypes.findMessageSupport(name)
+            val message = ProtoTypes.findMessageSupport(".$name")
             this.extensionNumber += message.extensions.map { it.descriptor.number }
         })
     }

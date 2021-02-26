@@ -41,8 +41,7 @@ class TranscodingServiceRouterFunction private constructor(
 
         operator fun invoke(service: ServerServiceDefinition): RouterFunction<ServerResponse>? {
             // Ensure for the service proto.
-            val proto = ProtoTypes.findSupport(service.serviceDescriptor.name)?.descriptor as? ServiceDescriptorProto
-                    ?: return null
+            val proto = ProtoTypes.findServiceSupport(".${service.serviceDescriptor.name}").descriptor
             val methodRouters = service.methods.mapNotNull { TranscodingMethodRouterFunction(it) }
             // Return null if no method routers created.
             if (methodRouters.isEmpty()) return null

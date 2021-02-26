@@ -30,7 +30,7 @@ class BitInputStream(private val source: InputStream) : InputStream() {
         }
 
         var read = 0
-        loop@for (i in 0 until bits) {
+        loop@ for (i in 0 until bits) {
             when (read()) {
                 0 -> data.set(i, false)
                 1 -> data.set(i, true)
@@ -47,7 +47,7 @@ class BitInputStream(private val source: InputStream) : InputStream() {
         var int = 0
 
         var read = 0
-        loop@for (i in 0 until bits) {
+        loop@ for (i in 0 until bits) {
             when (read()) {
                 1 -> int = int or (1 shl (bits - i - 1))
                 0 -> int

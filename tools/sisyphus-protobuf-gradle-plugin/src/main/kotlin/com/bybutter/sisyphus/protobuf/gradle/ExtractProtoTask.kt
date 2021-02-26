@@ -119,14 +119,20 @@ open class ExtractProtoTask : DefaultTask() {
         }
 
         if (protobuf.mapping.isNotEmpty()) {
-            Files.write(Paths.get(resourceOutput.toPath().toString(), "protomap"), protobuf.mapping.map { "${it.key}=${it.value}" })
+            Files.write(
+                Paths.get(resourceOutput.toPath().toString(), "protomap"),
+                protobuf.mapping.map { "${it.key}=${it.value}" })
         }
 
         val desc = ProtocRunner.generate(protoPath, sourceProtos.keys)
         Files.write(Paths.get(protoPath.toPath().toString(), "protodesc.pb"), desc.toByteArray())
-        Files.write(Paths.get(protoPath.toPath().toString(), "protomap"), scannedMapping.map { "${it.key}=${it.value}" })
+        Files.write(
+            Paths.get(protoPath.toPath().toString(), "protomap"),
+            scannedMapping.map { "${it.key}=${it.value}" })
         Files.write(Paths.get(protoPath.toPath().toString(), "protosrc"), sourceProtos.map { "${it.key}=${it.value}" })
-        Files.write(Paths.get(protoPath.toPath().toString(), "protofile"), sourceFileMapping.map { "${it.key}=${it.value}" })
+        Files.write(
+            Paths.get(protoPath.toPath().toString(), "protofile"),
+            sourceFileMapping.map { "${it.key}=${it.value}" })
     }
 }
 

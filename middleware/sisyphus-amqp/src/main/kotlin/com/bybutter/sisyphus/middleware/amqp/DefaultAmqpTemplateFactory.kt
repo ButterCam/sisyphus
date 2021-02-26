@@ -12,7 +12,7 @@ open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
 
     override fun createTemplate(property: MessageQueueProperty): AmqpTemplate {
         return RabbitTemplate(
-                createConnectionFactory(property.host, property.port, property)
+            createConnectionFactory(property.host, property.port, property)
         ).apply {
             property.queue?.let {
                 this.setDefaultReceiveQueue(it)
@@ -22,7 +22,11 @@ open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
         }
     }
 
-    protected open fun createConnectionFactory(host: String, port: Int, property: MessageQueueProperty): ConnectionFactory {
+    protected open fun createConnectionFactory(
+        host: String,
+        port: Int,
+        property: MessageQueueProperty
+    ): ConnectionFactory {
         return connectionFactories.getOrPut("$host:$port/${property.vhost}") {
             CachingConnectionFactory(host, port).apply {
                 this.virtualHost = property.vhost

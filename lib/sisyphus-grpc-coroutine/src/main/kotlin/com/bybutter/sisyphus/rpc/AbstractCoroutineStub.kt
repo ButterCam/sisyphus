@@ -33,7 +33,11 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
         return build(channel, optionsInterceptors, callOptions)
     }
 
-    abstract fun build(channel: Channel, optionsInterceptors: Iterable<CallOptionsInterceptor>, callOptions: CallOptions): T
+    abstract fun build(
+        channel: Channel,
+        optionsInterceptors: Iterable<CallOptionsInterceptor>,
+        callOptions: CallOptions
+    ): T
 
     protected fun buildOption(method: MethodDescriptor<*, *>): CallOptions {
         return optionsInterceptors.fold(callOptions) { options, interceptor ->
@@ -41,19 +45,35 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
         }
     }
 
-    protected suspend fun <TReq, TRes> unaryCall(method: MethodDescriptor<TReq, TRes>, input: TReq, metadata: Metadata): TRes {
+    protected suspend fun <TReq, TRes> unaryCall(
+        method: MethodDescriptor<TReq, TRes>,
+        input: TReq,
+        metadata: Metadata
+    ): TRes {
         return ClientCalls.unaryRpc(channel, method, input, buildOption(method), metadata)
     }
 
-    protected fun <TReq, TRes> serverStreaming(method: MethodDescriptor<TReq, TRes>, input: TReq, metadata: Metadata): Flow<TRes> {
+    protected fun <TReq, TRes> serverStreaming(
+        method: MethodDescriptor<TReq, TRes>,
+        input: TReq,
+        metadata: Metadata
+    ): Flow<TRes> {
         return ClientCalls.serverStreamingRpc(channel, method, input, buildOption(method), metadata)
     }
 
-    protected suspend fun <TReq, TRes> clientStreaming(method: MethodDescriptor<TReq, TRes>, input: Flow<TReq>, metadata: Metadata): TRes {
+    protected suspend fun <TReq, TRes> clientStreaming(
+        method: MethodDescriptor<TReq, TRes>,
+        input: Flow<TReq>,
+        metadata: Metadata
+    ): TRes {
         return ClientCalls.clientStreamingRpc(channel, method, input, buildOption(method), metadata)
     }
 
-    protected fun <TReq, TRes> bidiStreaming(method: MethodDescriptor<TReq, TRes>, input: Flow<TReq>, metadata: Metadata): Flow<TRes> {
+    protected fun <TReq, TRes> bidiStreaming(
+        method: MethodDescriptor<TReq, TRes>,
+        input: Flow<TReq>,
+        metadata: Metadata
+    ): Flow<TRes> {
         return ClientCalls.bidiStreamingRpc(channel, method, input, buildOption(method), metadata)
     }
 }

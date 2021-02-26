@@ -80,10 +80,24 @@ open class ProtobufApiLintTask : SourceTask() {
     }
 }
 
-data class LinterResponse(@JsonProperty("file_path") var filePath: String, @JsonProperty("problems") var problems: List<Problem>)
+data class LinterResponse(
+    @JsonProperty("file_path") var filePath: String,
+    @JsonProperty("problems") var problems: List<Problem>
+)
 
-data class Problem(var message: String, var location: Location, @JsonProperty("rule_id") var ruleId: String, @JsonProperty("rule_doc_uri") var ruleDocUri: String)
+data class Problem(
+    var message: String,
+    var location: Location,
+    @JsonProperty("rule_id") var ruleId: String,
+    @JsonProperty("rule_doc_uri") var ruleDocUri: String
+)
 
-data class Location(@JsonProperty("start_position") val startPosition: FilePosition, @JsonProperty("end_position") val endPosition: FilePosition)
+data class Location(
+    @JsonProperty("start_position") val startPosition: FilePosition,
+    @JsonProperty("end_position") val endPosition: FilePosition
+)
 
-data class FilePosition(@JsonProperty("line_number") var lineNumber: Int, @JsonProperty("column_number") var columnNumber: Int)
+data class FilePosition(
+    @JsonProperty("line_number") var lineNumber: Int,
+    @JsonProperty("column_number") var columnNumber: Int
+)

@@ -60,7 +60,7 @@ class SwaggerRouterFunction private constructor(
 
         for (service in services) {
             // Get service descriptor.
-            val serviceSupport = ProtoTypes.findServiceSupport(service.serviceDescriptor.name)
+            val serviceSupport = ProtoTypes.findServiceSupport(".${service.serviceDescriptor.name}")
             // Get service file.
             val fileSupport = serviceSupport.file()
             // Get service path,used to find notes.

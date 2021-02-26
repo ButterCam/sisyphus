@@ -6,7 +6,7 @@ import java.lang.reflect.Type
 import java.util.concurrent.ConcurrentHashMap
 
 class GenericType private constructor(raw: Class<*>, private val parameters: List<JvmType>) : SimpleType(raw),
-        ParameterizedType {
+    ParameterizedType {
     companion object {
         private val cache = ConcurrentHashMap<String, GenericType>()
 

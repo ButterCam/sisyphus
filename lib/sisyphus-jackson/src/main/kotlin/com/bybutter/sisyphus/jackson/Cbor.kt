@@ -10,9 +10,9 @@ import com.fasterxml.jackson.dataformat.cbor.CBORFactory
 object Cbor : JacksonFormatSupport() {
     override val mapper: ObjectMapper by lazy {
         ObjectMapper(CBORFactory()).findAndRegisterModules()
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(JsonParser.Feature.IGNORE_UNDEFINED, true)
-                .configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(JsonParser.Feature.IGNORE_UNDEFINED, true)
+            .configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true)
     }
 }

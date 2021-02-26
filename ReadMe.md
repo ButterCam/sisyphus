@@ -1,30 +1,38 @@
-# Sisyphus  
+# Sisyphus
 
 ![JDK version](https://img.shields.io/badge/jdk-11-green?logo=java) ![Gradle Version](https://img.shields.io/badge/gradle-%5E6.5-green?logo=gradle) [![Maven Central](https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom)](https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom) [![Dependencies](https://img.shields.io/librariesio/release/maven/com.bybutter.sisyphus:sisyphus-dependencies)](https://libraries.io/maven/com.bybutter.sisyphus:sisyphus-dependencies)
 
-Sisyphus is the way how we provide backend services. It integrates all tools and libraries needed for designing API which follows the [Google API Improvement Proposals](https://aip.bybutter.com).
+Sisyphus is the way how we provide backend services. It integrates all tools and libraries needed for designing API
+which follows the [Google API Improvement Proposals](https://aip.bybutter.com).
 
 ## We are rolling a huge boulder
 
-Due to analyzing product documents completely, it is not particularly difficult to write an exquisite and easy-to-use API at the beginning for most APIs.
+Due to analyzing product documents completely, it is not particularly difficult to write an exquisite and easy-to-use
+API at the beginning for most APIs.
 
 However, many people will break the initial design of the API in the endless updates of products.
 
-It's hard to create a strong and extensible API in the whole project lifetime, just like rolling a huge boulder endlessly up a steep hill.
+It's hard to create a strong and extensible API in the whole project lifetime, just like rolling a huge boulder
+endlessly up a steep hill.
 
-So we need an all-encompassing guide book to guide us in creating, updating, and modifying APIs.  
+So we need an all-encompassing guide book to guide us in creating, updating, and modifying APIs.
 
-The [Google API Improvement Proposals](https://aip.bybutter.com) is the all-encompassing guide book. Google created it in their rich and extensive API design experience. It laid the foundation for anyone to create an extensible API.
+The [Google API Improvement Proposals](https://aip.bybutter.com) is the all-encompassing guide book. Google created it
+in their rich and extensive API design experience. It laid the foundation for anyone to create an extensible API.
 
 ## Good tools can help you
 
-Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sisyphus provides and integrates many tools in your 'boulder rolling' route.
+Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sisyphus provides and integrates many tools
+in your 'boulder rolling' route.
 
-[**Kotlin**](https://kotlinlang.org/) is our target language. The mature JVM community and concise grammar are the reasons.
+[**Kotlin**](https://kotlinlang.org/) is our target language. The mature JVM community and concise grammar are the
+reasons.
 
 [**Spring boot**](https://spring.io/projects/spring-boot) is our old friend to manage and organize our components.
 
-[**gRPC**](https://grpc.io/) is our target API framework. Sisyphus also provides the [HTTP and gRPC Transcoding](https://aip.bybutter.com/127) component for the environment which isn't compatible with gRPC.
+[**gRPC**](https://grpc.io/) is our target API framework. Sisyphus also provides
+the [HTTP and gRPC Transcoding](https://aip.bybutter.com/127) component for the environment which isn't compatible with
+gRPC.
 
 [**Sisyphus Protobuf**](/lib/sisyphus-protobuf) is our customized protobuf runtime, which designed for Kotlin.
 
@@ -34,17 +42,23 @@ Choosing good tools can help you 'rolling a huge boulder' faster and easier. Sis
 
 [**Sisyphus Middleware**](/middleware) is the way how we connect Sisyphus and other systems.
 
-[**Sisyphus Configuration Artifact**](/middleware/sisyphus-configuration-artifact) is the way how we manage configurations and developing environment.
+[**Sisyphus Configuration Artifact**](/middleware/sisyphus-configuration-artifact) is the way how we manage
+configurations and developing environment.
 
-[**Sisyphus Kubernetes gRPC client**](/middleware/sisyphus-grpc-client-kubernetes) is the way how we implement service discovery in Kubernetes.
+[**Sisyphus Kubernetes gRPC client**](/middleware/sisyphus-grpc-client-kubernetes) is the way how we implement service
+discovery in Kubernetes.
 
 [**Sisyphus Protobuf Compiler**](/tools/sisyphus-protoc) is the way how we generate Kotlin codes by `.proto` files.
 
-[**Sisyphus Project Plugin**](/tools/sisyphus-project-gradle-plugin) is the way how we manage project and configuring Gradle.
+[**Sisyphus Project Plugin**](/tools/sisyphus-project-gradle-plugin) is the way how we manage project and configuring
+Gradle.
 
-[**Sisyphus Protobuf Plugin**](/tools/sisyphus-protobuf-gradle-plugin) is the way how we generate code by `.proto` files in Gradle.
+[**Sisyphus Protobuf Plugin**](/tools/sisyphus-protobuf-gradle-plugin) is the way how we generate code by `.proto` files
+in Gradle.
 
-**And More** tools like [CEL(Common Expression Language)](https://github.com/google/cel-spec), [Filtering](https://aip.bybutter.com/160) and [Ordering](https://aip.bybutter.com/132#ordering) scripts will help you to design APIs following Google AIP.
+**And More** tools like [CEL(Common Expression Language)](https://github.com/google/cel-spec)
+, [Filtering](https://aip.bybutter.com/160) and [Ordering](https://aip.bybutter.com/132#ordering) scripts will help you
+to design APIs following Google AIP.
 
 ## Rolling with Sisyphus
 
@@ -52,12 +66,14 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
 
 1. **System requirement**
 
-   - Gradle 6.7+
-   - JDK 11+
+    - Gradle 6.7+
+    - JDK 11+
 
 2. **Configure Sisyphus with gradle.properties**
 
-   We use [gradle.properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) to configure global settings of Sisyphus and all Sisyphus projects.
+   We
+   use [gradle.properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties)
+   to configure global settings of Sisyphus and all Sisyphus projects.
 
    ```properties
    # [DEV,RT] Set developer name for developing environment.
@@ -93,7 +109,8 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    >
    > **[RT]** for runtime environment properties.
 
-   `gradle.properties` are shared between Gradle and Spring. Sisyphus Project Plugin will load them and configure Gradle automatically. Sisyphus Configuration Artifact will load them for Spring Framework.
+   `gradle.properties` are shared between Gradle and Spring. Sisyphus Project Plugin will load them and configure Gradle
+   automatically. Sisyphus Configuration Artifact will load them for Spring Framework.
 
 3. **Write Protobuf schemas**
 
@@ -157,7 +174,8 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
 
 4. **Implement API**
 
-   API schema is ready now. The next step is to implement this API schema. Create a service project and refer to the schema project.
+   API schema is ready now. The next step is to implement this API schema. Create a service project and refer to the
+   schema project.
 
    This is a sample service project `build.gradle.kts` config.
 
@@ -203,7 +221,8 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
 
 5. **Run the Application**
 
-   The service project is just a non-runnable library. We need to create an application project to run our service projects.
+   The service project is just a non-runnable library. We need to create an application project to run our service
+   projects.
 
    This is a sample application project `build.gradle.kts` config.
 

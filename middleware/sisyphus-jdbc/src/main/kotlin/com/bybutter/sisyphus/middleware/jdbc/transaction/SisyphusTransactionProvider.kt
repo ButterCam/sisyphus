@@ -34,5 +34,6 @@ class SisyphusTransactionProvider : TransactionProvider {
         }
     }
 
-    private data class SisyphusTransaction(val context: com.bybutter.sisyphus.middleware.jdbc.transaction.TransactionContext) : Transaction
+    private data class SisyphusTransaction(val context: com.bybutter.sisyphus.middleware.jdbc.transaction.TransactionContext) :
+        Transaction
 }

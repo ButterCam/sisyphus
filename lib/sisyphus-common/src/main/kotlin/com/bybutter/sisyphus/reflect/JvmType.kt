@@ -41,8 +41,10 @@ abstract class JvmType protected constructor() : Type {
         fun fromName(name: String): JvmType {
             return when {
                 name == "?" -> OutWildcardType.STAR
-                name.startsWith("? extends ") -> OutWildcardType(name.substringAfter("? extends ").split(" & ").map { it.toType() as SimpleType })
-                name.startsWith("? super ") -> InWildcardType(name.substringAfter("? extends ").split(" & ").map { it.toType() as SimpleType })
+                name.startsWith("? extends ") -> OutWildcardType(
+                    name.substringAfter("? extends ").split(" & ").map { it.toType() as SimpleType })
+                name.startsWith("? super ") -> InWildcardType(
+                    name.substringAfter("? extends ").split(" & ").map { it.toType() as SimpleType })
                 name.indexOf('<') > 0 -> {
                     val raw = Class.forName(name.substringBefore('<'))
                     val parameters = name.substring(name.indexOf('<') + 1, name.lastIndexOf('>'))

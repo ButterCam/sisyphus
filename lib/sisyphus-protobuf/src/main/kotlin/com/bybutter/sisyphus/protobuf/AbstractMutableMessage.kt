@@ -31,7 +31,8 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
                 if (extension == null) {
                     unknownFields().readFrom(reader, number, wireType)
                 } else {
-                    _extensions[number] = extension.read(reader, number, wireType, _extensions[number] as? MessageExtension<Any>)
+                    _extensions[number] =
+                        extension.read(reader, number, wireType, _extensions[number] as? MessageExtension<Any>)
                 }
             }
         }
@@ -111,7 +112,7 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
             return
         }
         val extension = support().extensions.firstOrNull { it.descriptor.number == number } as? ExtensionSupport<T>
-                ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
+            ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
         _extensions[number] = extension.wrap(value)
     }
 

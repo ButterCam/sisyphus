@@ -287,7 +287,11 @@ class CoroutineServiceSupportBasicGenerator : GroupedGenerator<ServiceSupportGen
             property("serviceDescriptor", RuntimeTypes.SERVICE_DESCRIPTOR) {
                 delegate(buildCodeBlock {
                     beginScope("%M", RuntimeMethods.LAZY) {
-                        add("%T.newBuilder(name)\n", RuntimeTypes.SERVICE_DESCRIPTOR)
+                        add(
+                            "%T.newBuilder(%S)\n",
+                            RuntimeTypes.SERVICE_DESCRIPTOR,
+                            state.descriptor.fullProtoName().trim('.')
+                        )
                         for (method in state.descriptor.methods) {
                             add(".addMethod(%L)\n", method.name())
                         }
@@ -332,7 +336,7 @@ class CoroutineServiceSupportMethodGenerator : GroupedGenerator<ServiceSupportGe
                             add(".setType(MethodDescriptor.MethodType.%L)\n", "BIDI_STREAMING")
                         }
                     }
-                    add(".setFullMethodName(%S)\n", method.fullProtoName())
+                    add(".setFullMethodName(%S)\n", method.fullProtoName().substring(1))
                     add(
                         ".setRequestMarshaller(%T.%M())\n",
                         method.inputMessage().className(),

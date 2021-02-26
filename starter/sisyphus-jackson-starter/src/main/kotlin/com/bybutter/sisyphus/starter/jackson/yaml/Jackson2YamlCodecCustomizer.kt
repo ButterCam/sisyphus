@@ -8,13 +8,14 @@ import org.springframework.util.MimeType
 class Jackson2YamlCodecCustomizer : CodecCustomizer {
     companion object {
         val DEFAULT_YAML_MIME_TYPES = arrayOf(
-                MimeType("text", "vnd.yaml"),
-                MimeType("text", "yaml"),
-                MimeType("text", "x-yaml"),
-                MimeType("text", "*+x-yaml"),
-                MimeType("application", "yaml"),
-                MimeType("application", "x-yaml"),
-                MimeType("application", "*+x-yaml"))
+            MimeType("text", "vnd.yaml"),
+            MimeType("text", "yaml"),
+            MimeType("text", "x-yaml"),
+            MimeType("text", "*+x-yaml"),
+            MimeType("application", "yaml"),
+            MimeType("application", "x-yaml"),
+            MimeType("application", "*+x-yaml")
+        )
     }
 
     override fun customize(configurer: CodecConfigurer) {

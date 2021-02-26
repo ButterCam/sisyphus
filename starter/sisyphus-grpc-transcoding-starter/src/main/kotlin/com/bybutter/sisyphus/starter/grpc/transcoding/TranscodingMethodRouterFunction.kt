@@ -8,7 +8,6 @@ import com.bybutter.sisyphus.protobuf.MessagePatcher
 import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoTypes
-import com.bybutter.sisyphus.protobuf.ServiceSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
 import com.bybutter.sisyphus.reflect.uncheckedCast
@@ -124,8 +123,11 @@ class TranscodingMethodRouterFunction private constructor(
     private fun prepareHeader(request: ServerRequest): Metadata {
         val header = Metadata()
         for ((key, values) in request.headers().asHttpHeaders()) {
-            if (key.toLowerCase() == HttpHeaders.USER_AGENT.toLowerCase()) {
-                header.put(Metadata.Key.of("X-${HttpHeaders.USER_AGENT}", Metadata.ASCII_STRING_MARSHALLER), values.joinToString(","))
+            if (key.equals(HttpHeaders.USER_AGENT, ignoreCase = true)) {
+                header.put(
+                    Metadata.Key.of("X-${HttpHeaders.USER_AGENT}", Metadata.ASCII_STRING_MARSHALLER),
+                    values.joinToString(",")
+                )
                 continue
             }
             header.put(Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER), values.joinToString(","))
@@ -139,7 +141,7 @@ class TranscodingMethodRouterFunction private constructor(
             if (method.methodDescriptor.type != MethodDescriptor.MethodType.UNARY)
                 return null
             // Ensure method proto registered.
-            val service = ProtoTypes.findSupport(method.methodDescriptor.serviceName!!) as? ServiceSupport ?: return null
+            val service = ProtoTypes.findServiceSupport(".${method.methodDescriptor.serviceName}")
             val proto = service.descriptor.method.firstOrNull {
                 it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
             } ?: return null

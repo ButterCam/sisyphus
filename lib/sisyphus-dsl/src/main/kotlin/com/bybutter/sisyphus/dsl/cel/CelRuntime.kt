@@ -4,7 +4,6 @@ import com.bybutter.sisyphus.dsl.cel.grammar.CelParser
 import com.bybutter.sisyphus.protobuf.CustomProtoType
 import com.bybutter.sisyphus.protobuf.CustomProtoTypeSupport
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
-import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -156,8 +155,7 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
 
     @OptIn(InternalProtoApi::class)
     fun createMessage(type: String, initializer: Map<String, Any?>): Any {
-        val messageSupport = ProtoTypes.findSupport(type) as? MessageSupport<*, *>
-            ?: throw IllegalStateException("Message '$type' not defined.")
+        val messageSupport = ProtoTypes.findMessageSupport(type)
         return messageSupport.newMutable().apply {
             for ((key, value) in initializer) {
                 value ?: continue

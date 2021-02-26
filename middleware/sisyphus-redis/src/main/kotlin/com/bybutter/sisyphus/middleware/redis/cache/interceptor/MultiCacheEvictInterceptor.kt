@@ -12,7 +12,10 @@ import org.aopalliance.intercept.MethodInvocation
 import org.slf4j.LoggerFactory
 import org.springframework.cache.Cache
 
-class MultiCacheEvictInterceptor(private val redisCacheManager: MultiRedisCacheManager, private val evaluationContextInterceptorList: List<EvaluationContextInterceptor>) : MethodInterceptor, Serializable {
+class MultiCacheEvictInterceptor(
+    private val redisCacheManager: MultiRedisCacheManager,
+    private val evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+) : MethodInterceptor, Serializable {
 
     val log = LoggerFactory.getLogger(this.javaClass)
 
@@ -29,8 +32,15 @@ class MultiCacheEvictInterceptor(private val redisCacheManager: MultiRedisCacheM
         }
     }
 
-    private fun normalCacheEvict(invocation: MethodInvocation, method: Method, multiCacheEvict: MultiCacheEvict, multiRedisCache: Cache?): Any? {
-        val key = generateNormalKey(invocation, multiCacheEvict.key, method, evaluationContextInterceptorList)?.toString() ?: return invocation.proceed()
+    private fun normalCacheEvict(
+        invocation: MethodInvocation,
+        method: Method,
+        multiCacheEvict: MultiCacheEvict,
+        multiRedisCache: Cache?
+    ): Any? {
+        val key =
+            generateNormalKey(invocation, multiCacheEvict.key, method, evaluationContextInterceptorList)?.toString()
+                ?: return invocation.proceed()
         return evict(key, invocation, multiRedisCache)
     }
 
@@ -39,15 +49,26 @@ class MultiCacheEvictInterceptor(private val redisCacheManager: MultiRedisCacheM
         return invocation.proceed()
     }
 
-    private fun globalCacheEvict(invocation: MethodInvocation, method: Method, multiCacheEvict: MultiCacheEvict, multiRedisCache: Cache?): Any? {
+    private fun globalCacheEvict(
+        invocation: MethodInvocation,
+        method: Method,
+        multiCacheEvict: MultiCacheEvict,
+        multiRedisCache: Cache?
+    ): Any? {
         for (remCount in 0 until multiCacheEvict.remCount) {
             multiRedisCache?.evictIfPresent(remCount.toString())
         }
         return invocation.proceed()
     }
 
-    private fun batchCacheEvict(invocation: MethodInvocation, method: Method, multiCacheEvict: MultiCacheEvict, multiRedisCache: Cache?): Any? {
-        val keys = generateBatchKey(invocation, multiCacheEvict.key, method, evaluationContextInterceptorList) ?: return invocation.proceed()
+    private fun batchCacheEvict(
+        invocation: MethodInvocation,
+        method: Method,
+        multiCacheEvict: MultiCacheEvict,
+        multiRedisCache: Cache?
+    ): Any? {
+        val keys = generateBatchKey(invocation, multiCacheEvict.key, method, evaluationContextInterceptorList)
+            ?: return invocation.proceed()
         for (key in keys) {
             multiRedisCache?.evictIfPresent(key)
         }

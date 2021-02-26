@@ -192,7 +192,7 @@ class MessagePatcher : PatcherNode {
 
     @OptIn(InternalProtoApi::class)
     fun asMessage(type: String): Message<*, *> {
-        return (ProtoTypes.findSupport(type) as MessageSupport<*, *>).newMutable().apply {
+        return ProtoTypes.findMessageSupport(type).newMutable().apply {
             applyTo(this)
         }
     }
