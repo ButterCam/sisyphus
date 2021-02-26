@@ -40,7 +40,7 @@ dependencies {
         api("io.swagger.core.v3:swagger-core:2.1.6")
         api("org.jooq:jooq:3.13.4")
         api("com.google.api.grpc:proto-google-common-protos:2.0.1")
-        api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
+        api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.31")
         api("org.jetbrains.kotlin:kotlin-allopen:1.3.72")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.3.3.RELEASE")
         api("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
