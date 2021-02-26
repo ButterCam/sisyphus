@@ -20,6 +20,6 @@ class EnumConverter constructor(val type: JavaType) : ValueConverter<Any> {
     override fun convertBack(value: ByteArray): Any {
         val stringValue = value.toString(Charset.defaultCharset())
         return type.rawClass.enumConstants.firstOrNull { (it as Enum<*>).name == stringValue }
-                ?: throw RuntimeException("Invalid enum value('$stringValue') for type '${type.typeName}'.")
+            ?: throw RuntimeException("Invalid enum value('$stringValue') for type '${type.typeName}'.")
     }
 }

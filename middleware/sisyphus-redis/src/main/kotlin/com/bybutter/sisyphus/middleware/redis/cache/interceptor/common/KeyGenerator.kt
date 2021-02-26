@@ -13,7 +13,12 @@ import org.springframework.expression.spel.support.StandardEvaluationContext
 
 object KeyGenerator {
     private val log = LoggerFactory.getLogger(this.javaClass)
-    fun generateNormalKey(invocation: MethodInvocation, key: String, method: Method, evaluationContextInterceptorList: List<EvaluationContextInterceptor>): Any? {
+    fun generateNormalKey(
+        invocation: MethodInvocation,
+        key: String,
+        method: Method,
+        evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+    ): Any? {
         val arguments = invocation.arguments
         return if (key.isNotEmpty()) {
             if (key.contains("#")) {
@@ -31,8 +36,15 @@ object KeyGenerator {
         }
     }
 
-    fun generateGlobalKey(invocation: MethodInvocation, key: String, method: Method, remCount: Int, evaluationContextInterceptorList: List<EvaluationContextInterceptor>): String? {
-        val key = generateNormalKey(invocation, key, method, evaluationContextInterceptorList)?.toString() ?: return null
+    fun generateGlobalKey(
+        invocation: MethodInvocation,
+        key: String,
+        method: Method,
+        remCount: Int,
+        evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+    ): String? {
+        val key =
+            generateNormalKey(invocation, key, method, evaluationContextInterceptorList)?.toString() ?: return null
         return key.toCRC32().rem(remCount).toString()
     }
 
@@ -50,7 +62,12 @@ object KeyGenerator {
         return arguments.contentDeepHashCode()
     }
 
-    fun generateBatchKey(invocation: MethodInvocation, key: String, method: Method, evaluationContextInterceptorList: List<EvaluationContextInterceptor>): List<*>? {
+    fun generateBatchKey(
+        invocation: MethodInvocation,
+        key: String,
+        method: Method,
+        evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+    ): List<*>? {
         val arguments = invocation.arguments
         return when {
             // 方法参数空的
@@ -81,7 +98,12 @@ object KeyGenerator {
         }
     }
 
-    private fun spELParser(arguments: Array<Any>, spELString: String, method: Method, evaluationContextInterceptorList: List<EvaluationContextInterceptor>): Any? {
+    private fun spELParser(
+        arguments: Array<Any>,
+        spELString: String,
+        method: Method,
+        evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+    ): Any? {
         // SpEL解析器
         val parser = SpelExpressionParser()
         // 用于获取方法参数定义名字

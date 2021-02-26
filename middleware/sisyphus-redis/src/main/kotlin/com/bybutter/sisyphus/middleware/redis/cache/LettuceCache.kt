@@ -44,7 +44,12 @@ class LettuceCache(private val client: RedisClient) : CacheProvider<String, Stri
         return client.connect().async().incrby(key, delta).await()
     }
 
-    override suspend fun extendableGetOrSet(key: String, duration: Long, unit: TimeUnit, action: suspend () -> String?): String? {
+    override suspend fun extendableGetOrSet(
+        key: String,
+        duration: Long,
+        unit: TimeUnit,
+        action: suspend () -> String?
+    ): String? {
         val commands = client.connect().async()
         return if (duration != 0L) {
             commands.expire(key, unit.toSeconds(duration))

@@ -15,7 +15,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
-import reactor.core.publisher.MonoProcessor
+import reactor.core.publisher.Sinks
 
 /**
  * Listener for gRPC calling, it convert gRPC call to [ServerResponse] asynchronously.
@@ -24,7 +24,7 @@ import reactor.core.publisher.MonoProcessor
  * @see https://aip.bybutter.com/127#http-method-and-path
  */
 class TranscodingCallListener(private val body: String) : ClientCall.Listener<Message<*, *>>() {
-    private val response = MonoProcessor.create<Mono<ServerResponse>>()
+    private val response = Sinks.one<Mono<ServerResponse>>()
 
     private var headers: Metadata? = null
     private var message: Message<*, *>? = null
@@ -40,7 +40,7 @@ class TranscodingCallListener(private val body: String) : ClientCall.Listener<Me
             trailers[STATUS_META_KEY]?.let {
                 if (it.code != Code.OK.number) {
                     // The trailers contains status meta and code is not [Code.OK], return the status directly.
-                    this.response.onNext(builder.body(DetectBodyInserter(it)))
+                    this.response.tryEmitValue(builder.body(DetectBodyInserter(it)))
                     return
                 } else {
                     // The trailers contains status meta but code is [Code.OK], return the status in response header.
@@ -69,9 +69,9 @@ class TranscodingCallListener(private val body: String) : ClientCall.Listener<Me
                     }
                 ))
             }
-            this.response.onNext(response)
+            this.response.tryEmitValue(response)
         } catch (e: Exception) {
-            this.response.onNext(ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            this.response.tryEmitValue(ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(DetectBodyInserter(
                     com.bybutter.sisyphus.rpc.Status {
                         this.code = Status.Code.INTERNAL.value()
@@ -106,7 +106,7 @@ class TranscodingCallListener(private val body: String) : ClientCall.Listener<Me
     }
 
     fun response(): Mono<ServerResponse> {
-        return response.flatMap { it }
+        return response.asMono().flatMap { it }
     }
 
     companion object {

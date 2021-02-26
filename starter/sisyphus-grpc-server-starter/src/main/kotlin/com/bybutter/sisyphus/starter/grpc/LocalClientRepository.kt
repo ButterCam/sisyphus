@@ -21,17 +21,28 @@ import org.springframework.core.env.Environment
 class LocalClientRepository : ClientRepository {
     override var order: Int = Int.MIN_VALUE + 1000
 
-    override fun listClientBeanDefinition(beanFactory: ConfigurableListableBeanFactory, environment: Environment): List<AbstractBeanDefinition> {
+    override fun listClientBeanDefinition(
+        beanFactory: ConfigurableListableBeanFactory,
+        environment: Environment
+    ): List<AbstractBeanDefinition> {
         val channelBuilderInterceptors = BeanUtils.getSortedBeans(beanFactory, ChannelBuilderInterceptor::class.java)
         val builderInterceptors = BeanUtils.getSortedBeans(beanFactory, ClientBuilderInterceptor::class.java)
         val clientInterceptors = BeanUtils.getSortedBeans(beanFactory, ClientInterceptor::class.java)
         val optionsInterceptors = BeanUtils.getSortedBeans(beanFactory, CallOptionsInterceptor::class.java)
-        val managedChannelLifecycle = beanFactory.getBean<ManagedChannelLifecycle>(ClientRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE)
+        val managedChannelLifecycle =
+            beanFactory.getBean<ManagedChannelLifecycle>(ClientRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE)
 
-        (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(LOCAL_CHANNEL_BEAN_NAME, BeanDefinitionBuilder.genericBeanDefinition(Channel::class.java) {
-            val config = beanFactory.getBean<ServiceConfig>()
-            createGrpcChannel("localhost:${config.serverPort}", channelBuilderInterceptors.values, managedChannelLifecycle)
-        }.beanDefinition)
+        (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
+            LOCAL_CHANNEL_BEAN_NAME,
+            BeanDefinitionBuilder.genericBeanDefinition(Channel::class.java) {
+                val config = beanFactory.getBean<ServiceConfig>()
+                createGrpcChannel(
+                    "localhost:${config.serverPort}",
+                    channelBuilderInterceptors.values,
+                    managedChannelLifecycle
+                )
+            }.beanDefinition
+        )
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
         for (serviceName in beanFactory.getBeanNamesForAnnotation(RpcServiceImpl::class.java)) {
             val serviceBeanDefinition = beanFactory.getBeanDefinition(serviceName)
@@ -39,7 +50,11 @@ class LocalClientRepository : ClientRepository {
             val stub = getClientFromService(serviceClass.superclass)
             val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(stub as Class<Any>) {
                 val localChannel = beanFactory.getBean<Channel>(LOCAL_CHANNEL_BEAN_NAME)
-                interceptStub(createGrpcClient(stub, localChannel, optionsInterceptors.values, CallOptions.DEFAULT), builderInterceptors.values, clientInterceptors.values)
+                interceptStub(
+                    createGrpcClient(stub, localChannel, optionsInterceptors.values, CallOptions.DEFAULT),
+                    builderInterceptors.values,
+                    clientInterceptors.values
+                )
             }
             beanDefinitionList.add(clientBeanDefinition.beanDefinition)
         }

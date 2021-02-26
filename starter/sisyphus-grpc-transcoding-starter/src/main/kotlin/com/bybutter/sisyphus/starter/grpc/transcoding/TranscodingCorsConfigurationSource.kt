@@ -33,7 +33,7 @@ class TranscodingCorsConfigurationSource(
 
         // Find a supported request path.
         val pattern = corsConfigurations.keys.firstOrNull {
-            PathMatcher.match(it, lookupPath.value(), setOf('/', ':'))
+            PathMatcher.match(it, lookupPath.value().substring(1), setOf('/', ':'))
         } ?: return null
 
         return corsConfigurations[pattern]
@@ -59,7 +59,7 @@ class TranscodingCorsConfigurationSource(
 
     private fun registerMethod(method: ServerMethodDefinition<*, *>) {
         // Ensure method proto registered.
-        val serice = method.methodDescriptor.serviceName?.let { ProtoTypes.findSupport(it) } as? ServiceSupport
+        val serice = method.methodDescriptor.serviceName?.let { ProtoTypes.findServiceSupport(".$it") }
             ?: return
         val proto = serice.descriptor.method.firstOrNull {
             it.name == method.methodDescriptor.fullMethodName.substringAfter('/')

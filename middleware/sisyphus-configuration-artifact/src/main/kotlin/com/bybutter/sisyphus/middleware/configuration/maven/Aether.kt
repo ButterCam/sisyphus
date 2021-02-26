@@ -34,7 +34,8 @@ class Aether {
         val userHome = System.getProperty("user.home")
         val localRepositoryDir = File("$userHome/.m2/repository")
 
-        localRepository = RemoteRepository.Builder("local", "dafult", localRepositoryDir.toURI().toURL().toExternalForm()).build()
+        localRepository =
+            RemoteRepository.Builder("local", "dafult", localRepositoryDir.toURI().toURL().toExternalForm()).build()
 
         val locator = MavenRepositorySystemUtils.newServiceLocator()
         locator.addService(RepositoryConnectorFactory::class.java, BasicRepositoryConnectorFactory::class.java)

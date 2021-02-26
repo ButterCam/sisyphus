@@ -42,7 +42,9 @@ class CoroutineTransactionContext(transactionActive: Boolean = true) :
     }
 
     override fun nest(): TransactionContext {
-        return TransactionSavePointContext(this, connectionHandle.values.associateWith { it.setSavepoint("Savepoint${savePointCounter.incrementAndGet()}") })
+        return TransactionSavePointContext(
+            this,
+            connectionHandle.values.associateWith { it.setSavepoint("Savepoint${savePointCounter.incrementAndGet()}") })
     }
 
     override fun rollback() {

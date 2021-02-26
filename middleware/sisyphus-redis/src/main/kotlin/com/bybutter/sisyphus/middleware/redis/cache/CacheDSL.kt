@@ -26,7 +26,13 @@ suspend fun <K, V> cache(provider: CacheProvider<K, V>, key: K, action: suspend 
     return provider.getOrSet(key, action)
 }
 
-suspend fun <K, V> cache(provider: CacheProvider<K, V>, key: K, duration: Long, unit: TimeUnit, action: suspend () -> V?): V? {
+suspend fun <K, V> cache(
+    provider: CacheProvider<K, V>,
+    key: K,
+    duration: Long,
+    unit: TimeUnit,
+    action: suspend () -> V?
+): V? {
     return provider.getOrSet(key, duration, unit, action)
 }
 
@@ -34,7 +40,12 @@ suspend fun <K, V> extendableCache(key: K, scenes: CacheScenes, action: suspend 
     return extendableCache(CacheProvider.current as CacheProvider<K, V>, key, scenes, action)
 }
 
-suspend fun <K, V> extendableCache(provider: CacheProvider<K, V>, key: K, scenes: CacheScenes, action: suspend () -> V?): V? {
+suspend fun <K, V> extendableCache(
+    provider: CacheProvider<K, V>,
+    key: K,
+    scenes: CacheScenes,
+    action: suspend () -> V?
+): V? {
     return extendableCache(provider, key, scenes.duration, scenes.unit, action)
 }
 
@@ -42,13 +53,25 @@ suspend fun <K, V> extendableCache(key: K, duration: Long, unit: TimeUnit, actio
     return extendableCache(CacheProvider.current as CacheProvider<K, V>, key, duration, unit, action)
 }
 
-suspend fun <K, V> extendableCache(provider: CacheProvider<K, V>, key: K, duration: Long, unit: TimeUnit, action: suspend () -> V?): V? {
+suspend fun <K, V> extendableCache(
+    provider: CacheProvider<K, V>,
+    key: K,
+    duration: Long,
+    unit: TimeUnit,
+    action: suspend () -> V?
+): V? {
     return provider.extendableGetOrSet(key, duration, unit, action)
 }
 
 private data class CacheContext<K, V, T>(val target: T, val key: K, var value: V? = null)
 
-suspend fun <K, V : Any, T> batchCache(provider: CacheProvider<K, V>, targets: Collection<T>, keyMapper: (T) -> K, scenes: CacheScenes, action: (Collection<T>) -> Collection<Pair<K, V>>): List<V> {
+suspend fun <K, V : Any, T> batchCache(
+    provider: CacheProvider<K, V>,
+    targets: Collection<T>,
+    keyMapper: (T) -> K,
+    scenes: CacheScenes,
+    action: (Collection<T>) -> Collection<Pair<K, V>>
+): List<V> {
     val contextMap = targets.map { CacheContext<K, V, T>(it, getCacheKeyForItem(keyMapper, it)) }.associateBy { it.key }
 
     fillAlreadyCached(contextMap, provider)
@@ -73,9 +96,12 @@ private suspend fun <K, T, V : Any> fillNotCached(contextMap: Map<K, CacheContex
 }
 
 private fun <K, T, V : Any> getNotCached(contextMap: Map<K, CacheContext<K, V, T>>) =
-        contextMap.values.filter { it.value == null }.map { it.target }
+    contextMap.values.filter { it.value == null }.map { it.target }
 
-private suspend fun <K, T, V : Any> fillAlreadyCached(contextMap: Map<K, CacheContext<K, V, T>>, provider: CacheProvider<K, V>) {
+private suspend fun <K, T, V : Any> fillAlreadyCached(
+    contextMap: Map<K, CacheContext<K, V, T>>,
+    provider: CacheProvider<K, V>
+) {
     contextMap.values.forEach {
         it.value = provider.get(it.key)
     }

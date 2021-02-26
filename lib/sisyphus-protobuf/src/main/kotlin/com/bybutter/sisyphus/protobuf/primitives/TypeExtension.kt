@@ -7,7 +7,7 @@ import com.bybutter.sisyphus.protobuf.ProtoTypes
 
 fun DescriptorProto.toType(typeName: String): Type {
     return Type {
-        val support = ProtoTypes.findSupport(typeName) as MessageSupport<*, *>
+        val support = ProtoTypes.findMessageSupport(typeName)
         this.name = this@toType.name
         for (fieldDescriptor in support.fieldDescriptors) {
             this.fields += fieldDescriptor.toField()
@@ -87,7 +87,7 @@ fun EnumValueDescriptorProto.toEnumValue(): EnumValue {
 private fun Message<*, *>.toOptions(): List<Option> {
     val result = mutableListOf<Option>()
 
-    loop@for ((field, value) in this) {
+    loop@ for ((field, value) in this) {
         when (value) {
             is List<*> -> {
                 for (v in value) {

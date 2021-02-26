@@ -8,15 +8,15 @@ data class RetrofitProperty(
     val url: String? = null,
     val connectTimeout: Long? = null,
     /**
- * Configuration classes name is required in configuration file.
- * example: [com.bybutter.sisyphus.middleware.retrofit.converter.JacksonConverterFactory].
- * */
-val converterFactory: List<Class<out Converter.Factory>>? = null,
+     * Configuration classes name is required in configuration file.
+     * example: [com.bybutter.sisyphus.middleware.retrofit.converter.JacksonConverterFactory].
+     * */
+    val converterFactory: List<Class<out Converter.Factory>>? = null,
     val builderInterceptors: List<Class<out RetrofitBuilderInterceptor>>? = null,
     val clientBuilderInterceptors: List<Class<out OkHttpClientBuilderInterceptor>>? = null,
     val enableCircuitBreaker: Boolean? = null,
     @NestedConfigurationProperty
-val circuitBreakerProperty: CircuitBreakerProperty? = null
+    val circuitBreakerProperty: CircuitBreakerProperty? = null
 )
 
 /**

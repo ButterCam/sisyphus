@@ -28,7 +28,10 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
         val lifecycleBuilder = BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
             ManagedChannelLifecycle()
         }
-        registry.registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE, lifecycleBuilder.beanDefinition)
+        registry.registerBeanDefinition(
+            QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE,
+            lifecycleBuilder.beanDefinition
+        )
         for (clientRepository in clientRepositories) {
             val clientBeanList = clientRepository.listClientBeanDefinition(beanFactory, environment)
             for (clientBean in clientBeanList) {

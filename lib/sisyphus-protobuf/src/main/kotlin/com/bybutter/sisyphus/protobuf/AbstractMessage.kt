@@ -184,18 +184,21 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     protected fun <T> getFieldInExtensions(name: String): T {
-        val number = support().fieldInfo(name)?.number ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
+        val number = support().fieldInfo(name)?.number
+            ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
         return getFieldInExtensions(number)
     }
 
     protected fun <T> getFieldInExtensions(number: Int): T {
-        val extensions = support().extensions.firstOrNull { it.descriptor.number == number } ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
+        val extensions = support().extensions.firstOrNull { it.descriptor.number == number }
+            ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
         return (_extensions[number]?.value ?: extensions.default()).uncheckedCast()
     }
 
     protected fun getPropertyInExtensions(name: String): KProperty<*>? {
-        val extension = support().extensions.firstOrNull { it.descriptor.name == name || it.descriptor.jsonName == name }
-            ?: return null
+        val extension =
+            support().extensions.firstOrNull { it.descriptor.name == name || it.descriptor.jsonName == name }
+                ?: return null
         return extension.getProperty()
     }
 

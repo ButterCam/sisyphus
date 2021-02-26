@@ -28,7 +28,8 @@ open class RequestContext<T>(name: String) {
     }
 }
 
-class MutableRequestContext<T>(name: String, private val merger: MutableRequestContextMerger<T>) : RequestContext<T>(name) {
+class MutableRequestContext<T>(name: String, private val merger: MutableRequestContextMerger<T>) :
+    RequestContext<T>(name) {
     var changed: Boolean = false
         private set
 

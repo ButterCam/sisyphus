@@ -15,7 +15,8 @@ class Jackson2SmileCodecCustomizer : CodecCustomizer {
 
     companion object {
         val DEFAULT_SMILE_MIME_TYPES = arrayOf(
-                MimeType("application", "x-jackson-smile"),
-                MimeType("application", "*+x-jackson-smile"))
+            MimeType("application", "x-jackson-smile"),
+            MimeType("application", "*+x-jackson-smile")
+        )
     }
 }

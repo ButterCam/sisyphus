@@ -45,7 +45,11 @@ open class SisyphusExtension(val project: Project) {
             buildVersion != null -> "$buildVersion"
             tagName != null -> "$tagName"
             branchName != null -> "$branchName-SNAPSHOT"
-            githubRef != null && pullRequestRefRegex.matches(githubRef) -> "PR-${pullRequestRefRegex.matchEntire(githubRef)?.groupValues?.get(1)}-SNAPSHOT"
+            githubRef != null && pullRequestRefRegex.matches(githubRef) -> "PR-${
+                pullRequestRefRegex.matchEntire(
+                    githubRef
+                )?.groupValues?.get(1)
+            }-SNAPSHOT"
             else -> project.version as String
         }
 
@@ -60,19 +64,24 @@ open class SisyphusExtension(val project: Project) {
             repositories[repositoryName] = Repository(url, username, password)
         }
 
-        dependencyRepositories = (project.findProperty("sisyphus.dependency.repositories") as? String)?.split(',')?.toMutableList()
+        dependencyRepositories =
+            (project.findProperty("sisyphus.dependency.repositories") as? String)?.split(',')?.toMutableList()
                 ?: dependencyRepositories
-        releaseRepositories = (project.findProperty("sisyphus.release.repositories") as? String)?.split(',')?.toMutableList()
+        releaseRepositories =
+            (project.findProperty("sisyphus.release.repositories") as? String)?.split(',')?.toMutableList()
                 ?: releaseRepositories
-        snapshotRepositories = (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
+        snapshotRepositories =
+            (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
                 ?: snapshotRepositories
-        dockerPublishRegistries = (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
+        dockerPublishRegistries =
+            (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
                 ?: dockerPublishRegistries
 
-        managedDependencies = (project.findProperty("sisyphus.dependency.overriding") as? String)?.split(',')?.associate {
-            val moduleStringNotation = ParsedModuleStringNotation(it, null)
-            "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
-        }?.toMutableMap() ?: managedDependencies
+        managedDependencies =
+            (project.findProperty("sisyphus.dependency.overriding") as? String)?.split(',')?.associate {
+                val moduleStringNotation = ParsedModuleStringNotation(it, null)
+                "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
+            }?.toMutableMap() ?: managedDependencies
 
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
     }

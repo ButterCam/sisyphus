@@ -9,7 +9,12 @@ import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.util.MimeType
 
 class ProtobufDecoder(vararg mimeTypes: MimeType) : AbstractDataBufferDecoder<Message<*, *>>(*mimeTypes) {
-    override fun decode(buffer: DataBuffer, targetType: ResolvableType, mimeType: MimeType?, hints: Map<String, Any>?): Message<*, *> {
+    override fun decode(
+        buffer: DataBuffer,
+        targetType: ResolvableType,
+        mimeType: MimeType?,
+        hints: Map<String, Any>?
+    ): Message<*, *> {
         val support = targetType.rawClass.kotlin.companionObjectInstance as MessageSupport<*, *>
         return support.parse(buffer.asInputStream(), Int.MAX_VALUE)
     }

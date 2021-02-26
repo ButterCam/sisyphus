@@ -10,9 +10,9 @@ import com.fasterxml.jackson.dataformat.smile.SmileFactory
 object Smile : JacksonFormatSupport() {
     override val mapper: ObjectMapper by lazy {
         ObjectMapper(SmileFactory()).findAndRegisterModules()
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(JsonParser.Feature.IGNORE_UNDEFINED, true)
-                .configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(JsonParser.Feature.IGNORE_UNDEFINED, true)
+            .configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true)
     }
 }

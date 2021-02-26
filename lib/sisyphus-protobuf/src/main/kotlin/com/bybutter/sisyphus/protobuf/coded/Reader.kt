@@ -13,16 +13,17 @@ class Reader(private val inputStream: InputStream) {
     var readBytes = 0
         private set
 
-    val isAtEnd: Boolean get() {
-        return when (currentByte) {
-            -1 -> true
-            -2 -> {
-                currentByte = inputStream.read()
-                currentByte == -1
+    val isAtEnd: Boolean
+        get() {
+            return when (currentByte) {
+                -1 -> true
+                -2 -> {
+                    currentByte = inputStream.read()
+                    currentByte == -1
+                }
+                else -> false
             }
-            else -> false
         }
-    }
 
     private var currentByte: Int = -2
 

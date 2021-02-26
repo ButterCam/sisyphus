@@ -31,8 +31,8 @@ class MongoClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwa
 
         val properties = beanFactory.getBeansOfType<MongoDatabaseProperty>().toMutableMap()
         val mongoProperties = Binder.get(environment)
-                .bind("sisyphus", MongoDatabaseProperties::class.java)
-                .orElse(null)?.mongo ?: mapOf()
+            .bind("sisyphus", MongoDatabaseProperties::class.java)
+            .orElse(null)?.mongo ?: mapOf()
 
         properties += mongoProperties
 

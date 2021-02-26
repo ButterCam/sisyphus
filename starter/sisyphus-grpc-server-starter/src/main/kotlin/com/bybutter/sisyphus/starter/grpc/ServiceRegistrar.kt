@@ -75,14 +75,20 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
             builder.build()
         }
-        (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER, definitionBuilder.beanDefinition)
+        (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
+            QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER,
+            definitionBuilder.beanDefinition
+        )
 
         val lifecycleBuilder = BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
             val server = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
             val shutdown = environment.getProperty("server.shutdown", Shutdown::class.java)
             ServerLifecycle(server, shutdown ?: Shutdown.IMMEDIATE)
         }
-        (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER_LIFECYCLE, lifecycleBuilder.beanDefinition)
+        (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
+            QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER_LIFECYCLE,
+            lifecycleBuilder.beanDefinition
+        )
     }
 
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {

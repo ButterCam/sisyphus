@@ -38,7 +38,10 @@ class DefaultRequestLogger : RequestLogger {
         if (status.isOk) {
             logger.info("[${status.code}] ${call.methodDescriptor.fullMethodName} +${getCostString(cost)}")
         } else {
-            logger.error("[${status.code}] ${call.methodDescriptor.fullMethodName} +${getCostString(cost)}", status.cause)
+            logger.error(
+                "[${status.code}] ${call.methodDescriptor.fullMethodName} +${getCostString(cost)}",
+                status.cause
+            )
         }
     }
 

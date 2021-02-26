@@ -11,7 +11,8 @@ import org.jooq.impl.DSL
 import org.jooq.impl.DefaultConfiguration
 import org.jooq.tools.jdbc.JDBCUtils
 
-abstract class AbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) : DslContextFactory {
+abstract class AbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) :
+    DslContextFactory {
     final override fun createContext(qualifier: Class<*>, property: JdbcDatabaseProperty): DSLContext {
         val url = buildJdbcUrl(property)
         val datasource = createDatasource(url, property)
@@ -58,7 +59,12 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         })
     }
 
-    protected open fun createConfiguration(qualifier: Class<*>, datasource: DataSource, dialect: SQLDialect, interceptors: List<JooqConfigInterceptor>): Configuration {
+    protected open fun createConfiguration(
+        qualifier: Class<*>,
+        datasource: DataSource,
+        dialect: SQLDialect,
+        interceptors: List<JooqConfigInterceptor>
+    ): Configuration {
         val config: Configuration = DefaultConfiguration().apply {
             set(dialect)
             set(TransactionDelegatingDataSource(datasource))

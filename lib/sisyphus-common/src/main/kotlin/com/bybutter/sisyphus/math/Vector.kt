@@ -7,6 +7,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 typealias Vec2 = Pair<Double, Double>
+
 val Vec2.x get() = first
 val Vec2.y get() = second
 
@@ -63,6 +64,7 @@ fun Vec2.toCartesian(): Vec2 {
 }
 
 typealias Vec3 = Triple<Double, Double, Double>
+
 val Vec3.x get() = first
 val Vec3.y get() = second
 val Vec3.z get() = third
@@ -110,6 +112,7 @@ fun Vec3.dot(other: Vec3): Double {
 }
 
 typealias Vec4 = Quat<Double, Double, Double, Double>
+
 val Vec4.x get() = first
 val Vec4.y get() = second
 val Vec4.z get() = third

@@ -32,8 +32,9 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
             ?: return
 
         // Get the value of basePackageNames from the annotation.
-        val basePackageNames = (enableAnnotation[EnableRetrofitClients::basePackageNames.name] as? Array<String>)?.asList()?.toMutableSet()
-            ?: mutableSetOf()
+        val basePackageNames =
+            (enableAnnotation[EnableRetrofitClients::basePackageNames.name] as? Array<String>)?.asList()?.toMutableSet()
+                ?: mutableSetOf()
 
         // Get the value of basePackageClasses from the annotation. And class as anchor, get class package.
         (enableAnnotation[EnableRetrofitClients::basePackageClasses.name] as? Array<Class<*>>)?.asList()?.map {
@@ -106,7 +107,12 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
         }?.build() ?: clientBuilder.build()
     }
 
-    private fun createRetrofit(property: RetrofitProperty, propertyPrefix: String, clientClass: Class<*>, client: OkHttpClient): Any {
+    private fun createRetrofit(
+        property: RetrofitProperty,
+        propertyPrefix: String,
+        clientClass: Class<*>,
+        client: OkHttpClient
+    ): Any {
         val baseUrl = property.url ?: throw IllegalStateException("Retrofit client must have 'url'.")
         val retrofitBuilder = Retrofit.Builder().baseUrl(baseUrl).client(client)
         property.converterFactory?.forEach {
@@ -125,15 +131,17 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
     }
 
     private fun buildRetrofitProperty(retrofitClient: RetrofitClient, property: RetrofitProperty?): RetrofitProperty {
-        return RetrofitProperty(property?.name
+        return RetrofitProperty(
+            property?.name
                 ?: retrofitClient.name,
-                property?.url ?: retrofitClient.url,
-                property?.connectTimeout ?: retrofitClient.connectTimeout,
-                property?.converterFactory ?: retrofitClient.converterFactory.map { it.java },
-                property?.builderInterceptors ?: retrofitClient.builderInterceptors.map { it.java },
-                property?.clientBuilderInterceptors ?: retrofitClient.clientBuilderInterceptors.map { it.java },
-                property?.enableCircuitBreaker ?: retrofitClient.enableCircuitBreaker,
-                property?.circuitBreakerProperty)
+            property?.url ?: retrofitClient.url,
+            property?.connectTimeout ?: retrofitClient.connectTimeout,
+            property?.converterFactory ?: retrofitClient.converterFactory.map { it.java },
+            property?.builderInterceptors ?: retrofitClient.builderInterceptors.map { it.java },
+            property?.clientBuilderInterceptors ?: retrofitClient.clientBuilderInterceptors.map { it.java },
+            property?.enableCircuitBreaker ?: retrofitClient.enableCircuitBreaker,
+            property?.circuitBreakerProperty
+        )
     }
 
     private fun buildCircuitBreaker(property: RetrofitProperty): CircuitBreaker {
@@ -164,7 +172,8 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
             }
         }
 
-        return CircuitBreakerRegistry.of(configBuilder.build()).circuitBreaker(CIRCUIT_BREAKER_NAME_PREFIX + property.name)
+        return CircuitBreakerRegistry.of(configBuilder.build())
+            .circuitBreaker(CIRCUIT_BREAKER_NAME_PREFIX + property.name)
     }
 
     companion object {

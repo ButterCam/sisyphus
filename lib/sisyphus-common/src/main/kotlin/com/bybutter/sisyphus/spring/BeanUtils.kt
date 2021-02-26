@@ -43,14 +43,21 @@ object BeanUtils {
         }
     }
 
-    inline fun <reified T> getBeansWithAnnotation(beanFactory: ListableBeanFactory, annotation: Class<out Annotation>): Map<String, T> {
+    inline fun <reified T> getBeansWithAnnotation(
+        beanFactory: ListableBeanFactory,
+        annotation: Class<out Annotation>
+    ): Map<String, T> {
         return getBeansWithAnnotation(beanFactory, T::class.java, annotation)
     }
 
     /**
      * Get beans of specified type and annotation, if [beanFactory] is [ConfigurableBeanFactory] or [ApplicationContext] this function will return sorted beans.
      */
-    fun <T> getBeansWithAnnotation(beanFactory: ListableBeanFactory, type: Class<T>, annotation: Class<out Annotation>): Map<String, T> {
+    fun <T> getBeansWithAnnotation(
+        beanFactory: ListableBeanFactory,
+        type: Class<T>,
+        annotation: Class<out Annotation>
+    ): Map<String, T> {
         val factory = when (beanFactory) {
             is ApplicationContext -> beanFactory.autowireCapableBeanFactory
             else -> beanFactory
@@ -66,7 +73,11 @@ object BeanUtils {
         }
     }
 
-    fun <T> getSortedBeansWithAnnotation(beanFactory: ConfigurableListableBeanFactory, type: Class<T>, annotation: Class<out Annotation>): Map<String, T> {
+    fun <T> getSortedBeansWithAnnotation(
+        beanFactory: ConfigurableListableBeanFactory,
+        type: Class<T>,
+        annotation: Class<out Annotation>
+    ): Map<String, T> {
         return getSortedBeansWithCondition(beanFactory, type) { _, _, definition ->
             val beanType = Class.forName(definition.beanClassName)
             AnnotationUtils.getAnnotation(beanType, annotation) != null
@@ -76,7 +87,11 @@ object BeanUtils {
     /**
      * Get beans of specified type and annotation, if [beanFactory] is [ConfigurableBeanFactory] or [ApplicationContext] this function will return sorted beans.
      */
-    fun <T> getBeansWithCondition(beanFactory: ListableBeanFactory, type: Class<T>, condition: (String, ListableBeanFactory) -> Boolean): Map<String, T> {
+    fun <T> getBeansWithCondition(
+        beanFactory: ListableBeanFactory,
+        type: Class<T>,
+        condition: (String, ListableBeanFactory) -> Boolean
+    ): Map<String, T> {
         val factory = when (beanFactory) {
             is ApplicationContext -> beanFactory.autowireCapableBeanFactory
             else -> beanFactory
@@ -100,7 +115,11 @@ object BeanUtils {
         return result
     }
 
-    fun <T> getSortedBeansWithCondition(beanFactory: ConfigurableListableBeanFactory, type: Class<T>, condition: (String, ConfigurableBeanFactory, BeanDefinition) -> Boolean): Map<String, T> {
+    fun <T> getSortedBeansWithCondition(
+        beanFactory: ConfigurableListableBeanFactory,
+        type: Class<T>,
+        condition: (String, ConfigurableBeanFactory, BeanDefinition) -> Boolean
+    ): Map<String, T> {
         val names = beanFactory.getBeanNamesForType(type)
         val beans = mutableMapOf<String, BeanDefinition>()
 
@@ -120,7 +139,8 @@ object BeanUtils {
 
 private class BeanDefinitionOrderComparer(private val map: Map<String, BeanDefinition>) : Comparator<String> {
     companion object {
-        private val ORDER_ATTRIBUTE = Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor::class.java, "order")
+        private val ORDER_ATTRIBUTE =
+            Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor::class.java, "order")
     }
 
     override fun compare(o1: String, o2: String): Int {

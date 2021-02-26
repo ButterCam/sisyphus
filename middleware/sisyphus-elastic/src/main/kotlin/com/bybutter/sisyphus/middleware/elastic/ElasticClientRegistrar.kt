@@ -28,8 +28,8 @@ class ElasticClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentA
 
         val properties = beanFactory.getBeansOfType<ElasticProperty>().toMutableMap()
         val elasticProperties = Binder.get(environment)
-                .bind("sisyphus", ElasticProperties::class.java)
-                .orElse(null)?.elastic ?: mapOf()
+            .bind("sisyphus", ElasticProperties::class.java)
+            .orElse(null)?.elastic ?: mapOf()
 
         properties += elasticProperties
 

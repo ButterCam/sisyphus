@@ -28,8 +28,8 @@ class MessageQueueRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAw
 
         val properties = beanFactory.getBeansOfType<MessageQueueProperty>().toMutableMap()
         val amqpProperties = Binder.get(environment)
-                .bind("sisyphus", MessageQueueProperties::class.java)
-                .orElse(null)?.amqp ?: mapOf()
+            .bind("sisyphus", MessageQueueProperties::class.java)
+            .orElse(null)?.amqp ?: mapOf()
 
         properties += amqpProperties
 

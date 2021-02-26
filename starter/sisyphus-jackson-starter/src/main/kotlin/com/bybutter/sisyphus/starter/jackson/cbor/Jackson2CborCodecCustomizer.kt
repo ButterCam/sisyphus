@@ -9,7 +9,9 @@ import org.springframework.http.codec.cbor.Jackson2CborEncoder
 
 class Jackson2CborCodecCustomizer : CodecCustomizer {
     override fun customize(configurer: CodecConfigurer) {
-        configurer.customCodecs().registerWithDefaultConfig(Jackson2CborEncoder(Cbor.mapper, MediaType.APPLICATION_CBOR))
-        configurer.customCodecs().registerWithDefaultConfig(Jackson2CborDecoder(Cbor.mapper, MediaType.APPLICATION_CBOR))
+        configurer.customCodecs()
+            .registerWithDefaultConfig(Jackson2CborEncoder(Cbor.mapper, MediaType.APPLICATION_CBOR))
+        configurer.customCodecs()
+            .registerWithDefaultConfig(Jackson2CborDecoder(Cbor.mapper, MediaType.APPLICATION_CBOR))
     }
 }

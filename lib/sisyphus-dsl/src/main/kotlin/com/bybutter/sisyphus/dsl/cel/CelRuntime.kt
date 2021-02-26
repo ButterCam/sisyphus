@@ -156,8 +156,7 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
 
     @OptIn(InternalProtoApi::class)
     fun createMessage(type: String, initializer: Map<String, Any?>): Any {
-        val messageSupport = ProtoTypes.findSupport(type) as? MessageSupport<*, *>
-            ?: throw IllegalStateException("Message '$type' not defined.")
+        val messageSupport = ProtoTypes.findMessageSupport(type)
         return messageSupport.newMutable().apply {
             for ((key, value) in initializer) {
                 value ?: continue

@@ -49,11 +49,22 @@ object ProtoTypes {
         return "$host/$name"
     }
 
+    /**
+     * Find protobuf support for file, enum, message and service.
+     * 'name' must be full proto name begin with dot like
+     * '.google.protobuf.Any' or type url like
+     * 'types.googleapis.com/google.protobuf.Any' or file name like
+     * 'google/api/annotation.proto'.
+     */
     fun findSupport(name: String): ProtoSupport<*>? {
         if (name.contains('/')) {
-            return protoToSupportMap[getProtoNameByTypeUrl(name)]
+            return protoToSupportMap[getProtoNameByTypeUrl(name)] ?: protoToSupportMap[name]
         }
         return protoToSupportMap[name]
+    }
+
+    fun findFileSupport(name: String): FileSupport {
+        return findSupport(name) as FileSupport
     }
 
     fun findMessageSupport(name: String): MessageSupport<*, *> {

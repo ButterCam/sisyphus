@@ -46,7 +46,16 @@ fun Timestamp.Companion.tryParse(value: String): Timestamp? {
     }
 }
 
-operator fun Timestamp.Companion.invoke(year: Int, month: Month, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0, nano: Int = 0, zoneId: ZoneId = ZoneId.systemDefault()): Timestamp {
+operator fun Timestamp.Companion.invoke(
+    year: Int,
+    month: Month,
+    day: Int,
+    hour: Int = 0,
+    minute: Int = 0,
+    second: Int = 0,
+    nano: Int = 0,
+    zoneId: ZoneId = ZoneId.systemDefault()
+): Timestamp {
     val instant = ZonedDateTime.of(year, month.value, day, hour, minute, second, nano, zoneId).toInstant()
     return Timestamp {
         this.seconds = instant.epochSecond
@@ -54,7 +63,16 @@ operator fun Timestamp.Companion.invoke(year: Int, month: Month, day: Int, hour:
     }
 }
 
-operator fun Timestamp.Companion.invoke(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0, nano: Int = 0, zoneId: ZoneId = ZoneId.systemDefault()): Timestamp {
+operator fun Timestamp.Companion.invoke(
+    year: Int,
+    month: Int,
+    day: Int,
+    hour: Int = 0,
+    minute: Int = 0,
+    second: Int = 0,
+    nano: Int = 0,
+    zoneId: ZoneId = ZoneId.systemDefault()
+): Timestamp {
     val instant = ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId).toInstant()
     return Timestamp {
         this.seconds = instant.epochSecond
@@ -143,7 +161,11 @@ operator fun Duration.Companion.invoke(nanos: BigInteger): Duration {
 }
 
 operator fun Duration.Companion.invoke(hours: Long, minutes: Long, seconds: Long, nanos: Int = 0): Duration {
-    return Duration((TimeUnit.HOURS.toNanos(hours) + TimeUnit.MINUTES.toNanos(minutes) + TimeUnit.SECONDS.toNanos(seconds) + nanos).toBigInteger())
+    return Duration(
+        (TimeUnit.HOURS.toNanos(hours) + TimeUnit.MINUTES.toNanos(minutes) + TimeUnit.SECONDS.toNanos(
+            seconds
+        ) + nanos).toBigInteger()
+    )
 }
 
 fun Timestamp.toBigInteger(): BigInteger {

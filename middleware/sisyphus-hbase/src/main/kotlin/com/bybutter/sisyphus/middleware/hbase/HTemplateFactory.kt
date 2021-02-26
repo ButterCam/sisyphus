@@ -58,8 +58,9 @@ class HTemplateFactory<TKey, TValue> constructor(
 
     companion object {
         inline operator fun <reified TKey, reified TValue> invoke(): HTemplateFactory<TKey, TValue> where TKey : Any, TValue : DtoModel {
-            return HTemplateFactory(TypeFactory.defaultInstance().constructType(object : TypeReference<TKey>() {}),
-                    TypeFactory.defaultInstance().constructType(object : TypeReference<TValue>() {})
+            return HTemplateFactory(
+                TypeFactory.defaultInstance().constructType(object : TypeReference<TKey>() {}),
+                TypeFactory.defaultInstance().constructType(object : TypeReference<TValue>() {})
             )
         }
     }
@@ -103,7 +104,7 @@ class HTemplateFactory<TKey, TValue> constructor(
                 return it.get(getRequests).filter { it.row != null }.associate {
                     val keyMap = keys.associate { rowKeyConverter.convert(it)?.hashWrapper() to it }
                     (keyMap[it.row.hashWrapper()]
-                            ?: throw RuntimeException("Key value not found.")) to tableModelConverter.convert(it)
+                        ?: throw RuntimeException("Key value not found.")) to tableModelConverter.convert(it)
                 }
             }
         }

@@ -47,7 +47,11 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
         writeAny(value as Any, value.javaType, gen, provider)
     }
 
-    private fun getSerializedPropertyName(field: FieldDescriptorProto, gen: JsonGenerator, provider: SerializerProvider): String {
+    private fun getSerializedPropertyName(
+        field: FieldDescriptorProto,
+        gen: JsonGenerator,
+        provider: SerializerProvider
+    ): String {
         return when (gen) {
             is YAMLGenerator -> field.name
             else -> field.jsonName
@@ -61,7 +65,12 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
             }
 
             gen.writeFieldName(getSerializedPropertyName(field, gen, provider))
-            writeAny(fieldValue!!, TypeFactory.defaultInstance().constructType(value.getProperty(field.number)?.returnType?.javaType), gen, provider)
+            writeAny(
+                fieldValue!!,
+                TypeFactory.defaultInstance().constructType(value.getProperty(field.number)?.returnType?.javaType),
+                gen,
+                provider
+            )
         }
     }
 
@@ -201,7 +210,8 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
         if ((value as? Float)?.isInfinite() == true ||
             (value as? Float)?.isNaN() == true ||
             (value as? Double)?.isInfinite() == true ||
-            (value as? Double)?.isNaN() == true) {
+            (value as? Double)?.isNaN() == true
+        ) {
             gen.writeString(value.toString())
         }
 

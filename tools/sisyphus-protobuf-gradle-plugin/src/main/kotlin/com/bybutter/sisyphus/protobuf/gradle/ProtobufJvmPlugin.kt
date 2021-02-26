@@ -64,7 +64,11 @@ class ProtobufJvmPlugin : Plugin<Project> {
         }
     }
 
-    private fun registerProtoConfig(target: Project, extension: ProtobufExtension, sourceSet: SourceSet): Configuration {
+    private fun registerProtoConfig(
+        target: Project,
+        extension: ProtobufExtension,
+        sourceSet: SourceSet
+    ): Configuration {
         return target.configurations.maybeCreate(sourceSet.getProtoConfigurationName()).apply {
             description = "Proto files to compile for source set '${sourceSet.name}'"
             isCanBeConsumed = false
@@ -86,7 +90,11 @@ class ProtobufJvmPlugin : Plugin<Project> {
         }
     }
 
-    private fun registerProtoApiConfig(target: Project, extension: ProtobufExtension, sourceSet: SourceSet): Configuration {
+    private fun registerProtoApiConfig(
+        target: Project,
+        extension: ProtobufExtension,
+        sourceSet: SourceSet
+    ): Configuration {
         return target.configurations.maybeCreate(sourceSet.getProtoApiConfigurationName()).apply {
             description = "Proto dependency files for compiling of source set '${sourceSet.name}'"
             isCanBeConsumed = false
@@ -96,13 +104,23 @@ class ProtobufJvmPlugin : Plugin<Project> {
         }
     }
 
-    private fun registerExtractProto(target: Project, extension: ProtobufExtension, sourceSet: SourceSet): ExtractProtoTask {
-        val inputDir = target.file(extension.sourceSet(sourceSet.name).inputDir
-            ?: sourceSet.protoSourcePath)
-        val resourceOutputDir = target.file(extension.sourceSet(sourceSet.name).resourceOutputDir
-            ?: sourceSet.protoResourceCompileOutputPath)
-        val protoDir = target.file(extension.sourceSet(sourceSet.name).resourceOutputDir
-            ?: sourceSet.protoTempCompileOutputPath)
+    private fun registerExtractProto(
+        target: Project,
+        extension: ProtobufExtension,
+        sourceSet: SourceSet
+    ): ExtractProtoTask {
+        val inputDir = target.file(
+            extension.sourceSet(sourceSet.name).inputDir
+                ?: sourceSet.protoSourcePath
+        )
+        val resourceOutputDir = target.file(
+            extension.sourceSet(sourceSet.name).resourceOutputDir
+                ?: sourceSet.protoResourceCompileOutputPath
+        )
+        val protoDir = target.file(
+            extension.sourceSet(sourceSet.name).resourceOutputDir
+                ?: sourceSet.protoTempCompileOutputPath
+        )
 
         Files.createDirectories(resourceOutputDir.toPath())
         Files.createDirectories(protoDir.toPath())
@@ -114,8 +132,10 @@ class ProtobufJvmPlugin : Plugin<Project> {
 
         return target.tasks.register("extract ${sourceSet.name} protos".toCamelCase(), ExtractProtoTask::class.java) {
             if (sourceSet.isTestSourceSet) {
-                val mainInputDir = target.file(extension.sourceSet("main").inputDir
-                    ?: target.sourceSets.main!!.protoSourcePath)
+                val mainInputDir = target.file(
+                    extension.sourceSet("main").inputDir
+                        ?: target.sourceSets.main!!.protoSourcePath
+                )
                 it.input = target.layout.files(inputDir, mainInputDir)
             } else {
                 it.input = target.layout.files(inputDir)
@@ -133,13 +153,24 @@ class ProtobufJvmPlugin : Plugin<Project> {
         }.get()
     }
 
-    private fun registerGenerateProto(target: Project, extension: ProtobufExtension, sourceSet: SourceSet, extractTask: ExtractProtoTask): ProtoGenerateTask {
-        val outputDir = target.file(extension.sourceSet(sourceSet.name).outputDir
-            ?: sourceSet.protoCompileOutputPath)
-        val implOutputDir = target.file(extension.sourceSet(sourceSet.name).implDir
-            ?: sourceSet.protoInternalCompileOutputPath)
-        val resourceOutputDir = target.file(extension.sourceSet(sourceSet.name).resourceOutputDir
-            ?: sourceSet.protoResourceCompileOutputPath)
+    private fun registerGenerateProto(
+        target: Project,
+        extension: ProtobufExtension,
+        sourceSet: SourceSet,
+        extractTask: ExtractProtoTask
+    ): ProtoGenerateTask {
+        val outputDir = target.file(
+            extension.sourceSet(sourceSet.name).outputDir
+                ?: sourceSet.protoCompileOutputPath
+        )
+        val implOutputDir = target.file(
+            extension.sourceSet(sourceSet.name).implDir
+                ?: sourceSet.protoInternalCompileOutputPath
+        )
+        val resourceOutputDir = target.file(
+            extension.sourceSet(sourceSet.name).resourceOutputDir
+                ?: sourceSet.protoResourceCompileOutputPath
+        )
 
         Files.createDirectories(outputDir.toPath())
         Files.createDirectories(implOutputDir.toPath())
@@ -154,17 +185,18 @@ class ProtobufJvmPlugin : Plugin<Project> {
             it.srcDir(implOutputDir)
         }
 
-        val generateTask = target.tasks.register("generate ${sourceSet.name} protos".toCamelCase(), ProtoGenerateTask::class.java) {
-            it.protoPath = extractTask.protoPath
-            it.output = outputDir
-            it.implOutput = implOutputDir
-            it.resourceOutput = resourceOutputDir
-            it.group = "proto"
-            it.description = "Generate protos for '${sourceSet.name}' source set."
-            it.protobuf = extension
+        val generateTask =
+            target.tasks.register("generate ${sourceSet.name} protos".toCamelCase(), ProtoGenerateTask::class.java) {
+                it.protoPath = extractTask.protoPath
+                it.output = outputDir
+                it.implOutput = implOutputDir
+                it.resourceOutput = resourceOutputDir
+                it.group = "proto"
+                it.description = "Generate protos for '${sourceSet.name}' source set."
+                it.protobuf = extension
 
-            it.dependsOn(extractTask)
-        }.get()
+                it.dependsOn(extractTask)
+            }.get()
 
         target.extensions.findByType(IdeaModel::class.java)?.apply {
             module.generatedSourceDirs.add(outputDir)
@@ -181,11 +213,18 @@ class ProtobufJvmPlugin : Plugin<Project> {
         return generateTask
     }
 
-    private fun registerPackageProto(target: Project, extension: ProtobufExtension, sourceSet: SourceSet, extractTask: ExtractProtoTask): Zip? {
+    private fun registerPackageProto(
+        target: Project,
+        extension: ProtobufExtension,
+        sourceSet: SourceSet,
+        extractTask: ExtractProtoTask
+    ): Zip? {
         if (!sourceSet.isMainSourceSet) return null
 
-        val protoDir = target.file(extension.sourceSet(sourceSet.name).resourceOutputDir
-            ?: sourceSet.protoTempCompileOutputPath)
+        val protoDir = target.file(
+            extension.sourceSet(sourceSet.name).resourceOutputDir
+                ?: sourceSet.protoTempCompileOutputPath
+        )
 
         return target.tasks.register("protoZip", Zip::class.java) {
             it.from(protoDir)
@@ -195,7 +234,12 @@ class ProtobufJvmPlugin : Plugin<Project> {
         }.get()
     }
 
-    private fun registerApiLintProto(target: Project, extension: ProtobufExtension, sourceSet: SourceSet, extractTask: ExtractProtoTask): ProtobufApiLintTask {
+    private fun registerApiLintProto(
+        target: Project,
+        extension: ProtobufExtension,
+        sourceSet: SourceSet,
+        extractTask: ExtractProtoTask
+    ): ProtobufApiLintTask {
         return target.tasks.register("${sourceSet.name} api lint".toCamelCase(), ProtobufApiLintTask::class.java) {
             it.protoPath = extractTask.protoPath
             it.protobuf = extension

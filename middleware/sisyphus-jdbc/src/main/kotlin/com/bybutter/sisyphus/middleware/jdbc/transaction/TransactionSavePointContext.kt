@@ -3,7 +3,10 @@ package com.bybutter.sisyphus.middleware.jdbc.transaction
 import java.sql.Connection
 import java.sql.Savepoint
 
-class TransactionSavePointContext(private val context: CoroutineTransactionContext, private val savePoints: Map<out Connection, Savepoint>) : TransactionContext {
+class TransactionSavePointContext(
+    private val context: CoroutineTransactionContext,
+    private val savePoints: Map<out Connection, Savepoint>
+) : TransactionContext {
     override fun nest(): TransactionContext {
         return context.nest()
     }

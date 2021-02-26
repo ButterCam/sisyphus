@@ -47,9 +47,11 @@ class SisyphusDockerPlugin : Plugin<Project> {
             docker.files(it.outputs)
         }
 
-        docker.buildArgs(docker.buildArgs + mapOf(
-            "PROJECT_NAME" to target.name,
-            "PROJECT_VERSION" to target.version.toString()
-        ))
+        docker.buildArgs(
+            docker.buildArgs + mapOf(
+                "PROJECT_NAME" to target.name,
+                "PROJECT_VERSION" to target.version.toString()
+            )
+        )
     }
 }
