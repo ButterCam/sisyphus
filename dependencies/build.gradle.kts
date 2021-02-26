@@ -32,7 +32,7 @@ dependencies {
         api("org.apache.maven.wagon:wagon-http:3.4.3")
         api("org.junit.jupiter:junit-jupiter:5.7.1")
         api("org.reflections:reflections:0.9.12")
-        api("com.squareup.okhttp3:okhttp:4.8.1")
+        api("com.squareup.okhttp3:okhttp:4.9.1")
         api("com.squareup.retrofit2:retrofit:2.9.0")
         api("io.github.resilience4j:resilience4j-retrofit:1.5.0")
         api("org.antlr:antlr4:4.9.1")
