@@ -10,7 +10,9 @@ description = "Sisyphus customized gRPC runtime for Kotlin coroutine(full suppor
 dependencies {
     api(project(":lib:sisyphus-grpc"))
     api(Dependencies.Grpc.stub)
-    api(Dependencies.Grpc.kotlin)
+    api(Dependencies.Grpc.kotlin) {
+        exclude("io.grpc", "grpc-protobuf")
+    }
 
     implementation(project(":lib:sisyphus-jackson"))
 
