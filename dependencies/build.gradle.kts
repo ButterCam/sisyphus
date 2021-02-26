@@ -36,7 +36,7 @@ dependencies {
         api("com.squareup.retrofit2:retrofit:2.9.0")
         api("io.github.resilience4j:resilience4j-retrofit:1.5.0")
         api("org.antlr:antlr4:4.9.1")
-        api("io.swagger.core.v3:swagger-core:2.1.6")
+        api("io.swagger.core.v3:swagger-core:2.1.7")
         api("org.jooq:jooq:3.13.4")
         api("com.google.api.grpc:proto-google-common-protos:2.0.1")
         api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.31")
