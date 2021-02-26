@@ -1,12 +1,12 @@
 package com.bybutter.sisyphus.middleware.rocketmq.autoconfigure
 
+import com.bybutter.sisyphus.middleware.rocketmq.ConsumerLifecycle
 import com.bybutter.sisyphus.middleware.rocketmq.MessageConsumer
 import com.bybutter.sisyphus.middleware.rocketmq.MessageListener
 import com.bybutter.sisyphus.middleware.rocketmq.RocketMqConsumerProperty
 import com.bybutter.sisyphus.middleware.rocketmq.RocketMqProducerProperty
 import com.bybutter.sisyphus.middleware.rocketmq.RocketMqProperties
 import com.bybutter.sisyphus.middleware.rocketmq.RocketMqResourceFactory
-import org.apache.rocketmq.client.consumer.MQConsumer
 import org.apache.rocketmq.client.producer.MQProducer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
 import org.springframework.boot.context.properties.bind.Binder
 import org.springframework.context.EnvironmentAware
+import org.springframework.context.SmartLifecycle
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 
@@ -76,15 +77,15 @@ class RocketMqRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
             val consumer = selectedConsumers.first()
 
             val consumerName = "$BEAN_NAME_PREFIX:${listener}Consumer"
-            val consumerDefinition = BeanDefinitionBuilder.genericBeanDefinition(MQConsumer::class.java) {
-                val factory = beanFactory.getBean(RocketMqResourceFactory::class.java)
-                factory.createConsumer(consumer, annotation, beanFactory.getBean<MessageListener<*>>(listener)).also {
-                    logger.info("RocketMQ listener (${annotation.groupId}) registered on topic '${annotation.topic}(${annotation.filter})'.")
-                }
+            val consumerDefinition = BeanDefinitionBuilder.genericBeanDefinition(SmartLifecycle::class.java) {
+                ConsumerLifecycle(beanFactory.getBean(RocketMqResourceFactory::class.java)
+                    .createConsumer(consumer, annotation, beanFactory.getBean<MessageListener<*>>(listener))
+                    .also {
+                        logger.info("RocketMQ listener (${annotation.groupId}) registered on topic '${annotation.topic}(${annotation.filter})'.")
+                    }
+                )
             }.beanDefinition
             consumerDefinition.addQualifier(AutowireCandidateQualifier(consumer.qualifier))
-            consumerDefinition.initMethodName = INIT_METHOD
-            consumerDefinition.destroyMethodName = DESTROY_METHOD
             registry.registerBeanDefinition(consumerName, consumerDefinition)
         }
     }

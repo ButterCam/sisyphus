@@ -1,12 +1,9 @@
 package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.collection.contentEquals
-import com.bybutter.sisyphus.collection.takeWhen
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.coded.Writer
-import com.google.protobuf.WireFormat
-import java.io.ByteArrayOutputStream
 
 abstract class UnknownField<T> {
     abstract val tag: Int
@@ -95,16 +92,16 @@ class UnknownFields {
 
     fun readFrom(reader: Reader, number: Int, wireType: Int) {
         when (wireType) {
-            WireFormat.WIRETYPE_VARINT -> {
+            WireType.VARINT.ordinal -> {
                 _fields.add(Varint(number, reader.int64()))
             }
-            WireFormat.WIRETYPE_FIXED32 -> {
+            WireType.FIXED32.ordinal -> {
                 _fields.add(Fixed32(number, reader.sfixed32()))
             }
-            WireFormat.WIRETYPE_FIXED64 -> {
+            WireType.FIXED64.ordinal -> {
                 _fields.add(Fixed64(number, reader.sfixed64()))
             }
-            WireFormat.WIRETYPE_LENGTH_DELIMITED -> {
+            WireType.LENGTH_DELIMITED.ordinal -> {
                 _fields.add(Bytes(number, reader.bytes()))
             }
             else -> throw UnsupportedOperationException("Unsupported wire type '$wireType'.")
@@ -144,26 +141,5 @@ class UnknownFields {
 
     operator fun plusAssign(other: UnknownFields) {
         this._fields.addAll(other.fields)
-    }
-
-    @OptIn(InternalProtoApi::class)
-    fun exportExtension(support: ExtensionSupport<*, *>): Message<*, *> {
-        val extendedFields = support.extendedFields.map { it.number }.toSet()
-        val extended = support.extendedFields
-
-        val fieldsData = _fields.takeWhen {
-            WireType.getFieldNumber(it.tag) in extendedFields
-        }
-
-        val writer = Writer()
-        for (field in fieldsData) {
-            field.writeTo(writer)
-        }
-        val buffer = ByteArrayOutputStream()
-        writer.writeTo(buffer)
-
-        return support.newMutable().apply {
-            readFrom(Reader(buffer.toByteArray().inputStream()), Int.MAX_VALUE)
-        }
     }
 }

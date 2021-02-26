@@ -1,11 +1,10 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
 import com.bybutter.sisyphus.api.HttpRule
-import com.bybutter.sisyphus.api.resource.PathTemplate
-import com.bybutter.sisyphus.protobuf.ProtoSupport
-import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.google.protobuf.DescriptorProtos
+import com.bybutter.sisyphus.protobuf.primitives.FileDescriptorProto
+import com.google.api.pathtemplate.PathTemplate
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
@@ -19,12 +18,24 @@ object SwaggerPaths {
     /**
      * Build Paths based on request method.
      * */
-    fun fetchPaths(httpRule: HttpRule, inputTypeProto: ProtoSupport<*, *>, inputTypeFields: MutableList<FieldDescriptorProto>, operation: Operation, paths: Paths): Paths {
+    fun fetchPaths(
+        httpRule: HttpRule,
+        inputTypeProto: MessageSupport<*, *>,
+        inputTypeFields: MutableList<FieldDescriptorProto>,
+        operation: Operation,
+        paths: Paths
+    ): Paths {
         when (httpRule.pattern) {
             is HttpRule.Pattern.Get -> {
                 val requestUrlMap = fetchRequestUrl(httpRule.get)
                 val key = requestUrlMap.keys.first()
-                val item = fetchOperation(httpRule.get, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                val item = fetchOperation(
+                    httpRule.get,
+                    requestUrlMap.values.first(),
+                    inputTypeProto,
+                    inputTypeFields,
+                    operation
+                )
                 if (paths[key] == null) {
                     paths[key] = PathItem().get(item)
                 } else {
@@ -36,7 +47,13 @@ object SwaggerPaths {
             is HttpRule.Pattern.Post -> {
                 val requestUrlMap = fetchRequestUrl(httpRule.post)
                 val key = requestUrlMap.keys.first()
-                val item = fetchOperation(httpRule.post, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                val item = fetchOperation(
+                    httpRule.post,
+                    requestUrlMap.values.first(),
+                    inputTypeProto,
+                    inputTypeFields,
+                    operation
+                )
                 if (paths[key] == null) {
                     paths[key] = PathItem().post(item)
                 } else {
@@ -48,7 +65,13 @@ object SwaggerPaths {
             is HttpRule.Pattern.Put -> {
                 val requestUrlMap = fetchRequestUrl(httpRule.put)
                 val key = requestUrlMap.keys.first()
-                val item = fetchOperation(httpRule.put, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                val item = fetchOperation(
+                    httpRule.put,
+                    requestUrlMap.values.first(),
+                    inputTypeProto,
+                    inputTypeFields,
+                    operation
+                )
                 if (paths[key] == null) {
                     paths[key] = PathItem().put(item)
                 } else {
@@ -60,7 +83,13 @@ object SwaggerPaths {
             is HttpRule.Pattern.Patch -> {
                 val requestUrlMap = fetchRequestUrl(httpRule.patch)
                 val key = requestUrlMap.keys.first()
-                val item = fetchOperation(httpRule.patch, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                val item = fetchOperation(
+                    httpRule.patch,
+                    requestUrlMap.values.first(),
+                    inputTypeProto,
+                    inputTypeFields,
+                    operation
+                )
                 if (paths[key] == null) {
                     paths[key] = PathItem().patch(item)
                 } else {
@@ -72,7 +101,13 @@ object SwaggerPaths {
             is HttpRule.Pattern.Delete -> {
                 val requestUrlMap = fetchRequestUrl(httpRule.delete)
                 val key = requestUrlMap.keys.first()
-                val item = fetchOperation(httpRule.delete, requestUrlMap.values.first(), inputTypeProto, inputTypeFields, operation)
+                val item = fetchOperation(
+                    httpRule.delete,
+                    requestUrlMap.values.first(),
+                    inputTypeProto,
+                    inputTypeFields,
+                    operation
+                )
                 if (paths[key] == null) {
                     paths[key] = PathItem().delete(item)
                 } else {
@@ -111,7 +146,8 @@ object SwaggerPaths {
                             append("{")
                             append(param)
                             append("}")
-                        } else -> append(s)
+                        }
+                        else -> append(s)
                     }
                 }
             }
@@ -126,11 +162,18 @@ object SwaggerPaths {
     /**
      *  Add path params and query params to operation.
      * */
-    private fun fetchOperation(url: String, pathParamList: List<String>, inputTypeProto: ProtoSupport<*, *>, fieldDescriptionList: List<FieldDescriptorProto>, operation: Operation): Operation {
-        val fileDescriptor = ProtoTypes.getFileContainingSymbol(inputTypeProto.fullName)
-        val path = listOf(DescriptorProtos.FileDescriptorProto.MESSAGE_TYPE_FIELD_NUMBER,
-                fileDescriptor?.messageType?.indexOf(inputTypeProto.descriptor),
-                DescriptorProtos.FileDescriptorProto.PACKAGE_FIELD_NUMBER)
+    private fun fetchOperation(
+        url: String,
+        pathParamList: List<String>,
+        inputTypeProto: MessageSupport<*, *>,
+        fieldDescriptionList: List<FieldDescriptorProto>,
+        operation: Operation
+    ): Operation {
+        val fileSupport = inputTypeProto.file()
+        val path = listOf(
+            FileDescriptorProto.MESSAGE_TYPE_FIELD_NUMBER,
+            fileSupport.descriptor.messageType.indexOf(inputTypeProto.descriptor)
+        )
 
         pathParamList.forEach { param ->
             operation.addParametersItem(PathParameter().apply {
@@ -146,7 +189,10 @@ object SwaggerPaths {
             fieldDescriptionList.forEach { field ->
                 if (pathParams.find { param -> param == field.name || param == field.jsonName } == null) {
                     this.addParametersItem(QueryParameter().apply {
-                        description = SwaggerDescription.fetchDescription(path + inputTypeProto.descriptor.field.indexOf(field), fileDescriptor)
+                        description = SwaggerDescription.fetchDescription(
+                            path + inputTypeProto.descriptor.field.indexOf(field),
+                            fileSupport.descriptor
+                        )
                         name = field.jsonName
                         required = false
                         schema = if (field.label == FieldDescriptorProto.Label.REPEATED) {

@@ -95,9 +95,9 @@ val Type.kotlinType: KType
             }
             is ParameterizedType -> {
                 (this.rawType as Class<*>).kotlin.createType(
-                        this.actualTypeArguments.map {
-                            it.toKTypeProjection()
-                        }
+                    this.actualTypeArguments.map {
+                        it.toKTypeProjection()
+                    }
                 )
             }
             else -> throw UnsupportedOperationException("Unsupported '$this'.")
@@ -168,6 +168,18 @@ val KClass<*>.allProperties: List<KProperty1<out Any, *>>
     }
 
 object Reflect {
+    fun tryGetClass(name: String): Class<*>? {
+        return try {
+            Class.forName(name)
+        } catch (e: ClassNotFoundException) {
+            null
+        }
+    }
+
+    fun classExist(name: String): Boolean {
+        return tryGetClass(name) != null
+    }
+
     fun <T> getPrivateField(any: Any, name: String): T? {
         return getPrivateField(any.javaClass, any, name)
     }

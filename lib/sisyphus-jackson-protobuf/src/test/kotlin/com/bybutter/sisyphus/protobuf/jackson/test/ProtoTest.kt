@@ -56,8 +56,8 @@ class ProtoTest {
         }
 
         val json = raw.toJson()
-        val jsonUnmarshlled = json.parseJson<MapMessageTest>()
-        Assertions.assertArrayEquals(raw.toProto(), jsonUnmarshlled.toProto())
+        val jsonUnmarshalled = json.parseJson<MapMessageTest>()
+        Assertions.assertArrayEquals(raw.toProto(), jsonUnmarshalled.toProto())
     }
 
     @Test
@@ -95,8 +95,8 @@ class ProtoTest {
         }
 
         val yml = raw.toYaml()
-        val ymlUnmarshlled = yml.parseYaml<MapMessageTest>()
-        Assertions.assertArrayEquals(raw.toProto(), ymlUnmarshlled.toProto())
+        val ymlUnmarshalled = yml.parseYaml<MapMessageTest>()
+        Assertions.assertArrayEquals(raw.toProto(), ymlUnmarshalled.toProto())
     }
 
     @Test

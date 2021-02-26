@@ -12,8 +12,6 @@ object Dependencies {
         object Coroutines {
             private const val group = "org.jetbrains.kotlinx"
             const val core = "$group:kotlinx-coroutines-core"
-            const val reactor = "$group:kotlinx-coroutines-reactor"
-            const val guava = "$group:kotlinx-coroutines-guava"
             const val jdk = "$group:kotlinx-coroutines-jdk8"
             const val reactive = "$group:kotlinx-coroutines-reactive"
         }
@@ -21,9 +19,7 @@ object Dependencies {
 
     object Jackson {
         private const val group = "com.fasterxml.jackson.core"
-        const val databind = "$group:jackson-databind"
         const val core = "$group:jackson-core"
-        const val annotations = "$group:jackson-annotations"
 
         object Module {
             private const val group = "com.fasterxml.jackson.module"
@@ -32,7 +28,6 @@ object Dependencies {
 
         object Dataformat {
             private const val group = "com.fasterxml.jackson.dataformat"
-            const val xml = "$group:jackson-dataformat-xml"
             const val yaml = "$group:jackson-dataformat-yaml"
             const val properties = "$group:jackson-dataformat-properties"
             const val cbor = "$group:jackson-dataformat-cbor"
@@ -45,8 +40,6 @@ object Dependencies {
             private const val group = "org.springframework"
 
             const val webflux = "$group:spring-webflux"
-
-            const val tx = "$group:spring-tx"
 
             const val amqp = "$group.amqp:spring-rabbit"
 
@@ -69,24 +62,16 @@ object Dependencies {
 
             const val amqp = "$group:spring-boot-starter-amqp"
 
-            const val cp = "$group:spring-boot-configuration-processor"
-
             const val jackson = "$group:spring-boot-starter-json"
 
             const val actuator = "$group:spring-boot-starter-actuator"
-        }
-
-        object Data {
-            private const val group = "org.springframework.data"
-            const val mongo = "$group:spring-data-mongodb"
         }
     }
 
     object Proto {
         private const val group = "com.google.protobuf"
 
-        const val base = "$group:protobuf-java:3.13.0"
-        const val lite = "$group:protobuf-javalite"
+        const val base = "$group:protobuf-java"
         const val apiCompiler = "com.google.api:api-compiler"
         const val grpcProto = "com.google.api.grpc:proto-google-common-protos"
     }
@@ -101,8 +86,6 @@ object Dependencies {
         const val stub = "$group:grpc-stub"
 
         const val netty = "$group:grpc-netty"
-
-        const val proto = "$group:grpc-protobuf"
 
         const val kotlin = "$group:grpc-kotlin-stub"
     }
@@ -121,7 +104,7 @@ object Dependencies {
         const val wagonHttp = "$group.wagon:wagon-http"
     }
 
-    const val elastic5 = "org.elasticsearch.client:transport"
+    const val elastic = "org.elasticsearch.client:elasticsearch-rest-client"
 
     const val mysql = "mysql:mysql-connector-java"
 
@@ -150,8 +133,6 @@ object Dependencies {
     const val okhttp = "com.squareup.okhttp3:okhttp"
 
     const val resilience4j = "io.github.resilience4j:resilience4j-retrofit"
-
-    const val lettuce = "io.lettuce:lettuce-core"
 
     const val antlr4 = "org.antlr:antlr4"
 

@@ -28,7 +28,7 @@ class BbCodeBuilder {
     }
 
     fun ln(): BbCodeBuilder {
-        builder.appendln()
+        builder.appendLine()
         return this
     }
 

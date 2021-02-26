@@ -39,7 +39,7 @@ class MultiCacheableInterceptor(private val redisCacheManager: MultiRedisCacheMa
         return cache(key, invocation, multiRedisCache)
     }
 
-    private fun cache(key: Any, invocation: MethodInvocation, multiRedisCache: Cache?): Any {
+    private fun cache(key: Any, invocation: MethodInvocation, multiRedisCache: Cache?): Any? {
         val value = multiRedisCache?.get(key)?.get()
         return if (value == null) {
             val invokeValue = invocation.proceed()

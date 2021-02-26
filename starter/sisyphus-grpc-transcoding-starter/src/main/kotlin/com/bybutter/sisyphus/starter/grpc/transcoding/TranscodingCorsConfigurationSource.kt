@@ -2,10 +2,10 @@ package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.api.HttpRule
 import com.bybutter.sisyphus.api.http
-import com.bybutter.sisyphus.api.resource.PathTemplate
 import com.bybutter.sisyphus.protobuf.ProtoTypes
-import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
+import com.bybutter.sisyphus.protobuf.ServiceSupport
 import com.bybutter.sisyphus.string.PathMatcher
+import com.google.api.pathtemplate.PathTemplate
 import io.grpc.Server
 import io.grpc.ServerMethodDefinition
 import io.grpc.ServerServiceDefinition
@@ -17,7 +17,11 @@ import org.springframework.web.server.ServerWebExchange
 /**
  * CORS config source for gRPC transcoding.
  */
-class TranscodingCorsConfigurationSource(server: Server, private val configurationFactory: TranscodingCorsConfigurationFactory, enableServices: Collection<String> = listOf()) : CorsConfigurationSource {
+class TranscodingCorsConfigurationSource(
+    server: Server,
+    private val interceptors: Iterable<TranscodingCorsConfigurationInterceptor>,
+    enableServices: Collection<String> = listOf()
+) : CorsConfigurationSource {
     private val corsConfigurations = mutableMapOf<String, CorsConfiguration>()
 
     init {
@@ -55,11 +59,14 @@ class TranscodingCorsConfigurationSource(server: Server, private val configurati
 
     private fun registerMethod(method: ServerMethodDefinition<*, *>) {
         // Ensure method proto registered.
-        val proto = ProtoTypes.getDescriptorBySymbol(method.methodDescriptor.fullMethodName) as? MethodDescriptorProto
-                ?: return
+        val serice = method.methodDescriptor.serviceName?.let { ProtoTypes.findSupport(it) } as? ServiceSupport
+            ?: return
+        val proto = serice.descriptor.method.firstOrNull {
+            it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
+        }
 
         // Ensure http rule existed.
-        val httpRule = proto.options?.http ?: return
+        val httpRule = proto?.options?.http ?: return
 
         registerRule(httpRule, method)
     }
@@ -109,7 +116,14 @@ class TranscodingCorsConfigurationSource(server: Server, private val configurati
         val normalizedPattern = pathTemplate.withoutVars().toString()
 
         val config = corsConfigurations.getOrPut(normalizedPattern) {
-            configurationFactory.getConfiguration(method, pattern, normalizedPattern)
+            interceptors.fold(CorsConfiguration().apply {
+                addAllowedHeader(CorsConfiguration.ALL)
+                addAllowedOrigin(CorsConfiguration.ALL)
+                addAllowedMethod(HttpMethod.OPTIONS)
+                addAllowedMethod(HttpMethod.HEAD)
+            }) { config, interceptor ->
+                interceptor.intercept(config, method, pattern, normalizedPattern)
+            }
         }
 
         config.addAllowedMethod(httpMethod)

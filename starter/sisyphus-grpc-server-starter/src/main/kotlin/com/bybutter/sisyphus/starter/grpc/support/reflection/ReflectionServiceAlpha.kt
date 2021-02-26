@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.support.reflection
 
+import com.bybutter.sisyphus.protobuf.FileSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ExtensionNumberResponse
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha.ExtensionRequest
@@ -17,7 +18,6 @@ import kotlinx.coroutines.flow.flow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReflectionServiceAlpha : ServerReflection() {
-
     override fun serverReflectionInfo(input: Flow<ServerReflectionRequest>): Flow<ServerReflectionResponse> = flow {
         input.collect { request ->
             val response = ServerReflectionResponse {
@@ -49,24 +49,27 @@ class ReflectionServiceAlpha : ServerReflection() {
 
     private fun getFileByFileName(name: String): ServerReflectionResponse.MessageResponse.FileDescriptorResponse {
         return ServerReflectionResponse.MessageResponse.FileDescriptorResponse(FileDescriptorResponse {
-            ProtoTypes.getFileDescriptorByName(name)?.toProto()?.let {
-                this.fileDescriptorProto += it
-            }
+            this.fileDescriptorProto += (ProtoTypes.findSupport(name) as FileSupport).descriptor.toProto()
         })
     }
 
     private fun getFileContainingSymbol(name: String): ServerReflectionResponse.MessageResponse.FileDescriptorResponse {
         return ServerReflectionResponse.MessageResponse.FileDescriptorResponse(FileDescriptorResponse {
-            ProtoTypes.getFileContainingSymbol(name)?.toProto()?.let {
-                this.fileDescriptorProto += it
+            ProtoTypes.findSupport(name)?.file()?.let {
+                this.fileDescriptorProto += it.descriptor.toProto()
             }
         })
     }
 
     private fun getFileContainingExtension(request: ExtensionRequest): ServerReflectionResponse.MessageResponse.FileDescriptorResponse {
         return ServerReflectionResponse.MessageResponse.FileDescriptorResponse(FileDescriptorResponse {
-            ProtoTypes.getFileContainingExtension(request.containingType, request.extensionNumber)?.toProto()?.let {
-                this.fileDescriptorProto += it
+            val message = ProtoTypes.findMessageSupport(request.containingType)
+            val extension = message.extensions.firstOrNull {
+                it.descriptor.number == request.extensionNumber
+            }
+
+            extension?.file()?.let {
+                this.fileDescriptorProto += it.descriptor.toProto()
             }
         })
     }
@@ -74,7 +77,8 @@ class ReflectionServiceAlpha : ServerReflection() {
     private fun getAllExtensionNumbersOfType(name: String): ServerReflectionResponse.MessageResponse.AllExtensionNumbersResponse {
         return ServerReflectionResponse.MessageResponse.AllExtensionNumbersResponse(ExtensionNumberResponse {
             this.baseTypeName = name
-            this.extensionNumber += ProtoTypes.getTypeExtensions(name)
+            val message = ProtoTypes.findMessageSupport(name)
+            this.extensionNumber += message.extensions.map { it.descriptor.number }
         })
     }
 

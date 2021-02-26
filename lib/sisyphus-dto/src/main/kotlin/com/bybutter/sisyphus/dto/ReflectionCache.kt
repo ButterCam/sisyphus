@@ -33,45 +33,48 @@ object ReflectionCache {
 
             this.properties = memberProperties.associateBy { it.name }
             getters = allProperties.filter { it.javaGetter != null }
-                    .associateBy { it.javaGetter!! }
+                .associateBy { it.javaGetter!! }
             setters = allProperties.mapNotNull { it as? KMutableProperty1<out Any, *> }
-                    .filter { it.javaSetter != null }
-                    .associateBy { it.javaSetter!! }
+                .filter { it.javaSetter != null }
+                .associateBy { it.javaSetter!! }
             propertyValidators = memberProperties.mapNotNull { (it as? KMutableProperty1<out Any, *>) }
-                    .filter { it.javaSetter != null }
-                    .associate {
-                        it.name to listOfNotNull(
-                                it.javaSetter!!.getAnnotation(PropertyValidation::class.java)?.resolve(),
-                                *(it.javaSetter!!.getAnnotation(PropertyValidations::class.java)?.validations?.map { it.resolve() }?.toTypedArray()
-                                        ?: arrayOf<PropertyValidating>())
-                        )
-                    }
+                .filter { it.javaSetter != null }
+                .associate {
+                    it.name to listOfNotNull(
+                        it.javaSetter!!.getAnnotation(PropertyValidation::class.java)?.resolve(),
+                        *(it.javaSetter!!.getAnnotation(PropertyValidations::class.java)?.validations?.map { it.resolve() }
+                            ?.toTypedArray()
+                            ?: arrayOf<PropertyValidating>())
+                    )
+                }
             dtoValidators = listOfNotNull(
-                    type.raw.kotlin.findAnnotation<DtoValidation>()?.resolve(),
-                    *(type.raw.kotlin.findAnnotation<DtoValidations>()?.validations?.map { it.resolve() }?.toTypedArray()
-                            ?: arrayOf<DtoValidating>())
+                type.raw.kotlin.findAnnotation<DtoValidation>()?.resolve(),
+                *(type.raw.kotlin.findAnnotation<DtoValidations>()?.validations?.map { it.resolve() }?.toTypedArray()
+                    ?: arrayOf<DtoValidating>())
             )
             getterHooks = memberProperties.filter { it.javaGetter != null }
-                    .associate {
-                        it.name to listOfNotNull(
-                                it.javaGetter!!.getAnnotation(PropertyHook::class.java)?.resolve(),
-                                *(it.javaGetter!!.getAnnotation(PropertyHooks::class.java)?.hooks?.map { it.resolve() }?.toTypedArray()
-                                        ?: arrayOf<PropertyHooking>())
-                        )
-                    }
+                .associate {
+                    it.name to listOfNotNull(
+                        it.javaGetter!!.getAnnotation(PropertyHook::class.java)?.resolve(),
+                        *(it.javaGetter!!.getAnnotation(PropertyHooks::class.java)?.hooks?.map { it.resolve() }
+                            ?.toTypedArray()
+                            ?: arrayOf<PropertyHooking>())
+                    )
+                }
             setterHooks = memberProperties.mapNotNull { it as? KMutableProperty1<*, *> }
-                    .filter { it.javaSetter != null }
-                    .associate {
-                        it.name to listOfNotNull(
-                                it.javaSetter!!.getAnnotation(PropertyHook::class.java)?.resolve(),
-                                *(it.javaSetter!!.getAnnotation(PropertyHooks::class.java)?.hooks?.map { it.resolve() }?.toTypedArray()
-                                        ?: arrayOf<PropertyHooking>())
-                        )
-                    }
+                .filter { it.javaSetter != null }
+                .associate {
+                    it.name to listOfNotNull(
+                        it.javaSetter!!.getAnnotation(PropertyHook::class.java)?.resolve(),
+                        *(it.javaSetter!!.getAnnotation(PropertyHooks::class.java)?.hooks?.map { it.resolve() }
+                            ?.toTypedArray()
+                            ?: arrayOf<PropertyHooking>())
+                    )
+                }
             defaultValue = memberProperties.filter { it.javaGetter != null }
-                    .associate {
-                        it.name to it.javaGetter!!.getAnnotation(DefaultValue::class.java)?.resolve()
-                    }
+                .associate {
+                    it.name to it.javaGetter!!.getAnnotation(DefaultValue::class.java)?.resolve()
+                }
             notNullProperties = memberProperties.filter {
                 !it.returnType.isMarkedNullable &&
                         it.javaGetter?.getAnnotation(MetaProperty::class.java) == null &&

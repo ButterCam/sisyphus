@@ -112,7 +112,7 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
     }
 
     protected fun writeCustom(value: CustomProtoType<*>, gen: JsonGenerator, provider: SerializerProvider) {
-        val raw = value.raw() ?: NullValue.NULL_VALUE
+        val raw = value.value() ?: NullValue.NULL_VALUE
         writeAny(raw, raw.javaType, gen, provider)
     }
 

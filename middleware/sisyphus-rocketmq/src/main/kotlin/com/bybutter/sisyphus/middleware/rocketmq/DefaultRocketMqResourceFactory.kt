@@ -42,7 +42,11 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
         }
     }
 
-    override fun createConsumer(consumerProperty: RocketMqConsumerProperty, metadata: MessageConsumer, listener: MessageListener<*>): MQConsumer {
+    override fun createConsumer(
+        consumerProperty: RocketMqConsumerProperty,
+        metadata: MessageConsumer,
+        listener: MessageListener<*>
+    ): MQConsumer {
         val listener = listener as MessageListener<Any?>
         val hook = if (consumerProperty.aclAccessKey != null && consumerProperty.aclSecretKey != null) {
             AclClientRPCHook(SessionCredentials(consumerProperty.aclAccessKey, consumerProperty.aclSecretKey))
@@ -52,19 +56,24 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
 
         return if (consumerProperty.enableTrace) {
             DefaultMQPushConsumer(metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
-                    ?: MixAll.DEFAULT_CONSUMER_GROUP, hook,
-                    AllocateMessageQueueAveragely(),
-                    true, consumerProperty.traceTopic)
+                ?: MixAll.DEFAULT_CONSUMER_GROUP, hook,
+                AllocateMessageQueueAveragely(),
+                true, consumerProperty.traceTopic)
         } else {
             DefaultMQPushConsumer(metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
-                    ?: MixAll.DEFAULT_CONSUMER_GROUP, hook,
-                    AllocateMessageQueueAveragely())
+                ?: MixAll.DEFAULT_CONSUMER_GROUP, hook,
+                AllocateMessageQueueAveragely())
         }.apply {
             this.namesrvAddr = chooseNameServerAddr(consumerProperty)
             if (consumerProperty.accessChannel != null) {
                 this.accessChannel = consumerProperty.accessChannel
             }
-            this.subscribe(metadata.topic, if (metadata.filterType == ExpressionType.TAG) MessageSelector.byTag(metadata.filter) else MessageSelector.bySql(metadata.filter))
+            this.subscribe(
+                metadata.topic,
+                if (metadata.filterType == ExpressionType.TAG) MessageSelector.byTag(metadata.filter) else MessageSelector.bySql(
+                    metadata.filter
+                )
+            )
             val converter = metadata.converter.instance()
             when (metadata.type) {
                 ConsumerType.ORDERLY -> {
@@ -75,7 +84,10 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
                             }
                             ConsumeOrderlyStatus.SUCCESS
                         } catch (e: Exception) {
-                            listenerLogger.error("Consume message '${msgs.firstOrNull()?.msgId}' with exception on topic '${context.messageQueue.topic}'", e)
+                            listenerLogger.error(
+                                "Consume message '${msgs.firstOrNull()?.msgId}' with exception on topic '${context.messageQueue.topic}'",
+                                e
+                            )
                             ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT
                         }
                     }
@@ -88,7 +100,10 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
                             }
                             ConsumeConcurrentlyStatus.CONSUME_SUCCESS
                         } catch (e: Exception) {
-                            listenerLogger.error("Consume message '${msgs.firstOrNull()?.msgId}' with exception on topic '${context.messageQueue.topic}'", e)
+                            listenerLogger.error(
+                                "Consume message '${msgs.firstOrNull()?.msgId}' with exception on topic '${context.messageQueue.topic}'",
+                                e
+                            )
                             ConsumeConcurrentlyStatus.RECONSUME_LATER
                         }
                     }

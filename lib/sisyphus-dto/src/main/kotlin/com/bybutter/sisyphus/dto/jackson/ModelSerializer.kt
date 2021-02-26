@@ -15,9 +15,9 @@ internal class ModelSerializer : BeanSerializerBase {
     constructor(source: ModelSerializer, toIgnore: MutableSet<String>) : super(source, toIgnore)
 
     constructor(source: ModelSerializer, objectIdWriter: ObjectIdWriter, filterId: Any?) : super(
-            source,
-            objectIdWriter,
-            filterId
+        source,
+        objectIdWriter,
+        filterId
     )
 
     override fun withObjectIdWriter(objectIdWriter: ObjectIdWriter): BeanSerializerBase {

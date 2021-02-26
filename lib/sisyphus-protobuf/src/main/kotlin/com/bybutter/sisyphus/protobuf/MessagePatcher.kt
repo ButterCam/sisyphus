@@ -7,13 +7,13 @@ import com.bybutter.sisyphus.protobuf.primitives.ListValue
 import com.bybutter.sisyphus.protobuf.primitives.Struct
 import com.bybutter.sisyphus.protobuf.primitives.Timestamp
 import com.bybutter.sisyphus.protobuf.primitives.Value
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStruct
 import com.bybutter.sisyphus.protobuf.primitives.invoke
 import com.bybutter.sisyphus.security.base64Decode
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.isSubclassOf
-import proto.internal.com.bybutter.sisyphus.protobuf.primitives.MutableStruct
 
 interface PatcherNode {
     fun asField(field: FieldDescriptorProto, property: KProperty<*>): Any?
@@ -50,20 +50,17 @@ class ValueNode : PatcherNode {
             FieldDescriptorProto.Type.STRING -> values
             FieldDescriptorProto.Type.BYTES -> values.map { it.base64Decode() }
             FieldDescriptorProto.Type.ENUM -> values.map {
-                ProtoEnum(
-                    it,
-                    ProtoTypes.getClassByProtoName(field.typeName) as Class<ProtoEnum>
-                )
+                (ProtoTypes.findSupport(field.typeName) as EnumSupport<*>).invoke(it)
             }
             FieldDescriptorProto.Type.MESSAGE -> {
                 when (field.typeName.substring(1)) {
-                    FieldMask.fullName -> values.map {
+                    FieldMask.name -> values.map {
                         FieldMask {
                             this.paths += it.split(",").map { it.trim() }
                         }
                     }
-                    Timestamp.fullName -> values.map { Timestamp(it) }
-                    Duration.fullName -> values.map { Duration(it) }
+                    Timestamp.name -> values.map { Timestamp(it) }
+                    Duration.name -> values.map { Duration(it) }
                     else -> throw IllegalStateException()
                 }
             }
@@ -78,7 +75,7 @@ class ValueNode : PatcherNode {
         if (propertyType != null && propertyType.isSubclassOf(CustomProtoType::class)) {
             result = result.map {
                 val support = (propertyType.companionObjectInstance as CustomProtoTypeSupport<*, Any>)
-                support.wrapRaw(it)
+                support(it)
             }
         }
 
@@ -195,7 +192,7 @@ class MessagePatcher : PatcherNode {
 
     @OptIn(InternalProtoApi::class)
     fun asMessage(type: String): Message<*, *> {
-        return ProtoTypes.ensureSupportByProtoName(type).newMutable().apply {
+        return (ProtoTypes.findSupport(type) as MessageSupport<*, *>).newMutable().apply {
             applyTo(this)
         }
     }

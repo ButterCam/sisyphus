@@ -3,12 +3,11 @@ package com.bybutter.sisyphus.protobuf.jackson
 import com.bybutter.sisyphus.jackson.javaType
 import com.bybutter.sisyphus.protobuf.CustomProtoType
 import com.bybutter.sisyphus.protobuf.CustomProtoTypeSupport
+import com.bybutter.sisyphus.protobuf.EnumSupport
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.MutableMessage
-import com.bybutter.sisyphus.protobuf.ProtoEnum
-import com.bybutter.sisyphus.protobuf.ProtoStringEnum
-import com.bybutter.sisyphus.protobuf.ProtoSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
@@ -49,7 +48,6 @@ import kotlin.UnsupportedOperationException
 import kotlin.apply
 import kotlin.let
 import kotlin.reflect.full.companionObjectInstance
-import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.jvm.javaType
 import kotlin.toUInt
 import kotlin.toULong
@@ -164,7 +162,7 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
             throw IllegalStateException("Read illegal json token '${p.currentToken}', but should be '${JsonToken.START_OBJECT}'.")
         }
 
-        val support = type.rawClass.kotlin.companionObjectInstance as ProtoSupport<*, *>
+        val support = type.rawClass.kotlin.companionObjectInstance as MessageSupport<*, *>
         return support.newMutable().apply {
             p.nextToken()
             readProtoFields(this, p, ctxt)
@@ -174,7 +172,7 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
     private fun readCustom(type: JavaType, p: JsonParser, ctxt: DeserializationContext): CustomProtoType<*> {
         val support = type.rawClass.kotlin.companionObjectInstance as CustomProtoTypeSupport<CustomProtoType<Any?>, Any?>
         val raw = readAny(support.rawType.javaType, p, ctxt)
-        return support.wrapRaw(raw)
+        return support(raw)
     }
 
     @OptIn(InternalProtoApi::class)
@@ -189,26 +187,27 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
 
         val typeUrl = p.nextTextValue()
             ?: throw IllegalStateException("Any proto need '@type' field with String value.")
-        val protoType = ProtoTypes.getClassByProtoName(typeUrl.substringAfter("/"))
+        val protoSupport = ProtoTypes.findSupport(typeUrl)
             ?: throw IllegalStateException("Proto type '$typeUrl' not registered in current context.")
+        val protoType = protoSupport.javaClass.declaringClass
 
         return when (protoType) {
-            is Timestamp,
-            is Duration,
-            is Value,
-            is DoubleValue,
-            is FloatValue,
-            is Int32Value,
-            is Int64Value,
-            is UInt32Value,
-            is UInt64Value,
-            is BoolValue,
-            is StringValue,
-            is BytesValue,
-            is ListValue,
-            is FieldMask,
-            is Struct -> {
-                var result: kotlin.Any? = null
+            Timestamp::class.java,
+            Duration::class.java,
+            Value::class.java,
+            DoubleValue::class.java,
+            FloatValue::class.java,
+            Int32Value::class.java,
+            Int64Value::class.java,
+            UInt32Value::class.java,
+            UInt64Value::class.java,
+            BoolValue::class.java,
+            StringValue::class.java,
+            BytesValue::class.java,
+            ListValue::class.java,
+            FieldMask::class.java,
+            Struct::class.java -> {
+                var result: Any? = null
                 var current = p.nextToken()
                 while (current != null) {
                     if (current == JsonToken.END_OBJECT) {
@@ -231,7 +230,7 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
                 return result as Message<*, *>
             }
             else -> {
-                val support = protoType.kotlin.companionObjectInstance as ProtoSupport<*, *>
+                val support = protoType.kotlin.companionObjectInstance as MessageSupport<*, *>
                 support.newMutable().apply {
                     p.nextToken()
                     readProtoFields(this, p, ctxt)
@@ -240,19 +239,11 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
         }
     }
 
-    private fun readEnum(type: JavaType, p: JsonParser, ctxt: DeserializationContext): kotlin.Any? {
+    private fun readEnum(type: JavaType, p: JsonParser, ctxt: DeserializationContext): Any? {
+        val support = type.rawClass.kotlin.companionObjectInstance as EnumSupport<*>
         return when (p.currentToken) {
-            JsonToken.VALUE_STRING -> {
-                if (ProtoStringEnum::class.isSuperclassOf(type.rawClass.kotlin)) {
-                    ProtoStringEnum.fromValue(p.text, type.rawClass as Class<ProtoStringEnum>)
-                        ?: ProtoEnum(p.text, type.rawClass as Class<ProtoEnum>)
-                } else {
-                    ProtoEnum(p.text, type.rawClass as Class<ProtoEnum>)
-                }
-            }
-            JsonToken.VALUE_NUMBER_INT -> {
-                ProtoEnum(p.intValue, type.rawClass as Class<ProtoEnum>)
-            }
+            JsonToken.VALUE_STRING -> support(p.text)
+            JsonToken.VALUE_NUMBER_INT -> support(p.intValue)
             else -> throw IllegalStateException("Enum value muse be number or string in json, but '${p.currentToken}' read.")
         }
     }

@@ -1,7 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.support.metrics
 
-import com.bybutter.sisyphus.api.resource.PathTemplate
 import com.bybutter.sisyphus.starter.grpc.transcoding.TranscodingFunctions
+import com.google.api.pathtemplate.PathTemplate
 import io.grpc.MethodDescriptor
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags

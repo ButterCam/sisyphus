@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger
 import com.bybutter.sisyphus.api.http
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
+import com.bybutter.sisyphus.protobuf.primitives.FileDescriptorProto
 import com.bybutter.sisyphus.starter.grpc.transcoding.EmptyRouterFunction
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication.SwaggerValidate
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerDescription
@@ -12,7 +12,6 @@ import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.Swag
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerSchema
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerSecuritySchemes
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerServers
-import com.google.protobuf.DescriptorProtos
 import io.grpc.Server
 import io.grpc.ServerServiceDefinition
 import io.swagger.v3.core.util.Json
@@ -60,22 +59,26 @@ class SwaggerRouterFunction private constructor(
         val params = SwaggerParams.fetchParams(property.params)
 
         for (service in services) {
-            // Get service file.
-            val fileDescriptor = ProtoTypes.getFileContainingSymbol(service.serviceDescriptor.name)
             // Get service descriptor.
-            val serviceDescriptor = ProtoTypes.getDescriptorBySymbol(service.serviceDescriptor.name) as ServiceDescriptorProto
+            val serviceSupport = ProtoTypes.findServiceSupport(service.serviceDescriptor.name)
+            // Get service file.
+            val fileSupport = serviceSupport.file()
             // Get service path,used to find notes.
-            val serverPath = listOf(DescriptorProtos.FileDescriptorProto.SERVICE_FIELD_NUMBER, fileDescriptor?.service?.indexOf(serviceDescriptor))
-            val tag = serviceDescriptor.name
+            val serverPath = listOf(
+                FileDescriptorProto.SERVICE_FIELD_NUMBER,
+                fileSupport.descriptor.service.indexOf(serviceSupport.descriptor)
+            )
+            val tag = serviceSupport.name.trim('.')
             val servicePaths = Paths()
 
-            for (method in serviceDescriptor.method) {
+            for (method in serviceSupport.descriptor.method) {
                 val httpRule = method.options?.http ?: continue
                 val modelNames = mutableSetOf(method.outputType)
                 // Get input type proto,used to find notes and generate request parameters.
-                val inputTypeProto = ProtoTypes.ensureSupportByProtoName(method.inputType)
+                val inputTypeProto = ProtoTypes.findMessageSupport(method.inputType)
                 val inputTypeFields = (inputTypeProto.fieldDescriptors).toMutableList()
-                val field = inputTypeFields.firstOrNull { fieldDescriptorProto -> fieldDescriptorProto.name == httpRule.body }
+                val field =
+                    inputTypeFields.firstOrNull { fieldDescriptorProto -> fieldDescriptorProto.name == httpRule.body }
                 // Get request body param fields.
                 val bodyParam = when (httpRule.body) {
                     "" -> null
@@ -83,7 +86,8 @@ class SwaggerRouterFunction private constructor(
                         inputTypeFields.clear()
                         modelNames.add(method.inputType)
                         method.inputType
-                    } else -> {
+                    }
+                    else -> {
                         inputTypeFields.remove(field)
                         if (field!!.type == FieldDescriptorProto.Type.MESSAGE) modelNames.add(field.typeName)
                         field.typeName
@@ -94,7 +98,7 @@ class SwaggerRouterFunction private constructor(
                     val subModelNames = mutableSetOf<String>()
                     for (typeName in modelNames) {
                         if (schemas.containsKey(typeName)) continue
-                        SwaggerSchema.fetchSchemaModel(typeName).let { schema ->
+                        SwaggerSchema.fetchSchemaModel(typeName)?.let { schema ->
                             schemas[typeName.trim('.')] = schema.schema
                             subModelNames.addAll(schema.subTypeNames)
                         }
@@ -106,10 +110,13 @@ class SwaggerRouterFunction private constructor(
                 }
 
                 // Get method path, used to find notes.
-                val methodPath = serverPath + listOf(DescriptorProtos.FileDescriptorProto.PACKAGE_FIELD_NUMBER, serviceDescriptor.method.indexOf(method))
+                val methodPath = serverPath + listOf(
+                    FileDescriptorProto.PACKAGE_FIELD_NUMBER,
+                    serviceSupport.descriptor.method.indexOf(method)
+                )
                 val operation = Operation().apply {
                     this.tags = listOf(tag)
-                    summary = SwaggerDescription.fetchDescription(methodPath, fileDescriptor) ?: method.name
+                    summary = SwaggerDescription.fetchDescription(methodPath, fileSupport.descriptor) ?: method.name
                     if (bodyParam != null) {
                         requestBody(RequestBody().apply {
                             required = true
@@ -149,19 +156,28 @@ class SwaggerRouterFunction private constructor(
                             description = method.outputType.split(".").last()
                             content = Content().apply {
                                 addMediaType("application/json", MediaType().apply {
-                                    schema = ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + method.outputType.trim('.'))
+                                    schema =
+                                        ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + method.outputType.trim('.'))
                                 })
                             }
                         })
                     }
                 }
                 operation.operationId("${service.serviceDescriptor.name}/${method.name}")
-                servicePaths.putAll(SwaggerPaths.fetchPaths(httpRule, inputTypeProto, inputTypeFields, operation, servicePaths))
+                servicePaths.putAll(
+                    SwaggerPaths.fetchPaths(
+                        httpRule,
+                        inputTypeProto,
+                        inputTypeFields,
+                        operation,
+                        servicePaths
+                    )
+                )
             }
             if (servicePaths.isNotEmpty()) {
                 tags.add(Tag().apply {
                     name = tag
-                    description = SwaggerDescription.fetchDescription(serverPath, fileDescriptor)
+                    description = SwaggerDescription.fetchDescription(serverPath, fileSupport.descriptor)
                 })
                 paths.putAll(servicePaths)
             }
@@ -181,12 +197,14 @@ class SwaggerRouterFunction private constructor(
             this.tags = tags
             this.paths = paths
             servers = listOf(io.swagger.v3.oas.models.servers.Server().apply {
-                url = URI(request.uri().scheme, null, request.uri().host, request.uri().port, null, null, null).toString()
+                url =
+                    URI(request.uri().scheme, null, request.uri().host, request.uri().port, null, null, null).toString()
                 description = "Default Server"
             }) + SwaggerServers.fetchServers(property.servers)
             components = Components().apply {
                 this.schemas = schemas
-                if (property.securitySchemes != null) securitySchemes = SwaggerSecuritySchemes.fetchSecuritySchemes(property.securitySchemes)
+                if (property.securitySchemes != null) securitySchemes =
+                    SwaggerSecuritySchemes.fetchSecuritySchemes(property.securitySchemes)
             }
         }
         return ServerResponse.ok().bodyValue(Json.mapper().writeValueAsString(openApi))
@@ -194,7 +212,12 @@ class SwaggerRouterFunction private constructor(
 
     companion object {
         const val COMPONENTS_SCHEMAS_PREFIX = "#/components/schemas/"
-        operator fun invoke(server: Server, enableServices: Collection<String> = listOf(), swaggerAuthentication: SwaggerValidate, swaggerProperty: SwaggerProperty): RouterFunction<ServerResponse> {
+        operator fun invoke(
+            server: Server,
+            enableServices: Collection<String> = listOf(),
+            swaggerAuthentication: SwaggerValidate,
+            swaggerProperty: SwaggerProperty
+        ): RouterFunction<ServerResponse> {
             val enableServicesSet = enableServices.toSet()
             val enableServicesDefinition = mutableListOf<ServerServiceDefinition>()
             server.services.forEach {

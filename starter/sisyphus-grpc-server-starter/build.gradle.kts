@@ -8,7 +8,6 @@ plugins {
 description = "Starter for building gRPC server in Sisyphus Framework"
 
 dependencies {
-    api(project(":lib:sisyphus-protobuf"))
     api(project(":middleware:sisyphus-grpc-client"))
     api(project(":middleware:sisyphus-configuration-artifact"))
     compileOnly(Dependencies.Spring.Boot.actuator)
@@ -17,7 +16,7 @@ dependencies {
 
 protobuf {
     packageMapping(
-            "grpc.reflection.v1" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1",
-            "grpc.reflection.v1alpha" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha"
+            "io.grpc.reflection.v1" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1",
+            "io.grpc.reflection.v1alpha" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha"
     )
 }

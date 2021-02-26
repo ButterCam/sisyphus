@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.starter.grpc
 
 import com.bybutter.sisyphus.longrunning.OperationSupport
 import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
-import com.bybutter.sisyphus.rpc.GrpcServerConstants
 import com.bybutter.sisyphus.spring.BeanUtils
 import com.bybutter.sisyphus.starter.grpc.support.operation.Operations
 import com.bybutter.sisyphus.starter.grpc.support.reflection.ReflectionService
@@ -15,6 +14,7 @@ import io.grpc.ServerServiceDefinition
 import io.grpc.ServerStreamTracer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
@@ -34,7 +34,8 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
     override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
-            var builder = ServerBuilder.forPort(environment.getProperty(GrpcServerConstants.GRPC_PORT_PROPERTY, Int::class.java, GrpcServerConstants.DEFAULT_GRPC_PORT))
+            val config = beanFactory.getBean<ServiceConfig>()
+            var builder = ServerBuilder.forPort(config.serverPort)
 
             val builderInterceptors = beanFactory.getBeansOfType(ServerBuilderInterceptor::class.java)
             for ((_, builderInterceptor) in builderInterceptors) {

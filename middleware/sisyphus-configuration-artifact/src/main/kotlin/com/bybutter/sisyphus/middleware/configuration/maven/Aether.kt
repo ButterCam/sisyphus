@@ -65,6 +65,10 @@ class Aether {
         return registerRepository("https://plugins.gradle.org/m2/")
     }
 
+    fun registerGoogle(): RemoteRepository {
+        return registerRepository("https://maven.google.com/")
+    }
+
     fun registerRepository(url: String, user: String? = null, password: String? = null): RemoteRepository {
         val authentication = if (user != null && password != null) {
             AuthenticationBuilder().addUsername(user).addPassword(password).build()
