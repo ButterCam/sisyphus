@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.starter.grpc.transcoding
 import com.bybutter.sisyphus.api.HttpRule
 import com.bybutter.sisyphus.api.http
 import com.bybutter.sisyphus.protobuf.ProtoTypes
-import com.bybutter.sisyphus.protobuf.ServiceSupport
 import com.bybutter.sisyphus.string.PathMatcher
 import com.google.api.pathtemplate.PathTemplate
 import io.grpc.Server

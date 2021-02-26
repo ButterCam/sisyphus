@@ -2,10 +2,7 @@ package com.bybutter.sisyphus.middleware.redis.cache.annotation
 
 import com.bybutter.sisyphus.middleware.redis.cache.CacheAdapter
 import com.bybutter.sisyphus.middleware.redis.cache.CacheType
-import java.lang.annotation.Documented
 import java.lang.annotation.Inherited
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import kotlin.reflect.KClass
 
 @Target(

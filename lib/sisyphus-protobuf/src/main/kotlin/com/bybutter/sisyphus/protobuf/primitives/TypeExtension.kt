@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.protobuf.primitives
 
 import com.bybutter.sisyphus.protobuf.EnumSupport
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 
 fun DescriptorProto.toType(typeName: String): Type {

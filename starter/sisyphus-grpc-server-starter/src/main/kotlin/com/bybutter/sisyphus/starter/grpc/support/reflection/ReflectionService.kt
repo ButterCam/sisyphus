@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.starter.grpc.support.reflection
 
-import com.bybutter.sisyphus.protobuf.FileSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1.ExtensionNumberResponse
 import com.bybutter.sisyphus.starter.grpc.support.reflection.v1.ExtensionRequest

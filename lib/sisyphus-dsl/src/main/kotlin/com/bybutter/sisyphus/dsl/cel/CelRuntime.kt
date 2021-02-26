@@ -4,7 +4,6 @@ import com.bybutter.sisyphus.dsl.cel.grammar.CelParser
 import com.bybutter.sisyphus.protobuf.CustomProtoType
 import com.bybutter.sisyphus.protobuf.CustomProtoTypeSupport
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
-import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

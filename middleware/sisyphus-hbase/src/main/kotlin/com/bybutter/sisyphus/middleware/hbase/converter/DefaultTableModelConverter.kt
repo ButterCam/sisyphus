@@ -11,8 +11,8 @@ import com.bybutter.sisyphus.middleware.hbase.annotation.HColumn
 import com.bybutter.sisyphus.middleware.hbase.getDefaultValueConverter
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition
-import org.apache.hadoop.hbase.client.Result
 import java.util.NavigableMap
+import org.apache.hadoop.hbase.client.Result
 
 class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConverter<T> where T : DtoModel {
     private val beanDescription = type.beanDescription
