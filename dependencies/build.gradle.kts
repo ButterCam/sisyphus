@@ -34,7 +34,7 @@ dependencies {
         api("org.reflections:reflections:0.9.12")
         api("com.squareup.okhttp3:okhttp:4.9.1")
         api("com.squareup.retrofit2:retrofit:2.9.0")
-        api("io.github.resilience4j:resilience4j-retrofit:1.5.0")
+        api("io.github.resilience4j:resilience4j-retrofit:1.7.0")
         api("org.antlr:antlr4:4.9.1")
         api("io.swagger.core.v3:swagger-core:2.1.7")
         api("org.jooq:jooq:3.14.8")
