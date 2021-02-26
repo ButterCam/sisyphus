@@ -68,7 +68,7 @@ class SwaggerRouterFunction private constructor(
                 FileDescriptorProto.SERVICE_FIELD_NUMBER,
                 fileSupport.descriptor.service.indexOf(serviceSupport.descriptor)
             )
-            val tag = serviceSupport.name
+            val tag = serviceSupport.name.trim('.')
             val servicePaths = Paths()
 
             for (method in serviceSupport.descriptor.method) {
@@ -98,7 +98,7 @@ class SwaggerRouterFunction private constructor(
                     val subModelNames = mutableSetOf<String>()
                     for (typeName in modelNames) {
                         if (schemas.containsKey(typeName)) continue
-                        SwaggerSchema.fetchSchemaModel(typeName).let { schema ->
+                        SwaggerSchema.fetchSchemaModel(typeName)?.let { schema ->
                             schemas[typeName.trim('.')] = schema.schema
                             subModelNames.addAll(schema.subTypeNames)
                         }

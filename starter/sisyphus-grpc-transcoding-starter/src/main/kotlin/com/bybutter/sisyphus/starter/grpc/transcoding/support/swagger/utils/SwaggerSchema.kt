@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
@@ -36,8 +37,8 @@ object SwaggerSchema {
      *  Fetch swagger schema.
      *  If proto field type is Message,field type name is returned for next generation.
      * */
-    fun fetchSchemaModel(path: String): SchemaModel {
-        val messageSupport = ProtoTypes.findMessageSupport(path)
+    fun fetchSchemaModel(path: String): SchemaModel? {
+        val messageSupport = ProtoTypes.findSupport(path) as? MessageSupport<*, *> ?: return null
         val fileSupport = messageSupport.file()
         val subTypeNames = mutableSetOf<String>()
         val schema = ObjectSchema().apply {
@@ -73,12 +74,16 @@ object SwaggerSchema {
                         ListValue.name -> ArraySchema()
                         FieldMask.name -> StringSchema()
                         else -> {
-                            subTypeNames.add(name)
-                            ObjectSchema().`$ref`(
-                                SwaggerRouterFunction.COMPONENTS_SCHEMAS_PREFIX + field.typeName.trim(
-                                    '.'
+                            if (ProtoTypes.findSupport(field.typeName) == null) {
+                                ObjectSchema()
+                            } else {
+                                subTypeNames.add(field.typeName)
+                                ObjectSchema().`$ref`(
+                                    SwaggerRouterFunction.COMPONENTS_SCHEMAS_PREFIX + field.typeName.trim(
+                                        '.'
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 } else {
