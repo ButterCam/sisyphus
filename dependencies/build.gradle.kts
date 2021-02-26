@@ -46,7 +46,7 @@ dependencies {
         api("com.github.ben-manes:gradle-versions-plugin:0.28.0")
         api("com.netflix.nebula:nebula-publishing-plugin:17.3.2")
         api("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
-        api("com.netflix.nebula:gradle-info-plugin:9.1.1")
+        api("com.netflix.nebula:gradle-info-plugin:9.3.0")
         api("org.gradle.kotlin:plugins:1.3.6")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
         api("org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r")
