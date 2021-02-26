@@ -16,7 +16,7 @@ dependencies {
     api(platform("org.springframework.boot:spring-boot-dependencies:2.4.2"))
     api(platform("io.micrometer:micrometer-bom:1.6.4"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.4.31"))
-    api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2"))
+    api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2-native-mt"))
     api(platform("org.apache.maven:maven:3.6.3"))
     api(platform("io.grpc:grpc-bom:1.36.0"))
     api(platform("com.google.protobuf:protobuf-bom:3.15.0"))
