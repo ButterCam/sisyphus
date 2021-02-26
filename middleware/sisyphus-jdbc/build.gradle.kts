@@ -16,4 +16,5 @@ dependencies {
     compileOnly(project(":lib:sisyphus-dsl"))
 
     testImplementation(Dependencies.h2)
+    testImplementation(project(":lib:sisyphus-dsl"))
 }

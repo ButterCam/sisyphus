@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package sisyphus.api.cel.test;
 
+import "google/protobuf/struct.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
@@ -28,7 +29,10 @@ message HasMessageTest {
   map<string, google.protobuf.Any> any_map_value = 5;
   repeated google.protobuf.Any any_list_value = 6;
   HasMessage has_message_value = 7;
-
+  google.protobuf.Value value = 8;
+  google.protobuf.Value value_list = 9;
+  google.protobuf.Value value_string = 10;
+  google.protobuf.Value value_struct = 11;
   message HasMessage {
     int32 int32_value = 1;
   }
