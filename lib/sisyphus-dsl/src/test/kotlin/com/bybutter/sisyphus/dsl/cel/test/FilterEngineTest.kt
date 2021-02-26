@@ -47,7 +47,7 @@ class FilterEngineTest {
         engine.assertEvalResult("a = 1 b.c = 2", false)
 
         engine.assertEvalResult("d > 1.0", false)
-        engine.assertEvalResult("d >= 1.0", false)
+        engine.assertEvalResult("d >= 1.0", true)
         engine.assertEvalResult("e > 'a'", true)
         engine.assertEvalResult("f < 2.0", true)
         engine.assertEvalResult("f <= 2.0", true)
