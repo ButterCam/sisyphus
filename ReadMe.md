@@ -5,6 +5,8 @@
 Sisyphus is the way how we provide backend services. It integrates all tools and libraries needed for designing API
 which follows the [Google API Improvement Proposals](https://aip.bybutter.com).
 
+[中文文档](doc/zh-cn/ReadMe.md)
+
 ## We are rolling a huge boulder
 
 Due to analyzing product documents completely, it is not particularly difficult to write an exquisite and easy-to-use
@@ -36,7 +38,9 @@ gRPC.
 
 [**Sisyphus Protobuf**](/lib/sisyphus-protobuf) is our customized protobuf runtime, which designed for Kotlin.
 
-[**Sisyphus gRPC**](/lib/sisyphus-grpc) is our customized gRPC runtime, which designed for Kotlin coroutine.
+[**Sisyphus gRPC Coroutine**](/lib/sisyphus-grpc) is our customized gRPC stub runtime, which designed for Kotlin coroutine.
+
+[**Sisyphus gRPC RxJava**](/lib/sisyphus-grpc) is our customized gRPC stub runtime, which designed for RxJava2(Client only, design for Android).
 
 [**Sisyphus DTO**](/lib/sisyphus-dto) is the way how we create struct without protobuf.
 
@@ -66,8 +70,8 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
 
 1. **System requirement**
 
-    - Gradle 6.7+
-    - JDK 11+
+   - Gradle 6.7+
+   - JDK 11+
 
 2. **Configure Sisyphus with gradle.properties**
 
@@ -122,12 +126,12 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    plugins {
        `java-library` // We build this project as a java library.
        kotlin("jvm") version "1.3.72" // Use the kotlin plugin to compile .kt files
-       id("com.bybutter.sisyphus.project") version "0.0.22" // Use the sisyphus project management plugin.
-       id("com.bybutter.sisyphus.protobuf") version "0.0.22" // Use the sisyphus protobuf compiler plugin.
+       id("com.bybutter.sisyphus.project") version "1.0.0" // Use the sisyphus project management plugin.
+       id("com.bybutter.sisyphus.protobuf") version "1.0.0" // Use the sisyphus protobuf compiler plugin.
    }
    
    dependencies {
-       api("com.bybutter.sisyphus:sisyphus-grpc:0.0.22") // Dependent on sisyphus grpc runtime.
+       api("com.bybutter.sisyphus:sisyphus-grpc-coroutine:1.0.0") // Dependent on sisyphus grpc runtime.
        /*proto("com.foo.bar:baz:1.0.0")*/ // Use 'proto' configuration to config jars need to compile proto.
        /*protoApi("com.foo.bar:baz:1.0.0")*/ // Use 'protoApi' configuration to config needed jars in proto compiling.
        // All dependencies in 'implementation' configuration will auto add to 'protoApi' configuration.
@@ -183,11 +187,11 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    plugins {
        `java-library`
        kotlin("jvm") version "1.3.72"
-       id("com.bybutter.sisyphus.project") version "0.0.22"
+       id("com.bybutter.sisyphus.project") version "1.0.0"
    }
    
    dependencies {
-       api("com.bybutter.sisyphus.middleware:sisyphus-grpc-client:0.0.22") // Dependent on spring grpc runtime.
+       api("com.bybutter.sisyphus.middleware:sisyphus-grpc-client:1.0.0") // Dependent on spring grpc runtime.
        api(project("schema:example-schema")) // Dependent on schema project.
    }
    ```
@@ -231,13 +235,13 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
        application
        kotlin("jvm") version "1.3.72"
        `kotlin-spring`
-       id("com.bybutter.sisyphus.project") version "0.0.22"
+       id("com.bybutter.sisyphus.project") version "1.0.0"
    }
    
    dependencies {
-       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-server-starter:0.0.22") // Dependent on spring grpc starter.
-       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-transcoding-starter:0.0.22") // [Optional] Enable the http-transcoding feature.
-       implementation("com.bybutter.sisyphus.starter:sisyphus-protobuf-type-server-starter:0.0.22") // [Optional] Enable the type server feature.
+       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-server-starter:1.0.0") // Dependent on spring grpc starter.
+       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-transcoding-starter:1.0.0") // [Optional] Enable the http-transcoding feature.
+       implementation("com.bybutter.sisyphus.starter:sisyphus-protobuf-type-server-starter:1.0.0") // [Optional] Enable the type server feature.
        implementation(project("service:example-service")) 	// Dependent on service project.
    }
    ```
