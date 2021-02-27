@@ -28,7 +28,9 @@ Sisyphus 是我们用于提供黄油相机等产品 API 的后端框架，集成
 
 [**Sisyphus Protobuf**](/lib/sisyphus-protobuf) 是我们自制的 Protobuf 运行时，它专为 Kotlin 设计，能够在 Kotlin 中优雅的创建 Protobuf 实体。
 
-[**Sisyphus gRPC**](/lib/sisyphus-grpc) 是我们自制的 gRPC 运行时，它也是专为 Kotlin 设计，采用了 Kotlin coroutine 来实现异步 API 提高性能。
+[**Sisyphus gRPC Coroutine**](/lib/sisyphus-grpc) 是我们自制的 gRPC stub 运行时，专为 Kotlin Coroutine 设计，客户端与服务端通用。
+
+[**Sisyphus gRPC RxJava**](/lib/sisyphus-grpc) 是我们自制的 gRPC stub 运行时，专为 RxJava2 设计，仅包含客户端，可以用于 Android 应用。
 
 [**Sisyphus DTO**](/lib/sisyphus-dto) 是我们在没有 Protobuf 环境下创建实体类的方式。
 
@@ -105,12 +107,12 @@ Sisyphus 是我们用于提供黄油相机等产品 API 的后端框架，集成
    plugins {
        `java-library` // 这是一个 Java 类库项目
        kotlin("jvm") version "1.3.72" // 加入 Kotlin 插件用于编译 Kotlin 文件
-       id("com.bybutter.sisyphus.project") version "0.0.22" // 用 Sisyphus Project 插件来管理与配置 Gradle
-       id("com.bybutter.sisyphus.protobuf") version "0.0.22" // 使用 Sisyphus Protobuf 插件来编译 Protobuf 文件
+       id("com.bybutter.sisyphus.project") version "1.0.0" // 用 Sisyphus Project 插件来管理与配置 Gradle
+       id("com.bybutter.sisyphus.protobuf") version "1.0.0" // 使用 Sisyphus Protobuf 插件来编译 Protobuf 文件
    }
    
    dependencies {
-       api("com.bybutter.sisyphus:sisyphus-grpc:0.0.22") // 依赖于 Sisyphus gRPC 运行时，如果只是一些实体类的定义可以只依赖 Protobuf 运行时
+       api("com.bybutter.sisyphus:sisyphus-grpc-coroutine:1.0.0") // 依赖于 Sisyphus gRPC 运行时，如果只是一些实体类的定义可以只依赖 Protobuf 运行时
        /*proto("com.foo.bar:baz:1.0.0")*/ // 如果有一些 Protobuf 文件是由别的 Jar 包提供，可以使用 proto 依赖来配置编译外部的 Protobuf 文件
        /*protoApi("com.foo.bar:baz:1.0.0")*/ // 如果 Protobuf 文件依赖了别的 Jar 包提供的 Protobuf 文件，可以用 protoApi 来提供这些依赖
        // 'protoApi' 配置会自动从 'implementation' 配置中拉取依赖
@@ -165,11 +167,11 @@ Sisyphus 是我们用于提供黄油相机等产品 API 的后端框架，集成
    plugins {
        `java-library`
        kotlin("jvm") version "1.3.72"
-       id("com.bybutter.sisyphus.project") version "0.0.22"
+       id("com.bybutter.sisyphus.project") version "1.0.0"
    }
    
    dependencies {
-       api("com.bybutter.sisyphus.middleware:sisyphus-grpc-client:0.0.22") // 依赖于 gRPC 客户端来访问其他 gRPC 服务。
+       api("com.bybutter.sisyphus.middleware:sisyphus-grpc-client:1.0.0") // 依赖于 gRPC 客户端来访问其他 gRPC 服务。
        api(project("schema:example-schema")) // 依赖于 schema 项目来使用 Protobuf 编译出来的实体类与服务。
    }
    ```
@@ -212,13 +214,13 @@ Sisyphus 是我们用于提供黄油相机等产品 API 的后端框架，集成
        application
        kotlin("jvm") version "1.3.72"
        `kotlin-spring`
-       id("com.bybutter.sisyphus.project") version "0.0.22"
+       id("com.bybutter.sisyphus.project") version "1.0.0"
    }
    
    dependencies {
-       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-server-starter:0.0.22") // 依赖于 Sisyphus gRPC server starter
-       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-transcoding-starter:0.0.22") // [可选] 添加 HTTP 与 gRPC 转码功能
-       implementation("com.bybutter.sisyphus.starter:sisyphus-protobuf-type-server-starter:0.0.22") // [可选] 添加 typeserver 功能
+       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-server-starter:1.0.0") // 依赖于 Sisyphus gRPC server starter
+       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-transcoding-starter:1.0.0") // [可选] 添加 HTTP 与 gRPC 转码功能
+       implementation("com.bybutter.sisyphus.starter:sisyphus-protobuf-type-server-starter:1.0.0") // [可选] 添加 typeserver 功能
        implementation(project("service:example-service")) 	// 依赖于 service 项目
    }
    ```
@@ -236,26 +238,3 @@ Sisyphus 是我们用于提供黄油相机等产品 API 的后端框架，集成
    ```
 
    就可以使用 `gradlew bootRun` 命令来提供我们的服务了。
-
-
-## 文档目录
-
-1. **[设计理念](./design)**
-
-   本节会讲述 Sisyphus 在设计中遵循的理念与一些组件之所以如此设计的理由。
-
-2. **[中间件](./middleware)**
-
-   本节会讲述 Sisyphus 中提供的各种中间件的用法。
-
-3. **[杂项](./miscellaneous)**
-
-   本节会讲述 Sisyphus 中各类杂项的工具类的用法。
-
-4. **[Protobuf](./protobuf)**
-
-   本节会讲述 Sisyphus 中自制的 Protobuf 与 gRPC 运行时的设计与用法。
-
-5. **[最佳实践](./best_practices)**
-
-   本节会讲述 Sisyphus 的各种模式的最佳实践。
