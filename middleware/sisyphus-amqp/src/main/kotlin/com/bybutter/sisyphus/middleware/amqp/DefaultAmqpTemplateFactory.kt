@@ -5,6 +5,7 @@ import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 
 open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
@@ -19,6 +20,14 @@ open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
             }
             this.exchange = property.exchange ?: ""
             this.messageConverter = Jackson2JsonMessageConverter(Json.mapper)
+        }
+    }
+
+    override fun createListenerContainer(property: MessageQueueProperty): SimpleMessageListenerContainer {
+        return SimpleMessageListenerContainer(createConnectionFactory(property.host, property.port, property)).apply {
+            property.queue?.let {
+                this.addQueueNames(it)
+            }
         }
     }
 
