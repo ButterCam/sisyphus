@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 
 class FilterEngine(global: Map<String, Any> = mapOf(), val runtime: FilterRuntime = FilterRuntime()) {
     val context = FilterContext(this, global)
-    val memberContext = MemberContext(this, global)
+    private val memberContext = MemberContext()
 
     fun eval(filter: String): Any? {
         return eval(parse(filter))
@@ -27,24 +27,9 @@ class FilterEngine(global: Map<String, Any> = mapOf(), val runtime: FilterRuntim
         return context.visit(filter)
     }
 
-    fun memberEval(filter: String): List<Any> {
-        return memberEval(parse(filter))
+    fun memberEval(filter: String): List<String> {
+        return memberContext.visit(parse(filter))
     }
-
-    fun memberEval(filter: String, global: Map<String, Any?>): List<Any> {
-        return memberEval(parse(filter), global)
-    }
-
-    fun memberEval(filter: FilterParser.FilterContext): List<Any> {
-        return memberContext.visit(filter)
-    }
-
-    fun memberEval(filter: FilterParser.FilterContext, global: Map<String, Any?>): List<Any> {
-        val context = memberContext.fork()
-        context.global += global
-        return context.visit(filter)
-    }
-
 
     companion object {
         fun parse(filter: String): FilterParser.FilterContext {

@@ -17,7 +17,7 @@ abstract class JooqConditionBuilder() {
         return engine.eval(filter) as Condition?
     }
 
-    fun members(filter: String): List<Any> {
+    fun members(filter: String): List<String> {
         return engine.memberEval(filter)
     }
 

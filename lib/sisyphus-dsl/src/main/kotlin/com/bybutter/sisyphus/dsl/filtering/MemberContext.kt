@@ -1,24 +1,16 @@
 package com.bybutter.sisyphus.dsl.filtering
 
 import com.bybutter.sisyphus.dsl.filtering.grammar.FilterParser
-import com.bybutter.sisyphus.protobuf.primitives.Duration
-import com.bybutter.sisyphus.protobuf.primitives.Timestamp
 import com.bybutter.sisyphus.protobuf.primitives.invoke
-import com.bybutter.sisyphus.string.unescape
 import java.lang.IllegalStateException
 
-open class MemberContext(val engine: FilterEngine, global: Map<String, Any?> = mapOf()) {
-    val global: MutableMap<String, Any?> = global.toMutableMap()
+open class MemberContext {
 
-    fun fork(): MemberContext {
-        return MemberContext(engine, this.global)
+    fun visit(filter: FilterParser.FilterContext): List<String> {
+        return visit(filter.e)
     }
 
-    fun visit(filter: FilterParser.FilterContext): List<Any> {
-        return visit(filter.e).filterNotNull()
-    }
-
-    protected open fun visit(expr: FilterParser.ExpressionContext): List<Any?> {
+    protected open fun visit(expr: FilterParser.ExpressionContext): List<String> {
         return expr.seq.fold(visit(expr.init) as MutableList) { members, seq ->
             members.apply {
                 this.addAll(visit(seq))
@@ -26,7 +18,7 @@ open class MemberContext(val engine: FilterEngine, global: Map<String, Any?> = m
         }
     }
 
-    protected open fun visit(seq: FilterParser.SequenceContext): List<Any?> {
+    protected open fun visit(seq: FilterParser.SequenceContext): List<String> {
         return seq.e.fold(visit(seq.init) as MutableList) { members, e ->
             members.apply {
                 this.addAll(visit(e))
@@ -34,36 +26,31 @@ open class MemberContext(val engine: FilterEngine, global: Map<String, Any?> = m
         }
     }
 
-    protected open fun visit(factor: FilterParser.FactorContext): List<Any?> {
-        return factor.e.fold(mutableListOf(visit(factor.init))) { members, e ->
+    protected open fun visit(factor: FilterParser.FactorContext): List<String> {
+        return factor.e.fold(visit(factor.init) as MutableList) { members, e ->
             members.apply {
-                this.add(visit(e))
+                this.addAll(visit(e))
             }
         }
     }
 
-    protected open fun visit(condition: FilterParser.ConditionContext): Any? {
+    protected open fun visit(condition: FilterParser.ConditionContext): List<String> {
         return when (condition) {
             is FilterParser.NotConditionContext -> {
                 visit(condition.expression())
             }
             is FilterParser.CompareConditionContext -> {
-                visit(condition.left)
+                listOfNotNull(visit(condition.left), visit(condition.right))
             }
             else -> throw IllegalStateException()
         }
     }
 
-    protected open fun visit(member: FilterParser.MemberContext): Any? {
-        return engine.runtime.access(member, global)
+    protected open fun visit(value: FilterParser.ValueContext): String? {
+        return value.member()?.let { return visit(it) }
     }
 
-    protected open fun visit(value: FilterParser.StringContext): String {
-        val string = value.text
-        return when {
-            string.startsWith("\"") -> string.substring(1, string.length - 1)
-            string.startsWith("'") -> string.substring(1, string.length - 1)
-            else -> throw IllegalStateException("Wrong string token '${value.text}'.")
-        }.unescape()
+    protected open fun visit(member: FilterParser.MemberContext): String {
+        return member.text
     }
 }
