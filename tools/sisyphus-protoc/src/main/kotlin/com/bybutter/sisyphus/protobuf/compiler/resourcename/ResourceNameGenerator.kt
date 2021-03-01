@@ -17,6 +17,7 @@ import com.bybutter.sisyphus.protobuf.compiler.kInterface
 import com.bybutter.sisyphus.protobuf.compiler.parameter
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
+import com.bybutter.sisyphus.string.toCamelCase
 import com.bybutter.sisyphus.string.toPascalCase
 import com.google.api.pathtemplate.PathTemplate
 import com.squareup.kotlinpoet.KModifier
@@ -66,7 +67,7 @@ class ResourceNameBasicGenerator : GroupedGenerator<ResourceNameGeneratingState>
             }
 
             for (commonField in commonFields) {
-                property(commonField, String::class) {
+                property(commonField.toCamelCase(), String::class) {
                     getter {
                         addStatement("return this[%S] ?: %S", commonField, "?")
                     }
@@ -110,7 +111,7 @@ class ResourceNameImplementationGenerator : GroupedGenerator<ResourceNameGenerat
 
                 for (field in template.vars()) {
                     if (!state.descriptor.commonFields.contains(field)) {
-                        property(field, String::class) {
+                        property(field.toCamelCase(), String::class) {
                             getter {
                                 addStatement("return this[%S] ?: %S", field, "?")
                             }
