@@ -17,6 +17,10 @@ abstract class JooqConditionBuilder() {
         return engine.eval(filter) as Condition?
     }
 
+    fun members(filter: String): List<Any> {
+        return engine.memberEval(filter)
+    }
+
     abstract fun resolveMember(member: String): Field<*>?
 
     open fun resolveValue(field: Field<*>?, value: Any?): Any? {
