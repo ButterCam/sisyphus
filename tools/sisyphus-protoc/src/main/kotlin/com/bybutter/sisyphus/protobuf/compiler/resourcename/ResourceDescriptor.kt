@@ -60,9 +60,9 @@ class ResourceDescriptor(
     fun templateName(template: PathTemplate): String {
         val uniqueFields = template.vars() - commonFields
         return if (uniqueFields.isEmpty()) {
-            "${name()}Base"
+            "Base"
         } else {
-            "${name()}With${uniqueFields.joinToString("And") { it.toPascalCase() }}"
+            template.vars().joinToString("And") { it.toPascalCase() }
         }
     }
 
