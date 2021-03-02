@@ -6,6 +6,7 @@ import com.bybutter.sisyphus.protobuf.compiler.MessageDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.fileSet
 import com.bybutter.sisyphus.string.plural
 import com.bybutter.sisyphus.string.singular
+import com.bybutter.sisyphus.string.toCamelCase
 import com.bybutter.sisyphus.string.toPascalCase
 import com.google.api.ResourceDescriptor
 import com.google.api.pathtemplate.PathTemplate
@@ -42,7 +43,7 @@ class ResourceDescriptor(
             return@run this.descriptor.plural.singular()
         }
 
-        resource().singular()
+        resource().toCamelCase().singular()
     }
 
     val plural = run {
@@ -54,15 +55,15 @@ class ResourceDescriptor(
             return@run this.descriptor.singular.plural()
         }
 
-        resource().plural()
+        resource().toCamelCase().plural()
     }
 
     fun templateName(template: PathTemplate): String {
         val uniqueFields = template.vars() - commonFields
         return if (uniqueFields.isEmpty()) {
-            "${name()}Base"
+            "Base"
         } else {
-            "${name()}With${uniqueFields.joinToString("And") { it.toPascalCase() }}"
+            template.vars().joinToString("And") { it.toPascalCase() }
         }
     }
 
