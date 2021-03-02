@@ -23,7 +23,7 @@ abstract class JooqConditionBuilder() {
 
     abstract fun resolveMember(member: String): Field<*>?
 
-    open fun resolveValue(field: Field<*>?, value: Any?): Any? {
+    open fun resolveValue(field: Field<*>, value: Any?): Any? {
         return when (value) {
             is Timestamp -> value.toSql()
             else -> value
