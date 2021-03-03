@@ -67,7 +67,7 @@ class ResourceDescriptor(
         }
     }
 
-    fun tempalteClassName(template: PathTemplate): ClassName {
+    fun templateClassName(template: PathTemplate): ClassName {
         return className().nestedClass(templateName(template))
     }
 

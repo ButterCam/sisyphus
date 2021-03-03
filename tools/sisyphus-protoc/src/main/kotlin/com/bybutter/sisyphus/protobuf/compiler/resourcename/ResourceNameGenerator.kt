@@ -174,7 +174,7 @@ class ResourceNameCompanionBasicGenerator : GroupedGenerator<ResourceNameCompani
                         addStatement("val result = pattern.match(name) ?: continue")
                         beginScope("return when(index)") {
                             for ((index, template) in state.descriptor.templates.withIndex()) {
-                                addStatement("$index -> %T(result)", state.descriptor.tempalteClassName(template))
+                                addStatement("$index -> %T(result)", state.descriptor.templateClassName(template))
                             }
                             addStatement("else -> null")
                         }
@@ -220,7 +220,7 @@ class ResourceNameCompanionInvokeGenerator : GroupedGenerator<ResourceNameCompan
                     }
 
                     addCode(buildCodeBlock {
-                        add("return %T(mapOf(", state.descriptor.tempalteClassName(template))
+                        add("return %T(mapOf(", state.descriptor.templateClassName(template))
                         for ((index, field) in template.vars().withIndex()) {
                             if (index > 0) {
                                 add(", ")
