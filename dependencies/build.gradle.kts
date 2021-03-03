@@ -58,7 +58,7 @@ dependencies {
         api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.1")
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.1")
         api("com.google.protobuf:protobuf-javalite:3.15.3")
-        api("org.mongodb:mongodb-driver-reactivestreams:4.2.1")
+        api("org.mongodb:mongodb-driver-reactivestreams:4.2.2")
         api("com.android.tools.build:gradle:4.1.2")
         api("com.salesforce.servicelibs:rxgrpc-stub:1.0.1")
         api("com.google.api:api-common:1.10.1")
