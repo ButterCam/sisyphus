@@ -7,7 +7,7 @@ import java.lang.IllegalStateException
 open class MemberContext {
 
     fun visit(filter: FilterParser.FilterContext): List<String> {
-        return visit(filter.e)
+        return visit(filter.e ?: return emptyList())
     }
 
     protected open fun visit(expr: FilterParser.ExpressionContext): List<String> {
