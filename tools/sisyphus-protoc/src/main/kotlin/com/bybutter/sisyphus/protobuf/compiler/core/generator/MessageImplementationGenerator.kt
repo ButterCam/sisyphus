@@ -701,8 +701,9 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                     if (typeDescriptor.mapEntry()) {
                         val keyType =
                             WireFormat.FieldType.values()[typeDescriptor.fields.first { it.descriptor.number == 1 }.descriptor.type.ordinal]
-                        val valueType =
-                            WireFormat.FieldType.values()[typeDescriptor.fields.first { it.descriptor.number == 2 }.descriptor.type.ordinal]
+                        val valueDescriptor = typeDescriptor.fields.first { it.descriptor.number == 2 }.descriptor
+                        val anyValue = valueDescriptor.typeName == ".google.protobuf.Any"
+                        val valueType = WireFormat.FieldType.values()[valueDescriptor.type.ordinal]
 
                         addStatement(
                             "this.%N.forEach { (k, v) -> writer.tag(${
@@ -720,7 +721,8 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                                     2,
                                     valueType.wireType
                                 )
-                            }).${valueType.name.toLowerCase()}(v).endLd() }", state.descriptor.name()
+                            }).${if (anyValue) "any" else valueType.name.toLowerCase()}(v).endLd() }",
+                            state.descriptor.name()
                         )
                     } else {
                         addStatement(
