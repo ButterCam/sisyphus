@@ -3,10 +3,16 @@ package com.bybutter.sisyphus.protobuf
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
+import com.bybutter.sisyphus.reflect.getTypeArgument
 import java.io.InputStream
 import java.util.LinkedList
+import kotlin.reflect.KClass
 
 abstract class MessageSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>> : ProtoSupport<DescriptorProto> {
+    val messageClass: KClass<T> by lazy {
+        (this.javaClass.getTypeArgument(MessageSupport::class.java, 0) as Class<T>).kotlin
+    }
+
     @InternalProtoApi
     abstract fun newMutable(): TM
 

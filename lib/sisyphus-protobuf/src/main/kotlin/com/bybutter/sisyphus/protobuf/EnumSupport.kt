@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.protobuf
 import com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto
 import kotlin.reflect.KClass
 
-abstract class EnumSupport<T : ProtoEnum>(private val enumClass: KClass<T>) : ProtoEnumDsl<T>,
+abstract class EnumSupport<T : ProtoEnum>(val enumClass: KClass<T>) : ProtoEnumDsl<T>,
     ProtoSupport<EnumDescriptorProto> {
     private val numberMap = enumClass.java.enumConstants.associate {
         (it as ProtoEnum).number to (it as T)
