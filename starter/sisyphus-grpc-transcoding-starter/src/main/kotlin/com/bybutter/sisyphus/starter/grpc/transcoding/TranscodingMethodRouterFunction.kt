@@ -56,8 +56,8 @@ class TranscodingMethodRouterFunction private constructor(
                     FieldDescriptorProto.Type.BOOL -> Boolean::class.java
                     FieldDescriptorProto.Type.STRING -> String::class.java
                     FieldDescriptorProto.Type.BYTES -> ByteArray::class.java
-                    FieldDescriptorProto.Type.ENUM,
-                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.findMessageSupport(proto.inputType).javaClass
+                    FieldDescriptorProto.Type.ENUM -> ProtoTypes.findEnumSupport(proto.inputType).invoke().javaClass
+                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.findMessageSupport(proto.inputType).invoke().javaClass
                     else -> TODO()
                 }
             }
