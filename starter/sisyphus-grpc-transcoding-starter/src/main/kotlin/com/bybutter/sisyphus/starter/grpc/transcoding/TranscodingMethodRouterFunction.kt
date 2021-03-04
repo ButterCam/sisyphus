@@ -36,7 +36,7 @@ class TranscodingMethodRouterFunction private constructor(
     init {
         bodyClass = when (rule.body) {
             "" -> null
-            "*" -> ProtoTypes.findMessageSupport(proto.inputType).javaClass
+            "*" -> ProtoTypes.findMessageSupport(proto.inputType).messageClass.java
             else -> {
                 val field = inputSupport.fieldDescriptors.firstOrNull { it.name == rule.body }
                     ?: throw IllegalStateException("Wrong http rule options, input message not contains body field '${rule.body}'.")
@@ -56,8 +56,8 @@ class TranscodingMethodRouterFunction private constructor(
                     FieldDescriptorProto.Type.BOOL -> Boolean::class.java
                     FieldDescriptorProto.Type.STRING -> String::class.java
                     FieldDescriptorProto.Type.BYTES -> ByteArray::class.java
-                    FieldDescriptorProto.Type.ENUM -> ProtoTypes.findEnumSupport(proto.inputType).invoke().javaClass
-                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.findMessageSupport(proto.inputType).invoke().javaClass
+                    FieldDescriptorProto.Type.ENUM -> ProtoTypes.findEnumSupport(field.typeName).enumClass.java
+                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.findMessageSupport(field.typeName).messageClass.java
                     else -> TODO()
                 }
             }
