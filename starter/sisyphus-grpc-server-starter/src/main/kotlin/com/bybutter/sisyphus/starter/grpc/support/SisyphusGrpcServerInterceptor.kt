@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc.support
 
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.rpc.STATUS_META_KEY
 import com.bybutter.sisyphus.rpc.StatusException
 import io.grpc.Context
 import io.grpc.Contexts
@@ -54,8 +55,12 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
 
         override fun close(status: Status, trailers: Metadata) {
             val cause = status.cause
-            if (cause is StatusException) {
+            val status = if (cause is StatusException) {
                 trailers.merge(cause.trailers)
+                trailers.put(STATUS_META_KEY, cause.asStatusDetail())
+                cause.asStatus()
+            } else {
+                status
             }
 
             RequestLogger.REQUEST_CONTEXT_KEY.get().apply {

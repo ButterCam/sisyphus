@@ -113,4 +113,18 @@ open class StatusException : RuntimeException {
         this.trailers.merge(trailers)
         return this
     }
+
+    fun asStatus(): Status {
+        return Status.fromCodeValue(code)
+            .withDescription(message)
+            .withCause(this)
+    }
+
+    fun asStatusDetail(): com.bybutter.sisyphus.rpc.Status {
+        return Status {
+            this.code = this@StatusException.code
+            this.message = this@StatusException.message ?: "Unknown"
+            this.details += this@StatusException.details
+        }
+    }
 }
