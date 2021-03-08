@@ -19,7 +19,7 @@ dependencies {
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2"))
     api(platform("org.apache.maven:maven:3.6.3"))
     api(platform("io.grpc:grpc-bom:1.36.0"))
-    api(platform("com.google.protobuf:protobuf-bom:3.15.4"))
+    api(platform("com.google.protobuf:protobuf-bom:3.15.5"))
     api(platform("org.apache.rocketmq:rocketmq-all:4.8.0"))
 
     constraints {
@@ -57,7 +57,6 @@ dependencies {
         api("com.alibaba.csp:sentinel-transport-simple-http:1.8.1")
         api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.1")
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.1")
-        api("com.google.protobuf:protobuf-javalite:3.15.4")
         api("org.mongodb:mongodb-driver-reactivestreams:4.2.2")
         api("com.android.tools.build:gradle:4.1.2")
         api("com.salesforce.servicelibs:rxgrpc-stub:1.0.1")
