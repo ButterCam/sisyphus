@@ -43,7 +43,6 @@ operator fun FieldMask?.rangeTo(message: Message<*, *>): Iterable<String> {
     return message.resolveMask(this).paths
 }
 
-
 inline fun FieldMask?.forEach(message: Message<*, *>, block: (String) -> Unit) {
     message.resolveMask(this).paths.forEach(block)
 }
