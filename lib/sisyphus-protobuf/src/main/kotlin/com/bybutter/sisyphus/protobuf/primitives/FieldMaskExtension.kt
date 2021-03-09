@@ -34,7 +34,7 @@ fun Message<*, *>.resolveMask(mask: FieldMask?): FieldMask {
 
     return FieldMask {
         paths += mask.paths.mapNotNull {
-            this.support().fieldInfo(it)?.name
+            this@resolveMask.support().fieldInfo(it)?.name
         }.toSet()
     }
 }
