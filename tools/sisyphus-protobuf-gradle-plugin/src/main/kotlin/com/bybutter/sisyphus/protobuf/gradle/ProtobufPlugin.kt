@@ -8,7 +8,6 @@ class ProtobufPlugin : Plugin<Project> {
         target.pluginManager.withPlugin("com.android.base") {
             target.pluginManager.apply(ProtobufAndroidPlugin::class.java)
         }
-
         target.pluginManager.withPlugin("java") {
             target.pluginManager.apply(ProtobufJvmPlugin::class.java)
         }
