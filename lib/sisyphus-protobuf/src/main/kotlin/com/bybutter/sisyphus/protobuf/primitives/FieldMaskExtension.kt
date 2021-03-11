@@ -29,12 +29,12 @@ operator fun FieldMask.plus(other: FieldMask): FieldMask {
 
 fun Message<*, *>.resolveMask(mask: FieldMask?): FieldMask {
     mask?.paths?.isNullOrEmpty() ?: return FieldMask {
-        paths += this.support().fieldDescriptors.map { it.name }
+        paths += this@resolveMask.support().fieldDescriptors.map { it.name }
     }
 
     return FieldMask {
         paths += mask.paths.mapNotNull {
-            this.support().fieldInfo(it)?.name
+            this@resolveMask.support().fieldInfo(it)?.name
         }.toSet()
     }
 }
