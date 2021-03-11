@@ -17,15 +17,12 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
-open class ProtoGenerateTask : DefaultTask() {
+open class GenerateProtoTask : DefaultTask() {
     @get:InputDirectory
     lateinit var protoPath: File
 
     @get:OutputDirectory
     lateinit var output: File
-
-    @get:OutputDirectory
-    lateinit var implOutput: File
 
     @get:OutputDirectory
     lateinit var resourceOutput: File
@@ -58,22 +55,15 @@ open class ProtoGenerateTask : DefaultTask() {
 
         val sourceFile = protoPath.resolve("protosrc")
         val source = if (sourceFile.exists()) {
-            sourceFile.readLines().mapNotNull {
-                val map = it.split('=')
-                if (map.size == 2) {
-                    map[0] to map[1]
-                } else {
-                    null
-                }
-            }.associate { it }
+            sourceFile.readLines().toSet()
         } else {
-            mapOf()
+            setOf()
         }
 
         val compiler = ProtobufCompiler(desc, mapping, protobuf.plugins.toCodeGenerators())
         val fileSupports = StringBuilder()
 
-        for ((sourceProto, external) in source) {
+        for (sourceProto in source) {
             val result = compiler.generate(sourceProto)
 
             val descPbFile = Paths.get(
@@ -83,28 +73,20 @@ open class ProtoGenerateTask : DefaultTask() {
             Files.createDirectories(descPbFile.parent)
             Files.write(descPbFile, result.descriptor.descriptor.toByteArray())
 
-            if (external == "external") {
-                val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.descriptor.name)
-                val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
-                Files.createDirectories(sourceProtoFile.parent)
-                Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
-            }
+            val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.descriptor.name)
+            val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
+            Files.createDirectories(sourceProtoFile.parent)
+            Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
 
             for (file in result.files) {
-                var internal = false
                 for (member in file.members) {
                     val spec = member as? TypeSpec ?: continue
                     if (spec.superclass == RuntimeTypes.FILE_SUPPORT) {
                         fileSupports.appendLine("${file.packageName}.${spec.name}")
-                        internal = true
                     }
                 }
 
-                if (internal) {
-                    result.files[1].writeTo(implOutput.toPath())
-                } else {
-                    result.files[0].writeTo(output.toPath())
-                }
+                file.writeTo(output.toPath())
             }
         }
 
