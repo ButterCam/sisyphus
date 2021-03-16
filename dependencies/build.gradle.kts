@@ -49,7 +49,7 @@ dependencies {
         api("com.netflix.nebula:gradle-info-plugin:9.3.0")
         api("org.gradle.kotlin:plugins:1.3.6")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
-        api("org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r")
+        api("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
         api("com.palantir.gradle.docker:gradle-docker:0.25.0")
         api("io.grpc:grpc-kotlin-stub:1.0.0")
         api("com.google.api:api-compiler:0.0.8")
