@@ -7,8 +7,11 @@ import com.bybutter.sisyphus.string.leftPadding
 import com.bybutter.sisyphus.string.rightPadding
 import java.math.BigInteger
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.Month
+import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeParseException
 import java.util.concurrent.TimeUnit
@@ -19,6 +22,8 @@ private const val nanosPerSecond = 1000000000L
 
 private val nanosPerSecondBigInteger = nanosPerSecond.toBigInteger()
 
+private val defaultOffset = OffsetDateTime.now().offset
+
 fun java.sql.Timestamp.toProto(): Timestamp = Timestamp {
     seconds = TimeUnit.MILLISECONDS.toSeconds(this@toProto.time)
     nanos = this@toProto.nanos
@@ -28,6 +33,15 @@ fun Timestamp.toSql(): java.sql.Timestamp {
     val result = java.sql.Timestamp(TimeUnit.SECONDS.toMillis(seconds))
     result.nanos = nanos
     return result
+}
+
+fun LocalDateTime.toProto(): Timestamp = Timestamp {
+    seconds = this@toProto.toInstant(defaultOffset).epochSecond
+    nanos = this@toProto.nano
+}
+
+fun Timestamp.toLocalDateTime(offset: ZoneOffset = defaultOffset): LocalDateTime {
+    return LocalDateTime.ofEpochSecond(seconds, nanos, offset)
 }
 
 operator fun Timestamp.Companion.invoke(value: String): Timestamp {
