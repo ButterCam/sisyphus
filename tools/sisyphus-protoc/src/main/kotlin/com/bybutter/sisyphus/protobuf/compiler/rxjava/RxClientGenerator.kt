@@ -134,7 +134,7 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                         method.outputMessage().className()
                     )
                     add(".setType(MethodDescriptor.MethodType.%L)\n", "UNARY")
-                    add(".setFullMethodName(%S)\n", method.fullProtoName())
+                    add(".setFullMethodName(%S)\n", method.fullProtoName().substring(1))
                     add(
                         ".setRequestMarshaller(%T.%M())\n",
                         method.inputMessage().className(),
