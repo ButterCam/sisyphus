@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.protobuf.gradle
 
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceTask
@@ -18,9 +19,18 @@ class ProtobufJvmPlugin : BaseProtobufPlugin() {
         }
     }
 
+    override fun protoApiConfiguration(sourceSetName: String): Configuration {
+        return project.configurations.findByName(protoApiConfigurationName(sourceSetName)) ?: run {
+            val sourceSet = project.sourceSets.getByName(sourceSetName)
+            super.protoApiConfiguration(sourceSetName).apply {
+                this.extendsFrom(project.configurations.getByName(sourceSet.implementationConfigurationName))
+                this.extendsFrom(project.configurations.getByName(sourceSet.compileOnlyConfigurationName))
+            }
+        }
+    }
+
     override fun protoApiFiles(sourceSetName: String): FileCollection {
-        val sourceSet = project.sourceSets.getByName(sourceSetName)
-        return protoApiConfiguration(sourceSetName) + project.configurations.getByName(sourceSet.apiConfigurationName)
+        return protoApiConfiguration(sourceSetName)
     }
 
     override fun protoCompileFiles(sourceSetName: String): FileCollection {
