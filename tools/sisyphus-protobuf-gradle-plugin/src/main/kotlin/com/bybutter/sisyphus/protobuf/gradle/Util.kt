@@ -14,14 +14,6 @@ fun protoApiConfigurationName(sourceSetName: String): String {
     return "${protoConfigurationName(sourceSetName)} api".toCamelCase()
 }
 
-fun implementationConfigurationName(sourceSetName: String): String {
-    return if (sourceSetName == "main") {
-        "implementation"
-    } else {
-        "$sourceSetName implementation".toCamelCase()
-    }
-}
-
 fun extractProtoTaskName(sourceSetName: String): String {
     return "extract $sourceSetName proto".toCamelCase()
 }
