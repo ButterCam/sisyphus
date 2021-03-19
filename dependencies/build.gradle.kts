@@ -41,7 +41,7 @@ dependencies {
         api("com.google.api.grpc:proto-google-common-protos:2.1.0")
         api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.31")
         api("org.jetbrains.kotlin:kotlin-allopen:1.4.31")
-        api("org.springframework.boot:spring-boot-gradle-plugin:2.4.3")
+        api("org.springframework.boot:spring-boot-gradle-plugin:2.4.4")
         api("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
         api("com.github.ben-manes:gradle-versions-plugin:0.28.0")
         api("com.netflix.nebula:nebula-publishing-plugin:17.3.2")
