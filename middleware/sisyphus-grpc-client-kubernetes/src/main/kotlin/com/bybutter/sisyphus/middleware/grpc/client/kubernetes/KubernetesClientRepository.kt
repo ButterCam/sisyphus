@@ -62,7 +62,7 @@ class KubernetesClientRepository : ClientRepository {
                     null,
                     null,
                     null,
-                    "sisyphus/$service",
+                    "sisyphus/${service.name}",
                     null,
                     null,
                     null,
