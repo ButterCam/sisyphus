@@ -13,7 +13,7 @@ javaPlatform {
 
 dependencies {
     api(platform(project(":sisyphus-bom")))
-    api(platform("org.springframework.boot:spring-boot-dependencies:2.4.3"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:2.4.4"))
     api(platform("io.micrometer:micrometer-bom:1.6.5"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.4.31"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2"))
