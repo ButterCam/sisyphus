@@ -48,13 +48,13 @@ private fun TestCase.run(serviceTestSet: ServiceTestSet) = runBlocking {
 
         for (assert in methodTest.asserts) {
             when (celEngine.eval(assert)) {
-                true -> logger.info("{} pass", methodTest.title)
+                true -> logger.info("{} PASS", methodTest.title)
                 false -> {
-                    logger.error("{} fail", methodTest.title)
-                    throw Exception("${methodTest.title} fail")
+                    logger.error("{} FAIL", methodTest.title)
+                    throw Exception("${methodTest.title} FAIL")
                 }
                 else -> {
-                    logger.info("{} unknown", methodTest.title)
+                    logger.info("{} UNKNOWN", methodTest.title)
                 }
             }
         }
