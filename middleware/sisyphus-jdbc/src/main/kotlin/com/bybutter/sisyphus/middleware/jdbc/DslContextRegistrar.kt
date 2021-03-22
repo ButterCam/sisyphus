@@ -28,8 +28,8 @@ class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwar
 
         val properties = beanFactory.getBeansOfType<JdbcDatabaseProperty>().toMutableMap()
         val jdbcProperties = Binder.get(environment)
-                .bind("sisyphus", JdbcDatabaseProperties::class.java)
-                .orElse(null)?.jdbc ?: mapOf()
+            .bind("sisyphus", JdbcDatabaseProperties::class.java)
+            .orElse(null)?.jdbc ?: mapOf()
 
         properties += jdbcProperties
 

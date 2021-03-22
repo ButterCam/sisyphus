@@ -46,6 +46,10 @@ class ConfigArtifactProvider : EnvironmentPostProcessor, ApplicationListener<App
                     aether.registerGradlePortal()
                     null
                 }
+                "google" -> properties.repositories[repositoryKey] ?: run {
+                    aether.registerGoogle()
+                    null
+                }
                 else -> properties.repositories[repositoryKey]
             }
 
@@ -73,7 +77,7 @@ class ConfigArtifactProvider : EnvironmentPostProcessor, ApplicationListener<App
         val propertySources = ServiceLoader.load(ConfigArtifactPropertyExporter::class.java)
             .sortedByDescending { it.order }
             .flatMap {
-                it.export(classLoader)
+                it.export(properties.environment, classLoader)
             }
 
         for (propertySource in propertySources) {

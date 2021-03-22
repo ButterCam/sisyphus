@@ -18,6 +18,7 @@ class JdbcURIBuilder internal constructor(uri: URI) {
         }
         builder = resolvedUri.toBuilder()
     }
+
     var userInfo: String?
         get() = builder.userInfo
         set(value) {

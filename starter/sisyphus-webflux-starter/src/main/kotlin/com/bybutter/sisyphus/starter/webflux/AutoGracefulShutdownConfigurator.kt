@@ -11,8 +11,12 @@ class AutoGracefulShutdownConfigurator : EnvironmentPostProcessor {
     override fun postProcessEnvironment(environment: ConfigurableEnvironment, application: SpringApplication) {
         if (environment.containsProperty("server.shutdown")) return
 
-        environment.propertySources.addLast(PropertiesPropertySource("AutoGracefulShutdownConfiguration", Properties().apply {
-            this["server.shutdown"] = Shutdown.GRACEFUL.name
-        }))
+        environment.propertySources.addLast(
+            PropertiesPropertySource(
+                "AutoGracefulShutdownConfiguration",
+                Properties().apply {
+                    this["server.shutdown"] = Shutdown.GRACEFUL.name
+                })
+        )
     }
 }

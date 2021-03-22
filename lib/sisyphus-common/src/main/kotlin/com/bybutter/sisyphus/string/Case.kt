@@ -18,7 +18,8 @@ import com.bybutter.sisyphus.string.case.WordSplitter
 
 fun String.toCase(format: CaseFormat) = format.format(this)
 
-fun String.toCase(formatter: CaseFormatter, splitter: WordSplitter = CommonWordSplitter) = formatter.format(splitter.split(this))
+fun String.toCase(formatter: CaseFormatter, splitter: WordSplitter = CommonWordSplitter) =
+    formatter.format(splitter.split(this))
 
 /** Converts a string to 'SCREAMING_SNAKE_CASE'. */
 fun String.toScreamingSnakeCase() = toCase(ScreamingSnakeCaseFormatter)

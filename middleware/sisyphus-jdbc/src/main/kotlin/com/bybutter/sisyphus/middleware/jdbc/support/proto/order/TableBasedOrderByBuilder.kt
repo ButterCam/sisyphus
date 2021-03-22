@@ -4,7 +4,10 @@ import com.bybutter.sisyphus.string.toCamelCase
 import org.jooq.Field
 import org.jooq.Table
 
-class TableBasedOrderByBuilder(private val table: Table<*>, private val fieldNameMapping: Map<String, String> = mapOf()) : OrderByBuilder() {
+class TableBasedOrderByBuilder(
+    private val table: Table<*>,
+    private val fieldNameMapping: Map<String, String> = mapOf()
+) : OrderByBuilder() {
     private val fieldCache = table.fields().associateBy { it.name.toCamelCase() }
 
     override fun field(name: String): Field<*> {

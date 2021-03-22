@@ -14,7 +14,10 @@ class JacksonAutoRegister : ImportBeanDefinitionRegistrar {
                 module
             }
 
-            registry.registerBeanDefinition("jackson:spi:module:${module.moduleName}", beanDefinitionBuilder.beanDefinition)
+            registry.registerBeanDefinition(
+                "jackson:spi:module:${module.moduleName}",
+                beanDefinitionBuilder.beanDefinition
+            )
         }
     }
 }

@@ -9,7 +9,7 @@ interface CustomProtoType<T> {
     /**
      * Get the raw protobuf type of current custom proto type.
      */
-    fun raw(): T
+    fun value(): T
 }
 
 interface CustomProtoTypeSupport<T : CustomProtoType<TRaw>, TRaw> {
@@ -18,5 +18,5 @@ interface CustomProtoTypeSupport<T : CustomProtoType<TRaw>, TRaw> {
     /**
      * Wrap raw protobuf type to custom proto type.
      */
-    fun wrapRaw(value: TRaw): T
+    operator fun invoke(value: TRaw): T
 }

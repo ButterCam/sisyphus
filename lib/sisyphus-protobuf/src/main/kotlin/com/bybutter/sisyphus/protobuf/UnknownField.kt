@@ -1,99 +1,108 @@
 package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.collection.contentEquals
-import com.bybutter.sisyphus.collection.takeWhen
-import com.google.protobuf.CodedInputStream
-import com.google.protobuf.CodedOutputStream
-import com.google.protobuf.WireFormat
-import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
+import com.bybutter.sisyphus.protobuf.coded.Reader
+import com.bybutter.sisyphus.protobuf.coded.WireType
+import com.bybutter.sisyphus.protobuf.coded.Writer
 
-data class UnknownField(
-    var number: Int,
-    var wireType: Int,
-    var data: ByteArray
-) {
-    val size: Int
-        get() {
-            return CodedOutputStream.computeTagSize(this.number) + when (this.wireType) {
-                WireFormat.WIRETYPE_VARINT -> this.data.size
-                WireFormat.WIRETYPE_FIXED32 -> this.data.size
-                WireFormat.WIRETYPE_FIXED64 -> this.data.size
-                WireFormat.WIRETYPE_LENGTH_DELIMITED -> CodedOutputStream.computeInt32SizeNoTag(this.data.size) + this.data.size
-                else -> throw UnsupportedOperationException("Unsupported wire type '${this.wireType}'.")
-            }
-        }
+abstract class UnknownField<T> {
+    abstract val tag: Int
+    abstract val data: T
 
-    fun writeTo(output: CodedOutputStream) {
-        output.writeTag(this.number, this.wireType)
-        when (this.wireType) {
-            WireFormat.WIRETYPE_VARINT,
-            WireFormat.WIRETYPE_FIXED32,
-            WireFormat.WIRETYPE_FIXED64 -> {
-                output.writeRawBytes(this.data)
-            }
-            WireFormat.WIRETYPE_LENGTH_DELIMITED -> {
-                output.writeByteArrayNoTag(this.data)
-            }
-            else -> throw UnsupportedOperationException("Unsupported wire type '${this.wireType}'.")
-        }
+    abstract fun writeTo(writer: Writer)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as UnknownField<*>
+
+        if (tag != other.tag) return false
+        if (data != other.data) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = tag
+        result = 31 * result + data.hashCode()
+        return result
+    }
+}
+
+class Varint(number: Int, override val data: Long) : UnknownField<Long>() {
+    override val tag: Int = WireType.tagOf(number, WireType.VARINT)
+
+    override fun writeTo(writer: Writer) {
+        writer.tag(tag).int64(data)
+    }
+}
+
+class Fixed32(number: Int, override val data: Int) : UnknownField<Int>() {
+    override val tag: Int = WireType.tagOf(number, WireType.FIXED32)
+
+    override fun writeTo(writer: Writer) {
+        writer.tag(tag).sfixed32(data)
+    }
+}
+
+class Fixed64(number: Int, override val data: Long) : UnknownField<Long>() {
+    override val tag: Int = WireType.tagOf(number, WireType.FIXED64)
+
+    override fun writeTo(writer: Writer) {
+        writer.tag(tag).sfixed64(data)
+    }
+}
+
+class Bytes(number: Int, override val data: ByteArray) : UnknownField<ByteArray>() {
+    override val tag: Int = WireType.tagOf(number, WireType.LENGTH_DELIMITED)
+
+    override fun writeTo(writer: Writer) {
+        writer.tag(tag).bytes(data)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as UnknownField
+        other as Bytes
 
-        if (number != other.number) return false
-        if (wireType != other.wireType) return false
+        if (tag != other.tag) return false
         if (!data.contentEquals(other.data)) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = number
-        result = 31 * result + wireType
+        var result = tag
         result = 31 * result + data.contentHashCode()
         return result
     }
 }
 
 class UnknownFields {
-    val fields: List<UnknownField> get() = _fields
-    private val _fields: MutableList<UnknownField> = mutableListOf()
+    val fields: List<UnknownField<*>> get() = _fields
+    private val _fields: MutableList<UnknownField<*>> = mutableListOf()
 
-    val size: Int
-        get() {
-            return fields.sumBy { it.size }
-        }
-
-    fun writeTo(output: CodedOutputStream) {
+    fun writeTo(writer: Writer) {
         for (field in fields) {
-            field.writeTo(output)
+            field.writeTo(writer)
         }
     }
 
-    fun readFrom(input: CodedInputStream, number: Int, wireType: Int) {
+    fun readFrom(reader: Reader, number: Int, wireType: Int) {
         when (wireType) {
-            WireFormat.WIRETYPE_VARINT -> {
-                ByteArrayOutputStream().use {
-                    do {
-                        val byte = input.readRawByte().toInt()
-                        it.write(byte)
-                    } while (byte and 0x80 > 0)
-                    _fields.add(UnknownField(number, wireType, it.toByteArray()))
-                }
+            WireType.VARINT.ordinal -> {
+                _fields.add(Varint(number, reader.int64()))
             }
-            WireFormat.WIRETYPE_FIXED32 -> {
-                _fields.add(UnknownField(number, wireType, input.readRawBytes(4)))
+            WireType.FIXED32.ordinal -> {
+                _fields.add(Fixed32(number, reader.sfixed32()))
             }
-            WireFormat.WIRETYPE_FIXED64 -> {
-                _fields.add(UnknownField(number, wireType, input.readRawBytes(8)))
+            WireType.FIXED64.ordinal -> {
+                _fields.add(Fixed64(number, reader.sfixed64()))
             }
-            WireFormat.WIRETYPE_LENGTH_DELIMITED -> {
-                _fields.add(UnknownField(number, wireType, input.readByteArray()))
+            WireType.LENGTH_DELIMITED.ordinal -> {
+                _fields.add(Bytes(number, reader.bytes()))
             }
             else -> throw UnsupportedOperationException("Unsupported wire type '$wireType'.")
         }
@@ -117,7 +126,7 @@ class UnknownFields {
         return result
     }
 
-    fun clear(): List<UnknownField> {
+    fun clear(): List<UnknownField<*>> {
         return _fields.toList().apply {
             _fields.clear()
         }
@@ -132,30 +141,5 @@ class UnknownFields {
 
     operator fun plusAssign(other: UnknownFields) {
         this._fields.addAll(other.fields)
-    }
-
-    @UseExperimental(InternalProtoApi::class)
-    fun exportExtension(support: ExtensionSupport<*, *>): Message<*, *> {
-        val extendedFields = support.extendedFields.map { it.number }.toSet()
-        val extended = support.extendedFields
-
-        val fieldsData = _fields.takeWhen {
-            it.number in extendedFields
-        }
-
-        val buffer = ByteBuffer.allocate(fieldsData.sumBy { it.size })
-        val output = CodedOutputStream.newInstance(buffer)
-
-        for (field in fieldsData) {
-            field.writeTo(output)
-        }
-        output.flush()
-
-        buffer.rewind()
-        val input = CodedInputStream.newInstance(buffer)
-
-        return support.newMutable().apply {
-            readFrom(input, Int.MAX_VALUE)
-        }
     }
 }

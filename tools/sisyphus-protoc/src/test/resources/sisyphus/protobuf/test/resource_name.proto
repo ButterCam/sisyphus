@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package sisyphus.protobuf.test;
+
+import "google/api/resource.proto";
+
+option java_multiple_files = true;
+option java_package = "com.bybutter.sisyphus.protobuf.test";
+option java_outer_classname = "ResourceNameProto";
+
+option (google.api.resource_definition) = {
+  type: "test.bybutter.com/GlobalResource"
+  pattern: "global/resources/{resource}"
+};
+
+message Resource {
+  option (google.api.resource) = {
+    type: "test.bybutter.com/Resource"
+    pattern: "resources/{resource}"
+  };
+
+  string name = 1;
+}
+
+message ResourceReference {
+  string parent = 1 [(google.api.resource_reference) = {
+    type: "test.bybutter.com/Resource"
+  }];
+
+  oneof Target {
+    string resource = 2 [(google.api.resource_reference) = {
+      type: "test.bybutter.com/Resource"
+    }];
+    string global_resource = 3 [(google.api.resource_reference) = {
+      type: "test.bybutter.com/GlobalResource"
+    }];
+    string unknown_resource = 4 [(google.api.resource_reference) = {
+      type: "test.bybutter.com/UnknownResource"
+    }];
+  }
+}

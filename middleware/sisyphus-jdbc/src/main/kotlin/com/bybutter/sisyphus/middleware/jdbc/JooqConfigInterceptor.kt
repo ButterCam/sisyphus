@@ -1,6 +1,8 @@
 package com.bybutter.sisyphus.middleware.jdbc
 
+import javax.sql.DataSource
 import org.jooq.Configuration
+import org.jooq.SQLDialect
 
 /**
  * Interceptor for specified Jooq configuration.
@@ -13,5 +15,5 @@ interface JooqConfigInterceptor {
 
     val qualifier: Class<*>?
 
-    fun intercept(configuration: Configuration): Configuration
+    fun intercept(datasource: DataSource, dialect: SQLDialect, configuration: Configuration): Configuration
 }

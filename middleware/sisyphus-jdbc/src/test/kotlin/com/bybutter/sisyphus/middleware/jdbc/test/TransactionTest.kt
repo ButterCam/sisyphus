@@ -105,8 +105,8 @@ class TransactionTest {
 
     private fun createUser(dsl: DSLContext, name: String) {
         dsl.insertInto(table("USER"))
-                .set(field("NAME", String::class.java), name)
-                .execute()
+            .set(field("NAME", String::class.java), name)
+            .execute()
     }
 
     private fun assertUserExist(dsl: DSLContext, name: String) {
@@ -119,8 +119,8 @@ class TransactionTest {
 
     private fun getUser(dsl: DSLContext, name: String): Record? {
         return dsl.selectFrom(table("USER"))
-                .where(field("NAME", String::class.java).eq(name))
-                .fetchOne()
+            .where(field("NAME", String::class.java).eq(name))
+            .fetchOne()
     }
 
     private fun rollbackException() {
@@ -138,8 +138,8 @@ class TransactionTest {
     private fun initializeTable(dsl: DSLContext) {
         dsl.dropTableIfExists("USER").execute()
         dsl.createTable("USER")
-                .column("ID", SQLDataType.INTEGER.identity(true))
-                .column("NAME", SQLDataType.VARCHAR.length(64))
-                .execute()
+            .column("ID", SQLDataType.INTEGER.identity(true))
+            .column("NAME", SQLDataType.VARCHAR.length(64))
+            .execute()
     }
 }

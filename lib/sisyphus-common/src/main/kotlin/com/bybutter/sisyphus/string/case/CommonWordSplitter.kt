@@ -7,7 +7,12 @@ object CommonWordSplitter : WordSplitter {
         return entryPoint(string)
     }
 
-    private fun entryPoint(string: CharSequence, pos: Int = 0, stack: StringBuilder = StringBuilder(), result: MutableList<String> = mutableListOf()): List<String> {
+    private fun entryPoint(
+        string: CharSequence,
+        pos: Int = 0,
+        stack: StringBuilder = StringBuilder(),
+        result: MutableList<String> = mutableListOf()
+    ): List<String> {
         result.append(stack)
 
         if (pos >= string.length) {
@@ -33,7 +38,12 @@ object CommonWordSplitter : WordSplitter {
         }
     }
 
-    private fun handleDigital(string: CharSequence, pos: Int, stack: StringBuilder, result: MutableList<String>): List<String> {
+    private fun handleDigital(
+        string: CharSequence,
+        pos: Int,
+        stack: StringBuilder,
+        result: MutableList<String>
+    ): List<String> {
         var index = pos
         val digital = StringBuilder()
         digital.append(string[index++])
@@ -71,7 +81,12 @@ object CommonWordSplitter : WordSplitter {
         }
     }
 
-    private fun handleLowerCase(string: CharSequence, pos: Int, stack: StringBuilder, result: MutableList<String>): List<String> {
+    private fun handleLowerCase(
+        string: CharSequence,
+        pos: Int,
+        stack: StringBuilder,
+        result: MutableList<String>
+    ): List<String> {
         var index = pos
 
         while (true) {
@@ -91,7 +106,12 @@ object CommonWordSplitter : WordSplitter {
         }
     }
 
-    private fun handleUpperCase(string: CharSequence, pos: Int, stack: StringBuilder, result: MutableList<String>): List<String> {
+    private fun handleUpperCase(
+        string: CharSequence,
+        pos: Int,
+        stack: StringBuilder,
+        result: MutableList<String>
+    ): List<String> {
         var index = pos
 
         while (true) {
@@ -118,7 +138,13 @@ object CommonWordSplitter : WordSplitter {
         }
     }
 
-    private fun handleUpperCaseAfterDigital(string: CharSequence, pos: Int, stack: StringBuilder, digital: StringBuilder, result: MutableList<String>): List<String> {
+    private fun handleUpperCaseAfterDigital(
+        string: CharSequence,
+        pos: Int,
+        stack: StringBuilder,
+        digital: StringBuilder,
+        result: MutableList<String>
+    ): List<String> {
         var index = pos
 
         while (true) {
@@ -154,7 +180,12 @@ object CommonWordSplitter : WordSplitter {
         }
     }
 
-    private fun handleUnknown(string: CharSequence, pos: Int, stack: StringBuilder, result: MutableList<String>): List<String> {
+    private fun handleUnknown(
+        string: CharSequence,
+        pos: Int,
+        stack: StringBuilder,
+        result: MutableList<String>
+    ): List<String> {
         var index = pos
 
         while (true) {
@@ -171,7 +202,12 @@ object CommonWordSplitter : WordSplitter {
         }
     }
 
-    private fun handleDelimiter(string: CharSequence, pos: Int, stack: StringBuilder, result: MutableList<String>): List<String> {
+    private fun handleDelimiter(
+        string: CharSequence,
+        pos: Int,
+        stack: StringBuilder,
+        result: MutableList<String>
+    ): List<String> {
         var index = pos + 1
 
         while (true) {

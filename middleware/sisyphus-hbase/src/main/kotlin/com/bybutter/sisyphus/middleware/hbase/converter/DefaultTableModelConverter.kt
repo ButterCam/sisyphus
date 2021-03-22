@@ -149,7 +149,8 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
         }
     }
 
-    private fun <T1, T2, T3> MutableMap<T1, MutableMap<T2, T3>>.trySet(key1: T1, key2: T2, value: T3) {
+    private fun <T1, T2, T3> MutableMap<T1, MutableMap<T2, T3>>.trySet(key1: T1, key2: T2, value: T3?) {
+        value ?: return
         if (this.containsKey(key1)) {
             this[key1]?.set(key2, value)
         } else {

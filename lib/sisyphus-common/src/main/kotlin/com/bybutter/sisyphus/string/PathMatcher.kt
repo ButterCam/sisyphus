@@ -63,7 +63,13 @@ object PathMatcher {
         return si == str.length
     }
 
-    private fun wildcardMatch(pat: CharSequence, p: Int, str: CharSequence, s: Int, pathDelimiters: Set<Char>): Boolean {
+    private fun wildcardMatch(
+        pat: CharSequence,
+        p: Int,
+        str: CharSequence,
+        s: Int,
+        pathDelimiters: Set<Char>
+    ): Boolean {
         var si = s
         val pc = pat.getOrZero(p)
         while (true) {
@@ -96,7 +102,13 @@ object PathMatcher {
         }
     }
 
-    private fun multiWildcardMatch(pat: CharSequence, p: Int, str: CharSequence, s: Int, pathDelimiters: Set<Char>): Boolean {
+    private fun multiWildcardMatch(
+        pat: CharSequence,
+        p: Int,
+        str: CharSequence,
+        s: Int,
+        pathDelimiters: Set<Char>
+    ): Boolean {
         // End of pattern, just check the end of string is '/' quickly.
         var si = s
         if (p >= pat.length && si < str.length) {

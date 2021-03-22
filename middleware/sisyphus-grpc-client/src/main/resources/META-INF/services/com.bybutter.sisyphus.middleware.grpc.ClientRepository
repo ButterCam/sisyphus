@@ -1,2 +1,1 @@
-com.bybutter.sisyphus.middleware.grpc.LocalClientRepository
 com.bybutter.sisyphus.middleware.grpc.RemoteClientRepository

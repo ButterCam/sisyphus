@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.project.gradle
 
 import org.gradle.api.Project
+import org.gradle.api.internal.artifacts.dsl.ParsedModuleStringNotation
 
 open class SisyphusExtension(val project: Project) {
     var version: String
@@ -19,7 +20,7 @@ open class SisyphusExtension(val project: Project) {
 
     var repositories: MutableMap<String, Repository> = hashMapOf()
 
-    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "jcenter", "portal")
+    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "jcenter", "portal", "google")
 
     var releaseRepositories: MutableList<String> = mutableListOf("release")
 
@@ -27,12 +28,15 @@ open class SisyphusExtension(val project: Project) {
 
     var dockerPublishRegistries: MutableList<String> = mutableListOf()
 
+    var managedDependencies: MutableMap<String, ParsedModuleStringNotation> = mutableMapOf()
+
     val signKeyName: String?
 
     init {
         val developer: String? = project.findProperty("sisyphus.developer") as? String
         isDevelop = developer != null
         val branchName: String? = System.getenv("BRANCH_NAME")
+        val githubRef: String? = System.getenv("GITHUB_REF")
         val tagName: String? = System.getenv("TAG_NAME")
         val buildVersion: String? = System.getenv("BUILD_VERSION")
 
@@ -41,6 +45,11 @@ open class SisyphusExtension(val project: Project) {
             buildVersion != null -> "$buildVersion"
             tagName != null -> "$tagName"
             branchName != null -> "$branchName-SNAPSHOT"
+            githubRef != null && pullRequestRefRegex.matches(githubRef) -> "PR-${
+                pullRequestRefRegex.matchEntire(
+                    githubRef
+                )?.groupValues?.get(1)
+            }-SNAPSHOT"
             else -> project.version as String
         }
 
@@ -55,19 +64,30 @@ open class SisyphusExtension(val project: Project) {
             repositories[repositoryName] = Repository(url, username, password)
         }
 
-        dependencyRepositories = (project.findProperty("sisyphus.dependency.repositories") as? String)?.split(',')?.toMutableList()
-            ?: dependencyRepositories
-        releaseRepositories = (project.findProperty("sisyphus.release.repositories") as? String)?.split(',')?.toMutableList()
-            ?: releaseRepositories
-        snapshotRepositories = (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
-            ?: snapshotRepositories
-        dockerPublishRegistries = (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
-            ?: dockerPublishRegistries
+        dependencyRepositories =
+            (project.findProperty("sisyphus.dependency.repositories") as? String)?.split(',')?.toMutableList()
+                ?: dependencyRepositories
+        releaseRepositories =
+            (project.findProperty("sisyphus.release.repositories") as? String)?.split(',')?.toMutableList()
+                ?: releaseRepositories
+        snapshotRepositories =
+            (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
+                ?: snapshotRepositories
+        dockerPublishRegistries =
+            (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
+                ?: dockerPublishRegistries
+
+        managedDependencies =
+            (project.findProperty("sisyphus.dependency.overriding") as? String)?.split(',')?.associate {
+                val moduleStringNotation = ParsedModuleStringNotation(it, null)
+                "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
+            }?.toMutableMap() ?: managedDependencies
 
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
     }
 
     companion object {
         private val repositoryUrlRegex = """sisyphus\.repositories\.([A-Za-z][A-Za-z0-9-_]+)\.url""".toRegex()
+        private val pullRequestRefRegex = """refs/pull/([0-9]+)/merge""".toRegex()
     }
 }

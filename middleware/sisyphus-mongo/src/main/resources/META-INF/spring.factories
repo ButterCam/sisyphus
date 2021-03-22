@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.bybutter.sisyphus.middleware.mongo.autoconfigure.SisyphusMongoAutoConfiguration
+org.springframework.boot.autoconfigure.AutoConfigurationImportFilter=\
+com.bybutter.sisyphus.middleware.mongo.autoconfigure.SpringMongoAutoConfigurationDisable

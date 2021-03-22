@@ -12,9 +12,10 @@ import io.grpc.ClientCall
 import io.grpc.Metadata
 import io.grpc.Status
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
-import reactor.core.publisher.MonoProcessor
+import reactor.core.publisher.Sinks
 
 /**
  * Listener for gRPC calling, it convert gRPC call to [ServerResponse] asynchronously.
@@ -23,51 +24,61 @@ import reactor.core.publisher.MonoProcessor
  * @see https://aip.bybutter.com/127#http-method-and-path
  */
 class TranscodingCallListener(private val body: String) : ClientCall.Listener<Message<*, *>>() {
-    private val response = MonoProcessor.create<Mono<ServerResponse>>()
+    private val response = Sinks.one<Mono<ServerResponse>>()
 
     private var headers: Metadata? = null
     private var message: Message<*, *>? = null
 
     override fun onClose(status: Status, trailers: Metadata) {
-        val builder = ServerResponse.status(status.code.toHttpStatus())
+        try {
+            val builder = ServerResponse.status(status.code.toHttpStatus())
 
-        // Set response header from gRPC headers and trailers.
-        builder.setHeaderFromMetadata(headers)
-        builder.setHeaderFromMetadata(trailers)
+            // Set response header from gRPC headers and trailers.
+            builder.setHeaderFromMetadata(headers)
+            builder.setHeaderFromMetadata(trailers)
 
-        trailers[STATUS_META_KEY]?.let {
-            if (it.code != Code.OK.number) {
-                // The trailers contains status meta and code is not [Code.OK], return the status directly.
-                this.response.onNext(builder.body(DetectBodyInserter(it)))
-                return
-            } else {
-                // The trailers contains status meta but code is [Code.OK], return the status in response header.
-                builder.header(STATUS_META_KEY.name(), it.toProto().base64UrlSafe())
-            }
-        }
-
-        val message = message
-        val response = when {
-            // Empty message.
-            message is Empty -> builder.build()
-            // Return the body.
-            message != null -> when (body) {
-                "", "*" -> {
-                    builder.body(DetectBodyInserter(message))
-                }
-                else -> {
-                    builder.body(DetectBodyInserter<Any>(message[body]))
+            trailers[STATUS_META_KEY]?.let {
+                if (it.code != Code.OK.number) {
+                    // The trailers contains status meta and code is not [Code.OK], return the status directly.
+                    this.response.tryEmitValue(builder.body(DetectBodyInserter(it)))
+                    return
+                } else {
+                    // The trailers contains status meta but code is [Code.OK], return the status in response header.
+                    builder.header(STATUS_META_KEY.name(), it.toProto().base64UrlSafe())
                 }
             }
-            // No message returned by gRPC, maybe some unknown error happened.
-            else -> builder.body(DetectBodyInserter(
-                com.bybutter.sisyphus.rpc.Status {
-                    this.code = status.code.value()
-                    this.message = status.description ?: status.cause?.message ?: "Unknown"
+
+            val message = message
+            val response = when {
+                // Empty message.
+                message is Empty -> builder.build()
+                // Return the body.
+                message != null -> when (body) {
+                    "", "*" -> {
+                        builder.body(DetectBodyInserter(message))
+                    }
+                    else -> {
+                        builder.body(DetectBodyInserter<Any>(message[body]))
+                    }
                 }
-            ))
+                // No message returned by gRPC, maybe some unknown error happened.
+                else -> builder.body(DetectBodyInserter(
+                    com.bybutter.sisyphus.rpc.Status {
+                        this.code = status.code.value()
+                        this.message = status.description ?: status.cause?.message ?: "Unknown"
+                    }
+                ))
+            }
+            this.response.tryEmitValue(response)
+        } catch (e: Exception) {
+            this.response.tryEmitValue(ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(DetectBodyInserter(
+                    com.bybutter.sisyphus.rpc.Status {
+                        this.code = Status.Code.INTERNAL.value()
+                        this.message = e.message ?: "Unknown"
+                    }
+                )))
         }
-        this.response.onNext(response)
     }
 
     override fun onHeaders(headers: Metadata) {
@@ -95,10 +106,10 @@ class TranscodingCallListener(private val body: String) : ClientCall.Listener<Me
     }
 
     fun response(): Mono<ServerResponse> {
-        return response.flatMap { it }
+        return response.asMono().flatMap { it }
     }
 
     companion object {
-        val IGNORE_GRPC_HEADER = setOf(HttpHeaders.CONTENT_TYPE.toLowerCase())
+        val IGNORE_GRPC_HEADER = setOf(HttpHeaders.CONTENT_TYPE.toLowerCase(), STATUS_META_KEY.name())
     }
 }

@@ -19,22 +19,22 @@ abstract class HTableTemplate<TKey : Any, TValue : Any> : HTemplate<TKey, TValue
         get() {
             val valueClass = (this.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[1] as? Class<*>
             val annotation = this.javaClass.getAnnotation(HTable::class.java)
-                    ?: valueClass?.getAnnotation(HTable::class.java)
-                    ?: throw RuntimeException("HTableTemplate only support class with annotation 'HTable'.")
+                ?: valueClass?.getAnnotation(HTable::class.java)
+                ?: throw RuntimeException("HTableTemplate only support class with annotation 'HTable'.")
             return annotation.byteValue.let { if (it.isEmpty()) null else it }
-                    ?: annotation.value.toByteArray().let { if (it.isEmpty()) null else it }
-                    ?: throw RuntimeException("No table name for class '${valueClass?.name}'.")
+                ?: annotation.value.toByteArray().let { if (it.isEmpty()) null else it }
+                ?: throw RuntimeException("No table name for class '${valueClass?.name}'.")
         }
     open val rowKeyConverter: ValueConverter<TKey>
         get() {
             val keyClass = (this.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as? Class<*>
-                    ?: throw RuntimeException("Unknown table key type.")
+                ?: throw RuntimeException("Unknown table key type.")
             return getDefaultValueConverter<TKey>(keyClass.javaType) as ValueConverter<TKey>
         }
     open val tableModelConverter: TableModelConverter<TValue>
         get() {
             val valueClass = (this.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[1] as? Class<*>
-                    ?: throw RuntimeException("Unknown table value type.")
+                ?: throw RuntimeException("Unknown table value type.")
             return getDefaultTableModelConverter<DtoModel>(valueClass.javaType).uncheckedCast()
         }
 
@@ -68,9 +68,9 @@ abstract class HTableTemplate<TKey : Any, TValue : Any> : HTemplate<TKey, TValue
         connection.getTable(TableName.valueOf(table)).use {
             val getRequests = keys.map { Get(rowKeyConverter.convert(it)) }
             return it.get(getRequests).filter { it.row != null }.associate {
-                val keyMap = keys.associate { rowKeyConverter.convert(it).hashWrapper() to it }
+                val keyMap = keys.associate { rowKeyConverter.convert(it)?.hashWrapper() to it }
                 (keyMap[it.row.hashWrapper()]
-                        ?: throw RuntimeException("Key value not found.")) to tableModelConverter.convert(it)
+                    ?: throw RuntimeException("Key value not found.")) to tableModelConverter.convert(it)
             }
         }
     }

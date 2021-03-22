@@ -1,10 +1,10 @@
 package com.bybutter.sisyphus.middleware.amqp
 
 import org.springframework.amqp.core.AmqpTemplate
-import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 
 interface AmqpTemplateFactory {
     fun createTemplate(property: MessageQueueProperty): AmqpTemplate
 
-    fun createConnectionFactory(property: MessageQueueProperty): ConnectionFactory
+    fun createListenerContainer(property: MessageQueueProperty): SimpleMessageListenerContainer
 }

@@ -10,7 +10,12 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.cache.RedisCacheWriter
 
-class MultiRedisCacheManager(private val cacheWriter: RedisCacheWriter, private val defaultCacheConfig: RedisCacheConfiguration, private val initialCacheConfiguration: Map<String, RedisCacheConfiguration> = hashMapOf(), val allowInFlightCacheCreation: Boolean = true) :
+class MultiRedisCacheManager(
+    private val cacheWriter: RedisCacheWriter,
+    private val defaultCacheConfig: RedisCacheConfiguration,
+    private val initialCacheConfiguration: Map<String, RedisCacheConfiguration> = hashMapOf(),
+    val allowInFlightCacheCreation: Boolean = true
+) :
     RedisCacheManager(cacheWriter, defaultCacheConfig, initialCacheConfiguration, allowInFlightCacheCreation) {
     private val cacheMap: ConcurrentMap<String, Cache> = ConcurrentHashMap(16)
 

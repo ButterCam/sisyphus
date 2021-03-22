@@ -36,7 +36,13 @@ internal class ModelDeserializer<T : DtoModel>(val targetClass: JavaType) : Json
         return deserializeInto(p.codec, node, beanDescription, intoValue, ctxt)
     }
 
-    private fun deserializeInto(codec: ObjectCodec, node: TreeNode, beanDescription: BeanDescription, intoValue: T, ctxt: DeserializationContext): T {
+    private fun deserializeInto(
+        codec: ObjectCodec,
+        node: TreeNode,
+        beanDescription: BeanDescription,
+        intoValue: T,
+        ctxt: DeserializationContext
+    ): T {
         val properties = beanDescription.findProperties().associateBy { it.name }
 
         for (fieldName in node.fieldNames()) {

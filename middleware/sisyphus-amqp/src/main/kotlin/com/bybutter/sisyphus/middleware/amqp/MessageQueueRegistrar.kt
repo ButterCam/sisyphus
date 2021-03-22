@@ -1,8 +1,11 @@
 package com.bybutter.sisyphus.middleware.amqp
 
 import org.springframework.amqp.core.AmqpTemplate
-import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.amqp.core.MessageListener
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer
+import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
+import org.springframework.beans.factory.getBean
 import org.springframework.beans.factory.getBeansOfType
 import org.springframework.beans.factory.support.AutowireCandidateQualifier
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -29,12 +32,16 @@ class MessageQueueRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAw
 
         val properties = beanFactory.getBeansOfType<MessageQueueProperty>().toMutableMap()
         val amqpProperties = Binder.get(environment)
-                .bind("sisyphus", MessageQueueProperties::class.java)
-                .orElse(null)?.amqp ?: mapOf()
+            .bind("sisyphus", MessageQueueProperties::class.java)
+            .orElse(null)?.amqp ?: mapOf()
 
         properties += amqpProperties
 
         if (properties.isEmpty()) return
+
+        val listeners = registry.getBeanNamesForType(MessageListener::class.java).mapNotNull {
+            it to beanFactory.getBeanDefinition(it) as? AnnotatedBeanDefinition
+        }
 
         for ((name, property) in properties) {
             val beanName = "$BEAN_NAME_PREFIX:$name"
@@ -45,20 +52,20 @@ class MessageQueueRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAw
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
 
-            val connectionName = "${name}ConnectionFactory"
-            val connectionDefinition = BeanDefinitionBuilder.genericBeanDefinition(ConnectionFactory::class.java) {
-                val factory = beanFactory.getBean(AmqpTemplateFactory::class.java)
-                factory.createConnectionFactory(property)
-            }.beanDefinition
-            connectionDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
-            registry.registerBeanDefinition(connectionName, connectionDefinition)
+            for ((listenerName, listenerDefinition) in listeners) {
+                listenerDefinition ?: continue
+                if (!listenerDefinition.metadata.annotationTypes.contains(property.qualifier.name)) continue
 
-            val messageQueuePropertyName = "${name}QueueProperty"
-            val messageQueueProperty = BeanDefinitionBuilder.genericBeanDefinition(MessageQueueProperty::class.java) {
-                property
-            }.beanDefinition
-            messageQueueProperty.addQualifier(AutowireCandidateQualifier(property.qualifier))
-            registry.registerBeanDefinition(messageQueuePropertyName, messageQueueProperty)
+                val containerBeanName = "$listenerName:container"
+                val containerBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(MessageListenerContainer::class.java) {
+                    val factory = beanFactory.getBean(AmqpTemplateFactory::class.java)
+                    val listener = beanFactory.getBean(listenerName) as MessageListener
+                    factory.createListenerContainer(property).apply {
+                        this.setMessageListener(listener)
+                    }
+                }.beanDefinition
+                registry.registerBeanDefinition(containerBeanName, containerBeanDefinition)
+            }
         }
     }
 

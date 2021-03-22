@@ -1,12 +1,9 @@
 package com.bybutter.sisyphus.starter.grpc.support
 
+import com.bybutter.sisyphus.protobuf.Message
 import io.grpc.Context
-import io.grpc.Contexts
-import io.grpc.ForwardingServerCall
 import io.grpc.Metadata
 import io.grpc.ServerCall
-import io.grpc.ServerCallHandler
-import io.grpc.ServerInterceptor
 import io.grpc.Status
 import java.util.concurrent.TimeUnit
 import org.slf4j.LoggerFactory
@@ -14,22 +11,42 @@ import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
-private val logger = LoggerFactory.getLogger("RPC Request")
+interface RequestLogger {
+    val id: String
 
-val REQUEST_TIMESTAMP_CONTEXT_KEY = Context.key<Long>("request-timestamp")
+    fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long)
 
-@Order(Ordered.LOWEST_PRECEDENCE - 1000)
-@Component
-class RequestLogInterceptor : ServerInterceptor {
-    override fun <ReqT : Any, RespT : Any> interceptCall(call: ServerCall<ReqT, RespT>, headers: Metadata, next: ServerCallHandler<ReqT, RespT>): ServerCall.Listener<ReqT> {
-        return Contexts.interceptCall(Context.current().withValue(REQUEST_TIMESTAMP_CONTEXT_KEY, System.nanoTime()), RequestLoggerCall(call), headers, next)
+    companion object {
+        val REQUEST_CONTEXT_KEY: Context.Key<RequestInfo> = Context.key("sisyphus-request")
     }
 }
 
-class RequestLoggerCall<ReqT : Any, RespT : Any>(call: ServerCall<ReqT, RespT>) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
-    override fun close(status: Status, trailers: Metadata) {
-        val cost = System.nanoTime() - REQUEST_TIMESTAMP_CONTEXT_KEY.get()
-        val costString = when {
+data class RequestInfo(
+    var inputHeader: Metadata,
+    var outputHeader: Metadata? = null,
+    val inputMessage: MutableList<Message<*, *>> = mutableListOf(),
+    val outputMessage: MutableList<Message<*, *>> = mutableListOf(),
+    var outputTrailers: Metadata? = null
+)
+
+@Component
+@Order(Ordered.LOWEST_PRECEDENCE)
+class DefaultRequestLogger : RequestLogger {
+    override val id: String = RequestLogger::class.java.typeName
+
+    override fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long) {
+        if (status.isOk) {
+            logger.info("[${status.code}] ${call.methodDescriptor.fullMethodName} +${getCostString(cost)}")
+        } else {
+            logger.error(
+                "[${status.code}] ${call.methodDescriptor.fullMethodName} +${getCostString(cost)}",
+                status.cause
+            )
+        }
+    }
+
+    protected fun getCostString(cost: Long): String {
+        return when {
             cost < TimeUnit.MICROSECONDS.toNanos(1) -> {
                 "${cost}ns"
             }
@@ -43,13 +60,9 @@ class RequestLoggerCall<ReqT : Any, RespT : Any>(call: ServerCall<ReqT, RespT>) 
                 String.format("%.3fs", cost / 1000000000.0)
             }
         }
+    }
 
-        if (status.isOk) {
-            logger.info("[${status.code}] ${delegate().methodDescriptor.fullMethodName} +$costString")
-        } else {
-            logger.error("[${status.code}] ${delegate().methodDescriptor.fullMethodName} +$costString", status.cause)
-        }
-
-        super.close(status, trailers)
+    companion object {
+        val logger = LoggerFactory.getLogger("RPC Request")
     }
 }

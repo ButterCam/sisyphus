@@ -27,8 +27,8 @@ class HTableTemplateRegistrar : BeanDefinitionRegistryPostProcessor, Environment
 
         val properties = beanFactory.getBeansOfType<HBaseTableProperty>().toMutableMap()
         val hbaseProperties = Binder.get(environment)
-                .bind("sisyphus", HBaseTableProperties::class.java)
-                .orElse(null)?.hbase ?: mapOf()
+            .bind("sisyphus", HBaseTableProperties::class.java)
+            .orElse(null)?.hbase ?: mapOf()
 
         properties += hbaseProperties
 

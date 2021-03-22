@@ -42,6 +42,7 @@ class DtoTest {
 
     interface NormalDtoWithNullableProperty : DtoModel {
         var stringValue: String
+
         @get:NullableProperty
         var numberValue: Float
     }

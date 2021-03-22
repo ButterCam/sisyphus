@@ -2,7 +2,8 @@ name: Publish
 
 on:
   push:
-    branches: [ '**' ]
+    branches-ignore: [ 'dependabot/**' ]
+    paths-ignore: [ '**.md' ]
   release:
     types: [ prereleased, released ]
 
@@ -12,24 +13,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.7.0
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v2
       - name: Set up JDK 1.11
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v2
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      - uses: ButterCam/prepare-sisyphus-build@v1
+        uses: crazy-max/ghaction-import-gpg@v3
         with:
-          dependency-repositories: local,central,jcenter,portal,snapshot
-          snapshot-url: https://oss.sonatype.org/content/repositories/snapshots
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+      - uses: ButterCam/setup-sisyphus-build@v1
+        with:
+          dependency-repositories: local,central,jcenter,portal,google,snapshot
+          snapshot-url: https://s01.oss.sonatype.org/content/repositories/snapshots
           snapshot-username: ${{ secrets.OSSRH_USERNAME }}
           snapshot-password: ${{ secrets.OSSRH_PASSWORD }}
-          release-url: https://oss.sonatype.org/service/local/staging/deploy/maven2
+          release-url: https://s01.oss.sonatype.org/service/local/staging/deploy/maven2
           release-username: ${{ secrets.OSSRH_USERNAME }}
           release-password: ${{ secrets.OSSRH_PASSWORD }}
           gradle-portal-key: ${{ secrets.GRADLE_PUBLISH_KEY }}

@@ -5,6 +5,7 @@ import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 
 open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
@@ -12,23 +13,37 @@ open class DefaultAmqpTemplateFactory : AmqpTemplateFactory {
 
     override fun createTemplate(property: MessageQueueProperty): AmqpTemplate {
         return RabbitTemplate(
-                createConnectionFactory(property)
+            createConnectionFactory(property.host, property.port, property)
         ).apply {
             property.queue?.let {
                 this.setDefaultReceiveQueue(it)
             }
-
-            this.setExchange(property.exchange ?: "")
+            this.exchange = property.exchange ?: ""
             this.messageConverter = Jackson2JsonMessageConverter(Json.mapper)
         }
     }
 
-    override fun createConnectionFactory(property: MessageQueueProperty): ConnectionFactory {
-        return connectionFactories.getOrPut("${property.host}:${property.port}/${property.vhost}") {
-            CachingConnectionFactory(property.host, property.port).apply {
+    override fun createListenerContainer(property: MessageQueueProperty): SimpleMessageListenerContainer {
+        return SimpleMessageListenerContainer(createConnectionFactory(property.host, property.port, property)).apply {
+            property.queue?.let {
+                this.addQueueNames(it)
+            }
+        }
+    }
+
+    protected open fun createConnectionFactory(
+        host: String,
+        port: Int,
+        property: MessageQueueProperty
+    ): ConnectionFactory {
+        return connectionFactories.getOrPut("$host:$port/${property.vhost}") {
+            CachingConnectionFactory(host, port).apply {
                 this.virtualHost = property.vhost
                 this.username = property.userName
                 this.setPassword(property.password)
+                property.confirmType?.let {
+                    this.setPublisherConfirmType(it)
+                }
             }
         }
     }

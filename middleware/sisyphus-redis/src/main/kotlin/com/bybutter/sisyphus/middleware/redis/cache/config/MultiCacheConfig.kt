@@ -20,7 +20,10 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 class MultiCacheConfig {
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    fun multiCacheableAdvisor(redisCacheManager: MultiRedisCacheManager, evaluationContextInterceptorList: List<EvaluationContextInterceptor>): MultiCacheableBeanFactorySourceAdvisor {
+    fun multiCacheableAdvisor(
+        redisCacheManager: MultiRedisCacheManager,
+        evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+    ): MultiCacheableBeanFactorySourceAdvisor {
         val advisor = MultiCacheableBeanFactorySourceAdvisor()
         advisor.advice = MultiCacheableInterceptor(redisCacheManager, evaluationContextInterceptorList)
         return advisor
@@ -28,7 +31,10 @@ class MultiCacheConfig {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    fun multiCachePutAdvisor(redisCacheManager: MultiRedisCacheManager, evaluationContextInterceptorList: List<EvaluationContextInterceptor>): MultiCachePutBeanFactorySourceAdvisor {
+    fun multiCachePutAdvisor(
+        redisCacheManager: MultiRedisCacheManager,
+        evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+    ): MultiCachePutBeanFactorySourceAdvisor {
         val advisor = MultiCachePutBeanFactorySourceAdvisor()
         advisor.advice = MultiCachePutInterceptor(redisCacheManager, evaluationContextInterceptorList)
         return advisor
@@ -36,7 +42,10 @@ class MultiCacheConfig {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    fun multiCacheEvictAdvisor(redisCacheManager: MultiRedisCacheManager, evaluationContextInterceptorList: List<EvaluationContextInterceptor>): MultiCacheEvictBeanFactorySourceAdvisor {
+    fun multiCacheEvictAdvisor(
+        redisCacheManager: MultiRedisCacheManager,
+        evaluationContextInterceptorList: List<EvaluationContextInterceptor>
+    ): MultiCacheEvictBeanFactorySourceAdvisor {
         val advisor = MultiCacheEvictBeanFactorySourceAdvisor()
         advisor.advice = MultiCacheEvictInterceptor(redisCacheManager, evaluationContextInterceptorList)
         return advisor
@@ -61,7 +70,8 @@ class MultiCacheConfig {
         defaultRedisCacheConfiguration: RedisCacheConfiguration
     ): MultiRedisCacheManager {
         return MultiRedisCacheManager(
-                redisCacheWriter,
-                defaultRedisCacheConfiguration)
+            redisCacheWriter,
+            defaultRedisCacheConfiguration
+        )
     }
 }

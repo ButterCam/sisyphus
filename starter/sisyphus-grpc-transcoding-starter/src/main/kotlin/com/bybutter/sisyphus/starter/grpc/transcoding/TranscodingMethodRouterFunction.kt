@@ -5,20 +5,19 @@ import com.bybutter.sisyphus.api.http
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessagePatcher
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.MutableMessage
-import com.bybutter.sisyphus.protobuf.ProtoSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
 import com.bybutter.sisyphus.reflect.uncheckedCast
-import com.bybutter.sisyphus.starter.grpc.support.REQUEST_ID_META_KEY
-import com.bybutter.sisyphus.string.randomString
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientCall
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.ServerMethodDefinition
+import org.springframework.http.HttpHeaders
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -31,15 +30,16 @@ class TranscodingMethodRouterFunction private constructor(
     private val rule: HttpRule
 ) : RouterFunction<ServerResponse>, HandlerFunction<ServerResponse> {
     private val requestPredicate = HttpRulePredicate(rule)
-    private val inputSupport: ProtoSupport<*, *> = ProtoTypes.ensureSupportByProtoName(proto.inputType)
+    private val inputSupport: MessageSupport<*, *> = ProtoTypes.findMessageSupport(proto.inputType)
     private val bodyClass: Class<*>?
 
     init {
         bodyClass = when (rule.body) {
             "" -> null
-            "*" -> ProtoTypes.ensureClassByProtoName(proto.inputType)
+            "*" -> ProtoTypes.findMessageSupport(proto.inputType).messageClass.java
             else -> {
-                val field = inputSupport.fieldDescriptors.first { it.name == rule.body }
+                val field = inputSupport.fieldDescriptors.firstOrNull { it.name == rule.body }
+                    ?: throw IllegalStateException("Wrong http rule options, input message not contains body field '${rule.body}'.")
                 when (field.type) {
                     FieldDescriptorProto.Type.DOUBLE -> Double::class.java
                     FieldDescriptorProto.Type.FLOAT -> Float::class.java
@@ -56,8 +56,8 @@ class TranscodingMethodRouterFunction private constructor(
                     FieldDescriptorProto.Type.BOOL -> Boolean::class.java
                     FieldDescriptorProto.Type.STRING -> String::class.java
                     FieldDescriptorProto.Type.BYTES -> ByteArray::class.java
-                    FieldDescriptorProto.Type.ENUM,
-                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.ensureClassByProtoName(field.typeName)
+                    FieldDescriptorProto.Type.ENUM -> ProtoTypes.findEnumSupport(field.typeName).enumClass.java
+                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.findMessageSupport(field.typeName).messageClass.java
                     else -> TODO()
                 }
             }
@@ -79,21 +79,15 @@ class TranscodingMethodRouterFunction private constructor(
 
     @OptIn(InternalProtoApi::class)
     override fun handle(request: ServerRequest): Mono<ServerResponse> {
-        // We create request id in HTTP server but not gRPC server, it due to error maybe caused before gRPC calling
-        // or gRPC request id wrote, so we generate it here and set it to request attribute.
-        val requestId = request.headers().header(REQUEST_ID_META_KEY.name()).firstOrNull()
-                ?: randomString(12)
-
-        request.attributes()[TranscodingFunctions.REQUEST_ID_ATTRIBUTE] = requestId
-
         val channel = request.attributes()[TranscodingFunctions.GRPC_PROXY_CHANNEL_ATTRIBUTE] as Channel
-        val call = channel.newCall(method.methodDescriptor, CallOptions.DEFAULT).uncheckedCast<ClientCall<Message<*, *>, Message<*, *>>>()
+        val call = channel.newCall(method.methodDescriptor, CallOptions.DEFAULT)
+            .uncheckedCast<ClientCall<Message<*, *>, Message<*, *>>>()
         val header = prepareHeader(request)
         val listener = TranscodingCallListener(rule.responseBody)
 
         call.start(listener, header)
         // gRPC transcoding only support the unary calls, so we request 2 message for response.
-        // Server will try return 2 messages, but just 1 message returned, so server will return
+        // Server will try to return 2 messages, but just 1 message returned, so server will return
         // once and told client there is no more messages, call will be closed.
         call.request(2)
 
@@ -129,6 +123,13 @@ class TranscodingMethodRouterFunction private constructor(
     private fun prepareHeader(request: ServerRequest): Metadata {
         val header = Metadata()
         for ((key, values) in request.headers().asHttpHeaders()) {
+            if (key.equals(HttpHeaders.USER_AGENT, ignoreCase = true)) {
+                header.put(
+                    Metadata.Key.of("X-${HttpHeaders.USER_AGENT}", Metadata.ASCII_STRING_MARSHALLER),
+                    values.joinToString(",")
+                )
+                continue
+            }
             header.put(Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER), values.joinToString(","))
         }
         return header
@@ -136,15 +137,16 @@ class TranscodingMethodRouterFunction private constructor(
 
     companion object {
         operator fun invoke(method: ServerMethodDefinition<*, *>): RouterFunction<ServerResponse>? {
-            // Just support transcoding for unary gRpc calls.
+            // Just support transcoding for unary gRPC calls.
             if (method.methodDescriptor.type != MethodDescriptor.MethodType.UNARY)
                 return null
             // Ensure method proto registered.
-            val proto = ProtoTypes.getDescriptorBySymbol(method.methodDescriptor.fullMethodName) as? MethodDescriptorProto
-                    ?: return null
+            val service = ProtoTypes.findServiceSupport(".${method.methodDescriptor.serviceName}")
+            val proto = service.descriptor.method.firstOrNull {
+                it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
+            } ?: return null
             // Ensure http rule existed.
-            val httpRule = proto.options?.http
-                    ?: return null
+            val httpRule = proto.options?.http ?: return null
 
             return TranscodingMethodRouterFunction(method, proto, httpRule)
         }

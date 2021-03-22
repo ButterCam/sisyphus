@@ -11,7 +11,6 @@ import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
@@ -19,9 +18,6 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 open class ExtractProtoTask : DefaultTask() {
-    @get:InputFiles
-    lateinit var input: FileCollection
-
     @get:OutputDirectory
     lateinit var resourceOutput: File
 
@@ -29,10 +25,10 @@ open class ExtractProtoTask : DefaultTask() {
     lateinit var protoPath: File
 
     @get:InputFiles
-    lateinit var protoConfig: Configuration
+    lateinit var protoCompileFiles: FileCollection
 
     @get:InputFiles
-    lateinit var protoApiConfig: Configuration
+    lateinit var protoApiFiles: FileCollection
 
     @get:Internal
     lateinit var protobuf: ProtobufExtension
@@ -42,19 +38,22 @@ open class ExtractProtoTask : DefaultTask() {
     private val sourceFileMapping = mutableMapOf<String, String>()
 
     private fun addProto(file: File) {
-        addProto(file.toPath())
+        addProto(file, false)
     }
 
-    private fun addProto(path: Path) {
-        val file = path.toFile()
+    private fun addSource(file: File) {
+        addProto(file, true)
+    }
+
+    private fun addProto(file: File, source: Boolean) {
         if (file.isFile) {
-            FileSystems.newFileSystem(path, javaClass.classLoader).use {
+            FileSystems.newFileSystem(file.toPath(), javaClass.classLoader).use {
                 for (rootDirectory in it.rootDirectories) {
-                    addProtoInternal(rootDirectory, false)
+                    addProtoInternal(rootDirectory, source)
                 }
             }
         } else {
-            addProtoInternal(path, false)
+            addProtoInternal(file.toPath(), source)
         }
     }
 
@@ -86,7 +85,7 @@ open class ExtractProtoTask : DefaultTask() {
     private fun addProtoInternal(name: String, value: ByteArray, file: Path, source: Boolean) {
         if (source) {
             val protoName = name.toUnixPath()
-            sourceProtos.add(protoName)
+            sourceProtos += protoName
             sourceFileMapping[protoName] = file.toString()
         }
         val targetFile = protoPath.toPath().resolve(name)
@@ -95,61 +94,32 @@ open class ExtractProtoTask : DefaultTask() {
         Files.write(targetFile, value)
     }
 
-    private fun addSource(file: File) {
-        addSource(file.toPath())
-    }
-
-    private fun addSource(path: Path) {
-        val file = path.toFile()
-        if (file.isFile) {
-            FileSystems.newFileSystem(path, javaClass.classLoader).use {
-                for (rootDirectory in it.rootDirectories) {
-                    addProtoInternal(rootDirectory, true)
-                }
-            }
-        } else {
-            addProtoInternal(path, true)
-        }
-    }
-
     @TaskAction
     fun extractProto() {
         scannedMapping += protobuf.mapping
 
-        for (file in protoApiConfig.files) {
+        for (file in protoApiFiles) {
             addProto(file)
         }
 
-        for (file in protoConfig.files) {
-            addSource(file)
-        }
-
-        for (file in input) {
+        for (file in protoCompileFiles) {
             addSource(file)
         }
 
         if (protobuf.mapping.isNotEmpty()) {
-            Files.write(Paths.get(resourceOutput.toPath().toString(), "protomap"), protobuf.mapping.map { "${it.key}=${it.value}" })
+            Files.write(
+                Paths.get(resourceOutput.toPath().toString(), "protomap"),
+                protobuf.mapping.map { "${it.key}=${it.value}" })
         }
 
         val desc = ProtocRunner.generate(protoPath, sourceProtos)
         Files.write(Paths.get(protoPath.toPath().toString(), "protodesc.pb"), desc.toByteArray())
-        Files.write(Paths.get(protoPath.toPath().toString(), "protomap"), scannedMapping.map { "${it.key}=${it.value}" })
+        Files.write(
+            Paths.get(protoPath.toPath().toString(), "protomap"),
+            scannedMapping.map { "${it.key}=${it.value}" })
         Files.write(Paths.get(protoPath.toPath().toString(), "protosrc"), sourceProtos)
-        Files.write(Paths.get(protoPath.toPath().toString(), "protofile"), sourceFileMapping.map { "${it.key}=${it.value}" })
-
-        val enableServices = protobuf.service?.apis?.map { it.name }?.toSet()
-        val releaseProtos = mutableSetOf<String>()
-        for (file in desc.fileList) {
-            for (service in file.serviceList) {
-                val serviceName = file.`package` + service.name
-
-                if (enableServices == null || enableServices.contains(serviceName)) {
-                    releaseProtos += file.name
-                }
-            }
-        }
-        val releaseProtoFiles = ProtocRunner.generate(protoPath, releaseProtos)
-        Files.write(Paths.get(protoPath.toPath().toString(), "protorelease"), releaseProtoFiles.fileList.map { it.name })
+        Files.write(
+            Paths.get(protoPath.toPath().toString(), "protofile"),
+            sourceFileMapping.map { "${it.key}=${it.value}" })
     }
 }

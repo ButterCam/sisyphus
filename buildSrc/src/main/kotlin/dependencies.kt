@@ -12,17 +12,14 @@ object Dependencies {
         object Coroutines {
             private const val group = "org.jetbrains.kotlinx"
             const val core = "$group:kotlinx-coroutines-core"
-            const val reactor = "$group:kotlinx-coroutines-reactor"
-            const val guava = "$group:kotlinx-coroutines-guava"
             const val jdk = "$group:kotlinx-coroutines-jdk8"
+            const val reactive = "$group:kotlinx-coroutines-reactive"
         }
     }
 
     object Jackson {
         private const val group = "com.fasterxml.jackson.core"
-        const val databind = "$group:jackson-databind"
         const val core = "$group:jackson-core"
-        const val annotations = "$group:jackson-annotations"
 
         object Module {
             private const val group = "com.fasterxml.jackson.module"
@@ -31,17 +28,10 @@ object Dependencies {
 
         object Dataformat {
             private const val group = "com.fasterxml.jackson.dataformat"
-            const val xml = "$group:jackson-dataformat-xml"
             const val yaml = "$group:jackson-dataformat-yaml"
             const val properties = "$group:jackson-dataformat-properties"
             const val cbor = "$group:jackson-dataformat-cbor"
             const val smile = "$group:jackson-dataformat-smile"
-        }
-    }
-    object Aliyun {
-        object RocketMQ {
-            private const val group = "com.aliyun.openservices"
-            const val RocketMQ = "$group:ons-client"
         }
     }
 
@@ -50,8 +40,6 @@ object Dependencies {
             private const val group = "org.springframework"
 
             const val webflux = "$group:spring-webflux"
-
-            const val tx = "$group:spring-tx"
 
             const val amqp = "$group.amqp:spring-rabbit"
 
@@ -73,8 +61,6 @@ object Dependencies {
             const val redis = "$group:spring-boot-starter-data-redis"
 
             const val amqp = "$group:spring-boot-starter-amqp"
-
-            const val cp = "$group:spring-boot-configuration-processor"
 
             const val jackson = "$group:spring-boot-starter-json"
 
@@ -101,8 +87,6 @@ object Dependencies {
 
         const val netty = "$group:grpc-netty"
 
-        const val proto = "$group:grpc-protobuf"
-
         const val kotlin = "$group:grpc-kotlin-stub"
     }
 
@@ -120,7 +104,7 @@ object Dependencies {
         const val wagonHttp = "$group.wagon:wagon-http"
     }
 
-    const val elastic5 = "org.elasticsearch.client:transport"
+    const val elastic = "org.elasticsearch.client:elasticsearch-rest-client"
 
     const val mysql = "mysql:mysql-connector-java"
 
@@ -150,11 +134,15 @@ object Dependencies {
 
     const val resilience4j = "io.github.resilience4j:resilience4j-retrofit"
 
-    const val lettuce = "io.lettuce:lettuce-core"
-
     const val antlr4 = "org.antlr:antlr4"
 
     const val swagger = "io.swagger.core.v3:swagger-core"
+
+    const val rocketMq = "org.apache.rocketmq:rocketmq-client"
+
+    const val rocketMqAcl = "org.apache.rocketmq:rocketmq-acl"
+
+    const val mongo = "org.mongodb:mongodb-driver-reactivestreams"
 }
 
 val Project.managedDependencies: Project

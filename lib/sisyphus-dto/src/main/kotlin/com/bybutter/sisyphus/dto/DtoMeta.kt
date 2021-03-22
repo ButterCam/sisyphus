@@ -42,5 +42,7 @@ fun DtoModel.hasProperty(name: String): Boolean {
 }
 
 fun DtoMeta.hasProperty(name: String): Boolean {
-    return this.`$modelMap`.containsKey(name) && (Proxy.getInvocationHandler(this) as ModelProxy).properties.containsKey(name)
+    return this.`$modelMap`.containsKey(name) && (Proxy.getInvocationHandler(this) as ModelProxy).properties.containsKey(
+        name
+    )
 }

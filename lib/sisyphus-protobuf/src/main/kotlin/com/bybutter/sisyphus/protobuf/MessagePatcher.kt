@@ -1,6 +1,14 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.protobuf.primitives.Duration
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
+import com.bybutter.sisyphus.protobuf.primitives.FieldMask
+import com.bybutter.sisyphus.protobuf.primitives.ListValue
+import com.bybutter.sisyphus.protobuf.primitives.Struct
+import com.bybutter.sisyphus.protobuf.primitives.Timestamp
+import com.bybutter.sisyphus.protobuf.primitives.Value
+import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStruct
+import com.bybutter.sisyphus.protobuf.primitives.invoke
 import com.bybutter.sisyphus.security.base64Decode
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -9,6 +17,8 @@ import kotlin.reflect.full.isSubclassOf
 
 interface PatcherNode {
     fun asField(field: FieldDescriptorProto, property: KProperty<*>): Any?
+
+    fun asVaule(): Value
 }
 
 class ValueNode : PatcherNode {
@@ -39,7 +49,21 @@ class ValueNode : PatcherNode {
             FieldDescriptorProto.Type.BOOL -> values.map { it.toBoolean() }
             FieldDescriptorProto.Type.STRING -> values
             FieldDescriptorProto.Type.BYTES -> values.map { it.base64Decode() }
-            FieldDescriptorProto.Type.ENUM -> values.map { ProtoEnum(it, ProtoTypes.getClassByProtoName(field.typeName) as Class<ProtoEnum>) }
+            FieldDescriptorProto.Type.ENUM -> values.map {
+                (ProtoTypes.findSupport(field.typeName) as EnumSupport<*>).invoke(it)
+            }
+            FieldDescriptorProto.Type.MESSAGE -> {
+                when (field.typeName.substring(1)) {
+                    FieldMask.name -> values.map {
+                        FieldMask {
+                            this.paths += it.split(",").map { it.trim() }
+                        }
+                    }
+                    Timestamp.name -> values.map { Timestamp(it) }
+                    Duration.name -> values.map { Duration(it) }
+                    else -> throw IllegalStateException()
+                }
+            }
             else -> throw IllegalStateException()
         }
 
@@ -51,7 +75,7 @@ class ValueNode : PatcherNode {
         if (propertyType != null && propertyType.isSubclassOf(CustomProtoType::class)) {
             result = result.map {
                 val support = (propertyType.companionObjectInstance as CustomProtoTypeSupport<*, Any>)
-                support.wrapRaw(it)
+                support(it)
             }
         }
 
@@ -60,6 +84,22 @@ class ValueNode : PatcherNode {
             FieldDescriptorProto.Label.REQUIRED -> result.last()
             FieldDescriptorProto.Label.REPEATED -> result
             else -> throw IllegalStateException()
+        }
+    }
+
+    override fun asVaule(): Value {
+        return when (values.size) {
+            0 -> Value {
+                listValue = ListValue()
+            }
+            1 -> Value {
+                stringValue = values[0]
+            }
+            else -> Value {
+                listValue = ListValue {
+                    values += this@ValueNode.values.map { Value { stringValue = it } }
+                }
+            }
         }
     }
 }
@@ -120,6 +160,13 @@ class MessagePatcher : PatcherNode {
     }
 
     fun applyTo(message: MutableMessage<*, *>) {
+        if (message is MutableStruct) {
+            for ((field, value) in nodes) {
+                message.fields[field] = value.asVaule()
+            }
+            return
+        }
+
         for ((field, value) in nodes) {
             if (message.getProperty(field) == null) {
                 continue
@@ -145,8 +192,22 @@ class MessagePatcher : PatcherNode {
 
     @OptIn(InternalProtoApi::class)
     fun asMessage(type: String): Message<*, *> {
-        return ProtoTypes.ensureSupportByProtoName(type).newMutable().apply {
+        return ProtoTypes.findMessageSupport(type).newMutable().apply {
             applyTo(this)
+        }
+    }
+
+    override fun asVaule(): Value {
+        return Value {
+            structValue = asStruct()
+        }
+    }
+
+    fun asStruct(): Struct {
+        return Struct {
+            for ((field, value) in nodes) {
+                fields[field] = value.asVaule()
+            }
         }
     }
 }

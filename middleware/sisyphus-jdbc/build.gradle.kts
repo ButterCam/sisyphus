@@ -13,7 +13,8 @@ dependencies {
     runtimeOnly(Dependencies.mysql)
     runtimeOnly(Dependencies.postgresql)
 
-    compileOnly(project(":lib:sisyphus-grpc"))
+    compileOnly(project(":lib:sisyphus-dsl"))
 
     testImplementation(Dependencies.h2)
+    testImplementation(project(":lib:sisyphus-dsl"))
 }

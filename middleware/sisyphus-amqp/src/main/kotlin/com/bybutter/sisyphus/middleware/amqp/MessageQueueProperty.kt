@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.middleware.amqp
 
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class MessageQueueProperty(
@@ -11,7 +12,7 @@ data class MessageQueueProperty(
     val vhost: String,
     val exchange: String?,
     val queue: String?,
-    val errorQueue: String?
+    val confirmType: CachingConnectionFactory.ConfirmType?
 )
 
 data class MessageQueueProperties(

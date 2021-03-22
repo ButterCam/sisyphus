@@ -34,7 +34,8 @@ class Aether {
         val userHome = System.getProperty("user.home")
         val localRepositoryDir = File("$userHome/.m2/repository")
 
-        localRepository = RemoteRepository.Builder("local", "dafult", localRepositoryDir.toURI().toURL().toExternalForm()).build()
+        localRepository =
+            RemoteRepository.Builder("local", "dafult", localRepositoryDir.toURI().toURL().toExternalForm()).build()
 
         val locator = MavenRepositorySystemUtils.newServiceLocator()
         locator.addService(RepositoryConnectorFactory::class.java, BasicRepositoryConnectorFactory::class.java)
@@ -63,6 +64,10 @@ class Aether {
 
     fun registerGradlePortal(): RemoteRepository {
         return registerRepository("https://plugins.gradle.org/m2/")
+    }
+
+    fun registerGoogle(): RemoteRepository {
+        return registerRepository("https://maven.google.com/")
     }
 
     fun registerRepository(url: String, user: String? = null, password: String? = null): RemoteRepository {

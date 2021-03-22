@@ -19,15 +19,19 @@ class GradlePropertiesProvider : EnvironmentPostProcessor {
     }
 
     private fun registerRootGradleProperties(environment: ConfigurableEnvironment) {
-        registerProperties("rootGradleProperties",
+        registerProperties(
+            "rootGradleProperties",
             Path.of(System.getProperty("user.home"), ".gradle", GRADLE_PROPERTIES),
-            environment)
+            environment
+        )
     }
 
     private fun registerWorkspaceGradleProperties(environment: ConfigurableEnvironment) {
-        registerProperties("rootGradleProperties",
+        registerProperties(
+            "rootGradleProperties",
             Path.of(System.getProperty("user.dir"), GRADLE_PROPERTIES),
-            environment)
+            environment
+        )
     }
 
     private fun registerProperties(name: String, path: Path, environment: ConfigurableEnvironment) {

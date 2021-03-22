@@ -37,7 +37,10 @@ internal fun Project.tryApplyPluginClass(className: String, action: () -> Unit =
     }
 }
 
-internal fun RepositoryHandler.applyFromRepositoryKeys(repositories: Map<String, Repository>, repositoryKeys: Collection<String>) {
+internal fun RepositoryHandler.applyFromRepositoryKeys(
+    repositories: Map<String, Repository>,
+    repositoryKeys: Collection<String>
+) {
     for (repositoryKey in repositoryKeys) {
         val repository = when (repositoryKey) {
             "local" -> repositories[repositoryKey] ?: run {
@@ -54,6 +57,10 @@ internal fun RepositoryHandler.applyFromRepositoryKeys(repositories: Map<String,
             }
             "portal" -> repositories[repositoryKey] ?: run {
                 this.gradlePluginPortal()
+                null
+            }
+            "google" -> repositories[repositoryKey] ?: run {
+                this.google()
                 null
             }
             else -> repositories[repositoryKey]

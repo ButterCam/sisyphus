@@ -40,8 +40,10 @@ open class BaseEncoding(val table: CharArray) {
         val stream = BitOutputStream(output)
 
         for (char in input) {
-            stream.writeInt(reverseMap[char]
-                ?: throw IllegalArgumentException("Wrong base$bits input '$char'."), bits)
+            stream.writeInt(
+                reverseMap[char]
+                    ?: throw IllegalArgumentException("Wrong base$bits input '$char'."), bits
+            )
         }
         return output.toByteArray()
     }

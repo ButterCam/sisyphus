@@ -2,7 +2,7 @@ package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.rpc.Code
 import com.bybutter.sisyphus.rpc.Status
-import com.bybutter.sisyphus.rpc.fromThrowable
+import com.bybutter.sisyphus.rpc.invoke
 import org.springframework.boot.web.reactive.error.ErrorAttributes
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -17,7 +17,6 @@ class TranscodingErrorAttributes : ErrorAttributes {
     companion object {
         val ERROR_ATTRIBUTE = "${TranscodingErrorAttributes::class.java.name}.ERROR"
         val GRPC_STATUS_ATTRIBUTE = "grpcStatus"
-        val REQUEST_ID_ATTRIBUTE = "requestId"
     }
 
     override fun storeErrorInformation(error: Throwable, exchange: ServerWebExchange) {
@@ -37,14 +36,12 @@ class TranscodingErrorAttributes : ErrorAttributes {
                 message = "No handlers matched for '${request.methodName()} ${request.path()}'"
             }
         } else {
-            Status.fromThrowable(getError(request))
+            Status(error)
         }
 
         return mutableMapOf(
             // Store gRPC status
-            GRPC_STATUS_ATTRIBUTE to status,
-            // Store request id
-            REQUEST_ID_ATTRIBUTE to (request.attributeOrNull(TranscodingFunctions.REQUEST_ID_ATTRIBUTE) ?: "")
+            GRPC_STATUS_ATTRIBUTE to status
         )
     }
 }

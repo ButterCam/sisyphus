@@ -22,10 +22,12 @@ fun String.toWindowsPath(): String {
 fun String.toPlatformPath(): String {
     return buildString {
         for (ch in this@toPlatformPath) {
-            append(when (ch) {
-                '\\', '/' -> File.separatorChar
-                else -> ch
-            })
+            append(
+                when (ch) {
+                    '\\', '/' -> File.separatorChar
+                    else -> ch
+                }
+            )
         }
     }
 }
