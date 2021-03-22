@@ -20,6 +20,7 @@ dependencies {
     api(platform("org.apache.rocketmq:rocketmq-all:4.8.0"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.4.31"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2"))
+    api(platform("org.junit:junit-bom:5.7.1"))
     api(platform("org.springframework.boot:spring-boot-dependencies:2.4.4"))
 
     constraints {
@@ -55,7 +56,6 @@ dependencies {
         api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.31")
         api("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
         api("org.jooq:jooq:3.14.8")
-        api("org.junit.jupiter:junit-jupiter:5.7.1")
         api("org.mongodb:mongodb-driver-reactivestreams:4.2.2")
         api("org.reflections:reflections:0.9.12")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.4.4")

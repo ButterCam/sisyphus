@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "name": "test",
+      "method": "sisyphus.test.test.TestApi/Echo",
+      "input": {
+        "@type": "types.butterapis.com/sisyphus.test.test.EchoRequest",
+        "message": "Hello"
+      },
+      "asserts":[
+        "output.message == 'echo: Hello'"
+      ]
+    }
+  ]
+}
