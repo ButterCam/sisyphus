@@ -58,7 +58,6 @@ dependencies {
         api("org.junit.jupiter:junit-jupiter:5.7.1")
         api("org.mongodb:mongodb-driver-reactivestreams:4.2.2")
         api("org.reflections:reflections:0.9.12")
-        api("org.reflections:reflections:0.9.12")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.4.4")
     }
 }
