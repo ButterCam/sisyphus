@@ -63,4 +63,6 @@ object TranscodingFunctions {
      * contains the current request id, as a [String].
      */
     val REQUEST_ID_ATTRIBUTE = TranscodingFunctions::class.java.name + ".requestId"
+
+    val HEADER_EXPORTER_ATTRIBUTE = TranscodingHeaderExporter::class.java.name + ".exporters"
 }

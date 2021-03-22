@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.rpc
 import com.salesforce.rxgrpc.stub.ClientCalls
 import io.grpc.CallOptions
 import io.grpc.Channel
-import io.grpc.ClientInterceptors
 import io.grpc.MethodDescriptor
 import io.grpc.stub.AbstractStub
 import io.reactivex.Flowable
@@ -13,7 +12,7 @@ abstract class AbstractReactiveStub<T : AbstractReactiveStub<T>>(
     channel: Channel,
     optionsInterceptors: Iterable<CallOptionsInterceptor>,
     options: CallOptions
-) : AbstractStub<T>(ClientInterceptors.intercept(channel, ClientExceptionResolver), options) {
+) : AbstractStub<T>(channel, options) {
 
     private val _optionsInterceptors: MutableList<CallOptionsInterceptor> = optionsInterceptors.toMutableList()
 
