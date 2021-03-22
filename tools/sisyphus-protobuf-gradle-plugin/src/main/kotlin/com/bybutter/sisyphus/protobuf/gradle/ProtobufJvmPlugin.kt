@@ -30,7 +30,12 @@ class ProtobufJvmPlugin : BaseProtobufPlugin() {
     }
 
     override fun protoApiFiles(sourceSetName: String): FileCollection {
-        return protoApiConfiguration(sourceSetName)
+        return if (sourceSetName == SourceSet.TEST_SOURCE_SET_NAME) {
+            val sourceSet = project.sourceSets.getByName(sourceSetName)
+            protoApiConfiguration(sourceSetName) + sourceSet.compileClasspath
+        } else {
+            protoApiConfiguration(sourceSetName)
+        }
     }
 
     override fun protoCompileFiles(sourceSetName: String): FileCollection {
