@@ -33,6 +33,7 @@ include("starter:sisyphus-webflux-starter")
 include("starter:sisyphus-grpc-server-starter")
 include("starter:sisyphus-grpc-transcoding-starter")
 include("starter:sisyphus-protobuf-type-server-starter")
+include("starter:sisyphus-spring-boot-test-starter")
 
 include("dependencies")
 project(":dependencies").name = "sisyphus-dependencies"

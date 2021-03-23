@@ -17,6 +17,7 @@ dependencies {
 
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
 
+    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(project(":lib:sisyphus-grpc-coroutine"))
     testImplementation(project(":lib:sisyphus-grpc-rxjava"))
 }

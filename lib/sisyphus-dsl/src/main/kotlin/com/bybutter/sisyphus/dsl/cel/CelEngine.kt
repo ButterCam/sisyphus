@@ -18,6 +18,10 @@ class CelEngine(global: Map<String, Any?> = mapOf(), val runtime: CelRuntime = C
         return context.visit(parse(cel))
     }
 
+    fun fork(global: Map<String, Any?>): CelEngine {
+        return CelEngine(context.global + global, runtime)
+    }
+
     companion object {
         fun parse(cel: String): CelParser.StartContext {
             val lexer = CelLexer(CharStreams.fromString(cel))

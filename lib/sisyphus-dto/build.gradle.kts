@@ -11,4 +11,6 @@ dependencies {
     implementation(project(":lib:sisyphus-common"))
 
     implementation(Dependencies.Kotlin.reflect)
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }

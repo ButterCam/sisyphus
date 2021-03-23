@@ -3,48 +3,124 @@ syntax = "proto3";
 package sisyphus.test;
 
 import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
 
 option java_package = "com.bybutter.sisyphus.test";
 option objc_class_prefix = "SIS";
 
-// 测试用例的 json 文件或者是 protobuf 的文件
+// Struct for a valid test case file.
 message TestCase {
-  // 通用请求头
-  map<string, string> metadata = 1;
-
-  // 服务测试 case
-  repeated ServiceTestSet serviceTestSet = 2;
-}
-
-message ServiceTestSet {
-  // 服务名字
-  string service = 1;
-
-  string authority = 2;
-
-  // 在此次测试中覆盖和添加的请求头
-  map<string, string> metadata = 3;
-
-  // 关于服务的方法的测试 case
-  repeated MethodTest methodTests = 4;
-}
-
-message MethodTest {
-  // 给这个测试起名字
+  // Display title of test case, it will be set from file name if not set.
   string name = 1;
 
-  // 打日志或者是显示的名字
-  string title = 2;
+  // The global metadata for running test.
+  map<string, string> metadata = 2;
 
-  // 要测试的方法
+  // Test steps.
+  repeated TestStep steps = 3;
+
+  // CEL script for executing asserts.
+  // Using name of test step to get [TestResult] struct.
+  // Each CEL script must return true or false.
+  repeated string asserts = 4;
+}
+
+// Test step information to execute test.
+message TestStep {
+  // The unique id of test step, you can use
+  // this id to get [TestResult] struct in asserts.
+  // The id must be a valid identifier of CEL.
+  // To avoid name conflicts, any names same as fields
+  // of [TestStep] and [TestResult] will be invalid id.
+  string id = 1;
+
+  // Display title of test step, it will be [name] if not set.
+  string name = 2;
+
+  // CEL script for determining whether to execute the step.
+  // Current step will be executed when all script return true.
+  // In addition, you can use name of test step to get [TestResult] struct
+  // of test steps which have been executed before.
+  repeated string precondition = 3;
+
+  // The server host and port, it will be localhost:9090 if not set.
+  string authority = 4;
+
+  // The full method name to call.
+  string method = 5;
+
+  // The input of method.
+  google.protobuf.Any input = 6;
+
+  // CEL script for preparing metadata.
+  // Using current [TestStep] as context of CEL executing.
+  // In addition, you can use name of test step to get [TestResult] struct
+  // of test steps which have been executed before.
+  repeated string input_script = 7;
+
+  // The metadata of one call.
+  map<string, string> metadata = 8;
+
+  // CEL script for preparing metadata.
+  // Using current [TestStep] as context of CEL executing.
+  // In addition, you can use name of test step to get [TestResult] struct
+  // of test steps which have been executed before.
+  repeated string metadata_script = 9;
+
+  // Mark a test step is not sensitive, it means gRPC call could be failed,
+  // and asserts will be executed without [output] but with [status] amd [message].
+  bool insensitive = 10;
+
+  // CEL script for executing asserts.
+  // The [TestResult] of current [TestCase] will be the global context.
+  // It means you can use [input] directly to get request message,
+  // [output] to get response message.
+  // In addition, you can use name of test step to get [TestResult] struct
+  // of test steps which have been executed before.
+  repeated string asserts = 11;
+
+  // Timeout duration of compute deadline of gRPC calls.
+  // Depending on [not_sensitive] field, there are two different behaviors
+  // in the case of a request timeout.
+  // - [not_sensitive] is false, the step will failed.
+  // - [not_sensitive] is true, the asserts will be executed with [status]
+  //   set by '4'(DEADLINE_EXCEEDED).
+  google.protobuf.Duration timeout = 12;
+
+  // Retry count of current step.
+  int32 retry_count = 13;
+
+  // Retry condition of current step.
+  // The [TestResult] of current [TestCase] will be the global context.
+  // It means you can use [input] directly to get request message,
+  // [output] to get response message.
+  // In addition, you can use name of test step to get [TestResult] struct
+  // of test steps which have been executed before.
+  repeated string retry_condition = 14;
+}
+
+// Result of executing test step.
+message TestResult {
+  TestStep step = 1;
+
+  TestCase case = 2;
+
+  // Full method name of [TestStep].
   string method = 3;
 
-  // 输入的参数
-  google.protobuf.Any input = 4;
+  int32 status = 4;
 
-  // 在此次测试中覆盖的和添加的请求头
-  map<string, string> metadata = 5;
+  string message = 5;
 
-  // 对测试结果的 assert
-  repeated string asserts = 6;
+  // Input message of [TestStep].
+  google.protobuf.Any input = 6;
+
+  // Output message of [TestStep].
+  google.protobuf.Any output = 7;
+
+  // Input metadata of [TestStep].
+  map<string, string> headers = 8;
+
+  // Output metadata of [TestStep].
+  map<string, string> trailers = 9;
 }

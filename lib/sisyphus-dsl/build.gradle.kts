@@ -15,4 +15,6 @@ dependencies {
 
     antlr(platform(project(":sisyphus-dependencies")))
     antlr(Dependencies.antlr4)
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }

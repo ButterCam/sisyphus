@@ -12,6 +12,8 @@ dependencies {
 
     proto(platform(project(":sisyphus-dependencies")))
     proto(Dependencies.Proto.base)
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 protobuf {
