@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package sisyphus.test.test;
+package sisyphus.test.showcase;
 
-option java_package = "com.bybutter.sisyphus.test.test";
+option java_package = "com.bybutter.sisyphus.test.showcase";
 
-service TestApi {
+service ShowcaseApi {
   rpc Echo(EchoRequest) returns (EchoResponse);
 }
 

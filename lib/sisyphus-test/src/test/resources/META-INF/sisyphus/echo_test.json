@@ -1,14 +1,24 @@
 {
   "steps": [
     {
-      "id": "test",
-      "method": "sisyphus.test.test.TestApi/Echo",
+      "id": "step1",
+      "method": "sisyphus.test.showcase.ShowcaseApi/Echo",
       "input": {
-        "@type": "types.butterapis.com/sisyphus.test.test.EchoRequest",
+        "@type": "types.butterapis.com/sisyphus.test.showcase.EchoRequest",
         "message": "Hello"
       },
       "asserts":[
         "output.message == 'echo: Hello'"
+      ]
+    },
+    {
+      "id": "step2",
+      "method": "sisyphus.test.showcase.ShowcaseApi/Echo",
+      "inputScript": [
+        ".sisyphus.test.showcase.EchoRequest{ message: step1.output.message }"
+      ],
+      "asserts":[
+        "output.message == 'echo: echo: Hello'"
       ]
     }
   ]

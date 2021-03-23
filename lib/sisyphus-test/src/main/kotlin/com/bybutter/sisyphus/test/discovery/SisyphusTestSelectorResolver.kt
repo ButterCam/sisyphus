@@ -3,14 +3,15 @@ package com.bybutter.sisyphus.test.discovery
 import com.bybutter.sisyphus.jackson.Json
 import com.bybutter.sisyphus.jackson.Yaml
 import com.bybutter.sisyphus.protobuf.invoke
-import com.bybutter.sisyphus.string.toTitleCase
-import com.bybutter.sisyphus.test.descriptor.SisyphusTestCaseDescriptor
 import com.bybutter.sisyphus.test.SisyphusTestEngine
-import com.bybutter.sisyphus.test.descriptor.SisyphusTestStepDescriptor
 import com.bybutter.sisyphus.test.TestCase
 import com.bybutter.sisyphus.test.TestStep
+import com.bybutter.sisyphus.test.descriptor.SisyphusTestCaseDescriptor
+import com.bybutter.sisyphus.test.descriptor.SisyphusTestStepDescriptor
+import java.io.File
+import java.io.InputStream
+import java.util.Optional
 import org.junit.platform.commons.logging.LoggerFactory
-import org.junit.platform.commons.util.Preconditions
 import org.junit.platform.engine.DiscoverySelector
 import org.junit.platform.engine.TestDescriptor
 import org.junit.platform.engine.discovery.ClasspathResourceSelector
@@ -22,9 +23,6 @@ import org.junit.platform.engine.support.discovery.SelectorResolver
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import org.reflections.util.FilterBuilder
-import java.io.File
-import java.io.InputStream
-import java.util.Optional
 
 class SisyphusTestSelectorResolver : SelectorResolver {
     override fun resolve(
@@ -126,23 +124,25 @@ class SisyphusTestSelectorResolver : SelectorResolver {
 
     private fun createTestCaseDescriptor(parent: TestDescriptor, case: TestCase, name: String): TestDescriptor {
         val case = case {
-            this.name = this.name.takeIf { it.isNotBlank() } ?: File(name).nameWithoutExtension.toTitleCase()
-            val steps = this.steps.map {
-                it {
-                    Preconditions.notBlank(this.id, "Step id of case '${this@case.name}' must not be null")
-                    this.name = this.name.takeIf { it.isNotBlank() } ?: this.id
-                    this.authority = this.authority.takeIf { it.isNotBlank() } ?: "localhost:9090"
-                }
-            }
-            this.steps.clear()
-            this.steps += steps
+            this.name = this.name.takeIf { it.isNotBlank() } ?: File(name).nameWithoutExtension
         }
-        return SisyphusTestCaseDescriptor(parent.uniqueId.append(SisyphusTestCaseDescriptor.SEGMENT_TYPE, name), case)
+        return SisyphusTestCaseDescriptor(
+            parent.uniqueId.append(SisyphusTestCaseDescriptor.SEGMENT_TYPE, case.name),
+            case
+        )
     }
 
     private fun createTestStepDescriptor(parent: TestDescriptor, step: TestStep): TestDescriptor {
+        val parent = parent as SisyphusTestCaseDescriptor
+        val index = parent.case.steps.indexOf(step)
+
+        val step = step {
+            this.name = this.name.takeIf { it.isNotBlank() } ?: this.id.takeIf { it.isNotBlank() }
+                    ?: "${parent.displayName} Step$index"
+            this.authority = this.authority.takeIf { it.isNotBlank() } ?: "localhost:9090"
+        }
         return SisyphusTestStepDescriptor(
-            parent.uniqueId.append(SisyphusTestStepDescriptor.SEGMENT_TYPE, step.id),
+            parent.uniqueId.append(SisyphusTestStepDescriptor.SEGMENT_TYPE, step.name),
             step
         )
     }

@@ -69,7 +69,7 @@ message TestStep {
 
   // Mark a test step is not sensitive, it means gRPC call could be failed,
   // and asserts will be executed without [output] but with [status] amd [message].
-  bool not_sensitive = 10;
+  bool insensitive = 10;
 
   // CEL script for executing asserts.
   // The [TestResult] of current [TestCase] will be the global context.
@@ -101,11 +101,9 @@ message TestStep {
 
 // Result of executing test step.
 message TestResult {
-  // id of [TestStep].
-  string id = 1;
+  TestStep step = 1;
 
-  // name of [TestStep].
-  string name = 2;
+  TestCase case = 2;
 
   // Full method name of [TestStep].
   string method = 3;

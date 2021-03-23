@@ -5,18 +5,18 @@ plugins {
     protobuf
 }
 
-description = "Starter for test application in Sisyphus Framework"
+description = " Test framework for testing gRPC apis in Sisyphus Framework"
 
 dependencies {
     api("org.junit.platform:junit-platform-engine")
 
+    implementation(project(":lib:sisyphus-dsl"))
+    implementation(project(":lib:sisyphus-grpc"))
+    implementation(project(":lib:sisyphus-jackson-protobuf"))
     implementation("org.junit.platform:junit-platform-launcher")
     implementation("org.reflections:reflections")
-    implementation(project(":lib:sisyphus-jackson-protobuf"))
-    implementation(project(":lib:sisyphus-grpc-coroutine"))
-    implementation(project(":lib:sisyphus-dsl"))
-    implementation("ch.qos.logback:logback-classic")
+    implementation("io.grpc:grpc-stub")
 
     testImplementation(project(":starter:sisyphus-grpc-server-starter"))
-    testImplementation(Dependencies.Spring.Boot.test)
+    testImplementation(project(":starter:sisyphus-spring-boot-test-starter"))
 }

@@ -64,19 +64,19 @@ object ProtoTypes {
     }
 
     fun findFileSupport(name: String): FileSupport {
-        return findSupport(name) as FileSupport
+        return findSupport(name) as? FileSupport ?: throw IllegalStateException("Can't find proto file named '$name'")
     }
 
     fun findMessageSupport(name: String): MessageSupport<*, *> {
-        return findSupport(name) as MessageSupport<*, *>
+        return findSupport(name) as? MessageSupport<*, *> ?: throw IllegalStateException("Can't find protobuf message named '$name'")
     }
 
     fun findEnumSupport(name: String): EnumSupport<*> {
-        return findSupport(name) as EnumSupport<*>
+        return findSupport(name) as? EnumSupport<*> ?: throw IllegalStateException("Can't find protobuf enum named '$name'")
     }
 
     fun findServiceSupport(name: String): ServiceSupport {
-        return findSupport(name) as ServiceSupport
+        return findSupport(name) as? ServiceSupport ?: throw IllegalStateException("Can't find gRPC service named '$name'")
     }
 
     fun services(): List<ServiceSupport> {

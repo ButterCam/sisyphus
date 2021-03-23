@@ -124,8 +124,6 @@ object Dependencies {
 
     const val protoc = "com.github.os72:protoc-jar"
 
-    const val nettyTcnative = "io.netty:netty-tcnative-boringssl-static"
-
     const val kubeJavaClient = "io.kubernetes:client-java"
 
     const val retrofit = "com.squareup.retrofit2:retrofit"
@@ -150,6 +148,5 @@ val Project.managedDependencies: Project
         dependencies {
             add("implementation", platform(project(":sisyphus-dependencies")))
         }
-
         return this
     }

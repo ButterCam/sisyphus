@@ -30,10 +30,6 @@ val Project.next: Project
 
         java.kotlin.managedDependencies
 
-        dependencies {
-            add("testImplementation", Dependencies.junit)
-        }
-
         tasks.withType<Test> {
             useJUnitPlatform()
         }
@@ -52,8 +48,7 @@ val Project.middleware: Project
         group = "com.bybutter.sisyphus.middleware"
 
         dependencies {
-            add("api", Dependencies.Spring.Boot.boot)
-            add("testImplementation", Dependencies.Spring.Boot.test)
+            "api"(Dependencies.Spring.Boot.boot)
         }
         return this
     }
@@ -85,8 +80,8 @@ val Project.starter: Project
         group = "com.bybutter.sisyphus.starter"
 
         dependencies {
-            add("api", Dependencies.Spring.Boot.boot)
-            add("testImplementation", Dependencies.Spring.Boot.test)
+            "api"(Dependencies.Spring.Boot.boot)
+            "testImplementation"(Dependencies.Spring.Boot.test)
         }
         return this
     }
