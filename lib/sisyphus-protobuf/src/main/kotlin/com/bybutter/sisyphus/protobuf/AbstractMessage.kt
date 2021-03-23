@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.protobuf
 
-import com.bybutter.sisyphus.collection.contentEquals
 import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
@@ -11,16 +10,8 @@ import kotlin.reflect.KProperty
 
 abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Message<T, TM> {
     init {
-        // Initialize [ProtoTypes] class to read all proto info
         ProtoTypes
     }
-
-    private var hashCodeCache: Int = 0
-
-    private val _unknownFields = UnknownFields()
-
-    @OptIn(InternalProtoApi::class)
-    protected val _extensions = mutableMapOf<Int, MessageExtension<*>>()
 
     override fun fieldDescriptors(): List<FieldDescriptorProto> {
         return support().fieldDescriptors
@@ -54,12 +45,11 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
 
     override fun hashCode(): Int {
         var result = computeHashCode()
-        for (extension in _extensions) {
+        for (extension in extensions()) {
             result = result * 43 + extension.hashCode()
         }
 
         result = result * 57 + unknownFields().hashCode()
-        hashCodeCache = result
         return result
     }
 
@@ -69,7 +59,7 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
 
         val message = other as AbstractMessage<*, *>
 
-        return equalsMessage(other as T) && _extensions.contentEquals(message._extensions) && unknownFields() == message.unknownFields()
+        return equalsMessage(other as T) && extensions().contentEquals(message.extensions()) && unknownFields() == message.unknownFields()
     }
 
     override fun type(): String {
@@ -171,7 +161,7 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
 
     override fun writeTo(writer: Writer) {
         writeFields(writer)
-        for (extension in _extensions) {
+        for (extension in extensions()) {
             extension.value.writeTo(writer)
         }
         unknownFields().writeTo(writer)
@@ -190,9 +180,9 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     protected fun <T> getFieldInExtensions(number: Int): T {
-        val extensions = support().extensions.firstOrNull { it.descriptor.number == number }
+        val extension = support().extensions.firstOrNull { it.descriptor.number == number }
             ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
-        return (_extensions[number]?.value ?: extensions.default()).uncheckedCast()
+        return (extensions()[number]?.value ?: extension.default()).uncheckedCast()
     }
 
     protected fun getPropertyInExtensions(name: String): KProperty<*>? {
@@ -214,15 +204,7 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     protected fun hasFieldInExtensions(number: Int): Boolean {
-        return _extensions[number] != null
-    }
-
-    override fun unknownFields(): UnknownFields {
-        return _unknownFields
-    }
-
-    override fun extensions(): Map<Int, MessageExtension<*>> {
-        return _extensions
+        return extensions()[number] != null
     }
 
     protected abstract fun computeHashCode(): Int

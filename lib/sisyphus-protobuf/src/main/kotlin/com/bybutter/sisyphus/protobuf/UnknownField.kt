@@ -142,4 +142,8 @@ class UnknownFields {
     operator fun plusAssign(other: UnknownFields) {
         this._fields.addAll(other.fields)
     }
+
+    companion object {
+        val empty = UnknownFields()
+    }
 }
