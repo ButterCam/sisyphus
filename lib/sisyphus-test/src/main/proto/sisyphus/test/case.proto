@@ -125,6 +125,4 @@ message TestResult {
 
   // Output metadata of [TestStep].
   map<string, string> trailers = 9;
-
-
 }

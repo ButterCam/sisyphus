@@ -5,7 +5,7 @@ internal fun TestStep.extractContextTo(map: MutableMap<String, Any?>) {
     map["name"] = name
     map["authority"] = authority
     map["method"] = method
-    map["optional"] = optional
+    map["notSensitive"] = notSensitive
     map["input"] = input
     map["metadata"] = metadata
 }

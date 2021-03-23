@@ -1,7 +1,7 @@
 {
   "steps": [
     {
-      "name": "test",
+      "id": "test",
       "method": "sisyphus.test.test.TestApi/Echo",
       "input": {
         "@type": "types.butterapis.com/sisyphus.test.test.EchoRequest",

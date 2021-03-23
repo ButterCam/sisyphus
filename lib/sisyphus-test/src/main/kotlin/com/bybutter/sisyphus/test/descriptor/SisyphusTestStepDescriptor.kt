@@ -1,9 +1,11 @@
-package com.bybutter.sisyphus.test
+package com.bybutter.sisyphus.test.descriptor
 
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.test.SisyphusTestEngineContext
+import com.bybutter.sisyphus.test.TestResult
+import com.bybutter.sisyphus.test.TestStep
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientCall
@@ -11,14 +13,12 @@ import io.grpc.ClientInterceptor
 import io.grpc.ClientInterceptors
 import io.grpc.ForwardingClientCall
 import io.grpc.ForwardingClientCallListener
-import io.grpc.InternalClientInterceptors
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.ServiceDescriptor
 import io.grpc.Status
 import io.grpc.stub.ClientCalls
 import org.junit.platform.engine.TestDescriptor
-import org.junit.platform.engine.TestExecutionResult
 import org.junit.platform.engine.UniqueId
 import org.junit.platform.engine.support.descriptor.EngineDescriptor
 import org.junit.platform.engine.support.hierarchical.Node
@@ -110,6 +110,10 @@ class SisyphusTestStepDescriptor(id: UniqueId, val step: TestStep) :
 
     override fun getExecutionMode(): Node.ExecutionMode {
         return Node.ExecutionMode.SAME_THREAD
+    }
+
+    companion object {
+        const val SEGMENT_TYPE = "steps"
     }
 }
 
