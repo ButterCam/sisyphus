@@ -96,6 +96,6 @@ class KubernetesClientRepository : ClientRepository {
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(this.javaClass)
+        private val logger = LoggerFactory.getLogger(KubernetesClientRepository::class.java)
     }
 }

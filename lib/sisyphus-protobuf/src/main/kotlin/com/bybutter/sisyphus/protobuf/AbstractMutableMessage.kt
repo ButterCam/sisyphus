@@ -16,6 +16,32 @@ import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : AbstractMessage<T, TM>(),
     MutableMessage<T, TM> {
 
+    private var unknownFields: UnknownFields? = null
+
+    private var extensions: MutableMap<Int, MessageExtension<*>>? = null
+
+    private inline fun unknownFields(block: UnknownFields.() -> Unit) {
+        (this.unknownFields ?: UnknownFields()).apply {
+            block()
+            unknownFields = this
+        }
+    }
+
+    override fun unknownFields(): UnknownFields {
+        return unknownFields ?: UnknownFields.empty
+    }
+
+    private inline fun extensions(block: MutableMap<Int, MessageExtension<*>>.() -> Unit) {
+        (this.extensions ?: mutableMapOf()).apply {
+            block()
+            extensions = this
+        }
+    }
+
+    override fun extensions(): Map<Int, MessageExtension<*>> {
+        return extensions ?: mapOf()
+    }
+
     @OptIn(InternalProtoApi::class)
     override fun readFrom(reader: Reader, size: Int) {
         val current = reader.readBytes
@@ -29,10 +55,13 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
                 } as? ExtensionSupport<Any>
 
                 if (extension == null) {
-                    unknownFields().readFrom(reader, number, wireType)
+                    unknownFields {
+                        readFrom(reader, number, wireType)
+                    }
                 } else {
-                    _extensions[number] =
-                        extension.read(reader, number, wireType, _extensions[number] as? MessageExtension<Any>)
+                    extensions {
+                        this[number] = extension.read(reader, number, wireType, this[number] as? MessageExtension<Any>)
+                    }
                 }
             }
         }
@@ -113,7 +142,9 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
         }
         val extension = support().extensions.firstOrNull { it.descriptor.number == number } as? ExtensionSupport<T>
             ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
-        _extensions[number] = extension.wrap(value)
+        extensions {
+            this[number] = extension.wrap(value)
+        }
     }
 
     protected fun clearFieldInExtensions(name: String): Any? {
@@ -123,13 +154,20 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
     }
 
     protected fun clearFieldInExtensions(number: Int): Any? {
-        return _extensions[number]?.value?.also {
-            _extensions.remove(number)
+        if (extensions()[number] == null) return null
+        extensions {
+            return this[number]?.value?.also {
+                this.remove(number)
+            }
         }
+        return null
     }
 
     protected fun clearAllFieldInExtensions() {
-        _extensions.clear()
+        if (extensions().isEmpty()) return
+        extensions {
+            clear()
+        }
     }
 
     private fun copyFrom(message: Message<*, *>, keepOriginalValues: Boolean = false) {
