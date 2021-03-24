@@ -19,7 +19,9 @@ import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.bybutter.sisyphus.string.toCamelCase
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.UNIT
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock
 import kotlin.coroutines.CoroutineContext
@@ -179,35 +181,45 @@ class CoroutineClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                     addParameter("input", method.inputMessage().className())
                 }
 
-                parameter("metadata", RuntimeTypes.METADATA) {
-                    defaultValue("%T()", RuntimeTypes.METADATA)
-                }
-
                 when {
                     !method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                         addStatement(
-                            "return unaryCall(%T.${method.name()}, input, metadata)",
-                            method.parent.className()
+                            "return unaryCall(%T.${method.name()}, input, %T())",
+                            method.parent.className(), RuntimeTypes.METADATA
                         )
                     }
                     method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                         addStatement(
-                            "return clientStreaming(%T.${method.name()}, input, metadata)",
-                            method.parent.className()
+                            "return clientStreaming(%T.${method.name()}, input, %T())",
+                            method.parent.className(), RuntimeTypes.METADATA
                         )
                     }
                     !method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                         addStatement(
-                            "return serverStreaming(%T.${method.name()}, input, metadata)",
-                            method.parent.className()
+                            "return serverStreaming(%T.${method.name()}, input, %T())",
+                            method.parent.className(), RuntimeTypes.METADATA
                         )
                     }
                     method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                         addStatement(
-                            "return bidiStreaming(%T.${method.name()}, input, metadata)",
-                            method.parent.className()
+                            "return bidiStreaming(%T.${method.name()}, input, %T())",
+                            method.parent.className(), RuntimeTypes.METADATA
                         )
                     }
+                }
+            }
+
+            if (!method.descriptor.clientStreaming) {
+                state.target.function(method.name()) {
+                    this += KModifier.INLINE
+                    addParameter("block", LambdaTypeName.get(method.inputMessage().mutableClassName(), listOf(), UNIT))
+                    if (method.descriptor.serverStreaming) {
+                        returns(Flow::class.asClassName().parameterizedBy(method.outputMessage().className()))
+                    } else {
+                        this += KModifier.SUSPEND
+                        returns(method.outputMessage().className())
+                    }
+                    addStatement("return ${method.name()}(%T { block() })", method.inputMessage().className())
                 }
             }
         }
