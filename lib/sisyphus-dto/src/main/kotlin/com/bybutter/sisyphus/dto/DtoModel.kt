@@ -71,11 +71,13 @@ interface DtoModel {
         }
 
         operator fun <T : DtoModel> invoke(type: SimpleType): T {
-            val value = (proxyCache[type]?.instance() ?: Proxy.newProxyInstance(
-                type.raw.classLoader,
-                arrayOf(type.raw, DtoMeta::class.java),
-                ModelProxy(type)
-            )).uncheckedCast<T>()
+            val value = (
+                proxyCache[type]?.instance() ?: Proxy.newProxyInstance(
+                    type.raw.classLoader,
+                    arrayOf(type.raw, DtoMeta::class.java),
+                    ModelProxy(type)
+                )
+                ).uncheckedCast<T>()
             value.verify()
             return value
         }
@@ -84,11 +86,13 @@ interface DtoModel {
             type: SimpleType,
             block: T.() -> Unit
         ): T {
-            val value = (proxyCache[type]?.instance() ?: Proxy.newProxyInstance(
-                type.raw.classLoader,
-                arrayOf(type.raw, DtoMeta::class.java),
-                ModelProxy(type)
-            )).uncheckedCast<T>()
+            val value = (
+                proxyCache[type]?.instance() ?: Proxy.newProxyInstance(
+                    type.raw.classLoader,
+                    arrayOf(type.raw, DtoMeta::class.java),
+                    ModelProxy(type)
+                )
+                ).uncheckedCast<T>()
             value.apply(block)
             value.verify()
             return value

@@ -12,7 +12,8 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor
 import org.junit.platform.engine.support.hierarchical.Node
 import org.opentest4j.AssertionFailedError
 
-class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase) : EngineDescriptor(id, case.name),
+class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase) :
+    EngineDescriptor(id, case.name),
     Node<SisyphusTestEngineContext> {
 
     override fun shouldBeSkipped(context: SisyphusTestEngineContext): Node.SkipResult {

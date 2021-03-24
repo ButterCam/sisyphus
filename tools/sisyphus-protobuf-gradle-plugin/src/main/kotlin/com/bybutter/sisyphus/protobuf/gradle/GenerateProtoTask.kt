@@ -6,16 +6,16 @@ import com.bybutter.sisyphus.protobuf.compiler.ProtobufCompiler
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.TypeSpec
-import java.io.File
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import java.io.File
+import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 open class GenerateProtoTask : DefaultTask() {
     @get:InputDirectory

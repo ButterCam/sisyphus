@@ -31,7 +31,8 @@ class ProtoTest {
                 },
                 "bar" to MapMessageTest.NestedMessage {
                     this.int32Value = 2
-                })
+                }
+            )
             this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
             this.endValue = 2
             this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")
@@ -70,7 +71,8 @@ class ProtoTest {
                 },
                 "bar" to MapMessageTest.NestedMessage {
                     this.int32Value = 2
-                })
+                }
+            )
             this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
             this.endValue = 2
             this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")

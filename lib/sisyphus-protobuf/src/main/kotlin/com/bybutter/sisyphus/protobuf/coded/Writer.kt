@@ -15,16 +15,20 @@ class Writer(private val parent: Writer? = null) {
     private val ops: Deque<Op<*>> = LinkedList()
 
     private fun unshift(op: Op<*>): Writer {
-        ops.addFirst(op.also {
-            length += it.length
-        })
+        ops.addFirst(
+            op.also {
+                length += it.length
+            }
+        )
         return this
     }
 
     private fun push(op: Op<*>): Writer {
-        ops.offer(op.also {
-            length += it.length
-        })
+        ops.offer(
+            op.also {
+                length += it.length
+            }
+        )
         return this
     }
 

@@ -1,9 +1,9 @@
 package com.bybutter.sisyphus.middleware.grpc
 
 import io.grpc.ManagedChannel
+import org.springframework.context.SmartLifecycle
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
-import org.springframework.context.SmartLifecycle
 
 class ManagedChannelLifecycle : SmartLifecycle {
     private val channelList: MutableSet<ManagedChannel> = mutableSetOf()

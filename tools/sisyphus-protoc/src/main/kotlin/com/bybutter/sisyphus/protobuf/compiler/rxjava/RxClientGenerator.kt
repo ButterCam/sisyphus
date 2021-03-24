@@ -22,9 +22,11 @@ import com.squareup.kotlinpoet.buildCodeBlock
 class RxClientGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (service in state.descriptor.services) {
-            state.target.addType(kClass(service.name()) {
-                ClientGeneratingState(state, service, this).advance()
-            })
+            state.target.addType(
+                kClass(service.name()) {
+                    ClientGeneratingState(state, service, this).advance()
+                }
+            )
         }
         return true
     }
@@ -125,8 +127,7 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                     this += KModifier.INLINE
                     if (returnEmpty) {
                         returns(RuntimeTypes.COMPLETABLE)
-                    }
-                    else {
+                    } else {
                         returns(RuntimeTypes.SINGLE.parameterizedBy(method.outputMessage().className()))
                     }
 
@@ -143,28 +144,30 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                     method.outputMessage().className()
                 )
             ) {
-                initializer(buildCodeBlock {
-                    add(
-                        "%T.newBuilder<%T,·%T>()\n",
-                        RuntimeTypes.METHOD_DESCRIPTOR,
-                        method.inputMessage().className(),
-                        method.outputMessage().className()
-                    )
-                    add(".setType(MethodDescriptor.MethodType.%L)\n", "UNARY")
-                    add(".setFullMethodName(%S)\n", method.fullProtoName().substring(1))
-                    add(
-                        ".setRequestMarshaller(%T.%M())\n",
-                        method.inputMessage().className(),
-                        RuntimeMethods.MARSHALLER
-                    )
-                    add(
-                        ".setResponseMarshaller(%T.%M())\n",
-                        method.outputMessage().className(),
-                        RuntimeMethods.MARSHALLER
-                    )
-                    add(".setSchemaDescriptor(this)\n")
-                    add(".build()\n")
-                })
+                initializer(
+                    buildCodeBlock {
+                        add(
+                            "%T.newBuilder<%T,·%T>()\n",
+                            RuntimeTypes.METHOD_DESCRIPTOR,
+                            method.inputMessage().className(),
+                            method.outputMessage().className()
+                        )
+                        add(".setType(MethodDescriptor.MethodType.%L)\n", "UNARY")
+                        add(".setFullMethodName(%S)\n", method.fullProtoName().substring(1))
+                        add(
+                            ".setRequestMarshaller(%T.%M())\n",
+                            method.inputMessage().className(),
+                            RuntimeMethods.MARSHALLER
+                        )
+                        add(
+                            ".setResponseMarshaller(%T.%M())\n",
+                            method.outputMessage().className(),
+                            RuntimeMethods.MARSHALLER
+                        )
+                        add(".setSchemaDescriptor(this)\n")
+                        add(".build()\n")
+                    }
+                )
             }
         }
         return true

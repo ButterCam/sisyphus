@@ -1,12 +1,12 @@
 package com.bybutter.sisyphus.project.gradle.publishing
 
 import com.bybutter.sisyphus.project.gradle.ensurePlugin
-import java.io.File
 import nebula.plugin.info.scm.ScmInfoExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import java.io.File
 
 class ProjectLicensePlugin : Plugin<Project> {
     override fun apply(target: Project) {

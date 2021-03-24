@@ -148,9 +148,11 @@ private fun wrapValue(value: kotlin.Any?): Value {
         }
         is List<*> -> {
             Value {
-                kind = Value.Kind.ListValue(ListValue {
-                    values += value.map { wrapValue(it) }
-                })
+                kind = Value.Kind.ListValue(
+                    ListValue {
+                        values += value.map { wrapValue(it) }
+                    }
+                )
             }
         }
         is Boolean -> {

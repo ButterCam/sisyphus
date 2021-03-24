@@ -1,13 +1,13 @@
 package com.bybutter.sisyphus.middleware.configuration
 
-import java.nio.file.Files
-import java.nio.file.Path
-import java.util.Properties
 import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.env.EnvironmentPostProcessor
 import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.core.env.PropertiesPropertySource
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.Properties
 
 /**
  * Inject all fields in 'gradle.properties' into Spring runtime environment.

@@ -8,9 +8,6 @@ import com.bybutter.sisyphus.test.TestCase
 import com.bybutter.sisyphus.test.TestStep
 import com.bybutter.sisyphus.test.descriptor.SisyphusTestCaseDescriptor
 import com.bybutter.sisyphus.test.descriptor.SisyphusTestStepDescriptor
-import java.io.File
-import java.io.InputStream
-import java.util.Optional
 import org.junit.platform.commons.logging.LoggerFactory
 import org.junit.platform.engine.DiscoverySelector
 import org.junit.platform.engine.TestDescriptor
@@ -23,6 +20,9 @@ import org.junit.platform.engine.support.discovery.SelectorResolver
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import org.reflections.util.FilterBuilder
+import java.io.File
+import java.io.InputStream
+import java.util.Optional
 
 class SisyphusTestSelectorResolver : SelectorResolver {
     override fun resolve(
@@ -88,10 +88,10 @@ class SisyphusTestSelectorResolver : SelectorResolver {
     }
 
     private fun Optional<TestDescriptor>.toMatch(): Optional<SelectorResolver.Match> {
-        return map {
-            SelectorResolver.Match.exact(it) {
-                if (it is SisyphusTestCaseDescriptor) {
-                    it.case.steps.map { TestStepSelector(it) }.toSet()
+        return map { descriptor ->
+            SelectorResolver.Match.exact(descriptor) {
+                if (descriptor is SisyphusTestCaseDescriptor) {
+                    descriptor.case.steps.map { TestStepSelector(descriptor.uniqueId.toString(), it) }.toSet()
                 } else {
                     setOf()
                 }
@@ -123,26 +123,29 @@ class SisyphusTestSelectorResolver : SelectorResolver {
     }
 
     private fun createTestCaseDescriptor(parent: TestDescriptor, case: TestCase, name: String): TestDescriptor {
+        val id = File(name).nameWithoutExtension
         val case = case {
             this.name = this.name.takeIf { it.isNotBlank() } ?: File(name).nameWithoutExtension
         }
         return SisyphusTestCaseDescriptor(
-            parent.uniqueId.append(SisyphusTestCaseDescriptor.SEGMENT_TYPE, case.name),
+            parent.uniqueId.append(SisyphusTestCaseDescriptor.SEGMENT_TYPE, id),
             case
         )
     }
 
     private fun createTestStepDescriptor(parent: TestDescriptor, step: TestStep): TestDescriptor {
-        val parent = parent as SisyphusTestCaseDescriptor
+        parent as SisyphusTestCaseDescriptor
         val index = parent.case.steps.indexOf(step)
+        val id = "${parent.uniqueId.lastSegment.value}#$index"
 
         val step = step {
             this.name = this.name.takeIf { it.isNotBlank() } ?: this.id.takeIf { it.isNotBlank() }
-                    ?: "${parent.displayName} Step$index"
+                ?: "${parent.displayName} Step$index"
             this.authority = this.authority.takeIf { it.isNotBlank() } ?: "localhost:9090"
         }
+
         return SisyphusTestStepDescriptor(
-            parent.uniqueId.append(SisyphusTestStepDescriptor.SEGMENT_TYPE, step.name),
+            parent.uniqueId.append(SisyphusTestStepDescriptor.SEGMENT_TYPE, id),
             step
         )
     }

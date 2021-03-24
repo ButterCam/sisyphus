@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":lib:sisyphus-jackson"))
     implementation(project(":tools:sisyphus-protoc"))
     implementation(project(":tools:sisyphus-api-linter-runner"))
+
     compileOnly("com.android.tools.build:gradle")
 
     implementation(Dependencies.Kotlin.reflect)

@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.protobuf.gradle
 
-import java.io.File
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -11,6 +10,7 @@ import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
+import java.io.File
 
 abstract class BaseProtobufPlugin : Plugin<Project> {
     protected lateinit var project: Project

@@ -2,6 +2,12 @@ package com.bybutter.sisyphus.protobuf.gradle
 
 import com.bybutter.sisyphus.io.toUnixPath
 import com.bybutter.sisyphus.protobuf.compiler.ProtocRunner
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitResult
@@ -10,12 +16,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
-import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
 
 open class ExtractProtoTask : DefaultTask() {
     @get:OutputDirectory
@@ -62,24 +62,27 @@ open class ExtractProtoTask : DefaultTask() {
             return
         }
 
-        Files.walkFileTree(dir, object : SimpleFileVisitor<Path>() {
-            override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                if (file.fileName.toString().endsWith(".proto")) {
-                    addProtoInternal(dir.relativize(file).toString(), Files.readAllBytes(file), file, source)
-                }
-                if (file.endsWith("protomap")) {
-                    scannedMapping += Files.readAllLines(file).mapNotNull {
-                        val map = it.split('=')
-                        if (map.size == 2) {
-                            map[0] to map[1]
-                        } else {
-                            null
+        Files.walkFileTree(
+            dir,
+            object : SimpleFileVisitor<Path>() {
+                override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+                    if (file.fileName.toString().endsWith(".proto")) {
+                        addProtoInternal(dir.relativize(file).toString(), Files.readAllBytes(file), file, source)
+                    }
+                    if (file.endsWith("protomap")) {
+                        scannedMapping += Files.readAllLines(file).mapNotNull {
+                            val map = it.split('=')
+                            if (map.size == 2) {
+                                map[0] to map[1]
+                            } else {
+                                null
+                            }
                         }
                     }
+                    return FileVisitResult.CONTINUE
                 }
-                return FileVisitResult.CONTINUE
             }
-        })
+        )
     }
 
     private fun addProtoInternal(name: String, value: ByteArray, file: Path, source: Boolean) {
@@ -109,17 +112,20 @@ open class ExtractProtoTask : DefaultTask() {
         if (protobuf.mapping.isNotEmpty()) {
             Files.write(
                 Paths.get(resourceOutput.toPath().toString(), "protomap"),
-                protobuf.mapping.map { "${it.key}=${it.value}" })
+                protobuf.mapping.map { "${it.key}=${it.value}" }
+            )
         }
 
         val desc = ProtocRunner.generate(protoPath, sourceProtos)
         Files.write(Paths.get(protoPath.toPath().toString(), "protodesc.pb"), desc.toByteArray())
         Files.write(
             Paths.get(protoPath.toPath().toString(), "protomap"),
-            scannedMapping.map { "${it.key}=${it.value}" })
+            scannedMapping.map { "${it.key}=${it.value}" }
+        )
         Files.write(Paths.get(protoPath.toPath().toString(), "protosrc"), sourceProtos)
         Files.write(
             Paths.get(protoPath.toPath().toString(), "protofile"),
-            sourceFileMapping.map { "${it.key}=${it.value}" })
+            sourceFileMapping.map { "${it.key}=${it.value}" }
+        )
     }
 }

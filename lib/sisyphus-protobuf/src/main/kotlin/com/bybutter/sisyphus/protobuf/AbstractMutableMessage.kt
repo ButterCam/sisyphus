@@ -13,7 +13,8 @@ import com.bybutter.sisyphus.protobuf.primitives.StringValue
 import com.bybutter.sisyphus.protobuf.primitives.UInt32Value
 import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 
-abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : AbstractMessage<T, TM>(),
+abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
+    AbstractMessage<T, TM>(),
     MutableMessage<T, TM> {
 
     private var unknownFields: UnknownFields? = null

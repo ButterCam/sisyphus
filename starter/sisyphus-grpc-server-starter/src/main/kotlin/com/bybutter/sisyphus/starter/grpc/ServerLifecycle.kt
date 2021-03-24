@@ -1,10 +1,10 @@
 package com.bybutter.sisyphus.starter.grpc
 
 import io.grpc.Server
-import kotlin.concurrent.thread
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.server.Shutdown
 import org.springframework.context.SmartLifecycle
+import kotlin.concurrent.thread
 
 class ServerLifecycle(private val server: Server, private val shutdown: Shutdown) : SmartLifecycle {
     private var running = false

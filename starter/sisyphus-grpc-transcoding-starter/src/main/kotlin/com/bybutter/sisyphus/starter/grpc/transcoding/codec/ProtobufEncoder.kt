@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.codec
 
 import com.bybutter.sisyphus.protobuf.Message
-import java.io.IOException
 import org.reactivestreams.Publisher
 import org.springframework.core.ResolvableType
 import org.springframework.core.codec.AbstractEncoder
@@ -13,8 +12,10 @@ import org.springframework.http.codec.HttpMessageEncoder
 import org.springframework.util.MimeType
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.io.IOException
 
-class ProtobufEncoder(vararg mimeTypes: MimeType) : AbstractEncoder<Message<*, *>>(*mimeTypes),
+class ProtobufEncoder(vararg mimeTypes: MimeType) :
+    AbstractEncoder<Message<*, *>>(*mimeTypes),
     HttpMessageEncoder<Message<*, *>> {
     override fun getStreamingMediaTypes(): List<MediaType> {
         return ProtobufCodecCustomizer.STREAM_MIME_TYPES

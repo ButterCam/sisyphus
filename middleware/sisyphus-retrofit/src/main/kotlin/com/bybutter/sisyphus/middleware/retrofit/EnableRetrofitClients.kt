@@ -1,7 +1,7 @@
 package com.bybutter.sisyphus.middleware.retrofit
 
-import kotlin.reflect.KClass
 import org.springframework.context.annotation.Import
+import kotlin.reflect.KClass
 
 /**
  * Enable retrofit in the current service.

@@ -5,8 +5,6 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry
 import io.github.resilience4j.retrofit.CircuitBreakerCallAdapter
-import java.time.Duration
-import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import org.reflections.Reflections
 import org.slf4j.LoggerFactory
@@ -19,6 +17,8 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar
 import org.springframework.core.env.Environment
 import org.springframework.core.type.AnnotationMetadata
 import retrofit2.Retrofit
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware {
     private lateinit var environment: Environment

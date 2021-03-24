@@ -62,22 +62,28 @@ class TranscodingCallListener(private val body: String) : ClientCall.Listener<Me
                     }
                 }
                 // No message returned by gRPC, maybe some unknown error happened.
-                else -> builder.body(DetectBodyInserter(
-                    com.bybutter.sisyphus.rpc.Status {
-                        this.code = status.code.value()
-                        this.message = status.description ?: status.cause?.message ?: "Unknown"
-                    }
-                ))
+                else -> builder.body(
+                    DetectBodyInserter(
+                        com.bybutter.sisyphus.rpc.Status {
+                            this.code = status.code.value()
+                            this.message = status.description ?: status.cause?.message ?: "Unknown"
+                        }
+                    )
+                )
             }
             this.response.tryEmitValue(response)
         } catch (e: Exception) {
-            this.response.tryEmitValue(ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(DetectBodyInserter(
-                    com.bybutter.sisyphus.rpc.Status {
-                        this.code = Status.Code.INTERNAL.value()
-                        this.message = e.message ?: "Unknown"
-                    }
-                )))
+            this.response.tryEmitValue(
+                ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(
+                        DetectBodyInserter(
+                            com.bybutter.sisyphus.rpc.Status {
+                                this.code = Status.Code.INTERNAL.value()
+                                this.message = e.message ?: "Unknown"
+                            }
+                        )
+                    )
+            )
         }
     }
 

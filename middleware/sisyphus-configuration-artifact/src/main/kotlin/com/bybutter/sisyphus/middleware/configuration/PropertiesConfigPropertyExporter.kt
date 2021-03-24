@@ -1,9 +1,9 @@
 package com.bybutter.sisyphus.middleware.configuration
 
-import java.net.URL
-import java.util.Properties
 import org.springframework.core.env.PropertiesPropertySource
 import org.springframework.core.env.PropertySource
+import java.net.URL
+import java.util.Properties
 
 abstract class PropertiesConfigPropertyExporter : FileConfigPropertyExporter() {
     override fun read(url: URL): PropertySource<*>? {

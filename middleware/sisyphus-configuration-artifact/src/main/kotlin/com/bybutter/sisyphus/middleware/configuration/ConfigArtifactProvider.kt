@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.middleware.configuration
 
 import com.bybutter.sisyphus.middleware.configuration.maven.Aether
 import com.bybutter.sisyphus.spi.ServiceLoader
-import java.net.URLClassLoader
 import org.eclipse.aether.resolution.ArtifactResult
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.context.event.ApplicationPreparedEvent
@@ -12,6 +11,7 @@ import org.springframework.boot.env.EnvironmentPostProcessor
 import org.springframework.boot.logging.DeferredLog
 import org.springframework.context.ApplicationListener
 import org.springframework.core.env.ConfigurableEnvironment
+import java.net.URLClassLoader
 
 /**
  * Provide config artifacts for [ConfigArtifactPropertyExporter], it will download artifacts from configured maven repository

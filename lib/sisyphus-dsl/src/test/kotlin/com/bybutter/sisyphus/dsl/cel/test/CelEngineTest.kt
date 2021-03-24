@@ -10,10 +10,10 @@ import com.bybutter.sisyphus.dsl.cel.CelStandardLibrary
 import com.bybutter.sisyphus.protobuf.primitives.Duration
 import com.bybutter.sisyphus.protobuf.primitives.Timestamp
 import com.bybutter.sisyphus.protobuf.primitives.invoke
-import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 
 class CelEngineTest {
     @Test
@@ -406,12 +406,14 @@ class CelEngineTest {
 
     @Test
     fun `test cel left and right eval2`() {
-        val engine = CelEngine(mapOf(
-            "raw" to CellTest {
-                left = 1uL
-                right = 2uL
-            }
-        ))
+        val engine = CelEngine(
+            mapOf(
+                "raw" to CellTest {
+                    left = 1uL
+                    right = 2uL
+                }
+            )
+        )
         engine.assertEvalResult("""raw.left + raw.right""", 3uL)
     }
 
@@ -427,7 +429,8 @@ class CelEngineTest {
         val engine = CelEngine(
             mapOf(
                 "value" to listOf(1L, 3L)
-            ), CelRuntime(macro = CustomCelMacro())
+            ),
+            CelRuntime(macro = CustomCelMacro())
         )
         val result = engine.eval("""value.all(x, x % 2 == 1)""")
         val result2 = engine.eval("""value.all(x, x == 1)""")
@@ -453,43 +456,46 @@ class CelEngineTest {
 
     @Test
     fun `test map CelRuntime with macro`() {
-        val engine = CelEngine(mapOf(
-            "value" to HasMessageTest {
-                this.startValue = 1
-                this.messageMapValue += mapOf(
-                    "foo" to HasMessageTest.HasMessage {
-                        this.int32Value = 1
-                    },
-                    "bar" to HasMessageTest.HasMessage {
-                        this.int32Value = 2
-                    },
-                    "a" to HasMessageTest.HasMessage {
-                        this.int32Value = 3
-                    },
-                    "b" to HasMessageTest.HasMessage {
-                        this.int32Value = 4
-                    }
-                )
-                this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
-                this.endValue = 2
-                this.anyMapValue += mapOf(
-                    "foo" to HasMessageTest.HasMessage {
-                        this.int32Value = 1
-                    },
-                    "bar" to PackedTest {
-                        this.values += listOf(1, 2, 3, 4, 5, 6)
-                    }
-                )
-                this.anyListValue += listOf(
-                    HasMessageTest.HasMessage {
-                        this.int32Value = 1
-                    },
-                    PackedTest {
-                        this.values += listOf(1, 2, 3, 4, 5, 6)
-                    }
-                )
-            }
-        ), CelRuntime(macro = CustomCelMacro()))
+        val engine = CelEngine(
+            mapOf(
+                "value" to HasMessageTest {
+                    this.startValue = 1
+                    this.messageMapValue += mapOf(
+                        "foo" to HasMessageTest.HasMessage {
+                            this.int32Value = 1
+                        },
+                        "bar" to HasMessageTest.HasMessage {
+                            this.int32Value = 2
+                        },
+                        "a" to HasMessageTest.HasMessage {
+                            this.int32Value = 3
+                        },
+                        "b" to HasMessageTest.HasMessage {
+                            this.int32Value = 4
+                        }
+                    )
+                    this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
+                    this.endValue = 2
+                    this.anyMapValue += mapOf(
+                        "foo" to HasMessageTest.HasMessage {
+                            this.int32Value = 1
+                        },
+                        "bar" to PackedTest {
+                            this.values += listOf(1, 2, 3, 4, 5, 6)
+                        }
+                    )
+                    this.anyListValue += listOf(
+                        HasMessageTest.HasMessage {
+                            this.int32Value = 1
+                        },
+                        PackedTest {
+                            this.values += listOf(1, 2, 3, 4, 5, 6)
+                        }
+                    )
+                }
+            ),
+            CelRuntime(macro = CustomCelMacro())
+        )
         val result = engine.eval("""value.anyMapValue.all(x,x == 1)""")
         val result2 = engine.eval("""value.anyMapValue.all(x,x != 3)""")
         val result3 = engine.eval("""has(value.messageMapValue.foo)""")

@@ -1,12 +1,12 @@
 package com.bybutter.sisyphus.middleware.jdbc
 
-import java.math.BigInteger
-import java.sql.Timestamp
-import java.util.concurrent.TimeUnit
 import org.jooq.types.UByte
 import org.jooq.types.UInteger
 import org.jooq.types.ULong
 import org.jooq.types.UShort
+import java.math.BigInteger
+import java.sql.Timestamp
+import java.util.concurrent.TimeUnit
 
 fun String.toUInt(): UInteger {
     return UInteger.valueOf(this)

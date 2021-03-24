@@ -11,8 +11,8 @@ import com.bybutter.sisyphus.middleware.hbase.annotation.HColumn
 import com.bybutter.sisyphus.middleware.hbase.getDefaultValueConverter
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition
-import java.util.NavigableMap
 import org.apache.hadoop.hbase.client.Result
+import java.util.NavigableMap
 
 class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConverter<T> where T : DtoModel {
     private val beanDescription = type.beanDescription
@@ -59,8 +59,10 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
                 it
             }
         }
-        val converter: ValueConverter<Any>? = (converterType?.java?.newInstance()
-            ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>) as? ValueConverter<Any>
+        val converter: ValueConverter<Any>? = (
+            converterType?.java?.newInstance()
+                ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>
+            ) as? ValueConverter<Any>
 
         if (qualifier != null && pre.isNotEmpty()) {
             throw IllegalArgumentException("Set qualifier for three level property.")
@@ -73,7 +75,8 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
             converter ?: throw IllegalArgumentException("Can't convert byte array to type '${returnType.typeName}'.")
             property.setter.callOnWith(
                 instance,
-                map[name]?.get(qualifier)?.firstEntry()?.value?.let { converter.convertBack(it) })
+                map[name]?.get(qualifier)?.firstEntry()?.value?.let { converter.convertBack(it) }
+            )
             return
         }
 
@@ -81,15 +84,19 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
             converter ?: throw IllegalArgumentException("Can't convert byte array to type '${returnType.typeName}'.")
             property.setter.callOnWith(
                 instance,
-                map[pre[0]]?.get(name)?.firstEntry()?.value?.let { converter.convertBack(it) })
+                map[pre[0]]?.get(name)?.firstEntry()?.value?.let { converter.convertBack(it) }
+            )
             return
         }
 
-        property.setter.callOnWith(instance, DtoModel(returnType.jvm) {
-            for (it in returnType.beanDescription.findProperties()) {
-                readStructValue(this, pre + name, it, map)
+        property.setter.callOnWith(
+            instance,
+            DtoModel(returnType.jvm) {
+                for (it in returnType.beanDescription.findProperties()) {
+                    readStructValue(this, pre + name, it, map)
+                }
             }
-        })
+        )
     }
 
     private fun writeByteArrayValue(
@@ -116,8 +123,10 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
                 it
             }
         }
-        val converter: ValueConverter<Any>? = (converterType?.java?.newInstance()
-            ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>) as? ValueConverter<Any>
+        val converter: ValueConverter<Any>? = (
+            converterType?.java?.newInstance()
+                ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>
+            ) as? ValueConverter<Any>
 
         if (qualifier != null && pre.isNotEmpty()) {
             throw IllegalArgumentException("Set qualifier for three level property.")

@@ -6,11 +6,11 @@ import com.bybutter.sisyphus.middleware.redis.cache.annotation.MultiCacheable
 import com.bybutter.sisyphus.middleware.redis.cache.interceptor.common.KeyGenerator.generateBatchKey
 import com.bybutter.sisyphus.middleware.redis.cache.interceptor.common.KeyGenerator.generateGlobalKey
 import com.bybutter.sisyphus.middleware.redis.cache.interceptor.common.KeyGenerator.generateNormalKey
-import java.io.Serializable
-import java.lang.reflect.Method
 import org.aopalliance.intercept.MethodInterceptor
 import org.aopalliance.intercept.MethodInvocation
 import org.springframework.cache.Cache
+import java.io.Serializable
+import java.lang.reflect.Method
 
 class MultiCacheableInterceptor(
     private val redisCacheManager: MultiRedisCacheManager,

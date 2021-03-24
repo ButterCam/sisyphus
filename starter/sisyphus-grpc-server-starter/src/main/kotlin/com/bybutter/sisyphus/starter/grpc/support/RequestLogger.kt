@@ -5,11 +5,11 @@ import io.grpc.Context
 import io.grpc.Metadata
 import io.grpc.ServerCall
 import io.grpc.Status
-import java.util.concurrent.TimeUnit
 import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
+import java.util.concurrent.TimeUnit
 
 interface RequestLogger {
     val id: String

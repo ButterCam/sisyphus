@@ -15,11 +15,13 @@ class HttpRulePredicate(private val rule: HttpRule) : RequestPredicate {
         rule.pattern?.let {
             patternPredicates.add(HttpPatternPredicate(it))
         }
-        patternPredicates.addAll(rule.additionalBindings.mapNotNull {
-            it.pattern?.let {
-                HttpPatternPredicate(it)
+        patternPredicates.addAll(
+            rule.additionalBindings.mapNotNull {
+                it.pattern?.let {
+                    HttpPatternPredicate(it)
+                }
             }
-        })
+        )
     }
 
     override fun test(request: ServerRequest): Boolean {

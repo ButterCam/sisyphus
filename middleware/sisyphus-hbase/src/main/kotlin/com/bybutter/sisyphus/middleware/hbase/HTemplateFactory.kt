@@ -49,9 +49,9 @@ class HTemplateFactory<TKey, TValue> constructor(
         val table = table ?: throw IllegalArgumentException("Not set table for HTemplate.")
 
         val keyConverter = valueConverter ?: getDefaultValueConverter<TKey>(keyType)
-        ?: throw IllegalArgumentException("No convert for type '${keyType.typeName}'.")
+            ?: throw IllegalArgumentException("No convert for type '${keyType.typeName}'.")
         val valueConverter = tableModelConverter ?: getDefaultTableModelConverter<TValue>(valueType)
-        ?: throw IllegalArgumentException("No convert for type '${valueType.typeName}'.")
+            ?: throw IllegalArgumentException("No convert for type '${valueType.typeName}'.")
 
         return DefaultTemplate(connection, table, keyConverter, valueConverter)
     }
@@ -103,8 +103,10 @@ class HTemplateFactory<TKey, TValue> constructor(
                 val getRequests = keys.map { Get(rowKeyConverter.convert(it)) }
                 return it.get(getRequests).filter { it.row != null }.associate {
                     val keyMap = keys.associate { rowKeyConverter.convert(it)?.hashWrapper() to it }
-                    (keyMap[it.row.hashWrapper()]
-                        ?: throw RuntimeException("Key value not found.")) to tableModelConverter.convert(it)
+                    (
+                        keyMap[it.row.hashWrapper()]
+                            ?: throw RuntimeException("Key value not found.")
+                        ) to tableModelConverter.convert(it)
                 }
             }
         }

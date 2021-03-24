@@ -1,11 +1,11 @@
 package com.bybutter.sisyphus.middleware.configuration
 
-import java.net.URL
-import java.util.Properties
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean
 import org.springframework.core.env.PropertiesPropertySource
 import org.springframework.core.env.PropertySource
 import org.springframework.core.io.FileUrlResource
+import java.net.URL
+import java.util.Properties
 
 abstract class ConfigFormatFilePropertyExporter : FileConfigPropertyExporter() {
     abstract val names: Collection<String>

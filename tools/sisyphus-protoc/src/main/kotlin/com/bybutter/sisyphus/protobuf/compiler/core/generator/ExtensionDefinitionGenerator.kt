@@ -62,9 +62,11 @@ class NestedExtensionApiGenerator : GroupedGenerator<MessageCompanionGeneratingS
 class ExtensionSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
-            state.target.addType(kObject(extension.supportName()) {
-                ExtensionSupportGeneratingState(state, extension, this).advance()
-            })
+            state.target.addType(
+                kObject(extension.supportName()) {
+                    ExtensionSupportGeneratingState(state, extension, this).advance()
+                }
+            )
         }
         return true
     }
@@ -73,9 +75,11 @@ class ExtensionSupportGenerator : GroupedGenerator<InternalFileGeneratingState> 
 class NestedExtensionSupportGenerator : GroupedGenerator<MessageSupportGeneratingState> {
     override fun generate(state: MessageSupportGeneratingState): Boolean {
         for (extension in state.descriptor.extensions) {
-            state.target.addType(kObject(extension.supportName()) {
-                ExtensionSupportGeneratingState(state, extension, this).advance()
-            })
+            state.target.addType(
+                kObject(extension.supportName()) {
+                    ExtensionSupportGeneratingState(state, extension, this).advance()
+                }
+            )
         }
         return true
     }
@@ -166,7 +170,7 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                             addStatement(
                                 "return %S",
                                 "${
-                                    state.descriptor.extendee().fullProtoName()
+                                state.descriptor.extendee().fullProtoName()
                                 }.${state.descriptor.descriptor.name}@${parent.fullProtoName()}"
                             )
                         }
@@ -174,7 +178,7 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                             addStatement(
                                 "return %S",
                                 "${
-                                    state.descriptor.extendee().fullProtoName()
+                                state.descriptor.extendee().fullProtoName()
                                 }.${state.descriptor.descriptor.name}@${parent.descriptor.`package`}"
                             )
                         }
@@ -267,18 +271,18 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                 when {
                     packed && enum -> addStatement(
                         "writer.tag(${
-                            makeTag(
-                                state.descriptor.descriptor.number,
-                                WireFormat.WIRETYPE_LENGTH_DELIMITED
-                            )
+                        makeTag(
+                            state.descriptor.descriptor.number,
+                            WireFormat.WIRETYPE_LENGTH_DELIMITED
+                        )
                         }).beginLd().apply{ value.forEach { int32(it.number) } }.endLd()"
                     )
                     packed -> addStatement(
                         "writer.tag(${
-                            makeTag(
-                                state.descriptor.descriptor.number,
-                                WireFormat.WIRETYPE_LENGTH_DELIMITED
-                            )
+                        makeTag(
+                            state.descriptor.descriptor.number,
+                            WireFormat.WIRETYPE_LENGTH_DELIMITED
+                        )
                         }).beginLd().apply{ value.forEach { $method(it) } }.endLd()"
                     )
                     repeated && message -> {
@@ -290,63 +294,63 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
 
                             addStatement(
                                 "value.forEach { k, v -> writer.tag(${
-                                    makeTag(
-                                        state.descriptor.descriptor.number,
-                                        WireFormat.WIRETYPE_LENGTH_DELIMITED
-                                    )
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    WireFormat.WIRETYPE_LENGTH_DELIMITED
+                                )
                                 }).beginLd().tag(${
-                                    makeTag(
-                                        1,
-                                        keyType.wireType
-                                    )
+                                makeTag(
+                                    1,
+                                    keyType.wireType
+                                )
                                 }).${keyType.name.toLowerCase()}(k).tag(${
-                                    makeTag(
-                                        2,
-                                        valueType.wireType
-                                    )
+                                makeTag(
+                                    2,
+                                    valueType.wireType
+                                )
                                 }).${valueType.name.toLowerCase()}(v).endLd() }"
                             )
                         } else {
                             addStatement(
                                 "value.forEach { writer.tag(${
-                                    makeTag(
-                                        state.descriptor.descriptor.number,
-                                        WireFormat.WIRETYPE_LENGTH_DELIMITED
-                                    )
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    WireFormat.WIRETYPE_LENGTH_DELIMITED
+                                )
                                 }).${if (any) "any" else "message"}(it) }"
                             )
                         }
                     }
                     repeated -> addStatement(
                         "value.forEach { writer.tag(${
-                            makeTag(
-                                state.descriptor.descriptor.number,
-                                type.wireType
-                            )
+                        makeTag(
+                            state.descriptor.descriptor.number,
+                            type.wireType
+                        )
                         }).$method(it) }"
                     )
                     enum -> addStatement(
                         "writer.tag(${
-                            makeTag(
-                                state.descriptor.descriptor.number,
-                                type.wireType
-                            )
+                        makeTag(
+                            state.descriptor.descriptor.number,
+                            type.wireType
+                        )
                         }).int32(value.number)"
                     )
                     message -> addStatement(
                         "writer.tag(${
-                            makeTag(
-                                state.descriptor.descriptor.number,
-                                WireFormat.WIRETYPE_LENGTH_DELIMITED
-                            )
+                        makeTag(
+                            state.descriptor.descriptor.number,
+                            WireFormat.WIRETYPE_LENGTH_DELIMITED
+                        )
                         }).${if (any) "any" else "message"}(value)"
                     )
                     else -> addStatement(
                         "writer.tag(${
-                            makeTag(
-                                state.descriptor.descriptor.number,
-                                type.wireType
-                            )
+                        makeTag(
+                            state.descriptor.descriptor.number,
+                            type.wireType
+                        )
                         }).$method(value)"
                     )
                 }

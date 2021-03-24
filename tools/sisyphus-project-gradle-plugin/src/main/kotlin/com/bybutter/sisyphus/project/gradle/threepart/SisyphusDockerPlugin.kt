@@ -19,8 +19,9 @@ class SisyphusDockerPlugin : Plugin<Project> {
         val dockerFile = target.projectDir.resolve("Dockerfile")
         if (!dockerFile.exists()) return
         if (!target.tryApplyPluginClass("com.palantir.gradle.docker.PalantirDockerPlugin") {
-                target.afterEvaluate { afterEvaluate(it) }
-            }) return
+            target.afterEvaluate { afterEvaluate(it) }
+        }
+        ) return
         val docker = target.extensions.getByType(DockerExtension::class.java)
         docker.name = "${target.name}:${target.version}"
 

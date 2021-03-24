@@ -42,7 +42,8 @@ open class BaseEncoding(val table: CharArray) {
         for (char in input) {
             stream.writeInt(
                 reverseMap[char]
-                    ?: throw IllegalArgumentException("Wrong base$bits input '$char'."), bits
+                    ?: throw IllegalArgumentException("Wrong base$bits input '$char'."),
+                bits
             )
         }
         return output.toByteArray()

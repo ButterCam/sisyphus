@@ -1,8 +1,8 @@
 package com.bybutter.sisyphus.project.gradle
 
-import java.net.URI
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
+import java.net.URI
 
 internal fun Project.ensurePlugin(vararg ids: String, block: (Project) -> Unit): Boolean {
     for (id in ids) {

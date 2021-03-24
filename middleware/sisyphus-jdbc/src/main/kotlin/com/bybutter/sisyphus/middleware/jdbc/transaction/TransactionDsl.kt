@@ -1,9 +1,9 @@
 package com.bybutter.sisyphus.middleware.jdbc.transaction
 
-import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 /**
  * Always open a new non-transaction transaction.

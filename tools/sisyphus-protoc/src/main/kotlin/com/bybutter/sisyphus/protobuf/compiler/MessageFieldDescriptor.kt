@@ -27,9 +27,11 @@ open class MessageFieldDescriptor(
     }
 
     fun document(): String {
-        return escapeDoc(file().descriptor.sourceCodeInfo?.locationList?.firstOrNull {
-            it.pathList.contentEquals(path())
-        }?.leadingComments ?: "")
+        return escapeDoc(
+            file().descriptor.sourceCodeInfo?.locationList?.firstOrNull {
+                it.pathList.contentEquals(path())
+            }?.leadingComments ?: ""
+        )
     }
 
     fun oneof(): OneofFieldDescriptor? {

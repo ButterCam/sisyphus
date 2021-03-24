@@ -33,9 +33,11 @@ class MessageApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (message in state.descriptor.messages) {
             if (message.mapEntry()) continue
-            state.target.addType(kInterface(message.name()) {
-                MessageInterfaceGeneratingState(state, message, this).advance()
-            })
+            state.target.addType(
+                kInterface(message.name()) {
+                    MessageInterfaceGeneratingState(state, message, this).advance()
+                }
+            )
         }
 
         return true
@@ -53,9 +55,11 @@ class MessageInterfaceBasicGenerator : GroupedGenerator<MessageInterfaceGenerati
 
             for (message in state.descriptor.messages) {
                 if (message.mapEntry()) continue
-                state.target.addType(kInterface(message.name()) {
-                    MessageInterfaceGeneratingState(state, message, this).advance()
-                })
+                state.target.addType(
+                    kInterface(message.name()) {
+                        MessageInterfaceGeneratingState(state, message, this).advance()
+                    }
+                )
             }
 
             companion {
@@ -73,17 +77,23 @@ class MessageInternalGenerator : GroupedGenerator<InternalFileGeneratingState> {
         for (message in state.descriptor.messages) {
             if (message.mapEntry()) continue
 
-            state.target.addType(kInterface(message.mutableName()) {
-                MutableMessageInterfaceGeneratingState(state, message, this).advance()
-            })
+            state.target.addType(
+                kInterface(message.mutableName()) {
+                    MutableMessageInterfaceGeneratingState(state, message, this).advance()
+                }
+            )
 
-            state.target.addType(kClass(message.implementationName()) {
-                MessageImplementationGeneratingState(state, message, this).advance()
-            })
+            state.target.addType(
+                kClass(message.implementationName()) {
+                    MessageImplementationGeneratingState(state, message, this).advance()
+                }
+            )
 
-            state.target.addType(kClass(message.supportName()) {
-                MessageSupportGeneratingState(state, message, this).advance()
-            })
+            state.target.addType(
+                kClass(message.supportName()) {
+                    MessageSupportGeneratingState(state, message, this).advance()
+                }
+            )
         }
         return true
     }
@@ -100,9 +110,11 @@ class MutableMessageInterfaceBasicGenerator : GroupedGenerator<MutableMessageInt
 
             for (message in state.descriptor.messages) {
                 if (message.mapEntry()) continue
-                state.target.addType(kInterface(message.mutableName()) {
-                    MutableMessageInterfaceGeneratingState(state, message, this).advance()
-                })
+                state.target.addType(
+                    kInterface(message.mutableName()) {
+                        MutableMessageInterfaceGeneratingState(state, message, this).advance()
+                    }
+                )
             }
         }
         return true
@@ -122,9 +134,11 @@ class MessageImplementationBasicGenerator : GroupedGenerator<MessageImplementati
 
             for (message in state.descriptor.messages) {
                 if (message.mapEntry()) continue
-                state.target.addType(kClass(message.implementationName()) {
-                    MessageImplementationGeneratingState(state, message, this).advance()
-                })
+                state.target.addType(
+                    kClass(message.implementationName()) {
+                        MessageImplementationGeneratingState(state, message, this).advance()
+                    }
+                )
             }
         }
         return true
@@ -172,26 +186,28 @@ class MessageSupportBasicGenerator : GroupedGenerator<MessageSupportGeneratingSt
 
             property("descriptor", RuntimeTypes.DESCRIPTOR_PROTO) {
                 this += KModifier.OVERRIDE
-                delegate(buildCodeBlock {
-                    beginControlFlow("%M", RuntimeMethods.LAZY)
-                    when (val parent = state.descriptor.parent) {
-                        is FileDescriptor -> {
-                            addStatement(
-                                "%T.descriptor.messageType.first{ it.name == %S }",
-                                parent.fileMetadataClassName(),
-                                state.descriptor.descriptor.name
-                            )
+                delegate(
+                    buildCodeBlock {
+                        beginControlFlow("%M", RuntimeMethods.LAZY)
+                        when (val parent = state.descriptor.parent) {
+                            is FileDescriptor -> {
+                                addStatement(
+                                    "%T.descriptor.messageType.first{ it.name == %S }",
+                                    parent.fileMetadataClassName(),
+                                    state.descriptor.descriptor.name
+                                )
+                            }
+                            is MessageDescriptor -> {
+                                addStatement(
+                                    "%T.descriptor.nestedType.first{ it.name == %S }",
+                                    parent.className(),
+                                    state.descriptor.descriptor.name
+                                )
+                            }
                         }
-                        is MessageDescriptor -> {
-                            addStatement(
-                                "%T.descriptor.nestedType.first{ it.name == %S }",
-                                parent.className(),
-                                state.descriptor.descriptor.name
-                            )
-                        }
+                        endControlFlow()
                     }
-                    endControlFlow()
-                })
+                )
             }
 
             function("newMutable") {
@@ -208,9 +224,11 @@ class MessageSupportBasicGenerator : GroupedGenerator<MessageSupportGeneratingSt
 
             for (message in state.descriptor.messages) {
                 if (message.mapEntry()) continue
-                state.target.addType(kClass(message.supportName()) {
-                    MessageSupportGeneratingState(state, message, this).advance()
-                })
+                state.target.addType(
+                    kClass(message.supportName()) {
+                        MessageSupportGeneratingState(state, message, this).advance()
+                    }
+                )
             }
             return true
         }

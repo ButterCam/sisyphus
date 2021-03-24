@@ -1,11 +1,11 @@
 package com.bybutter.sisyphus.dto
 
 import com.bybutter.sisyphus.reflect.uncheckedCast
-import kotlin.math.roundToInt
-import kotlin.reflect.KProperty
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import kotlin.math.roundToInt
+import kotlin.reflect.KProperty
 
 interface TestDto<T> : DtoModel {
     var value: T

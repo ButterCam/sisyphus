@@ -1,8 +1,8 @@
 package com.bybutter.sisyphus.middleware.retrofit
 
 import com.bybutter.sisyphus.middleware.retrofit.converter.JacksonConverterFactory
-import kotlin.reflect.KClass
 import retrofit2.Converter
+import kotlin.reflect.KClass
 
 /**
  * Declare that this is a retrofit client.
