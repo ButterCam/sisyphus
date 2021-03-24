@@ -18,7 +18,7 @@ dependencies {
     api(platform("io.micrometer:micrometer-bom:1.6.5"))
     api(platform("org.apache.maven:maven:3.6.3"))
     api(platform("org.apache.rocketmq:rocketmq-all:4.8.0"))
-    api(platform("org.jetbrains.kotlin:kotlin-bom:1.4.31"))
+    api(platform("org.jetbrains.kotlin:kotlin-bom:1.4.32"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2"))
     api(platform("org.junit:junit-bom:5.7.1"))
     api(platform("org.springframework.boot:spring-boot-dependencies:2.4.4"))
