@@ -46,70 +46,81 @@ class SeparatedCoroutineServiceInternalFileGenerator : GroupedGenerator<FileGene
 
 class SeparatedCoroutineServiceFileSupportGenerator : GroupedGenerator<RpcInternalFileGeneratingState> {
     override fun generate(state: RpcInternalFileGeneratingState): Boolean {
-        state.target.addType(kObject(state.descriptor.rpcFileMetadataName()) {
-            this extends RuntimeTypes.FILE_SUPPORT
+        state.target.addType(
+            kObject(state.descriptor.rpcFileMetadataName()) {
+                this extends RuntimeTypes.FILE_SUPPORT
 
-            property("name", String::class) {
-                this += KModifier.OVERRIDE
-                initializer("%S", state.descriptor.descriptor.name)
-            }
-
-            property("descriptor", RuntimeTypes.FILE_DESCRIPTOR_PROTO) {
-                this += KModifier.OVERRIDE
-                delegate(buildCodeBlock {
-                    beginScope("%M", RuntimeMethods.LAZY) {
-                        addStatement(
-                            "readDescriptor(%S)",
-                            state.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
-                        )
-                    }
-                })
-            }
-
-            function("register") {
-                this += KModifier.OVERRIDE
-                for (service in state.descriptor.services) {
-                    ServiceRegisterGeneratingState(state, service, this).advance()
+                property("name", String::class) {
+                    this += KModifier.OVERRIDE
+                    initializer("%S", state.descriptor.descriptor.name)
                 }
-            }
 
-            FileSupportGeneratingState(state, state.descriptor, this).advance()
-        })
+                property("descriptor", RuntimeTypes.FILE_DESCRIPTOR_PROTO) {
+                    this += KModifier.OVERRIDE
+                    delegate(
+                        buildCodeBlock {
+                            beginScope("%M", RuntimeMethods.LAZY) {
+                                addStatement(
+                                    "readDescriptor(%S)",
+                                    state.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
+                                )
+                            }
+                        }
+                    )
+                }
+
+                function("register") {
+                    this += KModifier.OVERRIDE
+                    for (service in state.descriptor.services) {
+                        ServiceRegisterGeneratingState(state, service, this).advance()
+                    }
+                }
+
+                FileSupportGeneratingState(state, state.descriptor, this).advance()
+            }
+        )
         return true
     }
 }
 
-class SeparatedCoroutineServiceGenerator : GroupedGenerator<RpcApiFileGeneratingState>,
+class SeparatedCoroutineServiceGenerator :
+    GroupedGenerator<RpcApiFileGeneratingState>,
     SortableGenerator<RpcApiFileGeneratingState> {
     override val group: String = CoroutineServiceGenerator::class.java.canonicalName
     override val order: Int = -1000
 
     override fun generate(state: RpcApiFileGeneratingState): Boolean {
         for (service in state.descriptor.services) {
-            state.target.addType(kClass(service.name()) {
-                ServiceGeneratingState(state, service, this).advance()
-            })
+            state.target.addType(
+                kClass(service.name()) {
+                    ServiceGeneratingState(state, service, this).advance()
+                }
+            )
         }
         return true
     }
 }
 
-class SeparatedCoroutineServiceSupportGenerator : GroupedGenerator<RpcInternalFileGeneratingState>,
+class SeparatedCoroutineServiceSupportGenerator :
+    GroupedGenerator<RpcInternalFileGeneratingState>,
     SortableGenerator<RpcInternalFileGeneratingState> {
     override val group: String = CoroutineServiceSupportGenerator::class.java.canonicalName
     override val order: Int = -1000
 
     override fun generate(state: RpcInternalFileGeneratingState): Boolean {
         for (service in state.descriptor.services) {
-            state.target.addType(kClass(service.supportName()) {
-                ServiceSupportGeneratingState(state, service, this).advance()
-            })
+            state.target.addType(
+                kClass(service.supportName()) {
+                    ServiceSupportGeneratingState(state, service, this).advance()
+                }
+            )
         }
         return true
     }
 }
 
-class SeparatedCoroutineServiceSupportBasicGenerator : GroupedGenerator<ServiceSupportGeneratingState>,
+class SeparatedCoroutineServiceSupportBasicGenerator :
+    GroupedGenerator<ServiceSupportGeneratingState>,
     SortableGenerator<ServiceSupportGeneratingState> {
     override val order: Int = 1000
 

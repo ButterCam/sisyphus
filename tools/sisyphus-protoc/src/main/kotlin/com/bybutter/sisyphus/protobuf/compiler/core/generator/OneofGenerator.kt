@@ -40,9 +40,11 @@ class OneofInterfaceGenerator : GroupedGenerator<MessageInterfaceGeneratingState
                 oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true)
             )
 
-            state.target.addType(kInterface(oneof.oneOfName()) {
-                OneofValueTypeGeneratingState(state, oneof, this).advance()
-            })
+            state.target.addType(
+                kInterface(oneof.oneOfName()) {
+                    OneofValueTypeGeneratingState(state, oneof, this).advance()
+                }
+            )
         }
         return true
     }
@@ -118,7 +120,8 @@ class OneofImplementationGenerator : GroupedGenerator<MessageImplementationGener
     }
 }
 
-class OneofFieldImplementationInterceptorGenerator : GroupedGenerator<FieldImplementationGeneratingState>,
+class OneofFieldImplementationInterceptorGenerator :
+    GroupedGenerator<FieldImplementationGeneratingState>,
     SortableGenerator<FieldImplementationGeneratingState> {
     override val group: String get() = MessageImplementationFieldBasicGenerator::class.java.canonicalName
     override val order: Int = -1000
@@ -147,21 +150,23 @@ class OneofFieldImplementationInterceptorGenerator : GroupedGenerator<FieldImple
             }
             setter {
                 addParameter("value", state.descriptor.mutableFieldType())
-                addCode(buildCodeBlock {
-                    if (state.descriptor.mutableFieldType().isNullable) {
-                        addStatement(
-                            "%N = value?.let { %T(it) }",
-                            oneOf.fieldName(),
-                            oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
-                        )
-                    } else {
-                        addStatement(
-                            "%N = %T(value)",
-                            oneOf.fieldName(),
-                            oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
-                        )
+                addCode(
+                    buildCodeBlock {
+                        if (state.descriptor.mutableFieldType().isNullable) {
+                            addStatement(
+                                "%N = value?.let { %T(it) }",
+                                oneOf.fieldName(),
+                                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                            )
+                        } else {
+                            addStatement(
+                                "%N = %T(value)",
+                                oneOf.fieldName(),
+                                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                            )
+                        }
                     }
-                })
+                )
             }
         }
 

@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.middleware.configuration.maven
 
-import java.io.File
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils
 import org.eclipse.aether.RepositorySystem
 import org.eclipse.aether.RepositorySystemSession
@@ -23,6 +22,7 @@ import org.eclipse.aether.transport.wagon.WagonProvider
 import org.eclipse.aether.transport.wagon.WagonTransporterFactory
 import org.eclipse.aether.util.repository.AuthenticationBuilder
 import org.eclipse.aether.util.version.GenericVersionScheme
+import java.io.File
 
 class Aether {
     private val system: RepositorySystem

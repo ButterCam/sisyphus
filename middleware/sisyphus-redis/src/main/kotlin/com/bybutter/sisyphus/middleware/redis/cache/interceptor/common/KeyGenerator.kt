@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.middleware.redis.cache.interceptor.common
 
 import com.bybutter.sisyphus.middleware.redis.cache.interceptor.EvaluationContextInterceptor
 import com.bybutter.sisyphus.middleware.redis.cache.toCRC32
-import java.lang.reflect.Method
 import org.aopalliance.intercept.MethodInvocation
 import org.slf4j.LoggerFactory
 import org.springframework.core.DefaultParameterNameDiscoverer
@@ -10,6 +9,7 @@ import org.springframework.expression.EvaluationContext
 import org.springframework.expression.Expression
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.support.StandardEvaluationContext
+import java.lang.reflect.Method
 
 object KeyGenerator {
     private val log = LoggerFactory.getLogger(this.javaClass)

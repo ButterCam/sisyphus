@@ -1,7 +1,5 @@
 package com.bybutter.sisyphus.middleware.jdbc
 
-import javax.sql.DataSource
-import kotlin.streams.toList
 import org.jooq.Configuration
 import org.jooq.ExecuteListenerProvider
 import org.jooq.ExecutorProvider
@@ -18,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
+import javax.sql.DataSource
+import kotlin.streams.toList
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)

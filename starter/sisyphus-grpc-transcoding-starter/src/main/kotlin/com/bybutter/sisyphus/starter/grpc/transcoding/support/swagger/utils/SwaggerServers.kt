@@ -9,19 +9,26 @@ object SwaggerServers {
     fun fetchServers(servers: List<SwaggerServer>?): List<Server> {
         return mutableListOf<Server>().apply {
             servers?.forEach {
-                add(Server().apply {
-                    url = it.url
-                    description = it.description
-                    variables(ServerVariables().apply {
-                        for ((key, value) in it.serverVariables ?: mapOf()) {
-                            addServerVariable(key, ServerVariable().apply {
-                                default = value.default
-                                enum = value.enum
-                                description = value.description
-                            })
-                        }
-                    })
-                })
+                add(
+                    Server().apply {
+                        url = it.url
+                        description = it.description
+                        variables(
+                            ServerVariables().apply {
+                                for ((key, value) in it.serverVariables ?: mapOf()) {
+                                    addServerVariable(
+                                        key,
+                                        ServerVariable().apply {
+                                            default = value.default
+                                            enum = value.enum
+                                            description = value.description
+                                        }
+                                    )
+                                }
+                            }
+                        )
+                    }
+                )
             }
         }
     }

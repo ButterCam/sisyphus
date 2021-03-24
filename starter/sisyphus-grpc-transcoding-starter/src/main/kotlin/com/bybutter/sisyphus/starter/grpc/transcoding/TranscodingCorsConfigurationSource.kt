@@ -115,12 +115,14 @@ class TranscodingCorsConfigurationSource(
         val normalizedPattern = pathTemplate.withoutVars().toString()
 
         val config = corsConfigurations.getOrPut(normalizedPattern) {
-            interceptors.fold(CorsConfiguration().apply {
-                addAllowedHeader(CorsConfiguration.ALL)
-                addAllowedOrigin(CorsConfiguration.ALL)
-                addAllowedMethod(HttpMethod.OPTIONS)
-                addAllowedMethod(HttpMethod.HEAD)
-            }) { config, interceptor ->
+            interceptors.fold(
+                CorsConfiguration().apply {
+                    addAllowedHeader(CorsConfiguration.ALL)
+                    addAllowedOrigin(CorsConfiguration.ALL)
+                    addAllowedMethod(HttpMethod.OPTIONS)
+                    addAllowedMethod(HttpMethod.HEAD)
+                }
+            ) { config, interceptor ->
                 interceptor.intercept(config, method, pattern, normalizedPattern)
             }
         }

@@ -22,7 +22,8 @@ open class ProtocRunner(val version: String = "3.11.4") {
                 "--include_imports",
                 "--include_source_info",
                 *source.toTypedArray()
-            ), System.out, System.out
+            ),
+            System.out, System.out
         )
         if (result != 0) {
             throw IllegalStateException("Protoc return '$result' with not zero value.")

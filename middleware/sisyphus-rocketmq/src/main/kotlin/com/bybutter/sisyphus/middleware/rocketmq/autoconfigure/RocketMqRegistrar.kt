@@ -40,10 +40,14 @@ class RocketMqRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
         val rocketMqProperties = Binder.get(environment)
             .bind("sisyphus.rocketmq", RocketMqProperties::class.java)
             .orElse(null)
-        val producerProperties = (rocketMqProperties?.producers
-            ?: mapOf()) + beanFactory.getBeansOfType<RocketMqProducerProperty>()
-        val consumerProperties = (rocketMqProperties?.consumers
-            ?: mapOf()) + beanFactory.getBeansOfType<RocketMqConsumerProperty>()
+        val producerProperties = (
+            rocketMqProperties?.producers
+                ?: mapOf()
+            ) + beanFactory.getBeansOfType<RocketMqProducerProperty>()
+        val consumerProperties = (
+            rocketMqProperties?.consumers
+                ?: mapOf()
+            ) + beanFactory.getBeansOfType<RocketMqConsumerProperty>()
 
         for ((name, property) in producerProperties) {
             val producerName = "$BEAN_NAME_PREFIX:${name}Producer"
@@ -78,11 +82,12 @@ class RocketMqRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
 
             val consumerName = "$BEAN_NAME_PREFIX:${listener}Consumer"
             val consumerDefinition = BeanDefinitionBuilder.genericBeanDefinition(SmartLifecycle::class.java) {
-                ConsumerLifecycle(beanFactory.getBean(RocketMqResourceFactory::class.java)
-                    .createConsumer(consumer, annotation, beanFactory.getBean<MessageListener<*>>(listener))
-                    .also {
-                        logger.info("RocketMQ listener (${annotation.groupId}) registered on topic '${annotation.topic}(${annotation.filter})'.")
-                    }
+                ConsumerLifecycle(
+                    beanFactory.getBean(RocketMqResourceFactory::class.java)
+                        .createConsumer(consumer, annotation, beanFactory.getBean<MessageListener<*>>(listener))
+                        .also {
+                            logger.info("RocketMQ listener (${annotation.groupId}) registered on topic '${annotation.topic}(${annotation.filter})'.")
+                        }
                 )
             }.beanDefinition
             consumerDefinition.addQualifier(AutowireCandidateQualifier(consumer.qualifier))

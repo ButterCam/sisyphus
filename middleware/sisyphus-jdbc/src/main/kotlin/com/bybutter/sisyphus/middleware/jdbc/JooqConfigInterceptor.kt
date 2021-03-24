@@ -1,8 +1,8 @@
 package com.bybutter.sisyphus.middleware.jdbc
 
-import javax.sql.DataSource
 import org.jooq.Configuration
 import org.jooq.SQLDialect
+import javax.sql.DataSource
 
 /**
  * Interceptor for specified Jooq configuration.

@@ -13,16 +13,20 @@ import com.bybutter.sisyphus.protobuf.compiler.parameter
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.UNIT
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 class RxClientGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (service in state.descriptor.services) {
-            state.target.addType(kClass(service.name()) {
-                ClientGeneratingState(state, service, this).advance()
-            })
+            state.target.addType(
+                kClass(service.name()) {
+                    ClientGeneratingState(state, service, this).advance()
+                }
+            )
         }
         return true
     }
@@ -118,6 +122,20 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                 }
             }
 
+            if (!method.descriptor.clientStreaming) {
+                state.target.function(method.name()) {
+                    this += KModifier.INLINE
+                    if (returnEmpty) {
+                        returns(RuntimeTypes.COMPLETABLE)
+                    } else {
+                        returns(RuntimeTypes.SINGLE.parameterizedBy(method.outputMessage().className()))
+                    }
+
+                    addParameter("block", LambdaTypeName.get(method.inputMessage().mutableClassName(), listOf(), UNIT))
+                    addStatement("return ${method.name()}(%T { block() })", method.inputMessage().className())
+                }
+            }
+
             // generate method descriptor
             state.target.property(
                 method.name(),
@@ -126,28 +144,30 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                     method.outputMessage().className()
                 )
             ) {
-                initializer(buildCodeBlock {
-                    add(
-                        "%T.newBuilder<%T,·%T>()\n",
-                        RuntimeTypes.METHOD_DESCRIPTOR,
-                        method.inputMessage().className(),
-                        method.outputMessage().className()
-                    )
-                    add(".setType(MethodDescriptor.MethodType.%L)\n", "UNARY")
-                    add(".setFullMethodName(%S)\n", method.fullProtoName().substring(1))
-                    add(
-                        ".setRequestMarshaller(%T.%M())\n",
-                        method.inputMessage().className(),
-                        RuntimeMethods.MARSHALLER
-                    )
-                    add(
-                        ".setResponseMarshaller(%T.%M())\n",
-                        method.outputMessage().className(),
-                        RuntimeMethods.MARSHALLER
-                    )
-                    add(".setSchemaDescriptor(this)\n")
-                    add(".build()\n")
-                })
+                initializer(
+                    buildCodeBlock {
+                        add(
+                            "%T.newBuilder<%T,·%T>()\n",
+                            RuntimeTypes.METHOD_DESCRIPTOR,
+                            method.inputMessage().className(),
+                            method.outputMessage().className()
+                        )
+                        add(".setType(MethodDescriptor.MethodType.%L)\n", "UNARY")
+                        add(".setFullMethodName(%S)\n", method.fullProtoName().substring(1))
+                        add(
+                            ".setRequestMarshaller(%T.%M())\n",
+                            method.inputMessage().className(),
+                            RuntimeMethods.MARSHALLER
+                        )
+                        add(
+                            ".setResponseMarshaller(%T.%M())\n",
+                            method.outputMessage().className(),
+                            RuntimeMethods.MARSHALLER
+                        )
+                        add(".setSchemaDescriptor(this)\n")
+                        add(".build()\n")
+                    }
+                )
             }
         }
         return true

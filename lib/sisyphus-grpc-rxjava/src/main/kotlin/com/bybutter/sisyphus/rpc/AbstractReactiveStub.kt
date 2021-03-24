@@ -47,12 +47,16 @@ abstract class AbstractReactiveStub<T : AbstractReactiveStub<T>>(
         input: TReq
     ): Single<TRes> {
         val options = buildOption(method)
-        return ClientCalls.oneToOne<TReq, TRes>(Single.just(input), { req, res ->
-            io.grpc.stub.ClientCalls.asyncUnaryCall(
-                channel.newCall(method, options),
-                req, res
-            )
-        }, options)
+        return ClientCalls.oneToOne<TReq, TRes>(
+            Single.just(input),
+            { req, res ->
+                io.grpc.stub.ClientCalls.asyncUnaryCall(
+                    channel.newCall(method, options),
+                    req, res
+                )
+            },
+            options
+        )
     }
 
     protected fun <TReq, TRes> serverStreaming(
@@ -60,12 +64,16 @@ abstract class AbstractReactiveStub<T : AbstractReactiveStub<T>>(
         input: TReq
     ): Flowable<TRes> {
         val options = buildOption(method)
-        return ClientCalls.oneToMany<TReq, TRes>(Single.just(input), { req, res ->
-            io.grpc.stub.ClientCalls.asyncServerStreamingCall(
-                channel.newCall(method, options),
-                req, res
-            )
-        }, options)
+        return ClientCalls.oneToMany<TReq, TRes>(
+            Single.just(input),
+            { req, res ->
+                io.grpc.stub.ClientCalls.asyncServerStreamingCall(
+                    channel.newCall(method, options),
+                    req, res
+                )
+            },
+            options
+        )
     }
 
     protected fun <TReq, TRes> clientStreaming(
@@ -73,12 +81,16 @@ abstract class AbstractReactiveStub<T : AbstractReactiveStub<T>>(
         input: Flowable<TReq>
     ): Single<TRes> {
         val options = buildOption(method)
-        return ClientCalls.manyToOne(input, {
-            io.grpc.stub.ClientCalls.asyncClientStreamingCall(
-                channel.newCall(method, options),
-                it
-            )
-        }, options)
+        return ClientCalls.manyToOne(
+            input,
+            {
+                io.grpc.stub.ClientCalls.asyncClientStreamingCall(
+                    channel.newCall(method, options),
+                    it
+                )
+            },
+            options
+        )
     }
 
     protected fun <TReq, TRes> bidiStreaming(
@@ -86,11 +98,15 @@ abstract class AbstractReactiveStub<T : AbstractReactiveStub<T>>(
         input: Flowable<TReq>
     ): Flowable<TRes> {
         val options = buildOption(method)
-        return ClientCalls.manyToMany(input, {
-            io.grpc.stub.ClientCalls.asyncClientStreamingCall(
-                channel.newCall(method, options),
-                it
-            )
-        }, options)
+        return ClientCalls.manyToMany(
+            input,
+            {
+                io.grpc.stub.ClientCalls.asyncClientStreamingCall(
+                    channel.newCall(method, options),
+                    it
+                )
+            },
+            options
+        )
     }
 }

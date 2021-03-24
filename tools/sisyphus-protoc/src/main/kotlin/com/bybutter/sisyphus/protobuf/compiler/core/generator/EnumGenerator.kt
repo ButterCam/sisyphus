@@ -30,9 +30,11 @@ import com.squareup.kotlinpoet.buildCodeBlock
 class EnumApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
     override fun generate(state: ApiFileGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
-            state.target.addType(kEnum(enum.name()) {
-                EnumGeneratingState(state, enum, this).advance()
-            })
+            state.target.addType(
+                kEnum(enum.name()) {
+                    EnumGeneratingState(state, enum, this).advance()
+                }
+            )
         }
 
         return true
@@ -42,9 +44,11 @@ class EnumApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
 class NestedEnumGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
-            state.target.addType(kEnum(enum.name()) {
-                EnumGeneratingState(state, enum, this).advance()
-            })
+            state.target.addType(
+                kEnum(enum.name()) {
+                    EnumGeneratingState(state, enum, this).advance()
+                }
+            )
         }
 
         return true
@@ -75,7 +79,8 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
 
             for (value in state.descriptor.values) {
                 state.target.addEnumConstant(
-                    value.name(), TypeSpec.anonymousClassBuilder()
+                    value.name(),
+                    TypeSpec.anonymousClassBuilder()
                         .addSuperclassConstructorParameter("%L", value.descriptor.number)
                         .addSuperclassConstructorParameter("%S", value.descriptor.name)
                         .build()
@@ -89,9 +94,11 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
 class EnumSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
-            state.target.addType(kClass(enum.supportName()) {
-                EnumSupportGeneratingState(state, enum, this).advance()
-            })
+            state.target.addType(
+                kClass(enum.supportName()) {
+                    EnumSupportGeneratingState(state, enum, this).advance()
+                }
+            )
         }
         return true
     }
@@ -100,9 +107,11 @@ class EnumSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
 class NestedEnumSupportGenerator : GroupedGenerator<MessageSupportGeneratingState> {
     override fun generate(state: MessageSupportGeneratingState): Boolean {
         for (enum in state.descriptor.enums) {
-            state.target.addType(kClass(enum.supportName()) {
-                EnumSupportGeneratingState(state, enum, this).advance()
-            })
+            state.target.addType(
+                kClass(enum.supportName()) {
+                    EnumSupportGeneratingState(state, enum, this).advance()
+                }
+            )
         }
         return true
     }
@@ -146,26 +155,28 @@ class EnumSupportBasicGenerator : GroupedGenerator<EnumSupportGeneratingState> {
 
             property("descriptor", RuntimeTypes.ENUM_DESCRIPTOR_PROTO) {
                 this += KModifier.OVERRIDE
-                delegate(buildCodeBlock {
-                    beginControlFlow("%M", RuntimeMethods.LAZY)
-                    when (val parent = state.descriptor.parent) {
-                        is FileDescriptor -> {
-                            addStatement(
-                                "%T.descriptor.enumType.first{ it.name == %S }",
-                                parent.fileMetadataClassName(),
-                                state.descriptor.descriptor.name
-                            )
+                delegate(
+                    buildCodeBlock {
+                        beginControlFlow("%M", RuntimeMethods.LAZY)
+                        when (val parent = state.descriptor.parent) {
+                            is FileDescriptor -> {
+                                addStatement(
+                                    "%T.descriptor.enumType.first{ it.name == %S }",
+                                    parent.fileMetadataClassName(),
+                                    state.descriptor.descriptor.name
+                                )
+                            }
+                            is MessageDescriptor -> {
+                                addStatement(
+                                    "%T.descriptor.enumType.first{ it.name == %S }",
+                                    parent.className(),
+                                    state.descriptor.descriptor.name
+                                )
+                            }
                         }
-                        is MessageDescriptor -> {
-                            addStatement(
-                                "%T.descriptor.enumType.first{ it.name == %S }",
-                                parent.className(),
-                                state.descriptor.descriptor.name
-                            )
-                        }
+                        endControlFlow()
                     }
-                    endControlFlow()
-                })
+                )
             }
         }
         return true

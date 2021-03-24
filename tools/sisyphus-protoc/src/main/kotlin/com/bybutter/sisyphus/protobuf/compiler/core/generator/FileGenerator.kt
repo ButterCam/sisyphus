@@ -40,33 +40,37 @@ class InternalFileGenerator : GroupedGenerator<FileGeneratingState> {
 
 class FileSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
     override fun generate(state: InternalFileGeneratingState): Boolean {
-        state.target.addType(kObject(state.descriptor.fileMetadataName()) {
-            this extends RuntimeTypes.FILE_SUPPORT
+        state.target.addType(
+            kObject(state.descriptor.fileMetadataName()) {
+                this extends RuntimeTypes.FILE_SUPPORT
 
-            property("name", String::class) {
-                this += KModifier.OVERRIDE
-                initializer("%S", state.descriptor.descriptor.name)
+                property("name", String::class) {
+                    this += KModifier.OVERRIDE
+                    initializer("%S", state.descriptor.descriptor.name)
+                }
+
+                property("descriptor", RuntimeTypes.FILE_DESCRIPTOR_PROTO) {
+                    this += KModifier.OVERRIDE
+                    delegate(
+                        buildCodeBlock {
+                            beginScope("%M", RuntimeMethods.LAZY) {
+                                addStatement(
+                                    "readDescriptor(%S)",
+                                    state.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
+                                )
+                            }
+                        }
+                    )
+                }
+
+                function("register") {
+                    this += KModifier.OVERRIDE
+                    FileParentRegisterGeneratingState(state, state.descriptor, this).advance()
+                }
+
+                FileSupportGeneratingState(state, state.descriptor, this).advance()
             }
-
-            property("descriptor", RuntimeTypes.FILE_DESCRIPTOR_PROTO) {
-                this += KModifier.OVERRIDE
-                delegate(buildCodeBlock {
-                    beginScope("%M", RuntimeMethods.LAZY) {
-                        addStatement(
-                            "readDescriptor(%S)",
-                            state.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
-                        )
-                    }
-                })
-            }
-
-            function("register") {
-                this += KModifier.OVERRIDE
-                FileParentRegisterGeneratingState(state, state.descriptor, this).advance()
-            }
-
-            FileSupportGeneratingState(state, state.descriptor, this).advance()
-        })
+        )
         return true
     }
 }

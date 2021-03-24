@@ -135,13 +135,16 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
     private fun registerSwaggerCorsConfigSource(registry: BeanDefinitionRegistry) {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(CorsConfigurationSource::class.java) {
             UrlBasedCorsConfigurationSource().apply {
-                registerCorsConfiguration(swaggerProperty.path, CorsConfiguration().apply {
-                    addAllowedHeader(CorsConfiguration.ALL)
-                    addAllowedOrigin(CorsConfiguration.ALL)
-                    addAllowedMethod(HttpMethod.OPTIONS)
-                    addAllowedMethod(HttpMethod.HEAD)
-                    addAllowedMethod(HttpMethod.GET)
-                })
+                registerCorsConfiguration(
+                    swaggerProperty.path,
+                    CorsConfiguration().apply {
+                        addAllowedHeader(CorsConfiguration.ALL)
+                        addAllowedOrigin(CorsConfiguration.ALL)
+                        addAllowedMethod(HttpMethod.OPTIONS)
+                        addAllowedMethod(HttpMethod.HEAD)
+                        addAllowedMethod(HttpMethod.GET)
+                    }
+                )
             }
         }
         registry.registerBeanDefinition(

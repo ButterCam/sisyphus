@@ -5,12 +5,12 @@ import com.bybutter.sisyphus.middleware.redis.cache.MultiRedisCacheManager
 import com.bybutter.sisyphus.middleware.redis.cache.annotation.MultiCacheEvict
 import com.bybutter.sisyphus.middleware.redis.cache.interceptor.common.KeyGenerator.generateBatchKey
 import com.bybutter.sisyphus.middleware.redis.cache.interceptor.common.KeyGenerator.generateNormalKey
-import java.io.Serializable
-import java.lang.reflect.Method
 import org.aopalliance.intercept.MethodInterceptor
 import org.aopalliance.intercept.MethodInvocation
 import org.slf4j.LoggerFactory
 import org.springframework.cache.Cache
+import java.io.Serializable
+import java.lang.reflect.Method
 
 class MultiCacheEvictInterceptor(
     private val redisCacheManager: MultiRedisCacheManager,

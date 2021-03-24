@@ -96,11 +96,13 @@ object SwaggerSchema {
                             messagePath + listOf(
                                 FileDescriptorProto.PACKAGE_FIELD_NUMBER,
                                 messageSupport.descriptor.field.indexOf(field)
-                            ), fileSupport.descriptor
+                            ),
+                            fileSupport.descriptor
                         )?.let { description ->
                             this.description = description
                         }
-                    })
+                    }
+                )
             }
             name = messageSupport.name
             description = SwaggerDescription.fetchDescription(messagePath, fileSupport.descriptor)

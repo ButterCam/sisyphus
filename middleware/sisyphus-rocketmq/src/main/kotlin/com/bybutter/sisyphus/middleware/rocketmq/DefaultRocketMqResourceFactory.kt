@@ -55,14 +55,20 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
         }
 
         return if (consumerProperty.enableTrace) {
-            DefaultMQPushConsumer(metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
-                ?: MixAll.DEFAULT_CONSUMER_GROUP, hook,
+            DefaultMQPushConsumer(
+                metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
+                    ?: MixAll.DEFAULT_CONSUMER_GROUP,
+                hook,
                 AllocateMessageQueueAveragely(),
-                true, consumerProperty.traceTopic)
+                true, consumerProperty.traceTopic
+            )
         } else {
-            DefaultMQPushConsumer(metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
-                ?: MixAll.DEFAULT_CONSUMER_GROUP, hook,
-                AllocateMessageQueueAveragely())
+            DefaultMQPushConsumer(
+                metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
+                    ?: MixAll.DEFAULT_CONSUMER_GROUP,
+                hook,
+                AllocateMessageQueueAveragely()
+            )
         }.apply {
             this.namesrvAddr = chooseNameServerAddr(consumerProperty)
             if (consumerProperty.accessChannel != null) {

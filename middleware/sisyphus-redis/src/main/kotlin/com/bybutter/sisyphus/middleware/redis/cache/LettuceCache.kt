@@ -1,8 +1,8 @@
 package com.bybutter.sisyphus.middleware.redis.cache
 
 import io.lettuce.core.RedisClient
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.future.await
+import java.util.concurrent.TimeUnit
 
 class LettuceCache(private val client: RedisClient) : CacheProvider<String, String> {
     override suspend fun get(key: String): String? {

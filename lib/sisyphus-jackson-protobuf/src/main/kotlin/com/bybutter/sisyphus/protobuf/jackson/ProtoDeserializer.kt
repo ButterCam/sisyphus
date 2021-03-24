@@ -278,9 +278,11 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
         return Value {
             kind = when (p.currentToken) {
                 JsonToken.VALUE_STRING -> {
-                    (p.text.toDoubleOrNull()?.let {
-                        Value.Kind.NumberValue(it)
-                    } ?: Value.Kind.StringValue(p.text))
+                    (
+                        p.text.toDoubleOrNull()?.let {
+                            Value.Kind.NumberValue(it)
+                        } ?: Value.Kind.StringValue(p.text)
+                        )
                 }
                 JsonToken.VALUE_NUMBER_INT,
                 JsonToken.VALUE_NUMBER_FLOAT -> Value.Kind.NumberValue(p.doubleValue)

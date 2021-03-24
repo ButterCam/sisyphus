@@ -1,12 +1,12 @@
 package com.bybutter.sisyphus.middleware.jdbc.transaction
 
+import kotlinx.coroutines.ThreadContextElement
 import java.sql.Connection
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import javax.sql.DataSource
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.ThreadContextElement
 
 class CoroutineTransactionContext(transactionActive: Boolean = true) :
     AbstractCoroutineContextElement(CoroutineTransactionContext),
@@ -44,7 +44,8 @@ class CoroutineTransactionContext(transactionActive: Boolean = true) :
     override fun nest(): TransactionContext {
         return TransactionSavePointContext(
             this,
-            connectionHandle.values.associateWith { it.setSavepoint("Savepoint${savePointCounter.incrementAndGet()}") })
+            connectionHandle.values.associateWith { it.setSavepoint("Savepoint${savePointCounter.incrementAndGet()}") }
+        )
     }
 
     override fun rollback() {

@@ -148,14 +148,16 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
             is CelParser.SelectOrCallContext -> {
                 if (member.open != null) {
                     engine.runtime.invokeMarco(
-                        this, visit(member.member()), member.IDENTIFIER().text, member.args?.e
+                        this, visit(member.member()), member.IDENTIFIER().text,
+                        member.args?.e
                             ?: listOf()
                     ) { return it }
                     engine.runtime.invoke(
                         visit(member.member()),
                         member.IDENTIFIER().text,
                         member.args?.e?.map { visit(it) }
-                            ?: listOf())
+                            ?: listOf()
+                    )
                 } else {
                     if (member.text.startsWith(".")) {
                         engine.runtime.getGlobalField(member.text, global)
@@ -168,10 +170,15 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
                 engine.runtime.invoke(null, "index", visit(member.member()), visit(member.index))
             }
             is CelParser.CreateMessageContext -> {
-                engine.runtime.createMessage(member.member().text, (member.fieldInitializerList()?.fields
-                    ?: listOf()).asSequence().mapIndexed { index, token ->
-                    token.text to visit(member.fieldInitializerList().values[index])
-                }.associate { it })
+                engine.runtime.createMessage(
+                    member.member().text,
+                    (
+                        member.fieldInitializerList()?.fields
+                            ?: listOf()
+                        ).asSequence().mapIndexed { index, token ->
+                        token.text to visit(member.fieldInitializerList().values[index])
+                    }.associate { it }
+                )
             }
             else -> throw UnsupportedOperationException("Unsupported member expression '${member.text}'.")
         }
@@ -182,11 +189,15 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
             is CelParser.IdentOrGlobalCallContext -> {
                 if (primary.op != null) {
                     engine.runtime.invokeMarco(
-                        this, null, primary.IDENTIFIER().text, primary.args?.e
+                        this, null, primary.IDENTIFIER().text,
+                        primary.args?.e
                             ?: listOf()
                     ) { return it }
-                    engine.runtime.invoke(null, primary.IDENTIFIER().text, primary.args?.e?.map { visit(it) }
-                        ?: listOf())
+                    engine.runtime.invoke(
+                        null, primary.IDENTIFIER().text,
+                        primary.args?.e?.map { visit(it) }
+                            ?: listOf()
+                    )
                 } else {
                     engine.runtime.getGlobalField(primary.text, global)
                 }

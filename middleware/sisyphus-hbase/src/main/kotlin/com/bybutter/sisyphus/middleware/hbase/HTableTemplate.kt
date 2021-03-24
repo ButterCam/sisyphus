@@ -5,12 +5,12 @@ import com.bybutter.sisyphus.dto.DtoModel
 import com.bybutter.sisyphus.jackson.javaType
 import com.bybutter.sisyphus.middleware.hbase.annotation.HTable
 import com.bybutter.sisyphus.reflect.uncheckedCast
-import java.lang.reflect.ParameterizedType
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.Connection
 import org.apache.hadoop.hbase.client.Get
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.client.Scan
+import java.lang.reflect.ParameterizedType
 
 abstract class HTableTemplate<TKey : Any, TValue : Any> : HTemplate<TKey, TValue> {
     override lateinit var connection: Connection
@@ -69,8 +69,10 @@ abstract class HTableTemplate<TKey : Any, TValue : Any> : HTemplate<TKey, TValue
             val getRequests = keys.map { Get(rowKeyConverter.convert(it)) }
             return it.get(getRequests).filter { it.row != null }.associate {
                 val keyMap = keys.associate { rowKeyConverter.convert(it)?.hashWrapper() to it }
-                (keyMap[it.row.hashWrapper()]
-                    ?: throw RuntimeException("Key value not found.")) to tableModelConverter.convert(it)
+                (
+                    keyMap[it.row.hashWrapper()]
+                        ?: throw RuntimeException("Key value not found.")
+                    ) to tableModelConverter.convert(it)
             }
         }
     }

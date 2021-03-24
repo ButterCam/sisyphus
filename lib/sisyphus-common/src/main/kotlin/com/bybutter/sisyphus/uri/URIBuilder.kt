@@ -176,41 +176,45 @@ class URIBuilder {
 
     fun build(): URI {
         return if (isOpaque) {
-            URI(buildString {
-                scheme?.let {
-                    append(it)
-                    append(":")
+            URI(
+                buildString {
+                    scheme?.let {
+                        append(it)
+                        append(":")
+                    }
+                    schemeSpecificPart?.let {
+                        append(it)
+                    }
+                    fragment?.let {
+                        append("#")
+                        append(it)
+                    }
                 }
-                schemeSpecificPart?.let {
-                    append(it)
-                }
-                fragment?.let {
-                    append("#")
-                    append(it)
-                }
-            })
+            )
         } else {
-            URI(buildString {
-                scheme?.let {
-                    append(it)
-                    append(":")
+            URI(
+                buildString {
+                    scheme?.let {
+                        append(it)
+                        append(":")
+                    }
+                    authority?.let {
+                        append("//")
+                        append(it)
+                    }
+                    path?.let {
+                        append(it)
+                    }
+                    query?.let {
+                        append("?")
+                        append(it)
+                    }
+                    fragment?.let {
+                        append("#")
+                        append(it)
+                    }
                 }
-                authority?.let {
-                    append("//")
-                    append(it)
-                }
-                path?.let {
-                    append(it)
-                }
-                query?.let {
-                    append("?")
-                    append(it)
-                }
-                fragment?.let {
-                    append("#")
-                    append(it)
-                }
-            })
+            )
         }
     }
 

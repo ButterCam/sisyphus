@@ -69,16 +69,20 @@ class FilterEngineTest {
             }
             this.valueList = Value {
                 this.listValue = ListValue {
-                    this.values += arrayListOf(Value {
-                        this.numberValue = 30.0
-                    })
+                    this.values += arrayListOf(
+                        Value {
+                            this.numberValue = 30.0
+                        }
+                    )
                 }
             }
             this.valueStruct = Value {
                 this.structValue = Struct {
-                    this.fields += mapOf("struct" to Value {
-                        this.numberValue = 30.0
-                    })
+                    this.fields += mapOf(
+                        "struct" to Value {
+                            this.numberValue = 30.0
+                        }
+                    )
                 }
             }
             this.valueString = Value {

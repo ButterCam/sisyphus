@@ -176,31 +176,35 @@ object SwaggerPaths {
         )
 
         pathParamList.forEach { param ->
-            operation.addParametersItem(PathParameter().apply {
-                name = param
-                required = true
-                schema = StringSchema()
-                allowReserved = true
-                description = param
-            })
+            operation.addParametersItem(
+                PathParameter().apply {
+                    name = param
+                    required = true
+                    schema = StringSchema()
+                    allowReserved = true
+                    description = param
+                }
+            )
         }
         return operation.apply {
             val pathParams = PathTemplate.create(url).vars()
             fieldDescriptionList.forEach { field ->
                 if (pathParams.find { param -> param == field.name || param == field.jsonName } == null) {
-                    this.addParametersItem(QueryParameter().apply {
-                        description = SwaggerDescription.fetchDescription(
-                            path + inputTypeProto.descriptor.field.indexOf(field),
-                            fileSupport.descriptor
-                        )
-                        name = field.jsonName
-                        required = false
-                        schema = if (field.label == FieldDescriptorProto.Label.REPEATED) {
-                            ArraySchema().items(SwaggerSchema.fetchSchema(field.type, field.typeName))
-                        } else {
-                            SwaggerSchema.fetchSchema(field.type, field.typeName)
+                    this.addParametersItem(
+                        QueryParameter().apply {
+                            description = SwaggerDescription.fetchDescription(
+                                path + inputTypeProto.descriptor.field.indexOf(field),
+                                fileSupport.descriptor
+                            )
+                            name = field.jsonName
+                            required = false
+                            schema = if (field.label == FieldDescriptorProto.Label.REPEATED) {
+                                ArraySchema().items(SwaggerSchema.fetchSchema(field.type, field.typeName))
+                            } else {
+                                SwaggerSchema.fetchSchema(field.type, field.typeName)
+                            }
                         }
-                    })
+                    )
                 }
             }
         }

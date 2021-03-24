@@ -28,13 +28,13 @@ import io.grpc.ServiceDescriptor
 import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.stub.ClientCalls
-import java.util.concurrent.TimeUnit
-import kotlin.reflect.full.memberProperties
 import org.junit.platform.engine.TestDescriptor
 import org.junit.platform.engine.UniqueId
 import org.junit.platform.engine.support.descriptor.EngineDescriptor
 import org.junit.platform.engine.support.hierarchical.Node
 import org.opentest4j.AssertionFailedError
+import java.util.concurrent.TimeUnit
+import kotlin.reflect.full.memberProperties
 
 class SisyphusTestStepDescriptor(id: UniqueId, val step: TestStep) :
     EngineDescriptor(id, step.name), Node<SisyphusTestEngineContext> {

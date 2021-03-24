@@ -309,10 +309,12 @@ class CodeGenerators {
 
         loop@ for (generator in generators) {
             val targetState = targetType.getOrPut(generator) {
-                when (val type = generator.javaClass.getTypeArgument(
-                    CodeGenerator::class.java,
-                    0
-                )) {
+                when (
+                    val type = generator.javaClass.getTypeArgument(
+                        CodeGenerator::class.java,
+                        0
+                    )
+                ) {
                     is Class<*> -> type
                     is ParameterizedType -> type.rawType as Class<*>
                     else -> TODO()

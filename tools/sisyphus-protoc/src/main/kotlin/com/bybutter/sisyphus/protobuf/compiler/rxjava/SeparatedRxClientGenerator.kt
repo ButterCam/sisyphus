@@ -19,16 +19,19 @@ class SeparatedRxClientApiFileGenerator : GroupedGenerator<FileGeneratingState> 
     }
 }
 
-class SeparatedRxClientGenerator : GroupedGenerator<ClientApiFileGeneratingState>,
+class SeparatedRxClientGenerator :
+    GroupedGenerator<ClientApiFileGeneratingState>,
     SortableGenerator<ClientApiFileGeneratingState> {
     override val group: String = RxClientGenerator::class.java.canonicalName
     override val order: Int = -1000
 
     override fun generate(state: ClientApiFileGeneratingState): Boolean {
         for (service in state.descriptor.services) {
-            state.target.addType(kClass(service.name()) {
-                ClientGeneratingState(state, service, this).advance()
-            })
+            state.target.addType(
+                kClass(service.name()) {
+                    ClientGeneratingState(state, service, this).advance()
+                }
+            )
         }
         return true
     }

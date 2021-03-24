@@ -29,12 +29,12 @@ import io.swagger.v3.oas.models.parameters.RequestBody
 import io.swagger.v3.oas.models.responses.ApiResponse
 import io.swagger.v3.oas.models.responses.ApiResponses
 import io.swagger.v3.oas.models.tags.Tag
-import java.net.URI
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
+import java.net.URI
 
 class SwaggerRouterFunction private constructor(
     private val services: List<ServerServiceDefinition>,
@@ -118,28 +118,42 @@ class SwaggerRouterFunction private constructor(
                     this.tags = listOf(tag)
                     summary = SwaggerDescription.fetchDescription(methodPath, fileSupport.descriptor) ?: method.name
                     if (bodyParam != null) {
-                        requestBody(RequestBody().apply {
-                            required = true
-                            content = Content().apply {
-                                val schema = if (field != null && field.type != FieldDescriptorProto.Type.MESSAGE) {
-                                    SwaggerSchema.fetchSchema(field.type, bodyParam)
-                                } else {
-                                    ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
+                        requestBody(
+                            RequestBody().apply {
+                                required = true
+                                content = Content().apply {
+                                    val schema = if (field != null && field.type != FieldDescriptorProto.Type.MESSAGE) {
+                                        SwaggerSchema.fetchSchema(field.type, bodyParam)
+                                    } else {
+                                        ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + bodyParam.trim('.'))
+                                    }
+                                    addMediaType(
+                                        "application/json",
+                                        MediaType().apply {
+                                            this.schema = schema
+                                        }
+                                    )
+                                    addMediaType(
+                                        "text/xml",
+                                        MediaType().apply {
+                                            this.schema = schema
+                                        }
+                                    )
+                                    addMediaType(
+                                        "multipart/form-data",
+                                        MediaType().apply {
+                                            this.schema = schema
+                                        }
+                                    )
+                                    addMediaType(
+                                        "application/x-www-form-urlencoded",
+                                        MediaType().apply {
+                                            this.schema = schema
+                                        }
+                                    )
                                 }
-                                addMediaType("application/json", MediaType().apply {
-                                    this.schema = schema
-                                })
-                                addMediaType("text/xml", MediaType().apply {
-                                    this.schema = schema
-                                })
-                                addMediaType("multipart/form-data", MediaType().apply {
-                                    this.schema = schema
-                                })
-                                addMediaType("application/x-www-form-urlencoded", MediaType().apply {
-                                    this.schema = schema
-                                })
                             }
-                        })
+                        )
                     }
 
                     addParametersItem(SwaggerParams.fetchGrpcServiceNameParam(service.serviceDescriptor.name))
@@ -152,15 +166,21 @@ class SwaggerRouterFunction private constructor(
                         addSecurityItem(SwaggerSecuritySchemes.fetchSecurityRequirement(property.securitySchemes!!))
                     }
                     responses = ApiResponses().apply {
-                        addApiResponse("200", ApiResponse().apply {
-                            description = method.outputType.split(".").last()
-                            content = Content().apply {
-                                addMediaType("application/json", MediaType().apply {
-                                    schema =
-                                        ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + method.outputType.trim('.'))
-                                })
+                        addApiResponse(
+                            "200",
+                            ApiResponse().apply {
+                                description = method.outputType.split(".").last()
+                                content = Content().apply {
+                                    addMediaType(
+                                        "application/json",
+                                        MediaType().apply {
+                                            schema =
+                                                ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + method.outputType.trim('.'))
+                                        }
+                                    )
+                                }
                             }
-                        })
+                        )
                     }
                 }
                 operation.operationId("${service.serviceDescriptor.name}/${method.name}")
@@ -175,10 +195,12 @@ class SwaggerRouterFunction private constructor(
                 )
             }
             if (servicePaths.isNotEmpty()) {
-                tags.add(Tag().apply {
-                    name = tag
-                    description = SwaggerDescription.fetchDescription(serverPath, fileSupport.descriptor)
-                })
+                tags.add(
+                    Tag().apply {
+                        name = tag
+                        description = SwaggerDescription.fetchDescription(serverPath, fileSupport.descriptor)
+                    }
+                )
                 paths.putAll(servicePaths)
             }
         }
@@ -196,11 +218,13 @@ class SwaggerRouterFunction private constructor(
             }
             this.tags = tags
             this.paths = paths
-            servers = listOf(io.swagger.v3.oas.models.servers.Server().apply {
-                url =
-                    URI(request.uri().scheme, null, request.uri().host, request.uri().port, null, null, null).toString()
-                description = "Default Server"
-            }) + SwaggerServers.fetchServers(property.servers)
+            servers = listOf(
+                io.swagger.v3.oas.models.servers.Server().apply {
+                    url =
+                        URI(request.uri().scheme, null, request.uri().host, request.uri().port, null, null, null).toString()
+                    description = "Default Server"
+                }
+            ) + SwaggerServers.fetchServers(property.servers)
             components = Components().apply {
                 this.schemas = schemas
                 if (property.securitySchemes != null) securitySchemes =

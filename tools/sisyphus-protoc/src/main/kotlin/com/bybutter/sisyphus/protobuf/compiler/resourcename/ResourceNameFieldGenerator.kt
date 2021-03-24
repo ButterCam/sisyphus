@@ -38,7 +38,8 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock
 
-class ResourceNameInterfaceFieldGenerator : GroupedGenerator<FieldInterfaceGeneratingState>,
+class ResourceNameInterfaceFieldGenerator :
+    GroupedGenerator<FieldInterfaceGeneratingState>,
     SortableGenerator<FieldInterfaceGeneratingState> {
     override val order: Int get() = -2000
 
@@ -67,7 +68,8 @@ class ResourceNameInterfaceFieldGenerator : GroupedGenerator<FieldInterfaceGener
     }
 }
 
-class ResourceNameMutableInterfaceFieldGenerator : GroupedGenerator<FieldMutableInterafaceGeneratingState>,
+class ResourceNameMutableInterfaceFieldGenerator :
+    GroupedGenerator<FieldMutableInterafaceGeneratingState>,
     SortableGenerator<FieldMutableInterafaceGeneratingState> {
     override val order: Int get() = -2000
 
@@ -95,7 +97,8 @@ class ResourceNameMutableInterfaceFieldGenerator : GroupedGenerator<FieldMutable
     }
 }
 
-class ResourceNameImplementationFieldGenerator : GroupedGenerator<FieldImplementationGeneratingState>,
+class ResourceNameImplementationFieldGenerator :
+    GroupedGenerator<FieldImplementationGeneratingState>,
     SortableGenerator<FieldImplementationGeneratingState> {
     override val order: Int get() = -2000
 
@@ -158,7 +161,8 @@ class ResourceNameImplementationFieldGenerator : GroupedGenerator<FieldImplement
     }
 }
 
-class ResourceNameOneofImplementationFieldGenerator : GroupedGenerator<FieldImplementationGeneratingState>,
+class ResourceNameOneofImplementationFieldGenerator :
+    GroupedGenerator<FieldImplementationGeneratingState>,
     SortableGenerator<FieldImplementationGeneratingState> {
     override val order: Int get() = -3000
 
@@ -180,13 +184,15 @@ class ResourceNameOneofImplementationFieldGenerator : GroupedGenerator<FieldImpl
             }
             setter {
                 addParameter("value", resource.className().copy(true))
-                addCode(buildCodeBlock {
-                    addStatement(
-                        "%N = value?.let { %T(it) }",
-                        oneOf.fieldName(),
-                        oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
-                    )
-                })
+                addCode(
+                    buildCodeBlock {
+                        addStatement(
+                            "%N = value?.let { %T(it) }",
+                            oneOf.fieldName(),
+                            oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                        )
+                    }
+                )
             }
         }
 
@@ -216,7 +222,8 @@ class ResourceNameOneofImplementationFieldGenerator : GroupedGenerator<FieldImpl
     }
 }
 
-class ResourceNameOneofKindTypeBasicGenerator : GroupedGenerator<OneofKindTypeGeneratingState>,
+class ResourceNameOneofKindTypeBasicGenerator :
+    GroupedGenerator<OneofKindTypeGeneratingState>,
     SortableGenerator<OneofKindTypeGeneratingState> {
     override val order: Int get() = -1000
 
@@ -240,7 +247,8 @@ class ResourceNameOneofKindTypeBasicGenerator : GroupedGenerator<OneofKindTypeGe
     }
 }
 
-class ResourceNameMessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFunctionGeneratingState>,
+class ResourceNameMessageFieldWriteFunctionGenerator :
+    GroupedGenerator<MessageWriteFieldsFunctionGeneratingState>,
     SortableGenerator<MessageWriteFieldsFunctionGeneratingState> {
     override val group: String get() = MessageFieldWriteFunctionGenerator::class.java.canonicalName
 
@@ -252,7 +260,8 @@ class ResourceNameMessageFieldWriteFunctionGenerator : GroupedGenerator<MessageW
         if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
             state.target.beginScope("for(value in this.%N)", state.descriptor.name()) {
                 addStatement(
-                    "writer.tag(%L).string(value.value())", makeTag(
+                    "writer.tag(%L).string(value.value())",
+                    makeTag(
                         state.descriptor.descriptor.number,
                         WireFormat.WIRETYPE_LENGTH_DELIMITED
                     )
@@ -274,7 +283,8 @@ class ResourceNameMessageFieldWriteFunctionGenerator : GroupedGenerator<MessageW
     }
 }
 
-class ResourceNameMessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunctionGeneratingState>,
+class ResourceNameMessageFieldReadFunctionGenerator :
+    GroupedGenerator<MessageReadFieldFunctionGeneratingState>,
     SortableGenerator<MessageReadFieldFunctionGeneratingState> {
     override val group: String get() = MessageFieldReadFunctionGenerator::class.java.canonicalName
 
