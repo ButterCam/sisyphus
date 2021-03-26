@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.protobuf.test
 import com.bybutter.sisyphus.protobuf.MessagePatcher
 import com.bybutter.sisyphus.protobuf.primitives.FileOptions
 import com.bybutter.sisyphus.protobuf.primitives.Struct
-import com.bybutter.sisyphus.protobuf.primitives.Value
+import com.bybutter.sisyphus.protobuf.primitives.field
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -69,11 +69,7 @@ class ProtoTest {
     @Test
     fun `test struct`() {
         val raw = Struct {
-            fields += mapOf(
-                "test" to Value {
-                    kind = Value.Kind.StringValue("value")
-                }
-            )
+            field("test", "value")
         }
         Assertions.assertArrayEquals(raw.toProto(), Struct.parse(raw.toProto()).toProto())
     }
