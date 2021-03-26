@@ -1,11 +1,14 @@
 package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.collection.contentEquals
+import com.bybutter.sisyphus.data.toVarint
+import com.bybutter.sisyphus.io.FixedByteArrayOutputStream
+import com.bybutter.sisyphus.protobuf.coded.MeasureWriter
+import com.bybutter.sisyphus.protobuf.coded.StreamWriter
 import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.reflect.uncheckedCast
-import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import kotlin.reflect.KProperty
 
@@ -72,9 +75,11 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     override fun toProto(): ByteArray {
-        return ByteArrayOutputStream().use {
-            writeTo(it)
-            it.toByteArray()
+        val measurer = MeasureWriter()
+        writeTo(measurer)
+        return FixedByteArrayOutputStream(measurer.length()).use {
+            writeTo(StreamWriter(it, measurer.mark()))
+            it.data()
         }
     }
 
@@ -155,9 +160,9 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     override fun writeTo(output: OutputStream) {
-        val writer = Writer()
-        writeTo(writer)
-        writer.writeTo(output)
+        val measurer = MeasureWriter()
+        writeTo(measurer)
+        writeTo(StreamWriter(output, measurer.mark()))
     }
 
     override fun writeTo(writer: Writer) {
@@ -169,9 +174,10 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     override fun writeDelimitedTo(output: OutputStream) {
-        val writer = Writer()
-        writeTo(writer)
-        writer.ld().writeTo(output)
+        val measurer = MeasureWriter()
+        writeTo(measurer)
+        output.write(measurer.length().toVarint())
+        writeTo(StreamWriter(output, measurer.mark()))
     }
 
     protected fun <T> getFieldInExtensions(name: String): T {

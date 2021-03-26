@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.protobuf.coded
 
 import com.bybutter.sisyphus.data.decodeZigZag
+import com.bybutter.sisyphus.data.toInt
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes
@@ -119,10 +120,11 @@ class Reader(private val inputStream: InputStream) {
 
     fun sfixed32(): Int {
         var result = 0
-        result = result or ((readByte() and 0xFF) shl 0)
-        result = result or ((readByte() and 0xFF) shl 8)
-        result = result or ((readByte() and 0xFF) shl 16)
-        result = result or ((readByte() and 0xFF) shl 24)
+        val data = readNByte(4)
+        result = result or ((data[0].toInt() and 0xFF) shl 0)
+        result = result or ((data[1].toInt() and 0xFF) shl 8)
+        result = result or ((data[2].toInt() and 0xFF) shl 16)
+        result = result or ((data[3].toInt() and 0xFF) shl 24)
         return result
     }
 
@@ -152,14 +154,15 @@ class Reader(private val inputStream: InputStream) {
 
     fun sfixed64(): Long {
         var result = 0L
-        result = result or ((readByte() and 0xFF).toLong() shl 0)
-        result = result or ((readByte() and 0xFF).toLong() shl 8)
-        result = result or ((readByte() and 0xFF).toLong() shl 16)
-        result = result or ((readByte() and 0xFF).toLong() shl 24)
-        result = result or ((readByte() and 0xFF).toLong() shl 32)
-        result = result or ((readByte() and 0xFF).toLong() shl 40)
-        result = result or ((readByte() and 0xFF).toLong() shl 48)
-        result = result or ((readByte() and 0xFF).toLong() shl 56)
+        val data = readNByte(8)
+        result = result or ((data[0].toInt() and 0xFF).toLong() shl 0)
+        result = result or ((data[1].toInt() and 0xFF).toLong() shl 8)
+        result = result or ((data[2].toInt() and 0xFF).toLong() shl 16)
+        result = result or ((data[3].toInt() and 0xFF).toLong() shl 24)
+        result = result or ((data[4].toInt() and 0xFF).toLong() shl 32)
+        result = result or ((data[5].toInt() and 0xFF).toLong() shl 40)
+        result = result or ((data[6].toInt() and 0xFF).toLong() shl 48)
+        result = result or ((data[7].toInt() and 0xFF).toLong() shl 56)
         return result
     }
 

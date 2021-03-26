@@ -2,6 +2,7 @@ package com.bybutter.sisyphus.data
 
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import kotlin.math.max
 
 /**
  * Encode int to Varint.
@@ -84,26 +85,10 @@ fun ByteArray.toVarint64(): Long {
 }
 
 val Int.varintSize: Int
-    get() {
-        var n = this
-        var size = 0
-        do {
-            size++
-            n = n ushr 7
-        } while (n != 0)
-        return size
-    }
+    get() = max(1, (32 - this.countLeadingZeroBits() + 6) / 7)
 
 val Long.varintSize: Int
-    get() {
-        var n = this
-        var size = 0
-        do {
-            size++
-            n = n ushr 7
-        } while (n != 0L)
-        return size
-    }
+    get() = max(1, (64 - this.countLeadingZeroBits() + 6) / 7)
 
 fun Int.toZigZagVarint(): ByteArray {
     return this.encodeZigZag().toVarint()
