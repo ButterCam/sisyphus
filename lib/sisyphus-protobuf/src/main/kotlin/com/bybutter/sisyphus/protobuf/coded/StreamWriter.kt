@@ -43,10 +43,14 @@ class StreamWriter(private val stream: OutputStream, mark: MeasureWriter.LdMark)
     }
 
     override fun sfixed32(value: Int): StreamWriter {
-        stream.write(value and 0xFF)
-        stream.write((value ushr 8) and 0xFF)
-        stream.write((value ushr 16) and 0xFF)
-        stream.write((value ushr 24) and 0xFF)
+        stream.write(
+            byteArrayOf(
+                (value and 0xFF).toByte(),
+                ((value ushr 8) and 0xFF).toByte(),
+                ((value ushr 16) and 0xFF).toByte(),
+                ((value ushr 24) and 0xFF).toByte(),
+            )
+        )
         return this
     }
 
@@ -74,14 +78,18 @@ class StreamWriter(private val stream: OutputStream, mark: MeasureWriter.LdMark)
     }
 
     override fun sfixed64(value: Long): StreamWriter {
-        stream.write((value and 0xFF).toInt())
-        stream.write(((value ushr 8) and 0xFF).toInt())
-        stream.write(((value ushr 16) and 0xFF).toInt())
-        stream.write(((value ushr 24) and 0xFF).toInt())
-        stream.write(((value ushr 32) and 0xFF).toInt())
-        stream.write(((value ushr 40) and 0xFF).toInt())
-        stream.write(((value ushr 48) and 0xFF).toInt())
-        stream.write(((value ushr 56) and 0xFF).toInt())
+        stream.write(
+            byteArrayOf(
+                (value and 0xFF).toByte(),
+                ((value ushr 8) and 0xFF).toByte(),
+                ((value ushr 16) and 0xFF).toByte(),
+                ((value ushr 24) and 0xFF).toByte(),
+                ((value ushr 32) and 0xFF).toByte(),
+                ((value ushr 40) and 0xFF).toByte(),
+                ((value ushr 48) and 0xFF).toByte(),
+                ((value ushr 56) and 0xFF).toByte(),
+            )
+        )
         return this
     }
 

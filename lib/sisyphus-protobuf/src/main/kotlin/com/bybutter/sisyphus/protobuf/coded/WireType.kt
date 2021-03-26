@@ -25,8 +25,15 @@ enum class WireType {
         }
 
         fun valueOf(type: Int): WireType {
-            return WireType.values().getOrNull(type)
-                ?: throw IllegalStateException("Invalid wire type ($type).")
+            return when (type) {
+                0 -> VARINT
+                1 -> FIXED64
+                2 -> LENGTH_DELIMITED
+                3 -> START_GROUP
+                4 -> END_GROUP
+                5 -> FIXED32
+                else -> throw IllegalStateException("Invalid wire type ($type).")
+            }
         }
 
         fun tagOf(number: Int, type: WireType): Int {
