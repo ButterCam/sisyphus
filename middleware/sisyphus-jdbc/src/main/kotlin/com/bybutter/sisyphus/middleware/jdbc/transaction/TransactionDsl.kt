@@ -48,6 +48,8 @@ suspend fun <T> nestTransaction(block: suspend CoroutineScope.() -> T): T {
         } catch (e: Exception) {
             nestContext.rollback()
             throw e
+        } finally {
+            transactionContext.close()
         }
     } else {
         newTransaction(block)
