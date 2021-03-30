@@ -39,6 +39,7 @@ class CoroutineTransactionContext(transactionActive: Boolean = true) :
             }
         }
         connectionHandle.clear()
+        threadContext.remove()
     }
 
     override fun nest(): TransactionContext {
