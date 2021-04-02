@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.dto.DtoMeta
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonStreamContext
 import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter
 import com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase
 
@@ -20,6 +21,21 @@ internal class ModelSerializer : BeanSerializerBase {
         filterId
     )
 
+    constructor(
+        source: ModelSerializer,
+        properties: Array<out BeanPropertyWriter>?,
+        filteredProperties: Array<out BeanPropertyWriter>?
+    ) : super(
+        source,
+        properties, filteredProperties
+    )
+
+    constructor(source: ModelSerializer, toIgnore: MutableSet<String>?, toInclude: MutableSet<String>?) : super(
+        source,
+        toIgnore,
+        toInclude
+    )
+
     override fun withObjectIdWriter(objectIdWriter: ObjectIdWriter): BeanSerializerBase {
         return ModelSerializer(this, objectIdWriter)
     }
@@ -28,8 +44,22 @@ internal class ModelSerializer : BeanSerializerBase {
         return ModelSerializer(this, toIgnore)
     }
 
+    override fun withByNameInclusion(
+        toIgnore: MutableSet<String>?,
+        toInclude: MutableSet<String>?
+    ): BeanSerializerBase {
+        return ModelSerializer(this, toIgnore, toInclude)
+    }
+
     override fun asArraySerializer(): BeanSerializerBase {
         throw UnsupportedOperationException("Unsupported array serializer for DtoModel.")
+    }
+
+    override fun withProperties(
+        properties: Array<out BeanPropertyWriter>?,
+        filteredProperties: Array<out BeanPropertyWriter>?
+    ): BeanSerializerBase {
+        return ModelSerializer(this, properties, filteredProperties)
     }
 
     override fun withFilterId(filterId: Any?): BeanSerializerBase {

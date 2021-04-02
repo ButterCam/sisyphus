@@ -10,7 +10,7 @@ import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType
 
 val JavaType.beanDescription: BeanDescription
-    get() = Json.mapper.deserializationConfig.introspect<BeanDescription>(this)
+    get() = Json.mapper.deserializationConfig.introspect(this)
 
 val Class<*>.javaType: JavaType
     get() {

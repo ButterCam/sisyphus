@@ -59,5 +59,11 @@ dependencies {
         api("org.mongodb:mongodb-driver-reactivestreams:4.2.2")
         api("org.reflections:reflections:0.9.12")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.4.4")
+        api("com.fasterxml.jackson.core:jackson-core:2.12.2")
+        api("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.2")
+        api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.2")
+        api("com.fasterxml.jackson.dataformat:jackson-dataformat-properties:2.12.2")
+        api("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.2")
+        api("com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.12.2")
     }
 }
