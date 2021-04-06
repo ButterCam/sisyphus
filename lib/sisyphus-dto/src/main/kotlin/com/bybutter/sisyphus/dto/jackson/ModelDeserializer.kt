@@ -17,7 +17,7 @@ internal class ModelDeserializer<T : DtoModel>(val targetClass: JavaType) : Json
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T {
         val node = p.readValueAsTree<TreeNode>()
         val targetType = selectType(node, ctxt)
-        val beanDescription = ctxt.config.introspect<BeanDescription>(targetType)
+        val beanDescription = ctxt.config.introspect(targetType)
 
         return DtoModel(targetType.toCanonical().toType() as SimpleType) {
             deserializeInto(p.codec, node, beanDescription, this, ctxt)
@@ -32,7 +32,7 @@ internal class ModelDeserializer<T : DtoModel>(val targetClass: JavaType) : Json
             return ctxt.readValue(p, targetType)
         }
 
-        val beanDescription = ctxt.config.introspect<BeanDescription>(targetType)
+        val beanDescription = ctxt.config.introspect(targetType)
         return deserializeInto(p.codec, node, beanDescription, intoValue, ctxt)
     }
 
