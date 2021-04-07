@@ -62,7 +62,7 @@ class KubernetesClientRepository : ClientRepository {
                     null,
                     null,
                     null,
-                    "sisyphus/${service.name}",
+                    "sisyphus/${service.name.trimStart('.')}",
                     null,
                     null,
                     null,
@@ -75,7 +75,7 @@ class KubernetesClientRepository : ClientRepository {
             }
             if (list.items.isEmpty()) continue
             val k8sService = list.items[0]
-            val labelValue = k8sService.metadata?.labels?.get("sisyphus/${service.name}") ?: continue
+            val labelValue = k8sService.metadata?.labels?.get("sisyphus/${service.name.trimStart('.')}") ?: continue
             val port = k8sService.spec?.ports?.first {
                 it.name == labelValue || it.port.toString() == labelValue
             }?.port ?: continue
