@@ -36,6 +36,8 @@ reasons.
 the [HTTP and gRPC Transcoding](https://aip.bybutter.com/127) component for the environment which isn't compatible with
 gRPC.
 
+[**Sisyphus JS**](https://github.com/ButterCam/sisyphus-js) is our customized protobuf and gRPC runtime for Javascript/Typescript.
+
 [**Sisyphus Protobuf**](/lib/sisyphus-protobuf) is our customized protobuf runtime, which designed for Kotlin.
 
 [**Sisyphus gRPC Coroutine**](/lib/sisyphus-grpc) is our customized gRPC stub runtime, which designed for Kotlin coroutine.
@@ -43,6 +45,8 @@ gRPC.
 [**Sisyphus gRPC RxJava**](/lib/sisyphus-grpc) is our customized gRPC stub runtime, which designed for RxJava2(Client only, design for Android).
 
 [**Sisyphus DTO**](/lib/sisyphus-dto) is the way how we create struct without protobuf.
+
+[**Sisyphus Test**](/lib/sisyphus-test) is the way how we test our gRPC API by data-driven.
 
 [**Sisyphus Middleware**](/middleware) is the way how we connect Sisyphus and other systems.
 
@@ -126,12 +130,12 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    plugins {
        `java-library` // We build this project as a java library.
        kotlin("jvm") version "1.3.72" // Use the kotlin plugin to compile .kt files
-       id("com.bybutter.sisyphus.project") version "1.0.0" // Use the sisyphus project management plugin.
-       id("com.bybutter.sisyphus.protobuf") version "1.0.0" // Use the sisyphus protobuf compiler plugin.
+       id("com.bybutter.sisyphus.project") version "1.2.2" // Use the sisyphus project management plugin.
+       id("com.bybutter.sisyphus.protobuf") version "1.2.2" // Use the sisyphus protobuf compiler plugin.
    }
    
    dependencies {
-       api("com.bybutter.sisyphus:sisyphus-grpc-coroutine:1.0.0") // Dependent on sisyphus grpc runtime.
+       api("com.bybutter.sisyphus:sisyphus-grpc-coroutine:1.2.2") // Dependent on sisyphus grpc runtime.
        /*proto("com.foo.bar:baz:1.0.0")*/ // Use 'proto' configuration to config jars need to compile proto.
        /*protoApi("com.foo.bar:baz:1.0.0")*/ // Use 'protoApi' configuration to config needed jars in proto compiling.
        // All dependencies in 'implementation' configuration will auto add to 'protoApi' configuration.
@@ -187,11 +191,11 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    plugins {
        `java-library`
        kotlin("jvm") version "1.3.72"
-       id("com.bybutter.sisyphus.project") version "1.0.0"
+       id("com.bybutter.sisyphus.project") version "1.2.2"
    }
    
    dependencies {
-       api("com.bybutter.sisyphus.middleware:sisyphus-grpc-client:1.0.0") // Dependent on spring grpc runtime.
+       api("com.bybutter.sisyphus.middleware:sisyphus-grpc-client:1.2.2") // Dependent on spring grpc runtime.
        api(project("schema:example-schema")) // Dependent on schema project.
    }
    ```
@@ -235,13 +239,13 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
        application
        kotlin("jvm") version "1.3.72"
        `kotlin-spring`
-       id("com.bybutter.sisyphus.project") version "1.0.0"
+       id("com.bybutter.sisyphus.project") version "1.2.2"
    }
    
    dependencies {
-       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-server-starter:1.0.0") // Dependent on spring grpc starter.
-       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-transcoding-starter:1.0.0") // [Optional] Enable the http-transcoding feature.
-       implementation("com.bybutter.sisyphus.starter:sisyphus-protobuf-type-server-starter:1.0.0") // [Optional] Enable the type server feature.
+       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-server-starter:1.2.2") // Dependent on spring grpc starter.
+       implementation("com.bybutter.sisyphus.starter:sisyphus-grpc-transcoding-starter:1.2.2") // [Optional] Enable the http-transcoding feature.
+       implementation("com.bybutter.sisyphus.starter:sisyphus-protobuf-type-server-starter:1.2.2") // [Optional] Enable the type server feature.
        implementation(project("service:example-service")) 	// Dependent on service project.
    }
    ```
