@@ -6,6 +6,8 @@ import com.bybutter.sisyphus.io.FixedByteArrayOutputStream
 import com.bybutter.sisyphus.protobuf.coded.MeasureWriter
 import com.bybutter.sisyphus.protobuf.coded.StreamWriter
 import com.bybutter.sisyphus.protobuf.coded.Writer
+import com.bybutter.sisyphus.protobuf.json.JsonWriter
+import com.bybutter.sisyphus.protobuf.json.message
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.reflect.uncheckedCast
@@ -71,7 +73,7 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     override fun typeUrl(): String {
-        return "types.bybutter.com/${support().name.substring(1)}"
+        return support().typeUrl()
     }
 
     override fun toProto(): ByteArray {
@@ -173,6 +175,10 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
         unknownFields().writeTo(writer)
     }
 
+    override fun writeTo(writer: JsonWriter) {
+        writer.message(this)
+    }
+
     override fun writeDelimitedTo(output: OutputStream) {
         val measurer = MeasureWriter()
         writeTo(measurer)
@@ -192,6 +198,7 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
         return (extensions()[number]?.value ?: extension.default()).uncheckedCast()
     }
 
+    @Deprecated("Avoid reflect usage")
     protected fun getPropertyInExtensions(name: String): KProperty<*>? {
         val extension =
             support().extensions.firstOrNull { it.descriptor.name == name || it.descriptor.jsonName == name }
@@ -199,6 +206,7 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
         return extension.getProperty()
     }
 
+    @Deprecated("Avoid reflect usage")
     protected fun getPropertyInExtensions(number: Int): KProperty<*>? {
         val extension = support().extensions.firstOrNull { it.descriptor.number == number }
             ?: return null
