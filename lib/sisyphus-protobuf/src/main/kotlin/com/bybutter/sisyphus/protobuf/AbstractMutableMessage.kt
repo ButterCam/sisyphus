@@ -2,6 +2,8 @@ package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.WireType
+import com.bybutter.sisyphus.protobuf.json.JsonReader
+import com.bybutter.sisyphus.protobuf.json.readRaw
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
@@ -74,6 +76,10 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
 
     override fun readFrom(reader: Reader) {
         return readFrom(reader, reader.int32())
+    }
+
+    override fun readFrom(reader: JsonReader) {
+        readRaw(reader)
     }
 
     override fun copyFrom(message: Message<*, *>) {

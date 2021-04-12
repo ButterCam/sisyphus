@@ -13,6 +13,10 @@ abstract class MessageSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>> : 
         (this.javaClass.getTypeArgument(MessageSupport::class.java, 0) as Class<T>).kotlin
     }
 
+    fun typeUrl(): String {
+        return "types.bybutter.com/${name.substring(1)}"
+    }
+
     @InternalProtoApi
     abstract fun newMutable(): TM
 

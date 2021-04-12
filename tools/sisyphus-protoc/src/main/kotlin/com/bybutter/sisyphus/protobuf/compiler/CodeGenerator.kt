@@ -76,6 +76,7 @@ import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameImplemen
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameImplementationGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameInterfaceFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMessageFieldReadFunctionGenerator
+import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMessageFieldSetFieldInCurrentFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMessageFieldWriteFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameMutableInterfaceFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameOneofImplementationFieldGenerator
@@ -251,6 +252,7 @@ class CodeGenerators {
         register(ResourceNameMessageFieldWriteFunctionGenerator())
         register(ResourceNameMessageFieldReadFunctionGenerator())
         register(ResourceNameCompanionInvokeGenerator())
+        register(ResourceNameMessageFieldSetFieldInCurrentFunctionGenerator())
         return this
     }
 

@@ -20,11 +20,21 @@ operator fun FieldMask.Companion.invoke(vararg paths: String): FieldMask {
     }
 }
 
+operator fun FieldMask.Companion.invoke(paths: String): FieldMask {
+    return FieldMask {
+        this.paths += paths.split(',').map { it.trim() }
+    }
+}
+
 operator fun FieldMask.plus(other: FieldMask): FieldMask {
     return FieldMaskTree(this).let {
         it.merge(FieldMaskTree(other))
         it.toFieldMask()
     }
+}
+
+fun FieldMask.string(): String {
+    return this.paths.joinToString(",")
 }
 
 fun Message<*, *>.resolveMask(mask: FieldMask?): FieldMask {

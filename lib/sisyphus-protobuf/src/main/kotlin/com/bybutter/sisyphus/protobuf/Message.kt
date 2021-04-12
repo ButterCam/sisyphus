@@ -2,6 +2,8 @@ package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.Writer
+import com.bybutter.sisyphus.protobuf.json.JsonReader
+import com.bybutter.sisyphus.protobuf.json.JsonWriter
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import java.io.OutputStream
@@ -52,11 +54,13 @@ interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
     /**
      * Get kotlin property info by field/json name.
      */
+    @Deprecated("Avoid reflect usage")
     fun getProperty(fieldName: String): KProperty<*>?
 
     /**
      * Get kotlin property info by field number.
      */
+    @Deprecated("Avoid reflect usage")
     fun getProperty(fieldNumber: Int): KProperty<*>?
 
     /**
@@ -103,6 +107,8 @@ interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
 
     fun writeTo(writer: Writer)
 
+    fun writeTo(writer: JsonWriter)
+
     fun writeDelimitedTo(output: OutputStream)
 
     fun extensions(): Map<Int, MessageExtension<*>>
@@ -148,4 +154,6 @@ interface MutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Messa
     fun readFrom(reader: Reader, size: Int)
 
     fun readFrom(reader: Reader)
+
+    fun readFrom(reader: JsonReader)
 }
