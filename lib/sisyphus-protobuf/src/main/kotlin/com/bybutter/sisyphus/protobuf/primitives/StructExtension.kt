@@ -4,6 +4,42 @@ import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.primitives.internal.MutableListValue
 import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStruct
 
+operator fun Value.Companion.invoke(value: Struct): Value {
+    return Value {
+        structValue = value
+    }
+}
+
+operator fun Value.Companion.invoke(value: Double): Value {
+    return Value {
+        numberValue = value
+    }
+}
+
+operator fun Value.Companion.invoke(value: ListValue): Value {
+    return Value {
+        listValue = value
+    }
+}
+
+operator fun Value.Companion.invoke(value: NullValue): Value {
+    return Value {
+        nullValue = value
+    }
+}
+
+operator fun Value.Companion.invoke(value: String): Value {
+    return Value {
+        stringValue = value
+    }
+}
+
+operator fun Value.Companion.invoke(value: Boolean): Value {
+    return Value {
+        boolValue = value
+    }
+}
+
 operator fun Struct.Companion.invoke(vararg pairs: Pair<String, kotlin.Any?>): Struct {
     return Struct {
         fields += pairs.associate { it.first to wrapValue(it.second) }

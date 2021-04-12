@@ -7,6 +7,7 @@ import com.bybutter.sisyphus.protobuf.compiler.beginScope
 import com.bybutter.sisyphus.protobuf.compiler.clearFunction
 import com.bybutter.sisyphus.protobuf.compiler.constructor
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldReadFunctionGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldSetFieldInCurrentFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldWriteFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementationFieldBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceFieldBasicGenerator
@@ -16,6 +17,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldImplementationGen
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldInterfaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FieldMutableInterafaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageReadFieldFunctionGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageSetFieldInCurrentFunctionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageWriteFieldsFunctionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.OneofKindTypeGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.function
@@ -305,6 +307,40 @@ class ResourceNameMessageFieldReadFunctionGenerator :
                 addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N = %T(reader.string())",
                     state.descriptor.name(), resource.className()
+                )
+            }
+        }
+        return true
+    }
+}
+
+class ResourceNameMessageFieldSetFieldInCurrentFunctionGenerator :
+    GroupedGenerator<MessageSetFieldInCurrentFunctionGeneratingState>,
+    SortableGenerator<MessageSetFieldInCurrentFunctionGeneratingState> {
+    override val group: String get() = MessageFieldSetFieldInCurrentFunctionGenerator::class.java.canonicalName
+
+    override val order: Int get() = -1000
+
+    override fun generate(state: MessageSetFieldInCurrentFunctionGeneratingState): Boolean {
+        val resource = ResourceFields.resource(state.descriptor) ?: return false
+        state.target.codeBlock.apply {
+            if (state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
+                beginScope("%L", state.target.branch) {
+                    addStatement("this.%N.clear()", state.descriptor.name())
+                    addStatement(
+                        "this.%N.addAll((value as List<Any>).map{ if(it·is·%T)·it·else·%T(it·as·String) })",
+                        state.descriptor.name(),
+                        resource.className(),
+                        resource.className()
+                    )
+                }
+            } else {
+                addStatement(
+                    "%L this.%N·=·if(value·is·%T)·value·else·%T(value·as·String)",
+                    state.target.branch,
+                    state.descriptor.name(),
+                    resource.className(),
+                    resource.className()
                 )
             }
         }

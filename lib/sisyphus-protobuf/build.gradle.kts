@@ -14,6 +14,9 @@ dependencies {
     proto(Dependencies.Proto.base)
 
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(project(":lib:sisyphus-grpc"))
+    testImplementation(project(":lib:sisyphus-gson-protobuf"))
+    testImplementation(project(":lib:sisyphus-jackson-protobuf"))
 }
 
 protobuf {

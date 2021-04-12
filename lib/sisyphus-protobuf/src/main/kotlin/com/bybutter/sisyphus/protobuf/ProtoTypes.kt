@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.protobuf
 
+import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.spi.ServiceLoader
 
 object ProtoTypes {
@@ -68,15 +69,27 @@ object ProtoTypes {
     }
 
     fun findMessageSupport(name: String): MessageSupport<*, *> {
-        return findSupport(name) as? MessageSupport<*, *> ?: throw IllegalStateException("Can't find protobuf message named '$name'")
+        return findSupport(name) as? MessageSupport<*, *>
+            ?: throw IllegalStateException("Can't find protobuf message named '$name'")
+    }
+
+    fun findMapEntryDescriptor(name: String): DescriptorProto? {
+        val parentMessage = name.substringBeforeLast('.')
+        val entryName = name.substringAfterLast('.')
+        val messageSupport = findSupport(parentMessage) as? MessageSupport<*, *> ?: return null
+        return messageSupport.descriptor.nestedType.firstOrNull {
+            it.name == entryName && it.options?.mapEntry == true
+        }
     }
 
     fun findEnumSupport(name: String): EnumSupport<*> {
-        return findSupport(name) as? EnumSupport<*> ?: throw IllegalStateException("Can't find protobuf enum named '$name'")
+        return findSupport(name) as? EnumSupport<*>
+            ?: throw IllegalStateException("Can't find protobuf enum named '$name'")
     }
 
     fun findServiceSupport(name: String): ServiceSupport {
-        return findSupport(name) as? ServiceSupport ?: throw IllegalStateException("Can't find gRPC service named '$name'")
+        return findSupport(name) as? ServiceSupport
+            ?: throw IllegalStateException("Can't find gRPC service named '$name'")
     }
 
     fun services(): List<ServiceSupport> {
