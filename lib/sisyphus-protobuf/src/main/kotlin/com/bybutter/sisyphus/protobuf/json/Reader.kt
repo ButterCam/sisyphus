@@ -84,6 +84,7 @@ internal fun MutableMessage<*, *>.readRaw(reader: JsonReader) {
             while (reader.peek() != JsonToken.END_ARRAY) {
                 values += reader.readValue()
             }
+            reader.skip()
         }
         is MutableDoubleValue -> {
             value = reader.nextDouble()
@@ -208,7 +209,7 @@ internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
                 nextNull()
                 NullValue.NULL_VALUE
             } else {
-                ProtoTypes.findEnumSupport(field.typeName).invoke(nextInt())
+                ProtoTypes.findEnumSupport(field.typeName).invoke(nextString())
             }
         }
         FieldDescriptorProto.Type.MESSAGE -> {
