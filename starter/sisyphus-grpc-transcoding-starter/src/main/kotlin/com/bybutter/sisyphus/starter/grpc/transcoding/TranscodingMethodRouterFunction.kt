@@ -17,6 +17,7 @@ import io.grpc.ClientCall
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.ServerMethodDefinition
+import org.slf4j.LoggerFactory
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -116,6 +117,8 @@ class TranscodingMethodRouterFunction private constructor(
             call.halfClose()
         }.flatMap {
             listener.response()
+        }.doOnError {
+            logger.error("Transcoding error", it)
         }
     }
 
@@ -131,6 +134,8 @@ class TranscodingMethodRouterFunction private constructor(
     }
 
     companion object {
+        private val logger = LoggerFactory.getLogger(TranscodingMethodRouterFunction::class.java)
+
         operator fun invoke(method: ServerMethodDefinition<*, *>): RouterFunction<ServerResponse>? {
             // Just support transcoding for unary gRPC calls.
             if (method.methodDescriptor.type != MethodDescriptor.MethodType.UNARY)

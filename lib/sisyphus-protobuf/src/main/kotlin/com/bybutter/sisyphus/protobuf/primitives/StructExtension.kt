@@ -4,6 +4,12 @@ import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.primitives.internal.MutableListValue
 import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStruct
 
+fun Value.Companion.nullValue(): Value {
+    return Value {
+        nullValue = NullValue.NULL_VALUE
+    }
+}
+
 operator fun Value.Companion.invoke(value: Struct): Value {
     return Value {
         structValue = value
@@ -40,6 +46,24 @@ operator fun Value.Companion.invoke(value: Boolean): Value {
     }
 }
 
+operator fun Value.Companion.invoke(value: List<*>): Value {
+    return Value {
+        listValue = ListValue {
+            values += value.map { wrapValue(it) }
+        }
+    }
+}
+
+operator fun Value.Companion.invoke(value: Map<*, *>): Value {
+    return Value {
+        structValue = Struct {
+            value.forEach { (k, v) ->
+                field(k.toString(), wrapValue(v))
+            }
+        }
+    }
+}
+
 operator fun Struct.Companion.invoke(vararg pairs: Pair<String, kotlin.Any?>): Struct {
     return Struct {
         fields += pairs.associate { it.first to wrapValue(it.second) }
@@ -70,10 +94,8 @@ fun MutableStruct.field(field: String, value: String) {
     }
 }
 
-fun MutableStruct.field(field: String, value: Message<*, *>) {
-    this.fields[field] = Value {
-        structValue = value.asStruct()
-    }
+fun MutableStruct.field(field: String, value: Value) {
+    this.fields[field] = value
 }
 
 fun MutableStruct.field(field: String, value: List<*>) {
@@ -118,10 +140,8 @@ fun MutableListValue.value(value: String) {
     }
 }
 
-fun MutableListValue.value(value: Message<*, *>) {
-    this.values += Value {
-        structValue = value.asStruct()
-    }
+fun MutableListValue.value(value: Value) {
+    this.values += value
 }
 
 fun MutableListValue.value(value: List<*>) {
@@ -162,58 +182,17 @@ fun Struct.unwrapToMap(): Map<String, kotlin.Any?> {
 
 private fun wrapValue(value: kotlin.Any?): Value {
     return when (value) {
-        is Number -> {
-            Value {
-                kind = Value.Kind.NumberValue(value.toDouble())
-            }
-        }
-        is String -> {
-            Value {
-                kind = Value.Kind.StringValue(value)
-            }
-        }
-        is NullValue -> {
-            Value {
-                kind = Value.Kind.NullValue(value)
-            }
-        }
-        is Map<*, *> -> {
-            Value {
-                kind = Value.Kind.StructValue(Struct(value.entries.map { it.key.toString() to it.value }))
-            }
-        }
-        is List<*> -> {
-            Value {
-                kind = Value.Kind.ListValue(
-                    ListValue {
-                        values += value.map { wrapValue(it) }
-                    }
-                )
-            }
-        }
-        is Boolean -> {
-            Value {
-                kind = Value.Kind.BoolValue(value)
-            }
-        }
-        is Struct -> {
-            Value {
-                kind = Value.Kind.StructValue(value)
-            }
-        }
-        is Value -> {
-            value
-        }
-        is Message<*, *> -> {
-            Value {
-                kind = Value.Kind.StructValue(value.asStruct())
-            }
-        }
-        null -> {
-            Value {
-                kind = Value.Kind.NullValue(NullValue.NULL_VALUE)
-            }
-        }
+        is Number -> Value(value.toDouble())
+        is String -> Value(value)
+        is NullValue -> Value.nullValue()
+        is Map<*, *> -> Value(Struct(value.entries.map { it.key.toString() to it.value }))
+        is List<*> -> Value(value)
+        is ListValue -> Value(value)
+        is Boolean -> Value(value)
+        is Struct -> Value(value)
+        is Value -> value
+        is Message<*, *> -> Value(value.asStruct())
+        null -> Value.nullValue()
         else -> throw UnsupportedOperationException("Unsupported struct value.")
     }
 }
@@ -235,7 +214,7 @@ private fun unwrapValue(value: Value): kotlin.Any? {
     }
 }
 
-fun Message<*, *>.asStruct(): Struct {
+private fun Message<*, *>.asStruct(): Struct {
     if (this is Struct) return this
     val result = mutableListOf<Pair<String, kotlin.Any?>>()
 
@@ -251,5 +230,5 @@ fun Message<*, *>.asStruct(): Struct {
         }
     }
 
-    return Struct.invoke(result)
+    return Struct(result)
 }
