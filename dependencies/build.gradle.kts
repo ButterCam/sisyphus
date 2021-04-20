@@ -21,7 +21,7 @@ dependencies {
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.4.32"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2"))
     api(platform("org.junit:junit-bom:5.7.1"))
-    api(platform("org.springframework.boot:spring-boot-dependencies:2.4.4"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:2.4.5"))
     api(platform("com.fasterxml.jackson:jackson-bom:2.12.3"))
 
     constraints {
