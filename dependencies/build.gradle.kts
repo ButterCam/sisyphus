@@ -56,7 +56,7 @@ dependencies {
         api("org.jetbrains.kotlin:kotlin-allopen:1.4.32")
         api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32")
         api("org.jlleitschuh.gradle:ktlint-gradle:10.0.0")
-        api("org.jooq:jooq:3.14.8")
+        api("org.jooq:jooq:3.14.9")
         api("org.mongodb:mongodb-driver-reactivestreams:4.2.3")
         api("org.reflections:reflections:0.9.12")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.4.5")
