@@ -20,7 +20,3 @@ dependencies {
     testImplementation(project(":starter:sisyphus-grpc-server-starter"))
     testImplementation(project(":starter:sisyphus-spring-boot-test-starter"))
 }
-
-tasks.withType<Jar> {
-    this.duplicatesStrategy = DuplicatesStrategy.WARN
-}
