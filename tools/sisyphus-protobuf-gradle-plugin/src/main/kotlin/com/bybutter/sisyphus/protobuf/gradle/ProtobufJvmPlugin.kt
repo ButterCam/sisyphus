@@ -61,7 +61,6 @@ class ProtobufJvmPlugin : BaseProtobufPlugin() {
         }
 
         sourceSet.java {
-            it.srcDir(protoSrc(sourceSet.name))
             it.srcDir(outDir(sourceSet.name))
         }
     }
@@ -73,7 +72,10 @@ class ProtobufJvmPlugin : BaseProtobufPlugin() {
         }
 
         project.extensions.findByType(IdeaModel::class.java)?.apply {
+            module.sourceDirs = module.sourceDirs + protoSrc(sourceSet.name)
             module.generatedSourceDirs.add(outDir(sourceSet.name))
+            this.module.scopes["PROVIDED"]?.get("plus")?.add(protoApiConfiguration(sourceSet.name))
+            this.module.scopes["COMPILE"]?.get("plus")?.add(protoConfiguration(sourceSet.name))
         }
     }
 }

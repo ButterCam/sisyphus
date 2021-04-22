@@ -1,8 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc.support
 
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.rpc.STATUS_META_KEY
-import com.bybutter.sisyphus.rpc.StatusException
+import com.bybutter.sisyphus.starter.grpc.StatusRenderer
 import io.grpc.Context
 import io.grpc.Contexts
 import io.grpc.ForwardingServerCall
@@ -23,6 +22,9 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
     @Autowired(required = false)
     private var loggers: List<RequestLogger> = listOf()
 
+    @Autowired(required = false)
+    private var statusRenderers: List<StatusRenderer> = listOf()
+
     private val uniqueLoggers: List<RequestLogger> by lazy {
         val addedLogger = mutableSetOf<String>()
         loggers.mapNotNull {
@@ -39,7 +41,11 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
         val context = Context.current().withValue(RequestLogger.REQUEST_CONTEXT_KEY, RequestInfo(headers))
 
         return try {
-            Contexts.interceptCall(context, SisyphusGrpcServerCall(call, uniqueLoggers), headers) { call, headers ->
+            Contexts.interceptCall(
+                context,
+                SisyphusGrpcServerCall(call, uniqueLoggers, statusRenderers),
+                headers
+            ) { call, headers ->
                 SisyphusGrpcServerCallListener(next.startCall(call, headers))
             }
         } catch (e: Exception) {
@@ -49,19 +55,24 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
 
     private class SisyphusGrpcServerCall<ReqT, RespT>(
         call: ServerCall<ReqT, RespT>,
-        private val loggers: List<RequestLogger>
+        private val loggers: List<RequestLogger>,
+        private val statusRenderers: List<StatusRenderer>
     ) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
         private val requestNanoTime = System.nanoTime()
 
-        override fun close(status: Status, trailers: Metadata) {
-            val cause = status.cause
-            val status = if (cause is StatusException) {
-                trailers.merge(cause.trailers)
-                trailers.put(STATUS_META_KEY, cause.asStatusDetail())
-                cause.asStatus()
-            } else {
-                status
+        private fun renderStatus(status: Status, trailers: Metadata): Status {
+            statusRenderers.forEach {
+                if (it.canRender(status)) {
+                    it.render(status, trailers)?.let {
+                        return it
+                    }
+                }
             }
+            return status
+        }
+
+        override fun close(status: Status, trailers: Metadata) {
+            val status = renderStatus(status, trailers)
 
             RequestLogger.REQUEST_CONTEXT_KEY.get().apply {
                 outputTrailers = trailers
