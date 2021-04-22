@@ -20,7 +20,3 @@ protobuf {
         "io.grpc.reflection.v1alpha" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha"
     )
 }
-
-tasks.withType<Jar> {
-    this.duplicatesStrategy = DuplicatesStrategy.WARN
-}
