@@ -58,8 +58,15 @@ class HttpPatternPredicate(private val pattern: HttpRule.Pattern<*>) : RequestPr
         if (request.method() != method) {
             return false
         }
-
-        val result = pathTemplate.match(request.path().trim('/')) ?: return false
+        val path = request.path().trim('/')
+        val result = if (path.contains(':')) {
+            if (!pathTemplate.endsWithCustomVerb()) {
+                return false
+            }
+            pathTemplate.match(path)
+        } else {
+            pathTemplate.match(path)
+        } ?: return false
         request.attributes()[RouterFunctions.URI_TEMPLATE_VARIABLES_ATTRIBUTE] = result
         request.attributes()[TranscodingFunctions.MATCHING_PATH_TEMPLATE_ATTRIBUTE] = pathTemplate
         return true

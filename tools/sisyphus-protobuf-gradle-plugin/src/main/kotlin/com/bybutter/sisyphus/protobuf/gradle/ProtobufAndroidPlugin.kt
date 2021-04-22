@@ -60,14 +60,16 @@ class ProtobufAndroidPlugin : BaseProtobufPlugin() {
         }
 
         sourceSet.java {
-            srcDir(protoSrc(sourceSet.name))
             srcDir(outDir(sourceSet.name))
         }
     }
 
     private fun afterApplySourceSet(sourceSet: SourceSet) {
         project.extensions.findByType(IdeaModel::class.java)?.apply {
+            module.sourceDirs = module.sourceDirs + protoSrc(sourceSet.name)
             module.generatedSourceDirs.add(outDir(sourceSet.name))
+            this.module.scopes["PROVIDED"]?.get("plus")?.add(protoApiConfiguration(sourceSet.name))
+            this.module.scopes["COMPILE"]?.get("plus")?.add(protoConfiguration(sourceSet.name))
         }
     }
 

@@ -53,7 +53,7 @@ class ValueNode : PatcherNode {
                 (ProtoTypes.findSupport(field.typeName) as EnumSupport<*>).invoke(it)
             }
             FieldDescriptorProto.Type.MESSAGE -> {
-                when (field.typeName.substring(1)) {
+                when (field.typeName) {
                     FieldMask.name -> values.map {
                         FieldMask {
                             this.paths += it.split(",").map { it.trim() }
