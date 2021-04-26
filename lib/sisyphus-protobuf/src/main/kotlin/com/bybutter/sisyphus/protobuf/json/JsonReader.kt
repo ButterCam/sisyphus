@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.protobuf.json
 
 import com.bybutter.sisyphus.security.base64Decode
 
-
 interface JsonReader {
     fun peek(): JsonToken
 
