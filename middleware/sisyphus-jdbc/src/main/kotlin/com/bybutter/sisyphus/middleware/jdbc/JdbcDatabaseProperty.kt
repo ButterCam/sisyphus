@@ -9,8 +9,7 @@ data class JdbcDatabaseProperty(
     val parameters: Map<String, String> = mapOf(),
     @NestedConfigurationProperty
     val poolConfig: ConnectionPoolProperty? = null,
-    val qualifier: Class<*>,
-    val enableSeataTransaction: Boolean = false
+    val qualifier: Class<*>
 )
 
 data class ConnectionPoolProperty(

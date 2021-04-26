@@ -3,13 +3,13 @@ package com.bybutter.sisyphus.middleware.jdbc
 import com.bybutter.sisyphus.middleware.jdbc.transaction.TransactionDelegatingDataSource
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import javax.sql.DataSource
 import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.DefaultConfiguration
 import org.jooq.tools.jdbc.JDBCUtils
+import javax.sql.DataSource
 
 abstract class AbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) :
     DslContextFactory {

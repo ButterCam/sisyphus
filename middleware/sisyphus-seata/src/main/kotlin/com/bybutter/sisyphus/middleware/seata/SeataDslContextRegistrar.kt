@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.middleware.seata
 import com.bybutter.sisyphus.middleware.jdbc.DslContextFactory
 import com.bybutter.sisyphus.middleware.jdbc.JdbcDatabaseProperties
 import com.bybutter.sisyphus.middleware.jdbc.JdbcDatabaseProperty
-import javax.sql.DataSource
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
 import org.springframework.beans.factory.support.AutowireCandidateQualifier
@@ -14,6 +13,7 @@ import org.springframework.boot.context.properties.bind.Binder
 import org.springframework.context.EnvironmentAware
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
+import javax.sql.DataSource
 
 @Component
 class SeataDslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
@@ -31,8 +31,8 @@ class SeataDslContextRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
 
         val properties = beanFactory.getBeansOfType<JdbcDatabaseProperty>().toMutableMap()
         val jdbcProperties = Binder.get(environment)
-                .bind("sisyphus", JdbcDatabaseProperties::class.java)
-                .orElse(null)?.jdbc ?: mapOf()
+            .bind("sisyphus", JdbcDatabaseProperties::class.java)
+            .orElse(null)?.jdbc ?: mapOf()
 
         properties += jdbcProperties
 

@@ -1,13 +1,13 @@
 package com.bybutter.sisyphus.middleware.seata.transaction
 
 import io.seata.core.context.RootContext
+import kotlinx.coroutines.ThreadContextElement
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.ThreadContextElement
 
 class SeataCoroutineTransactionContext(private val xid: String? = RootContext.getXID()) :
-        AbstractCoroutineContextElement(SeataCoroutineTransactionContext),
-        ThreadContextElement<String?> {
+    AbstractCoroutineContextElement(SeataCoroutineTransactionContext),
+    ThreadContextElement<String?> {
 
     companion object : CoroutineContext.Key<SeataCoroutineTransactionContext>
 

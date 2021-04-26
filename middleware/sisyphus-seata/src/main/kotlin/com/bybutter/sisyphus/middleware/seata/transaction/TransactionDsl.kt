@@ -2,10 +2,10 @@ package com.bybutter.sisyphus.middleware.seata.transaction
 
 import io.seata.core.context.RootContext
 import io.seata.tm.api.GlobalTransactionContext
-import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
 /**
  * seata supports coroutine
