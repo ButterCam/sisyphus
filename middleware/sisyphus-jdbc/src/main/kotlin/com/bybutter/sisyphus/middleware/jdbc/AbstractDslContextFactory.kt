@@ -69,7 +69,6 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         }
     }
 
-    protected open fun createConfiguration(qualifier: Class<*>, datasource: DataSource, dialect: SQLDialect, interceptors: List<JooqConfigInterceptor>): Configuration {
     protected open fun createConfiguration(
         qualifier: Class<*>,
         datasource: DataSource,
