@@ -12,6 +12,7 @@ import com.bybutter.sisyphus.protobuf.primitives.Timestamp
 import com.bybutter.sisyphus.protobuf.primitives.invoke
 import com.bybutter.sisyphus.protobuf.primitives.now
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -20,7 +21,8 @@ class JsonTest {
 
     @Test
     fun `test struct json`() {
-        val raw = """{"image":{"publish":false,"comment":false},"article":{"comment":false}}"""
+        val raw =
+            """{"image":{"publish":false,"comment":false},"list":[{"comment":false},{"comment":false}],"article":{"comment":false}}"""
         val result = raw.parseJson<Struct>()
         Assertions.assertEquals(raw, result.toJson())
         Assertions.assertEquals(raw, gson.toJson(result))
@@ -132,5 +134,45 @@ class JsonTest {
         Assertions.assertEquals(test1, gson.fromJson(gson.toJson(test1), ResourceNameTest::class.java))
         Assertions.assertEquals(test2, test2.toJson().parseJson<ResourceNameTest2>())
         Assertions.assertEquals(test2, gson.fromJson(gson.toJson(test2), ResourceNameTest2::class.java))
+    }
+
+    @Test
+    fun `list test`() {
+        val raw = MapMessageTest {
+            this.startValue = 1
+            this.messageMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to MapMessageTest.NestedMessage {
+                    this.int32Value = 2
+                }
+            )
+            this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
+            this.endValue = 2
+            this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")
+            this.timestamp = Timestamp.now()
+            this.duration = Duration(8L, 0L, 0L)
+            this.anyMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
+            this.anyListValue += listOf(
+                MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
+        }
+
+        val json = listOf(raw, raw).toJson()
+        Assertions.assertEquals(json, json.parseJson<List<MapMessageTest>>().toJson())
+        Assertions.assertEquals(json, gson.toJson(gson.fromJson(json, object : TypeToken<List<MapMessageTest>>() {}.type) as List<MapMessageTest>))
     }
 }
