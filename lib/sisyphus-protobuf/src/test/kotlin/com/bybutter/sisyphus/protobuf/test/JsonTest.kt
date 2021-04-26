@@ -20,7 +20,8 @@ class JsonTest {
 
     @Test
     fun `test struct json`() {
-        val raw = """{"image":{"publish":false,"comment":false},"article":{"comment":false}}"""
+        val raw =
+            """{"image":{"publish":false,"comment":false},"list":[{"comment":false},{"comment":false}],"article":{"comment":false}}"""
         val result = raw.parseJson<Struct>()
         Assertions.assertEquals(raw, result.toJson())
         Assertions.assertEquals(raw, gson.toJson(result))

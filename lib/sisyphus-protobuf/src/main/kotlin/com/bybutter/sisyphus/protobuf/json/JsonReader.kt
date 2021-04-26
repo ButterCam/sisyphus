@@ -2,53 +2,51 @@ package com.bybutter.sisyphus.protobuf.json
 
 import com.bybutter.sisyphus.security.base64Decode
 
+
 interface JsonReader {
     fun peek(): JsonToken
 
-    fun nextTypeToken(): String {
-        if (nextName() != "@type") {
+    fun next(): JsonToken
+
+    fun typeToken(): String {
+        if (name() != "@type") {
             throw IllegalStateException()
         }
-        return nextString()
+        next()
+        return string()
     }
 
-    fun nextName(): String
+    fun name(): String
 
-    fun nextString(): String
+    fun string(): String
 
-    fun nextBytes(): ByteArray {
-        return nextString().base64Decode()
+    fun bytes(): ByteArray {
+        return string().base64Decode()
     }
 
-    fun nextInt(): Int
+    fun int(): Int
 
-    fun nextLong(): Long
+    fun long(): Long
 
-    fun nextUInt(): UInt {
-        return nextInt().toUInt()
+    fun uint(): UInt {
+        return int().toUInt()
     }
 
-    fun nextULong(): ULong {
-        return nextLong().toULong()
+    fun ulong(): ULong {
+        return long().toULong()
     }
 
-    fun nextFloat(): Float
+    fun float(): Float
 
-    fun nextDouble(): Double
+    fun double(): Double
 
-    fun nextBool(): Boolean
+    fun bool(): Boolean
 
-    fun nextNull() {
-        if (peek() == JsonToken.NULL) {
-            skip()
-        } else {
-            throw IllegalStateException()
-        }
+    fun nil() {
+        if (peek() != JsonToken.NULL) throw IllegalStateException()
     }
 
     fun skip()
-
-    fun skipValue()
 }
 
 enum class JsonToken {
