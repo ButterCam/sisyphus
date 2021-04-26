@@ -34,7 +34,7 @@ dependencies {
         api("com.github.ben-manes:gradle-versions-plugin:0.28.0")
         api("com.github.os72:protoc-jar:3.11.4")
         api("com.google.api.grpc:proto-google-common-protos:2.1.0")
-        api("com.google.api:api-common:1.10.1")
+        api("com.google.api:api-common:1.10.3")
         api("com.google.api:api-compiler:0.0.8")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
         api("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
