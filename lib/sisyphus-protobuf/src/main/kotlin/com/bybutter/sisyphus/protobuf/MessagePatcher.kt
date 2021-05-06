@@ -152,14 +152,12 @@ class MessagePatcher : PatcherNode {
         }
 
         for ((field, value) in nodes) {
-            if (!message.has(field)) {
-                continue
-            }
+            val fieldDescriptor = message.fieldDescriptorOrNull(field) ?: continue
 
             if (value is MessagePatcher && message.has(field)) {
                 value.applyTo(message[field])
             } else {
-                message[field] = value.asField(message.fieldDescriptor(field))
+                message[field] = value.asField(fieldDescriptor)
             }
         }
     }
