@@ -1,19 +1,14 @@
 package com.bybutter.sisyphus.dsl.cel
 
 import com.bybutter.sisyphus.dsl.cel.grammar.CelParser
-import com.bybutter.sisyphus.protobuf.CustomProtoType
-import com.bybutter.sisyphus.protobuf.CustomProtoTypeSupport
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
-import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.extensionReceiverParameter
-import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberExtensionFunctions
 import kotlin.reflect.full.memberFunctions
-import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.javaMethod
 
