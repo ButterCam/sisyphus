@@ -2,6 +2,7 @@ package com.bybutter.sisyphus.protobuf.compiler.descriptor
 
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
+import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.bybutter.sisyphus.protobuf.compiler.SortableGenerator
 import com.bybutter.sisyphus.protobuf.compiler.beginScope
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.DescriptorFileGenerator
@@ -10,7 +11,6 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.DescriptorGeneratingSt
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileDescriptorGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
-import com.bybutter.sisyphus.security.base64
 import com.squareup.kotlinpoet.buildCodeBlock
 
 class InlineDescriptorFileGenerator :
@@ -39,8 +39,8 @@ class InlineFileSupportDescriptorGenerator :
                 buildCodeBlock {
                     beginScope("%M", RuntimeMethods.LAZY) {
                         addStatement(
-                            "readDescriptorInline(%S)",
-                            descriptor.toString().base64()
+                            "%T.parse(byteArrayOf(${descriptor.toByteArray().joinToString(", ")}))",
+                            RuntimeTypes.FILE_DESCRIPTOR_PROTO
                         )
                     }
                 }
