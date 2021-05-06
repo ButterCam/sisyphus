@@ -26,6 +26,15 @@ class ProtobufAndroidPlugin : BaseProtobufPlugin() {
         }
     }
 
+    override fun protoExtension(): ProtobufExtension {
+        return project.extensions.create("protobuf", ProtobufExtension::class.java).apply {
+            source = false
+            plugins {
+                basic().rxJava().resourceName().liteDescriptor().inlineDescriptor()
+            }
+        }
+    }
+
     override fun protoApiFiles(sourceSetName: String): FileCollection {
         val variant = project.android.variants.first {
             it.name == sourceSetName

@@ -7,7 +7,6 @@ import com.bybutter.sisyphus.protobuf.json.JsonWriter
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import java.io.OutputStream
-import kotlin.reflect.KProperty
 
 interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
     /**
@@ -50,18 +49,6 @@ interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
      * Get field value by field number.
      */
     operator fun <T> get(fieldNumber: Int): T
-
-    /**
-     * Get kotlin property info by field/json name.
-     */
-    @Deprecated("Avoid reflect usage")
-    fun getProperty(fieldName: String): KProperty<*>?
-
-    /**
-     * Get kotlin property info by field number.
-     */
-    @Deprecated("Avoid reflect usage")
-    fun getProperty(fieldNumber: Int): KProperty<*>?
 
     /**
      * Check if the message has a specified field, it accords to is field tag contained in the serialized message.

@@ -13,6 +13,16 @@ data class ProtoCompilerPlugins(
         return this
     }
 
+    fun liteDescriptor(): ProtoCompilerPlugins {
+        buildInPlugins += BuildInPlugin.LITE_DESCRIPTOR_GENERATOR
+        return this
+    }
+
+    fun inlineDescriptor(): ProtoCompilerPlugins {
+        buildInPlugins += BuildInPlugin.INLINE_DESCRIPTOR_GENERATOR
+        return this
+    }
+
     fun basic(): ProtoCompilerPlugins {
         buildInPlugins += BuildInPlugin.BASIC_GENERATOR
         return this

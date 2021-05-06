@@ -9,6 +9,8 @@ open class ProtobufExtension {
 
     val plugins: ProtoCompilerPlugins get() = _plugins
 
+    var source = true
+
     var autoGenerating = true
 
     fun sourceSet(name: String, block: ProtoGeneratingConfig.() -> Unit = {}): ProtoGeneratingConfig {

@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.protobuf.compiler.rxjava
 
+import com.bybutter.sisyphus.protobuf.compiler.GeneratedKotlinFile
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.SortableGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileGeneratingState
@@ -11,9 +12,11 @@ import com.bybutter.sisyphus.protobuf.compiler.rpc.rpcKotlinFileName
 class SeparatedRxClientApiFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
         if (state.descriptor.services.isNotEmpty()) {
-            state.target += kFile(state.descriptor.packageName(), state.descriptor.rpcKotlinFileName()) {
-                ClientApiFileGeneratingState(state, state.descriptor, this).advance()
-            }
+            state.target += GeneratedKotlinFile(
+                kFile(state.descriptor.packageName(), state.descriptor.rpcKotlinFileName()) {
+                    ClientApiFileGeneratingState(state, state.descriptor, this).advance()
+                }
+            )
         }
         return true
     }

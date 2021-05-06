@@ -199,18 +199,23 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     @Deprecated("Avoid reflect usage")
+    protected open fun getProperty(fieldName: String): KProperty<*>? {
+        throw UnsupportedOperationException("get property is not supported")
+    }
+
+    @Deprecated("Avoid reflect usage")
+    protected open fun getProperty(fieldNumber: Int): KProperty<*>? {
+        throw UnsupportedOperationException("get property is not supported")
+    }
+
+    @Deprecated("Avoid reflect usage")
     protected fun getPropertyInExtensions(name: String): KProperty<*>? {
-        val extension =
-            support().extensions.firstOrNull { it.descriptor.name == name || it.descriptor.jsonName == name }
-                ?: return null
-        return extension.getProperty()
+        throw UnsupportedOperationException("get property is not supported")
     }
 
     @Deprecated("Avoid reflect usage")
     protected fun getPropertyInExtensions(number: Int): KProperty<*>? {
-        val extension = support().extensions.firstOrNull { it.descriptor.number == number }
-            ?: return null
-        return extension.getProperty()
+        throw UnsupportedOperationException("get property is not supported")
     }
 
     protected fun hasFieldInExtensions(name: String): Boolean {

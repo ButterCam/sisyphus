@@ -2,6 +2,7 @@ package com.bybutter.sisyphus.protobuf.compiler.rpc
 
 import com.bybutter.sisyphus.io.replaceExtensionName
 import com.bybutter.sisyphus.protobuf.compiler.FileDescriptor
+import com.bybutter.sisyphus.protobuf.compiler.GeneratedKotlinFile
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
@@ -25,9 +26,11 @@ import com.squareup.kotlinpoet.buildCodeBlock
 class SeparatedCoroutineServiceApiFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
         if (state.descriptor.services.isNotEmpty()) {
-            state.target += kFile(state.descriptor.packageName(), state.descriptor.rpcKotlinFileName()) {
-                RpcApiFileGeneratingState(state, state.descriptor, this).advance()
-            }
+            state.target += GeneratedKotlinFile(
+                kFile(state.descriptor.packageName(), state.descriptor.rpcKotlinFileName()) {
+                    RpcApiFileGeneratingState(state, state.descriptor, this).advance()
+                }
+            )
         }
         return true
     }
@@ -36,9 +39,11 @@ class SeparatedCoroutineServiceApiFileGenerator : GroupedGenerator<FileGeneratin
 class SeparatedCoroutineServiceInternalFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
         if (state.descriptor.services.isNotEmpty()) {
-            state.target += kFile(state.descriptor.internalPackageName(), state.descriptor.rpcKotlinFileName()) {
-                RpcInternalFileGeneratingState(state, state.descriptor, this).advance()
-            }
+            state.target += GeneratedKotlinFile(
+                kFile(state.descriptor.internalPackageName(), state.descriptor.rpcKotlinFileName()) {
+                    RpcInternalFileGeneratingState(state, state.descriptor, this).advance()
+                }
+            )
         }
         return true
     }

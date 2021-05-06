@@ -132,14 +132,14 @@ class CoroutineClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
                 ) {
                     defaultValue("listOf()")
                 }
-                parameter("options", RuntimeTypes.CALL_OPTIONS) {
+                parameter("callOptions", RuntimeTypes.CALL_OPTIONS) {
                     defaultValue("%T.DEFAULT", RuntimeTypes.CALL_OPTIONS)
                 }
             }
 
             addSuperclassConstructorParameter("channel")
             addSuperclassConstructorParameter("optionsInterceptors")
-            addSuperclassConstructorParameter("options")
+            addSuperclassConstructorParameter("callOptions")
 
             function("build") {
                 this += KModifier.OVERRIDE
@@ -148,12 +148,12 @@ class CoroutineClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
                     "optionsInterceptors",
                     Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR)
                 )
-                parameter("options", RuntimeTypes.CALL_OPTIONS)
+                parameter("callOptions", RuntimeTypes.CALL_OPTIONS)
 
                 returns(state.descriptor.className().nestedClass("Client"))
 
                 addStatement(
-                    "return %T(channel, optionsInterceptors, options)",
+                    "return %T(channel, optionsInterceptors, callOptions)",
                     state.descriptor.className().nestedClass("Client")
                 )
             }
