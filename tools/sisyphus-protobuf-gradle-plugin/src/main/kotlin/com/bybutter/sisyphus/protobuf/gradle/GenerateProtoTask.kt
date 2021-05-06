@@ -70,7 +70,7 @@ open class GenerateProtoTask : DefaultTask() {
             if (protobuf.source) {
                 val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
                 val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.descriptor.name)
-                Files.createDirectories(sourceProtoFile.parent)
+                Files.createDirectories(protoFile.parent)
                 Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
             }
 
