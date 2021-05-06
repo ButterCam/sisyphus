@@ -159,15 +159,7 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
         return messageSupport.newMutable().apply {
             for ((key, value) in initializer) {
                 value ?: continue
-                val property = getProperty(key)
-                    ?: throw IllegalStateException("Message type '$type' has not field '$key'.")
-                this[key] = if (property.returnType.isSubtypeOf(CustomProtoType::class.starProjectedType)) {
-                    val support =
-                        (property.returnType.classifier as KClass<*>).companionObjectInstance as CustomProtoTypeSupport<CustomProtoType<Any?>, Any?>
-                    support(value)
-                } else {
-                    value
-                }
+                this[key] = value
             }
         }
     }
