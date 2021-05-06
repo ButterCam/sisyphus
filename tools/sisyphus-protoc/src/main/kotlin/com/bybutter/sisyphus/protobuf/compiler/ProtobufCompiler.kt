@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf.compiler
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
 import com.google.protobuf.DescriptorProtos
-import com.squareup.kotlinpoet.FileSpec
 
 class ProtobufCompiler(
     files: DescriptorProtos.FileDescriptorSet,
@@ -17,7 +16,7 @@ class ProtobufCompiler(
     fun generate(file: String): ProtoCompileResult {
         val fileDescriptor = descriptorSet.files.firstOrNull { it.descriptor.name == file }
             ?: throw IllegalArgumentException("Proto file '$file' not imported.")
-        val result = mutableListOf<FileSpec>()
+        val result = mutableListOf<GeneratedFile>()
         FileGeneratingState(this, fileDescriptor, result).advance()
         return ProtoCompileResult(fileDescriptor, result)
     }

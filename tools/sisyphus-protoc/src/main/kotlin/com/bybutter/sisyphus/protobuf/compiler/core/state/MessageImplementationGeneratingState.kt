@@ -16,12 +16,6 @@ class MessageGetInCurrentFunctionGeneratingState(
     override val target: WhenBranchBuilder
 ) : ChildGeneratingState<MessageFieldDescriptor, WhenBranchBuilder>
 
-class MessageGetPropertyFunctionGeneratingState(
-    override val parent: GeneratingState<*, *>,
-    override val descriptor: MessageFieldDescriptor,
-    override val target: WhenBranchBuilder
-) : ChildGeneratingState<MessageFieldDescriptor, WhenBranchBuilder>
-
 class MessageSetFieldInCurrentFunctionGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: MessageFieldDescriptor,

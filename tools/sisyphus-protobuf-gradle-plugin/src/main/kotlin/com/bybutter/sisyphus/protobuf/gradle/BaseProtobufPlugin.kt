@@ -22,7 +22,7 @@ abstract class BaseProtobufPlugin : Plugin<Project> {
 
         this.project = target
         applied = true
-        extension = project.extensions.create("protobuf", ProtobufExtension::class.java)
+        extension = protoExtension()
         doApply()
         project.afterEvaluate {
             doAfterApply()
@@ -31,6 +31,8 @@ abstract class BaseProtobufPlugin : Plugin<Project> {
             }
         }
     }
+
+    protected abstract fun protoExtension(): ProtobufExtension
 
     protected open fun protoConfiguration(sourceSetName: String): Configuration {
         return project.configurations.maybeCreate(protoConfigurationName(sourceSetName)).apply {

@@ -1,7 +1,8 @@
 package com.bybutter.sisyphus.protobuf.gradle
 
-import com.bybutter.sisyphus.io.replaceExtensionName
 import com.bybutter.sisyphus.protobuf.compiler.CodeGenerators
+import com.bybutter.sisyphus.protobuf.compiler.GeneratedDescriptorFile
+import com.bybutter.sisyphus.protobuf.compiler.GeneratedKotlinFile
 import com.bybutter.sisyphus.protobuf.compiler.ProtobufCompiler
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.google.protobuf.DescriptorProtos
@@ -66,27 +67,28 @@ open class GenerateProtoTask : DefaultTask() {
         for (sourceProto in source) {
             val result = compiler.generate(sourceProto)
 
-            val descPbFile = Paths.get(
-                resourceOutput.toPath().toString(),
-                result.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
-            )
-            Files.createDirectories(descPbFile.parent)
-            Files.write(descPbFile, result.descriptor.descriptor.toByteArray())
-
-            val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.descriptor.name)
-            val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
-            Files.createDirectories(sourceProtoFile.parent)
-            Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
+            if (protobuf.source) {
+                val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
+                val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.descriptor.name)
+                Files.createDirectories(sourceProtoFile.parent)
+                Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
+            }
 
             for (file in result.files) {
-                for (member in file.members) {
-                    val spec = member as? TypeSpec ?: continue
-                    if (spec.superclass == RuntimeTypes.FILE_SUPPORT) {
-                        fileSupports.appendLine("${file.packageName}.${spec.name}")
+                when (file) {
+                    is GeneratedKotlinFile -> {
+                        for (member in file.file.members) {
+                            val spec = member as? TypeSpec ?: continue
+                            if (spec.superclass == RuntimeTypes.FILE_SUPPORT) {
+                                fileSupports.appendLine("${file.file.packageName}.${spec.name}")
+                            }
+                        }
+                        file.writeTo(output.toPath())
+                    }
+                    is GeneratedDescriptorFile -> {
+                        file.writeTo(resourceOutput.toPath())
                     }
                 }
-
-                file.writeTo(output.toPath())
             }
         }
 
@@ -110,6 +112,8 @@ open class GenerateProtoTask : DefaultTask() {
                         BuildInPlugin.SEPARATED_RXJAVA_SERVICE_GENERATOR -> separatedRxjavaClient()
                         BuildInPlugin.RESOURCE_NAME_GENERATOR -> resourceName()
                         BuildInPlugin.GENERATORS_FROM_SPI -> spi()
+                        BuildInPlugin.LITE_DESCRIPTOR_GENERATOR -> liteDescriptor()
+                        BuildInPlugin.INLINE_DESCRIPTOR_GENERATOR -> inlineDescriptor()
                     }
                 }
                 register(this@toCodeGenerators.plugins)

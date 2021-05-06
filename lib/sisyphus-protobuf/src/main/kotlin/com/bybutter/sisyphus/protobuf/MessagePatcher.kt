@@ -10,15 +10,11 @@ import com.bybutter.sisyphus.protobuf.primitives.Value
 import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStruct
 import com.bybutter.sisyphus.protobuf.primitives.invoke
 import com.bybutter.sisyphus.security.base64Decode
-import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
-import kotlin.reflect.full.companionObjectInstance
-import kotlin.reflect.full.isSubclassOf
 
 interface PatcherNode {
-    fun asField(field: FieldDescriptorProto, property: KProperty<*>): Any?
+    fun asField(field: FieldDescriptorProto): Any?
 
-    fun asVaule(): Value
+    fun asValue(): Value
 }
 
 class ValueNode : PatcherNode {
@@ -32,7 +28,7 @@ class ValueNode : PatcherNode {
         values.addAll(value)
     }
 
-    override fun asField(field: FieldDescriptorProto, property: KProperty<*>): Any? {
+    override fun asField(field: FieldDescriptorProto): Any? {
         var result = when (field.type) {
             FieldDescriptorProto.Type.DOUBLE -> values.map { it.toDouble() }
             FieldDescriptorProto.Type.FLOAT -> values.map { it.toFloat() }
@@ -67,18 +63,6 @@ class ValueNode : PatcherNode {
             else -> throw IllegalStateException()
         }
 
-        val propertyType = if (field.label == FieldDescriptorProto.Label.REPEATED) {
-            property.returnType.arguments.first().type?.classifier as? KClass<*>
-        } else {
-            property.returnType.classifier as? KClass<*>
-        }
-        if (propertyType != null && propertyType.isSubclassOf(CustomProtoType::class)) {
-            result = result.map {
-                val support = (propertyType.companionObjectInstance as CustomProtoTypeSupport<*, Any>)
-                support(it)
-            }
-        }
-
         return when (field.label) {
             FieldDescriptorProto.Label.OPTIONAL -> result.lastOrNull()
             FieldDescriptorProto.Label.REQUIRED -> result.last()
@@ -87,7 +71,7 @@ class ValueNode : PatcherNode {
         }
     }
 
-    override fun asVaule(): Value {
+    override fun asValue(): Value {
         return when (values.size) {
             0 -> Value {
                 listValue = ListValue()
@@ -127,7 +111,7 @@ class MessagePatcher : PatcherNode {
         }
     }
 
-    protected fun add(index: Int, field: List<String>, value: String) {
+    private fun add(index: Int, field: List<String>, value: String) {
         if (index == field.size - 1) {
             val valueNode = nodes.getOrPut(field[index]) {
                 ValueNode()
@@ -143,7 +127,7 @@ class MessagePatcher : PatcherNode {
         patcherNode.add(index + 1, field, value)
     }
 
-    protected fun addList(index: Int, field: List<String>, value: List<String>) {
+    private fun addList(index: Int, field: List<String>, value: List<String>) {
         if (index == field.size - 1) {
             val valueNode = nodes.getOrPut(field[index]) {
                 ValueNode()
@@ -162,26 +146,26 @@ class MessagePatcher : PatcherNode {
     fun applyTo(message: MutableMessage<*, *>) {
         if (message is MutableStruct) {
             for ((field, value) in nodes) {
-                message.fields[field] = value.asVaule()
+                message.fields[field] = value.asValue()
             }
             return
         }
 
         for ((field, value) in nodes) {
-            if (message.getProperty(field) == null) {
+            if (!message.has(field)) {
                 continue
             }
 
             if (value is MessagePatcher && message.has(field)) {
                 value.applyTo(message[field])
             } else {
-                message[field] = value.asField(message.fieldDescriptor(field), message.getProperty(field)!!)
+                message[field] = value.asField(message.fieldDescriptor(field))
             }
         }
     }
 
     @OptIn(InternalProtoApi::class)
-    override fun asField(field: FieldDescriptorProto, property: KProperty<*>): Any? {
+    override fun asField(field: FieldDescriptorProto): Any {
         return when (field.type) {
             FieldDescriptorProto.Type.MESSAGE -> {
                 asMessage(field.typeName)
@@ -197,7 +181,7 @@ class MessagePatcher : PatcherNode {
         }
     }
 
-    override fun asVaule(): Value {
+    override fun asValue(): Value {
         return Value {
             structValue = asStruct()
         }
@@ -206,7 +190,7 @@ class MessagePatcher : PatcherNode {
     fun asStruct(): Struct {
         return Struct {
             for ((field, value) in nodes) {
-                fields[field] = value.asVaule()
+                fields[field] = value.asValue()
             }
         }
     }

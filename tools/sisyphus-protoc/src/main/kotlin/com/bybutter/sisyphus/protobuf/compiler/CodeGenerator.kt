@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ApiFileGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.DescriptorFileGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumApiGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumParentRegisterGenerator
@@ -13,6 +14,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionParentReg
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionRegisterGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionSupportBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionSupportGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileSupportDescriptorGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileSupportGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.InternalFileGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageApiGenerator
@@ -26,13 +28,11 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldClearF
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldComputeHashCodeFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldEqualsFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldGetFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldGetPropertyFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldHasFieldInCurrentFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldReadFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldSetFieldInCurrentFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageFieldWriteFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageGetFieldInCurrentFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageGetPropertyFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageHasFieldInCurrentFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementationBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageImplementationFieldBasicGenerator
@@ -67,6 +67,9 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofKindTypeGener
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofMutableInterfaceGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofValueBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.state.GeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.descriptor.InlineDescriptorFileGenerator
+import com.bybutter.sisyphus.protobuf.compiler.descriptor.InlineFileSupportDescriptorGenerator
+import com.bybutter.sisyphus.protobuf.compiler.descriptor.LiteDescriptorGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.MessageResourceNameGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameCompanionBasicGenerator
@@ -186,6 +189,8 @@ class CodeGenerators {
         register(MessageImplementationFieldGenerator())
         register(MessageImplementationFieldBasicGenerator())
         register(ApiFileGenerator())
+        register(DescriptorFileGenerator())
+        register(FileSupportDescriptorGenerator())
         register(InternalFileGenerator())
         register(FileSupportGenerator())
         register(MessageApiGenerator())
@@ -204,8 +209,6 @@ class CodeGenerators {
         register(MessageFieldClearFieldInCurrentFunctionGenerator())
         register(MessageGetFieldInCurrentFunctionGenerator())
         register(MessageFieldGetFieldInCurrentFunctionGenerator())
-        register(MessageGetPropertyFunctionGenerator())
-        register(MessageFieldGetPropertyFunctionGenerator())
         register(MessageSetFieldInCurrentFunctionGenerator())
         register(MessageFieldSetFieldInCurrentFunctionGenerator())
         register(MessageHasFieldInCurrentFunctionGenerator())
@@ -298,6 +301,17 @@ class CodeGenerators {
         register(SeparatedRxClientGenerator())
 
         rxjavaClient()
+        return this
+    }
+
+    fun liteDescriptor(): CodeGenerators {
+        register(LiteDescriptorGenerator())
+        return this
+    }
+
+    fun inlineDescriptor(): CodeGenerators {
+        register(InlineDescriptorFileGenerator())
+        register(InlineFileSupportDescriptorGenerator())
         return this
     }
 

@@ -91,5 +91,7 @@ object RuntimeMethods {
 
     val MARSHALLER = MemberName("com.bybutter.sisyphus.rpc", "marshaller")
 
+    val BASE64_DECODE = MemberName("com.bybutter.sisyphus.security", "base64Decode")
+
     val LAZY = MemberName("kotlin", "lazy")
 }

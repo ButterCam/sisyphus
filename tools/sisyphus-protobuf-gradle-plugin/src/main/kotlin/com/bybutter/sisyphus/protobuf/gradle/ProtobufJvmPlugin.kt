@@ -19,6 +19,10 @@ class ProtobufJvmPlugin : BaseProtobufPlugin() {
         }
     }
 
+    override fun protoExtension(): ProtobufExtension {
+        return project.extensions.create("protobuf", ProtobufExtension::class.java)
+    }
+
     override fun protoApiConfiguration(sourceSetName: String): Configuration {
         return project.configurations.findByName(protoApiConfigurationName(sourceSetName)) ?: run {
             val sourceSet = project.sourceSets.getByName(sourceSetName)

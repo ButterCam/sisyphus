@@ -46,7 +46,7 @@ class ProtoTest {
                 "io.grpc.reflection.v1" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1",
                 "io.grpc.reflection.v1alpha" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha"
             ),
-            CodeGenerators().basic().resourceName().coroutineService()
+            CodeGenerators().basic().resourceName().coroutineService().liteDescriptor().inlineDescriptor()
         )
         for (s in source) {
             val result = compiler.generate(s)

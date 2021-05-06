@@ -9,7 +9,6 @@ import com.bybutter.sisyphus.protobuf.compiler.beginScope
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageClearInCurrentFunctionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageEqualsFunctionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageGetInCurrentFunctionGeneratingState
-import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageGetPropertyFunctionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageHasFieldInCurrentFunctionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageHashCodeFunctionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageImplementationGeneratingState
@@ -33,9 +32,7 @@ import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeVariableName
-import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock
-import kotlin.reflect.KProperty
 
 class MessageSupportFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
@@ -289,94 +286,6 @@ class MessageFieldGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageG
     override fun generate(state: MessageGetInCurrentFunctionGeneratingState): Boolean {
         state.target.codeBlock.apply {
             addStatement("%L this.%N.%M()", state.target.branch, state.descriptor.name(), RuntimeMethods.UNCHECK_CAST)
-        }
-        return true
-    }
-}
-
-class MessageGetPropertyFunctionGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
-    override fun generate(state: MessageImplementationGeneratingState): Boolean {
-        state.target.apply {
-            function("getProperty") {
-                this += KModifier.OVERRIDE
-                addParameter("fieldName", String::class)
-                returns(KProperty::class.asClassName().parameterizedBy(TypeVariableName("*")).copy(true))
-                addCode(
-                    buildCodeBlock {
-                        if (state.descriptor.fields.isEmpty()) {
-                            addStatement("return getPropertyInExtensions(fieldName)")
-                            return@buildCodeBlock
-                        }
-                        beginScope("return when(fieldName)") {
-                            for (field in state.descriptor.fields) {
-                                if (field.descriptor.name != field.descriptor.jsonName) {
-                                    MessageGetPropertyFunctionGeneratingState(
-                                        state, field,
-                                        WhenBranchBuilder(
-                                            buildCodeBlock {
-                                                add(
-                                                    "%S, %S ->",
-                                                    field.descriptor.name,
-                                                    field.descriptor.jsonName
-                                                )
-                                            },
-                                            this
-                                        )
-                                    ).advance()
-                                } else {
-                                    MessageGetPropertyFunctionGeneratingState(
-                                        state, field,
-                                        WhenBranchBuilder(
-                                            buildCodeBlock {
-                                                add("%S ->", field.descriptor.name)
-                                            },
-                                            this
-                                        )
-                                    ).advance()
-                                }
-                            }
-                            addStatement("else -> getPropertyInExtensions(fieldName)")
-                        }
-                    }
-                )
-            }
-
-            function("getProperty") {
-                this += KModifier.OVERRIDE
-                addParameter("fieldNumber", Int::class)
-                returns(KProperty::class.asClassName().parameterizedBy(TypeVariableName("*")).copy(true))
-                addCode(
-                    buildCodeBlock {
-                        if (state.descriptor.fields.isEmpty()) {
-                            addStatement("return getPropertyInExtensions(fieldNumber)")
-                            return@buildCodeBlock
-                        }
-                        beginScope("return when(fieldNumber)") {
-                            for (field in state.descriptor.fields) {
-                                MessageGetPropertyFunctionGeneratingState(
-                                    state, field,
-                                    WhenBranchBuilder(
-                                        buildCodeBlock {
-                                            add("${field.descriptor.number} ->")
-                                        },
-                                        this
-                                    )
-                                ).advance()
-                            }
-                            addStatement("else -> getPropertyInExtensions(fieldNumber)")
-                        }
-                    }
-                )
-            }
-        }
-        return true
-    }
-}
-
-class MessageFieldGetPropertyFunctionGenerator : GroupedGenerator<MessageGetPropertyFunctionGeneratingState> {
-    override fun generate(state: MessageGetPropertyFunctionGeneratingState): Boolean {
-        state.target.codeBlock.apply {
-            addStatement("%L %T::%N", state.target.branch, state.descriptor.parent.className(), state.descriptor.name())
         }
         return true
     }
