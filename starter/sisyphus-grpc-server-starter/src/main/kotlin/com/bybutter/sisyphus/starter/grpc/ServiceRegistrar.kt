@@ -12,6 +12,7 @@ import io.grpc.ServerBuilder
 import io.grpc.ServerInterceptor
 import io.grpc.ServerServiceDefinition
 import io.grpc.ServerStreamTracer
+import io.grpc.inprocess.InProcessServerBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBean
@@ -33,57 +34,28 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     }
 
     override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
-        val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
+        val serverBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
             val config = beanFactory.getBean<ServiceConfig>()
-            var builder = ServerBuilder.forPort(config.serverPort)
-
-            val builderInterceptors = beanFactory.getBeansOfType(ServerBuilderInterceptor::class.java)
-            for ((_, builderInterceptor) in builderInterceptors) {
-                builder = builderInterceptor.intercept(builder)
-            }
-
-            val services = beanFactory.getBeansWithAnnotation(RpcServiceImpl::class.java)
-            logger.info("${services.size} gRPC services registered: ${services.keys.joinToString(", ")}")
-            for ((_, service) in services) {
-                builder = when (service) {
-                    is BindableService -> {
-                        builder.addService(service)
-                    }
-                    is ServerServiceDefinition -> {
-                        builder.addService(service)
-                    }
-                    else -> {
-                        throw IllegalArgumentException("Grpc service implement must inherit from 'BindableService' or 'ServerServiceDefinition'.")
-                    }
-                }
-            }
-
-            val interceptors = BeanUtils.getBeans<ServerInterceptor>(beanFactory)
-            for (interceptor in interceptors.values.reversed()) {
-                builder = builder.intercept(interceptor)
-            }
-
-            val tracerFactories = BeanUtils.getBeans<ServerStreamTracer.Factory>(beanFactory)
-            for ((_, factory) in tracerFactories) {
-                builder = builder.addStreamTracerFactory(factory)
-            }
-
-            val operationSupports = BeanUtils.getBeans<OperationSupport>(beanFactory)
-            builder.addService(Operations(operationSupports.values.toList()))
-            builder.addService(ReflectionServiceAlpha())
-            builder.addService(ReflectionService())
-
-            builder.build()
+            buildServer(ServerBuilder.forPort(config.serverPort), beanFactory)
         }
         (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER,
-            definitionBuilder.beanDefinition
+            serverBuilder.beanDefinition
+        )
+
+        val inProcessServerBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
+            buildServer(InProcessServerBuilder.forName(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER), beanFactory)
+        }
+        (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
+            QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER,
+            inProcessServerBuilder.beanDefinition
         )
 
         val lifecycleBuilder = BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
-            val server = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
+            val server = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER, Server::class.java)
+            val inProcessServer = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER, Server::class.java)
             val shutdown = environment.getProperty("server.shutdown", Shutdown::class.java)
-            ServerLifecycle(server, shutdown ?: Shutdown.IMMEDIATE)
+            ServerLifecycle(shutdown ?: Shutdown.IMMEDIATE, server, inProcessServer)
         }
         (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER_LIFECYCLE,
@@ -94,10 +66,54 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
     }
 
+    private fun buildServer(serverBuilder: ServerBuilder<*>, beanFactory: ConfigurableListableBeanFactory): Server {
+        var builder = serverBuilder
+
+        val builderInterceptors = beanFactory.getBeansOfType(ServerBuilderInterceptor::class.java)
+        for ((_, builderInterceptor) in builderInterceptors) {
+            builder = builderInterceptor.intercept(builder)
+        }
+
+        val services = beanFactory.getBeansWithAnnotation(RpcServiceImpl::class.java)
+        logger.info("${services.size} gRPC services registered: ${services.keys.joinToString(", ")}")
+        for ((_, service) in services) {
+            builder = when (service) {
+                is BindableService -> {
+                    builder.addService(service)
+                }
+                is ServerServiceDefinition -> {
+                    builder.addService(service)
+                }
+                else -> {
+                    throw IllegalArgumentException("Grpc service implement must inherit from 'BindableService' or 'ServerServiceDefinition'.")
+                }
+            }
+        }
+
+        val interceptors = BeanUtils.getBeans<ServerInterceptor>(beanFactory)
+        for (interceptor in interceptors.values.reversed()) {
+            builder = builder.intercept(interceptor)
+        }
+
+        val tracerFactories = BeanUtils.getBeans<ServerStreamTracer.Factory>(beanFactory)
+        for ((_, factory) in tracerFactories) {
+            builder = builder.addStreamTracerFactory(factory)
+        }
+
+        val operationSupports = BeanUtils.getBeans<OperationSupport>(beanFactory)
+        builder.addService(Operations(operationSupports.values.toList()))
+        builder.addService(ReflectionServiceAlpha())
+        builder.addService(ReflectionService())
+
+        return builder.build()
+    }
+
     companion object {
         private val logger = LoggerFactory.getLogger(ServiceRegistrar::class.java)
 
         const val QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER = "sisyphus:grpc:server"
+
+        const val QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER = "sisyphus:grpc:inprocess-server"
 
         const val QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER_LIFECYCLE = "sisyphus:grpc:server-lifecycle"
     }

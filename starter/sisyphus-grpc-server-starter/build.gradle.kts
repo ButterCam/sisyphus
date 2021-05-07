@@ -10,6 +10,7 @@ description = "Starter for building gRPC server in Sisyphus Framework"
 dependencies {
     api(project(":middleware:sisyphus-grpc-client"))
     api(project(":middleware:sisyphus-configuration-artifact"))
+    implementation("io.grpc:grpc-core")
     compileOnly(Dependencies.Spring.Boot.actuator)
     runtimeOnly(Dependencies.Grpc.netty)
 }

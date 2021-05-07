@@ -6,7 +6,7 @@ import org.springframework.boot.web.server.Shutdown
 import org.springframework.context.SmartLifecycle
 import kotlin.concurrent.thread
 
-class ServerLifecycle(private val server: Server, private val shutdown: Shutdown) : SmartLifecycle {
+class ServerLifecycle(private val shutdown: Shutdown, private vararg val servers: Server) : SmartLifecycle {
     private var running = false
 
     override fun getPhase(): Int {
@@ -14,29 +14,34 @@ class ServerLifecycle(private val server: Server, private val shutdown: Shutdown
     }
 
     override fun isRunning(): Boolean {
-        if (server.isTerminated) return false
-        if (server.isShutdown) return false
         return running
     }
 
     override fun start() {
-        server.start()
+        servers.forEach {
+            it.start()
+        }
         running = true
-        logger.info("Running gRPC server via netty on port: ${server.port}")
+        logger.info("Running gRPC server via netty on port: ${servers.firstOrNull()?.port}")
     }
 
     override fun stop() {
-        server.shutdownNow()
+        servers.forEach {
+            it.shutdownNow()
+        }
     }
 
     override fun stop(callback: Runnable) {
         when (shutdown) {
             Shutdown.GRACEFUL -> {
                 logger.info("Commencing graceful shutdown for gRPC server. Waiting for active requests to complete")
-
-                server.shutdown()
+                servers.forEach {
+                    it.shutdown()
+                }
                 thread(name = "grpc-shutdown") {
-                    server.awaitTermination()
+                    servers.forEach {
+                        it.awaitTermination()
+                    }
                     logger.info("Graceful shutdown complete for gRPC server.")
                     callback.run()
                 }
