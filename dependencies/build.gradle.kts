@@ -13,7 +13,7 @@ javaPlatform {
 
 dependencies {
     api(platform(project(":sisyphus-bom")))
-    api(platform("com.google.protobuf:protobuf-bom:3.15.8"))
+    api(platform("com.google.protobuf:protobuf-bom:3.16.0"))
     api(platform("io.grpc:grpc-bom:1.37.0"))
     api(platform("io.micrometer:micrometer-bom:1.6.6"))
     api(platform("org.apache.maven:maven:3.8.1"))
