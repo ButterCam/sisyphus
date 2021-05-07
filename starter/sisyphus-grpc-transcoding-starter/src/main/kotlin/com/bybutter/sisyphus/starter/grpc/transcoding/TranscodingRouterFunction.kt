@@ -1,6 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
-import com.bybutter.sisyphus.starter.grpc.LocalClientRepository.Companion.LOCAL_CHANNEL_BEAN_NAME
+import com.bybutter.sisyphus.starter.grpc.LocalClientRepository.Companion.QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL
 import io.grpc.Channel
 import io.grpc.Server
 import org.springframework.context.ApplicationContext
@@ -26,7 +26,7 @@ class TranscodingRouterFunction private constructor(
     private val channel by lazy {
         // Create channel for localhost gRpc server.
         // We create channel lazily, because get server port will cause exceptions before server started.
-        applicationContext.getBean(LOCAL_CHANNEL_BEAN_NAME) as Channel
+        applicationContext.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL) as Channel
     }
 
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
