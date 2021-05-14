@@ -4,7 +4,6 @@ import com.android.build.api.dsl.AndroidSourceSet
 import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceTask
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
@@ -17,13 +16,15 @@ class ProtobufAndroidPlugin : BaseProtobufPlugin() {
     }
 
     override fun doAfterApply() {
-        for (sourceSet in project.sourceSets) {
+        for (sourceSet in project.android.sourceSets) {
             afterApplySourceSet(sourceSet)
         }
 
         for (variant in project.android.variants) {
             afterApplyVariant(variant)
         }
+
+        project.android.variants
     }
 
     override fun protoExtension(): ProtobufExtension {
@@ -73,7 +74,7 @@ class ProtobufAndroidPlugin : BaseProtobufPlugin() {
         }
     }
 
-    private fun afterApplySourceSet(sourceSet: SourceSet) {
+    private fun afterApplySourceSet(sourceSet: AndroidSourceSet) {
         project.extensions.findByType(IdeaModel::class.java)?.apply {
             module.sourceDirs = module.sourceDirs + protoSrc(sourceSet.name)
             module.generatedSourceDirs.add(outDir(sourceSet.name))
@@ -85,10 +86,12 @@ class ProtobufAndroidPlugin : BaseProtobufPlugin() {
     private fun afterApplyVariant(variant: BaseVariant) {
         extractProtoTask(variant.name)
         generateProtoTask(variant.name)
-        val kotlinTask = project.tasks.findByName(compileKotlinTaskName(variant.name)) as? SourceTask
-        if (extension.autoGenerating && kotlinTask != null) {
-            for (sourceSet in variant.sourceSets) {
-                kotlinTask.dependsOn(generateProtoTask(variant.name))
+
+        if (extension.autoGenerating) {
+            val kotlinTask = project.tasks.findByName(compileKotlinTaskName(variant.name)) as? SourceTask
+            kotlinTask?.dependsOn(generateProtoTask(variant.name))
+            variant.processJavaResourcesProvider.configure {
+                it.dependsOn(generateProtoTask(variant.name))
             }
         }
     }

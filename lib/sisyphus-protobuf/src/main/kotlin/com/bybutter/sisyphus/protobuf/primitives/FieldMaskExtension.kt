@@ -49,6 +49,21 @@ fun Message<*, *>.resolveMask(mask: FieldMask?): FieldMask {
     }
 }
 
+inline fun Message<*, *>.forEach(mask: FieldMask?, block: (FieldDescriptorProto, kotlin.Any?) -> Unit) {
+    if (mask == null) {
+        for ((field, value) in this) {
+            block(field, value)
+        }
+        return
+    }
+
+    mask.paths.forEach {
+        this.support().fieldInfo(it)?.let { field ->
+            block(field, this[it])
+        }
+    }
+}
+
 operator fun FieldMask?.rangeTo(message: Message<*, *>): Iterable<String> {
     return message.resolveMask(this).paths
 }
