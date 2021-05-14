@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.string.toCamelCase
 import org.jooq.Field
 import org.jooq.Table
 
+@Deprecated("Use JooqSqlBuilder to build sql", ReplaceWith("JooqSqlBuilder"))
 class TableBasedJooqConditionBuilder(
     private val table: Table<*>,
     private val fieldNameMapping: Map<String, String> = mapOf()
