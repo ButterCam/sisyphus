@@ -22,6 +22,7 @@ factor
 
 condition
     : 'NOT' expression  # NotCondition
+    | function  # FunCondition
     | left=member comparator right=value  # CompareCondition
     ;
 
