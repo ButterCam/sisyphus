@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.protobuf.compiler.rxjava
 
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
+import com.bybutter.sisyphus.protobuf.compiler.RuntimeAnnotations
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.bybutter.sisyphus.protobuf.compiler.constructor
@@ -12,6 +13,7 @@ import com.bybutter.sisyphus.protobuf.compiler.kClass
 import com.bybutter.sisyphus.protobuf.compiler.parameter
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -35,6 +37,11 @@ class RxClientGenerator : GroupedGenerator<ApiFileGeneratingState> {
 class RxClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
     override fun generate(state: ClientGeneratingState): Boolean {
         state.target.apply {
+            addAnnotation(
+                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION).addMember("%S", state.descriptor.fullProtoName())
+                    .build()
+            )
+
             this extends RuntimeTypes.ABSTRACT_REACTIVE_STUB.parameterizedBy(
                 state.descriptor.className()
             )

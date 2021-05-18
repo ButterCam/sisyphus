@@ -3,6 +3,10 @@ package com.bybutter.sisyphus.protobuf.compiler
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName
 
+object RuntimeAnnotations {
+    val PROTOBUF_DEFINITION = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.ProtobufDefinition")
+}
+
 object RuntimeTypes {
     val MESSAGE = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.Message")
 
@@ -90,8 +94,6 @@ object RuntimeMethods {
     val CONTENT_EQUALS = MemberName("com.bybutter.sisyphus.collection", "contentEquals")
 
     val MARSHALLER = MemberName("com.bybutter.sisyphus.rpc", "marshaller")
-
-    val BASE64_DECODE = MemberName("com.bybutter.sisyphus.security", "base64Decode")
 
     val LAZY = MemberName("kotlin", "lazy")
 }

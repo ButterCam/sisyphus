@@ -64,6 +64,7 @@ open class FilterContext(val engine: FilterEngine, global: Map<String, Any?> = m
                     else -> TODO()
                 }
             }
+            is FilterParser.FunConditionContext -> visit(condition.function())
             else -> throw IllegalStateException()
         }
     }

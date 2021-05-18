@@ -56,6 +56,7 @@ open class JooqSqlBuilder(val runtime: JooqFilterRuntime = JooqFilterRuntime()) 
                     else -> TODO()
                 }
             }
+            is FilterParser.FunConditionContext -> visit(context, condition.function()) as? Condition
             else -> throw IllegalStateException()
         }
     }

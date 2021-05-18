@@ -12,7 +12,6 @@ import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.reflect.uncheckedCast
 import java.io.OutputStream
-import kotlin.reflect.KProperty
 
 abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Message<T, TM> {
     init {
@@ -196,26 +195,6 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
         val extension = support().extensions.firstOrNull { it.descriptor.number == number }
             ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
         return (extensions()[number]?.value ?: extension.default()).uncheckedCast()
-    }
-
-    @Deprecated("Avoid reflect usage")
-    protected open fun getProperty(fieldName: String): KProperty<*>? {
-        throw UnsupportedOperationException("get property is not supported")
-    }
-
-    @Deprecated("Avoid reflect usage")
-    protected open fun getProperty(fieldNumber: Int): KProperty<*>? {
-        throw UnsupportedOperationException("get property is not supported")
-    }
-
-    @Deprecated("Avoid reflect usage")
-    protected fun getPropertyInExtensions(name: String): KProperty<*>? {
-        throw UnsupportedOperationException("get property is not supported")
-    }
-
-    @Deprecated("Avoid reflect usage")
-    protected fun getPropertyInExtensions(number: Int): KProperty<*>? {
-        throw UnsupportedOperationException("get property is not supported")
     }
 
     protected fun hasFieldInExtensions(name: String): Boolean {
