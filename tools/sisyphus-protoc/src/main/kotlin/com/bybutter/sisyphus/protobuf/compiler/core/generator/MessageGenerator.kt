@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.protobuf.compiler.core.generator
 import com.bybutter.sisyphus.protobuf.compiler.FileDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.MessageDescriptor
+import com.bybutter.sisyphus.protobuf.compiler.RuntimeAnnotations
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.bybutter.sisyphus.protobuf.compiler.annotation
@@ -25,6 +26,7 @@ import com.bybutter.sisyphus.protobuf.compiler.kClass
 import com.bybutter.sisyphus.protobuf.compiler.kInterface
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.buildCodeBlock
@@ -47,6 +49,10 @@ class MessageApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
 class MessageInterfaceBasicGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         state.target.apply {
+            addAnnotation(
+                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION).addMember("%S", state.descriptor.fullProtoName())
+                    .build()
+            )
             this implements RuntimeTypes.MESSAGE.parameterizedBy(
                 state.descriptor.className(),
                 state.descriptor.mutableClassName()

@@ -38,6 +38,12 @@ class ServiceSupportGeneratingState(
     override val target: TypeSpec.Builder
 ) : ChildGeneratingState<ServiceDescriptor, TypeSpec.Builder>
 
+class ServiceCompanionGeneratingState(
+    override val parent: GeneratingState<*, *>,
+    override val descriptor: ServiceDescriptor,
+    override val target: TypeSpec.Builder
+) : ChildGeneratingState<ServiceDescriptor, TypeSpec.Builder>
+
 class ServiceRegisterGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: ServiceDescriptor,

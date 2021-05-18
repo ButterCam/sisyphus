@@ -3,11 +3,13 @@ package com.bybutter.sisyphus.protobuf.compiler.core.generator
 import com.bybutter.sisyphus.protobuf.compiler.FileDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
 import com.bybutter.sisyphus.protobuf.compiler.MessageDescriptor
+import com.bybutter.sisyphus.protobuf.compiler.RuntimeAnnotations
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.bybutter.sisyphus.protobuf.compiler.companion
 import com.bybutter.sisyphus.protobuf.compiler.constructor
 import com.bybutter.sisyphus.protobuf.compiler.core.state.ApiFileGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.EnumCompanionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.EnumGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.EnumSupportGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.InternalFileGeneratingState
@@ -21,6 +23,7 @@ import com.bybutter.sisyphus.protobuf.compiler.kClass
 import com.bybutter.sisyphus.protobuf.compiler.kEnum
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
@@ -58,6 +61,11 @@ class NestedEnumGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
 class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
     override fun generate(state: EnumGeneratingState): Boolean {
         state.target.apply {
+            addAnnotation(
+                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION).addMember("%S", state.descriptor.fullProtoName())
+                    .build()
+            )
+
             this implements RuntimeTypes.PROTO_ENUM
 
             constructor {
@@ -75,6 +83,7 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
 
             companion {
                 this extends state.descriptor.supportClassName()
+                EnumCompanionGeneratingState(state, state.descriptor, this).advance()
             }
 
             for (value in state.descriptor.values) {

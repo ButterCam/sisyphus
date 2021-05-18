@@ -1,7 +1,8 @@
 package com.bybutter.sisyphus.protobuf.gson
 
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.MessageSupport
+import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.ProtobufDefinition
 import com.bybutter.sisyphus.protobuf.json.readAny
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
@@ -9,7 +10,6 @@ import com.google.gson.TypeAdapterFactory
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import kotlin.reflect.full.companionObjectInstance
 
 object MessageTypeAdapterFactory : TypeAdapterFactory {
     override fun <T : Any?> create(p0: Gson, p1: TypeToken<T>): TypeAdapter<T>? {
@@ -51,9 +51,9 @@ class MessageTypeAdapter(private val clazz: Class<*>) : TypeAdapter<Message<*, *
     }
 
     override fun read(reader: JsonReader): Message<*, *> {
-        val support = (clazz.kotlin.companionObjectInstance as? MessageSupport<*, *>)
-            ?: throw IllegalStateException()
-        return support.invoke {
+        val fullName =
+            clazz.getAnnotation(ProtobufDefinition::class.java)?.name ?: throw IllegalStateException()
+        return ProtoTypes.findMessageSupport(fullName).invoke {
             readFrom(GsonReader(reader))
         }
     }

@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.protobuf.compiler.rpc
 
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
+import com.bybutter.sisyphus.protobuf.compiler.RuntimeAnnotations
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.bybutter.sisyphus.protobuf.compiler.beginScope
@@ -18,6 +19,7 @@ import com.bybutter.sisyphus.protobuf.compiler.parameter
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.bybutter.sisyphus.string.toCamelCase
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -47,6 +49,11 @@ class CoroutineServiceBasicGenerator : GroupedGenerator<ServiceGeneratingState> 
             this += KModifier.ABSTRACT
             this extends RuntimeTypes.ABSTRACT_COROUTINE_SERVER_IMPL
             addKdoc(state.descriptor.document())
+
+            addAnnotation(
+                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION).addMember("%S", state.descriptor.fullProtoName())
+                    .build()
+            )
 
             constructor {
                 parameter("context", CoroutineContext::class) {
@@ -111,6 +118,7 @@ class CoroutineServiceBasicGenerator : GroupedGenerator<ServiceGeneratingState> 
 
             companion {
                 this extends state.descriptor.supportClassName()
+                ServiceCompanionGeneratingState(state, state.descriptor, this).advance()
             }
         }
 

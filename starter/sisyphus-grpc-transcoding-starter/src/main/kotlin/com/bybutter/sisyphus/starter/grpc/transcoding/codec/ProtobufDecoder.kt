@@ -1,12 +1,12 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.codec
 
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.MessageSupport
+import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.ProtobufDefinition
 import org.springframework.core.ResolvableType
 import org.springframework.core.codec.AbstractDataBufferDecoder
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.util.MimeType
-import kotlin.reflect.full.companionObjectInstance
 
 class ProtobufDecoder(vararg mimeTypes: MimeType) : AbstractDataBufferDecoder<Message<*, *>>(*mimeTypes) {
     override fun decode(
@@ -15,7 +15,7 @@ class ProtobufDecoder(vararg mimeTypes: MimeType) : AbstractDataBufferDecoder<Me
         mimeType: MimeType?,
         hints: Map<String, Any>?
     ): Message<*, *> {
-        val support = targetType.rawClass.kotlin.companionObjectInstance as MessageSupport<*, *>
-        return support.parse(buffer.asInputStream(), Int.MAX_VALUE)
+        val fullName = targetType.rawClass.getAnnotation(ProtobufDefinition::class.java).name
+        return ProtoTypes.findMessageSupport(fullName).parse(buffer.asInputStream(), Int.MAX_VALUE)
     }
 }
