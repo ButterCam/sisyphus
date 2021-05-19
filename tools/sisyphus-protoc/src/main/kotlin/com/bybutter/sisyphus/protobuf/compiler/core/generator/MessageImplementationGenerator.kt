@@ -645,7 +645,7 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                 state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL
             val type = WireFormat.FieldType.values()[state.descriptor.descriptor.type.ordinal]
             val packed = repeated && type.isPackable
-            val writeMethod = type.name.toLowerCase()
+            val writeMethod = type.name.lowercase()
             val any = state.descriptor.descriptor.typeName == ".google.protobuf.Any"
 
             if (optional) {
@@ -681,12 +681,12 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                                 1,
                                 keyType.wireType
                             )
-                            }).${keyType.name.toLowerCase()}(k).tag(${
+                            }).${keyType.name.lowercase()}(k).tag(${
                             makeTag(
                                 2,
                                 valueType.wireType
                             )
-                            }).${if (anyValue) "any" else valueType.name.toLowerCase()}(v).endLd() }",
+                            }).${if (anyValue) "any" else valueType.name.lowercase()}(v).endLd() }",
                             state.descriptor.name()
                         )
                     } else {
@@ -778,7 +778,7 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                 state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED
             val type = WireFormat.FieldType.values()[state.descriptor.descriptor.type.ordinal]
             val packed = repeated && type.isPackable
-            val readMethod = type.name.toLowerCase()
+            val readMethod = type.name.lowercase()
             val any = state.descriptor.descriptor.typeName == ".google.protobuf.Any"
 
             when {
@@ -803,25 +803,25 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                             WireFormat.FieldType.MESSAGE -> {
                                 if (valueDescriptor.messageType()?.fullProtoName() == ".google.protobuf.Any") {
                                     addStatement(
-                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { reader.any() }) { k,·v·-> this.%N[k]·=·v }",
+                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { reader.any() }) { k,·v·-> this.%N[k]·=·v }",
                                         state.descriptor.name()
                                     )
                                 } else {
                                     addStatement(
-                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> this.%N[k]·=·v }",
+                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> this.%N[k]·=·v }",
                                         valueDescriptor.elementType(), state.descriptor.name()
                                     )
                                 }
                             }
                             WireFormat.FieldType.ENUM -> {
                                 addStatement(
-                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { %T(it.int32()) }) { k,·v·-> this.%N[k]·=·v }",
+                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T(it.int32()) }) { k,·v·-> this.%N[k]·=·v }",
                                     valueDescriptor.elementType(), state.descriptor.name()
                                 )
                             }
                             else -> {
                                 addStatement(
-                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { it.${valueType.name.toLowerCase()}() }) { k,·v·-> this.%N[k]·=·v }",
+                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { it.${valueType.name.lowercase()}() }) { k,·v·-> this.%N[k]·=·v }",
                                     state.descriptor.name()
                                 )
                             }

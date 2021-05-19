@@ -1,7 +1,6 @@
 package com.bybutter.sisyphus.protobuf.coded
 
 import com.bybutter.sisyphus.data.decodeZigZag
-import com.bybutter.sisyphus.data.toInt
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoTypes

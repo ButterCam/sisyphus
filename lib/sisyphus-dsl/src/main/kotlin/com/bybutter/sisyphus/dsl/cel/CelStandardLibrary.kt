@@ -260,7 +260,7 @@ open class CelStandardLibrary {
                 null -> null
                 else -> throw IllegalStateException("Illegal proto value type '${kind.javaClass}'.")
             }
-            is ProtoEnum -> this.number.toLong()
+            is ProtoEnum<*> -> this.number.toLong()
             is List<*> -> this.map { it.protobufConversion() }
             is Map<*, *> -> this.mapValues { it.value.protobufConversion() }
             is CustomProtoType<*> -> this.value().protobufConversion()

@@ -16,12 +16,12 @@ fun String.escape(): String = buildString {
             '\"' -> append("\\\"")
             else -> {
                 if (ch.isISOControl()) {
-                    if (ch.toInt() < 255) {
+                    if (ch.code < 255) {
                         append("\\")
-                        append(ch.toInt().toString(8))
+                        append(ch.code.toString(8))
                     } else {
                         append("\\u")
-                        val hex = ch.toInt().toString(16)
+                        val hex = ch.code.toString(16)
                         repeat(4 - hex.length) {
                             append('0')
                         }

@@ -60,7 +60,7 @@ class ApiLinterRunner {
     }
 
     private fun String.normalize(): String {
-        return this.toLowerCase().replace("[^a-z0-9]+".toRegex(), "")
+        return this.lowercase().replace("[^a-z0-9]+".toRegex(), "")
     }
 
     private fun createTempBinDir(): Path {

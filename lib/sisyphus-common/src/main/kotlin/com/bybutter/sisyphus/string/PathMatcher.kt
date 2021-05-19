@@ -48,7 +48,7 @@ object PathMatcher {
             // pattern: a/?/c    a/b/c    a/b
             //            ↓        ↓       ↓
             // string:  a/b/c    a/b/d    a/d
-            if (pc == '?' && sc.toInt() != 0 && sc !in pathDelimiters || pc == sc) {
+            if (pc == '?' && sc.code != 0 && sc !in pathDelimiters || pc == sc) {
                 si++
                 pi++
                 continue

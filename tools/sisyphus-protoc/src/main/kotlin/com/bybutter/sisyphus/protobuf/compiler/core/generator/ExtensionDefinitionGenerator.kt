@@ -235,16 +235,6 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                 }
             }
 
-            function("getProperty") {
-                this += KModifier.OVERRIDE
-                returns(KProperty::class.asClassName().parameterizedBy(STAR))
-                addStatement(
-                    "return %T::%M",
-                    state.descriptor.extendee().className(),
-                    state.descriptor.propertyMemberName()
-                )
-            }
-
             function("default") {
                 this += KModifier.OVERRIDE
                 returns(state.descriptor.mutableFieldType())
@@ -259,7 +249,7 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                 state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL
             val type = WireFormat.FieldType.values()[state.descriptor.descriptor.type.ordinal]
             val packed = repeated && type.isPackable
-            val method = type.name.toLowerCase()
+            val method = type.name.lowercase()
             val any = state.descriptor.descriptor.typeName == ".google.protobuf.Any"
             val mapEntry = state.descriptor.mapEntry()
 
@@ -303,12 +293,12 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                                     1,
                                     keyType.wireType
                                 )
-                                }).${keyType.name.toLowerCase()}(k).tag(${
+                                }).${keyType.name.lowercase()}(k).tag(${
                                 makeTag(
                                     2,
                                     valueType.wireType
                                 )
-                                }).${valueType.name.toLowerCase()}(v).endLd() }"
+                                }).${valueType.name.lowercase()}(v).endLd() }"
                             )
                         } else {
                             addStatement(
@@ -388,18 +378,18 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                             when (valueType) {
                                 WireFormat.FieldType.MESSAGE -> {
                                     addStatement(
-                                        "reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> value[k]·=·v }",
+                                        "reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> value[k]·=·v }",
                                         valueDescriptor.elementType()
                                     )
                                 }
                                 WireFormat.FieldType.ENUM -> {
                                     addStatement(
-                                        "reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { %T(it.int32()) }) { k,·v·-> value[k]·=·v }",
+                                        "reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T(it.int32()) }) { k,·v·-> value[k]·=·v }",
                                         valueDescriptor.elementType()
                                     )
                                 }
                                 else -> {
-                                    addStatement("reader.mapEntry({ it.${keyType.name.toLowerCase()}() }, { it.${valueType.name.toLowerCase()}() }) { k,·v·-> value[k]·=·v }")
+                                    addStatement("reader.mapEntry({ it.${keyType.name.lowercase()}() }, { it.${valueType.name.lowercase()}() }) { k,·v·-> value[k]·=·v }")
                                 }
                             }
                         } else if (any) {
