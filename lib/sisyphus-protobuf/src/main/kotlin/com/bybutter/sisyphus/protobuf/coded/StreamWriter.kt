@@ -115,7 +115,7 @@ class StreamWriter(private val stream: OutputStream, mark: MeasureWriter.LdMark)
         return bytes(string.toByteArray())
     }
 
-    override fun enum(enum: ProtoEnum): StreamWriter {
+    override fun enum(enum: ProtoEnum<*>): StreamWriter {
         return int32(enum.number)
     }
 

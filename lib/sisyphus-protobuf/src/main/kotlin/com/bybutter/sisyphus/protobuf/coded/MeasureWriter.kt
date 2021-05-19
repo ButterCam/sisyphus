@@ -104,7 +104,7 @@ class MeasureWriter : Writer {
         return bytes(string.toByteArray())
     }
 
-    override fun enum(enum: ProtoEnum): MeasureWriter {
+    override fun enum(enum: ProtoEnum<*>): MeasureWriter {
         return int32(enum.number)
     }
 

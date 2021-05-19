@@ -39,7 +39,7 @@ interface Writer {
 
     fun string(string: String): Writer
 
-    fun enum(enum: ProtoEnum): Writer
+    fun enum(enum: ProtoEnum<*>): Writer
 
     fun message(message: Message<*, *>?): Writer
 

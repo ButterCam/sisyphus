@@ -70,7 +70,7 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
             if (field.typeName == NullValue.name) {
                 nullValue()
             } else {
-                value(value as ProtoEnum)
+                value(value as ProtoEnum<*>)
             }
         }
         FieldDescriptorProto.Type.MESSAGE -> {

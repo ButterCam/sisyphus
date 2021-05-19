@@ -103,7 +103,7 @@ class PredictWriter : Writer {
         return bytes(string.toByteArray())
     }
 
-    override fun enum(enum: ProtoEnum): PredictWriter {
+    override fun enum(enum: ProtoEnum<*>): PredictWriter {
         return int32(enum.number)
     }
 

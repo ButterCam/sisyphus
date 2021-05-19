@@ -6,6 +6,12 @@ abstract class FileSupport : ProtoSupport<FileDescriptorProto> {
     override val parent: ProtoSupport<*>
         get() = this
 
+    fun packageName(): String {
+        return descriptor.`package`.takeIf { it.isNotEmpty() }?.let {
+            ".$it"
+        } ?: ""
+    }
+
     fun readDescriptor(fileName: String): FileDescriptorProto {
         this.javaClass.classLoader.getResourceAsStream(fileName)?.use {
             return FileDescriptorProto.parse(it, it.available())

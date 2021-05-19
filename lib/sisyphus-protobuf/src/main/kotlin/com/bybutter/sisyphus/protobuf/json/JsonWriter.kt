@@ -36,7 +36,7 @@ interface JsonWriter {
 
     fun value(value: Boolean)
 
-    fun value(value: ProtoEnum) {
+    fun value(value: ProtoEnum<*>) {
         value(value.proto)
     }
 
