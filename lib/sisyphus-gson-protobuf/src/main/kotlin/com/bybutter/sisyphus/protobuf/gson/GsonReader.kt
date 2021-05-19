@@ -65,11 +65,6 @@ class GsonReader(val reader: com.google.gson.stream.JsonReader) : JsonReader {
         if (bufferedPeek() == com.google.gson.stream.JsonToken.BOOLEAN) return booleanValue!! else TODO()
     }
 
-    override fun skip() {
-        reader.skipValue()
-        token = null
-    }
-
     companion object {
         private fun com.google.gson.stream.JsonToken.token(): JsonToken {
             return when (this) {
