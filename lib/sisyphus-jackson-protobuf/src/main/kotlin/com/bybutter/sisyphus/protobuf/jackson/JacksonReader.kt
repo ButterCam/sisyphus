@@ -41,7 +41,7 @@ class JacksonReader(private val parser: JsonParser) : JsonReader {
         return parser.booleanValue
     }
 
-    override fun skip() {
+    override fun skipChildren() {
         parser.skipChildren()
     }
 

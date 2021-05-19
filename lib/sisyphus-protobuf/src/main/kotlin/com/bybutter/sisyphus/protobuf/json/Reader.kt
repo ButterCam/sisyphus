@@ -123,7 +123,7 @@ internal fun MutableMessage<*, *>.readFields(reader: JsonReader) {
         val fieldName = reader.nameAndNext()
         val field = this.support().fieldInfo(fieldName)
         if (field == null) {
-            reader.skip()
+            reader.skipChildren()
             continue
         }
         val value = if (field.label == FieldDescriptorProto.Label.REPEATED) {
@@ -178,7 +178,7 @@ internal fun JsonReader.readRepeated(field: FieldDescriptorProto): Any {
 
 internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
     if (peek() == JsonToken.NULL && field.type != FieldDescriptorProto.Type.ENUM) {
-        skip()
+        skipChildren()
         return null
     }
 
@@ -281,12 +281,25 @@ fun JsonReader.readAny(): Message<*, *> {
             if (nameAndNext() == "value") {
                 message.readRaw(this)
             } else {
-                skip()
+                skipChildren()
             }
         }
         else -> message.readFields(this)
     }
     return message
+}
+
+/**
+ * Ensure pointer at [JsonToken.NAME] and the field name is '@type',
+ * ensure the field value is string, read the string value and advance
+ * pointer to the string value.
+ */
+fun JsonReader.typeToken(): String {
+    if (name() != "@type") {
+        throw IllegalStateException()
+    }
+    next()
+    return string()
 }
 
 internal fun JsonReader.nameAndNext(): String {

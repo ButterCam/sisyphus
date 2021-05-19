@@ -175,4 +175,13 @@ class JsonTest {
         Assertions.assertEquals(json, json.parseJson<List<MapMessageTest>>().toJson())
         Assertions.assertEquals(json, gson.toJson(gson.fromJson(json, object : TypeToken<List<MapMessageTest>>() {}.type) as List<MapMessageTest>))
     }
+
+    @Test
+    fun `unknown field`() {
+        val json = """{"string_value": "", "test": "", "test2": [{}, {}], "test3": {"test": []}, "int64_value": 10}"""
+
+        val jsonUnmarshalled = json.parseJson<BaseTypeTest>()
+        val gsonUnmarshalled = gson.fromJson(json, BaseTypeTest::class.java)
+        Assertions.assertArrayEquals(gsonUnmarshalled.toProto(), jsonUnmarshalled.toProto())
+    }
 }
