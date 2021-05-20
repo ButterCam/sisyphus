@@ -46,7 +46,7 @@ abstract class AbstractRepeatedDynamicField<T>(private val descriptor: FieldDesc
         return when (other) {
             is List<*> -> get().contentEquals(other)
             is AbstractRepeatedDynamicField<*> -> {
-                if(this.javaClass != other.javaClass) return false
+                if (this.javaClass != other.javaClass) return false
                 get().contentEquals(other.get()) && descriptor().number == other.descriptor().number
             }
             else -> false

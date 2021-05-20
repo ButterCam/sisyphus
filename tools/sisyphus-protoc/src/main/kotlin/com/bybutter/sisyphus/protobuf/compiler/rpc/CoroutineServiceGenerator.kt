@@ -8,7 +8,7 @@ import com.bybutter.sisyphus.protobuf.compiler.beginScope
 import com.bybutter.sisyphus.protobuf.compiler.companion
 import com.bybutter.sisyphus.protobuf.compiler.constructor
 import com.bybutter.sisyphus.protobuf.compiler.core.state.ApiFileGeneratingState
-import com.bybutter.sisyphus.protobuf.compiler.core.state.FileParentRegisterGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.FileParentGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.InternalFileGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
 import com.bybutter.sisyphus.protobuf.compiler.extends
@@ -391,18 +391,11 @@ class CoroutineServiceSupportMethodGenerator : GroupedGenerator<ServiceSupportGe
     }
 }
 
-class CoroutineServiceParentRegisterGenerator : GroupedGenerator<FileParentRegisterGeneratingState> {
-    override fun generate(state: FileParentRegisterGeneratingState): Boolean {
+class CoroutineServiceChildGenerator : GroupedGenerator<FileParentGeneratingState> {
+    override fun generate(state: FileParentGeneratingState): Boolean {
         for (service in state.descriptor.services) {
-            ServiceRegisterGeneratingState(state, service, state.target).advance()
+            state.target += service.className()
         }
-        return true
-    }
-}
-
-class CoroutineServiceRegisterGenerator : GroupedGenerator<ServiceRegisterGeneratingState> {
-    override fun generate(state: ServiceRegisterGeneratingState): Boolean {
-        state.target.addStatement("%T.register(%T)", RuntimeTypes.PROTO_TYPES, state.descriptor.className())
         return true
     }
 }

@@ -15,7 +15,6 @@ abstract class FileSupport : ProtoSupport<FileDescriptorProto> {
     fun readDescriptor(fileName: String): FileDescriptorProto {
         this.javaClass.classLoader.getResourceAsStream(fileName)?.use {
             return FileDescriptorProto.parse(it, it.available())
-        }
-            ?: throw IllegalStateException("Proto file descriptor '$fileName' not found, check your classpath or recompile proto files.")
+        } ?: throw IllegalStateException("Proto file descriptor '$fileName' not found, check your classpath or recompile proto files.")
     }
 }

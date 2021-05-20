@@ -99,6 +99,9 @@ open class ExtractProtoTask : DefaultTask() {
 
     @TaskAction
     fun extractProto() {
+        resourceOutput.deleteRecursively()
+        resourceOutput.mkdirs()
+
         scannedMapping += protobuf.mapping
 
         for (file in protoApiFiles) {

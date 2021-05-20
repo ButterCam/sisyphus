@@ -43,11 +43,14 @@ class MapDynamicField<TKey, TValue>(private val descriptor: FieldDescriptorProto
     }
 
     override fun read(reader: Reader, field: Int, wire: Int) {
-        reader.mapEntry({
-            it.read<Any?>(keyField.type, keyField.typeName)
-        }, {
-            it.read<Any?>(valueField.type, valueField.typeName)
-        }) { k, v ->
+        reader.mapEntry(
+            {
+                it.read<Any?>(keyField.type, keyField.typeName)
+            },
+            {
+                it.read<Any?>(valueField.type, valueField.typeName)
+            }
+        ) { k, v ->
             get()[k as TKey] = v as TValue
         }
     }

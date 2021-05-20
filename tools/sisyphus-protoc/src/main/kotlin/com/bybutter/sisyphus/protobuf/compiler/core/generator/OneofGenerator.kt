@@ -53,6 +53,7 @@ class OneofInterfaceGenerator : GroupedGenerator<MessageInterfaceGeneratingState
 class OneofValueBasicGenerator : GroupedGenerator<OneofValueTypeGeneratingState> {
     override fun generate(state: OneofValueTypeGeneratingState): Boolean {
         state.target.apply {
+            this += KModifier.SEALED
             this implements RuntimeTypes.ONE_OF_VALUE.parameterizedBy(TypeVariableName("T"))
             this.addTypeVariable(TypeVariableName("T"))
         }

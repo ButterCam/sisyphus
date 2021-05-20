@@ -1,42 +1,22 @@
 package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.protobuf.primitives.DescriptorProto
-import com.bybutter.sisyphus.spi.ServiceLoader
 
 object ProtoTypes {
     private val protoToSupportMap: MutableMap<String, ProtoSupport<*>> = hashMapOf()
 
     init {
-        val supports = ServiceLoader.load(FileSupport::class.java)
-        for (support in supports) {
-            register(support)
+        ProtobufBooster.boost()
+    }
+
+    fun register(support: ProtoSupport<*>) {
+        when (support) {
+            is ExtensionSupport<*> -> support.extendee.registerExtension(support)
         }
-    }
-
-    fun register(support: MessageSupport<*, *>) {
-        support.register()
         protoToSupportMap[support.name] = support
-    }
-
-    fun register(support: EnumSupport<*>) {
-        support.register()
-        protoToSupportMap[support.name] = support
-    }
-
-    fun register(support: ExtensionSupport<*>) {
-        support.register()
-        support.extendee.registerExtension(support)
-        protoToSupportMap[support.name] = support
-    }
-
-    fun register(support: ServiceSupport) {
-        support.register()
-        protoToSupportMap[support.name] = support
-    }
-
-    fun register(support: FileSupport) {
-        support.register()
-        protoToSupportMap[support.name] = support
+        for (child in support.children()) {
+            register(child)
+        }
     }
 
     fun getProtoNameByTypeUrl(url: String): String {

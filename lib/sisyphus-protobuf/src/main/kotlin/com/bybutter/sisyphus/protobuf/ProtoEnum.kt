@@ -1,6 +1,6 @@
 package com.bybutter.sisyphus.protobuf
 
-interface ProtoEnum<T: ProtoEnum<T>> {
+interface ProtoEnum<T : ProtoEnum<T>> {
     val proto: String
     val number: Int
 

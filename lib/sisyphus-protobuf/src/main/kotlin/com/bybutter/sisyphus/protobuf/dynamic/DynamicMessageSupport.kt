@@ -22,4 +22,18 @@ class DynamicMessageSupport(
             else -> throw IllegalStateException("Wrong parent")
         }
     }
+
+    private val children: Array<ProtoSupport<*>> = run {
+        val messages = descriptor.nestedType.map {
+            DynamicMessageSupport(this, it)
+        }
+        val enums = descriptor.enumType.map {
+            DynamicEnumSupport(this, it)
+        }
+        (messages + enums).toTypedArray()
+    }
+
+    override fun children(): Array<ProtoSupport<*>> {
+        return children
+    }
 }
