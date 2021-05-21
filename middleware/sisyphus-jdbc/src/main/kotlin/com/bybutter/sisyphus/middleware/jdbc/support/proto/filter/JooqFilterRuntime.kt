@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.middleware.jdbc.support.proto.filter
 
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -30,7 +31,13 @@ open class JooqFilterRuntime(private val std: JooqFilterStandardLibrary = JooqFi
         val func = memberFunctions[function]?.firstOrNull {
             it.compatibleWith(arguments)
         } ?: return block()
-        return func.call(std, *arguments.toTypedArray())
+        return try {
+            func.call(std, *arguments.toTypedArray())
+        } catch (ex: InvocationTargetException) {
+            throw ex.cause ?: ex
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     private fun KFunction<*>.compatibleWith(arguments: List<Any?>): Boolean {
