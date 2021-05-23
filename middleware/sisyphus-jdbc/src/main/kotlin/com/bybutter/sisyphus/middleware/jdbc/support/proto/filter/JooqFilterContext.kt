@@ -13,7 +13,7 @@ abstract class JooqFilterContext<T : Record> {
 
     abstract fun member(member: FilterParser.MemberContext): Field<*>
 
-    fun value(field: Field<*>, value: Any?): Any? {
+    open fun value(field: Field<*>, value: Any?): Any? {
         return when (value) {
             is Timestamp -> value.toSql()
             else -> value
