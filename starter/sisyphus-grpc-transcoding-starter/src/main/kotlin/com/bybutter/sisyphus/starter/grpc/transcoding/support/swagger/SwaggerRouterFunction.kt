@@ -5,7 +5,6 @@ import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FileDescriptorProto
 import com.bybutter.sisyphus.starter.grpc.transcoding.EmptyRouterFunction
-import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication.SwaggerValidate
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerDescription
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerParams
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils.SwaggerPaths
@@ -38,8 +37,8 @@ import java.net.URI
 
 class SwaggerRouterFunction private constructor(
     private val services: List<ServerServiceDefinition>,
-    private val swaggerValidate: SwaggerValidate,
-    private val property: SwaggerProperty
+    private val property: SwaggerProperty,
+    private val authorizers: List<SwaggerAuthorizer>
 ) : RouterFunction<ServerResponse>, HandlerFunction<ServerResponse> {
 
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
@@ -51,8 +50,9 @@ class SwaggerRouterFunction private constructor(
     }
 
     override fun handle(request: ServerRequest): Mono<ServerResponse> {
-        // If enable validate ,verify the request is legal.
-        if (property.enableValidate) swaggerValidate.validate(request, property.validateContent)
+        authorizers.forEach {
+            it.authorize(request)
+        }
         val tags = mutableListOf<Tag>()
         val paths = Paths()
         val schemas = mutableMapOf<String, Schema<*>>()
@@ -97,7 +97,7 @@ class SwaggerRouterFunction private constructor(
                 while (true) {
                     val subModelNames = mutableSetOf<String>()
                     for (typeName in modelNames) {
-                        if (schemas.containsKey(typeName)) continue
+                        if (schemas.containsKey(typeName.trim('.'))) continue
                         SwaggerSchema.fetchSchemaModel(typeName)?.let { schema ->
                             schemas[typeName.trim('.')] = schema.schema
                             subModelNames.addAll(schema.subTypeNames)
@@ -175,7 +175,11 @@ class SwaggerRouterFunction private constructor(
                                         "application/json",
                                         MediaType().apply {
                                             schema =
-                                                ObjectSchema().`$ref`(COMPONENTS_SCHEMAS_PREFIX + method.outputType.trim('.'))
+                                                ObjectSchema().`$ref`(
+                                                    COMPONENTS_SCHEMAS_PREFIX + method.outputType.trim(
+                                                        '.'
+                                                    )
+                                                )
                                         }
                                     )
                                 }
@@ -221,7 +225,15 @@ class SwaggerRouterFunction private constructor(
             servers = listOf(
                 io.swagger.v3.oas.models.servers.Server().apply {
                     url =
-                        URI(request.uri().scheme, null, request.uri().host, request.uri().port, null, null, null).toString()
+                        URI(
+                            request.uri().scheme,
+                            null,
+                            request.uri().host,
+                            request.uri().port,
+                            null,
+                            null,
+                            null
+                        ).toString()
                     description = "Default Server"
                 }
             ) + SwaggerServers.fetchServers(property.servers)
@@ -239,8 +251,8 @@ class SwaggerRouterFunction private constructor(
         operator fun invoke(
             server: Server,
             enableServices: Collection<String> = listOf(),
-            swaggerAuthentication: SwaggerValidate,
-            swaggerProperty: SwaggerProperty
+            swaggerProperty: SwaggerProperty,
+            authorizers: List<SwaggerAuthorizer>
         ): RouterFunction<ServerResponse> {
             val enableServicesSet = enableServices.toSet()
             val enableServicesDefinition = mutableListOf<ServerServiceDefinition>()
@@ -250,7 +262,7 @@ class SwaggerRouterFunction private constructor(
                 }
             }
             if (enableServicesDefinition.isEmpty()) return EmptyRouterFunction
-            return SwaggerRouterFunction(enableServicesDefinition, swaggerAuthentication, swaggerProperty)
+            return SwaggerRouterFunction(enableServicesDefinition, swaggerProperty, authorizers)
         }
     }
 }
