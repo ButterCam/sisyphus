@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.middleware.jdbc.test
 
-import com.bybutter.sisyphus.middleware.jdbc.support.proto.filter.JooqConditionBuilder
 import org.jooq.Field
 import org.jooq.impl.DSL
 import org.junit.jupiter.api.Assertions

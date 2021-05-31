@@ -5,15 +5,11 @@ package com.bybutter.sisyphus.dsl.filtering.grammar;
 }
 
 filter
-    : e=expression? EOF
+    : e+=expression* EOF
     ;
 
 expression
-    : init=sequence (op='AND' seq+=sequence)*
-    ;
-
-sequence
-    : init=factor e+=factor*
+    : init=factor (op='AND' e+=factor)*
     ;
 
 factor

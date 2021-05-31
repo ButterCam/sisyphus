@@ -1,6 +1,6 @@
-package com.bybutter.sisyphus.dsl.filtering
+package com.bybutter.sisyphus.middleware.jdbc.support.proto.filter
 
-import com.bybutter.sisyphus.dsl.filtering.grammar.FilterParser
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -27,11 +27,17 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
         }
     }
 
-    open fun invokeOrDefault(function: String, arguments: List<Any?>, block: () -> Any?): Any? {
+    fun invokeOrDefault(function: String, arguments: List<Any?>, block: () -> Any?): Any? {
         val func = memberFunctions[function]?.firstOrNull {
             it.compatibleWith(arguments)
         } ?: return block()
-        return func.call(std, *arguments.toTypedArray())
+        return try {
+            func.call(std, *arguments.toTypedArray())
+        } catch (ex: InvocationTargetException) {
+            throw ex.cause ?: ex
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     private fun KFunction<*>.compatibleWith(arguments: List<Any?>): Boolean {
@@ -51,11 +57,5 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
         }
 
         return true
-    }
-
-    open fun access(member: FilterParser.MemberContext, global: Map<String, Any?>): Any? {
-        return member.names.map { it.text }.fold<String, Any?>(global) { result, it ->
-            invoke("access", listOf(result, it))
-        }
     }
 }

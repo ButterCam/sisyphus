@@ -1,8 +1,6 @@
 package com.bybutter.sisyphus.dsl.cel.test
 
 import com.bybutter.sisyphus.api.cel.test.HasMessageTest
-import com.bybutter.sisyphus.dsl.filtering.FilterEngine
-import com.bybutter.sisyphus.dsl.filtering.MessageFilter
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.primitives.Duration
 import com.bybutter.sisyphus.protobuf.primitives.ListValue
