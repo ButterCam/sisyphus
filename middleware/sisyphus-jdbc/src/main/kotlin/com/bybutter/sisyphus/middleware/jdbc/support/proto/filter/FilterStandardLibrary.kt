@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.middleware.jdbc.support.proto.filter
 import org.jooq.Condition
 import org.jooq.Field
 
-open class JooqFilterStandardLibrary {
+open class FilterStandardLibrary {
     fun and(left: Condition, right: Condition): Condition {
         return left.and(right)
     }
@@ -18,6 +18,46 @@ open class JooqFilterStandardLibrary {
 
     fun not(value: Condition): Condition {
         return value.not()
+    }
+
+    fun and(left: JooqConditionSupplier, right: Condition): Condition {
+        return left.get().and(right)
+    }
+
+    fun or(left: JooqConditionSupplier, right: Condition): Condition {
+        return left.get().or(right)
+    }
+
+    fun union(left: JooqConditionSupplier, right: Condition): Condition {
+        return left.get().and(right)
+    }
+
+    fun and(left: Condition, right: JooqConditionSupplier): Condition {
+        return left.and(right.get())
+    }
+
+    fun or(left: Condition, right: JooqConditionSupplier): Condition {
+        return left.or(right.get())
+    }
+
+    fun union(left: Condition, right: JooqConditionSupplier): Condition {
+        return left.and(right.get())
+    }
+
+    fun and(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
+        return left.get().and(right.get())
+    }
+
+    fun or(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
+        return left.get().or(right.get())
+    }
+
+    fun union(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
+        return left.get().and(right.get())
+    }
+
+    fun not(value: JooqConditionSupplier): Condition {
+        return value.get().not()
     }
 
     fun lessOrEquals(left: Field<*>, right: Any): Condition {
