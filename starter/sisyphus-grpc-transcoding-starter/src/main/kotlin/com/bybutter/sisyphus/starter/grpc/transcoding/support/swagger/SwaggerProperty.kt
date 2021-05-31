@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger
 import io.swagger.v3.oas.models.security.SecurityScheme
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
-import org.springframework.http.HttpHeaders
 
 /**
  *  Swagger configuration.
@@ -11,8 +10,6 @@ import org.springframework.http.HttpHeaders
 @ConfigurationProperties("swagger")
 data class SwaggerProperty(
     var path: String = "/api-docs",
-    var enableValidate: Boolean = true,
-    var validateContent: Map<String, String> = mapOf(HttpHeaders.AUTHORIZATION to "BCC383E0E10F1F67"),
     @NestedConfigurationProperty
     var info: Info? = null,
     @NestedConfigurationProperty

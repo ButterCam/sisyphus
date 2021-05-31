@@ -1,6 +1,5 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
-import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication.DefaultSwaggerConfig
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 
@@ -10,5 +9,5 @@ import org.springframework.context.annotation.Import
  * Empty list for all supported services.
  */
 @ComponentScan(basePackageClasses = [EnableHttpToGrpcTranscoding::class])
-@Import(DefaultSwaggerConfig::class, GrpcTranscodingConfig::class)
+@Import(GrpcTranscodingConfig::class)
 annotation class EnableHttpToGrpcTranscoding(val services: Array<String> = [])

@@ -2,9 +2,9 @@ package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.spring.BeanUtils
 import com.bybutter.sisyphus.starter.grpc.ServiceRegistrar
+import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerAuthorizer
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerProperty
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerRouterFunction
-import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.authentication.SwaggerValidate
 import io.grpc.Server
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -84,15 +84,15 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
      * Register swagger router function bean definition to spring context.
      */
     private fun registerSwaggerRouterFunction(registry: BeanDefinitionRegistry, enableServices: Collection<String>) {
-        BeanDefinitionBuilder.genericBeanDefinition(SwaggerValidate::class.java)
+        BeanDefinitionBuilder.genericBeanDefinition(SwaggerAuthorizer::class.java)
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(RouterFunction::class.java) {
             val server =
                 (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
             SwaggerRouterFunction(
                 server,
                 enableServices,
-                (registry as ConfigurableListableBeanFactory).getBeansOfType(SwaggerValidate::class.java).values.first(),
-                swaggerProperty
+                swaggerProperty,
+                (registry as ConfigurableListableBeanFactory).getBeansOfType(SwaggerAuthorizer::class.java).values.toList()
             )
         }
         registry.registerBeanDefinition(
