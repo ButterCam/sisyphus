@@ -539,7 +539,7 @@ class MessageFieldEqualsFunctionGenerator : GroupedGenerator<MessageEqualsFuncti
                 }
                 DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED -> {
                     addStatement(
-                        "if (%N.%M(other.%N)) return true", state.descriptor.name(),
+                        "if (!%N.%M(other.%N)) return false", state.descriptor.name(),
                         RuntimeMethods.CONTENT_EQUALS, state.descriptor.name()
                     )
                 }
