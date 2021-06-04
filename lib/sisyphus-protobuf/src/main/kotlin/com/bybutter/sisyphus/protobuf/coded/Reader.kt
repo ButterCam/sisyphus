@@ -3,13 +3,14 @@ package com.bybutter.sisyphus.protobuf.coded
 import com.bybutter.sisyphus.data.decodeZigZag
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessageSupport
+import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.primitives.Any
 import java.io.EOFException
 import java.io.InputStream
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class Reader(private val inputStream: InputStream) {
+class Reader(private val inputStream: InputStream, val reflection: ProtoReflection = ProtoTypes) {
     var readBytes = 0
         private set
 
@@ -192,7 +193,7 @@ class Reader(private val inputStream: InputStream) {
             it.tag()
             val typeUrl = it.string()
             it.tag()
-            val support = ProtoTypes.findSupport(typeUrl) as? MessageSupport<*, *> ?: return Any {
+            val support = reflection.findSupport(typeUrl) as? MessageSupport<*, *> ?: return Any {
                 this.typeUrl = typeUrl
                 this.value = it.bytes()
             }

@@ -1,5 +1,7 @@
 package com.bybutter.sisyphus.protobuf.gson
 
+import com.bybutter.sisyphus.protobuf.ProtoReflection
+import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.json.JsonReader
 import com.bybutter.sisyphus.protobuf.json.JsonToken
 
@@ -26,6 +28,10 @@ class GsonReader(val reader: com.google.gson.stream.JsonReader) : JsonReader {
             }
         }
         return token!!
+    }
+
+    override fun reflection(): ProtoReflection {
+        return ProtoTypes
     }
 
     override fun peek(): JsonToken {

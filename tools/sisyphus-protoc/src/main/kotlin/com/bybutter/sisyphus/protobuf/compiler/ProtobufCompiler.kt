@@ -1,8 +1,10 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
+import com.bybutter.sisyphus.data.hex
 import com.bybutter.sisyphus.protobuf.compiler.booster.ProtobufBoosterContext
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
+import com.bybutter.sisyphus.security.md5
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.KModifier
 
@@ -22,7 +24,8 @@ class ProtobufCompiler(
     }
 
     fun generate(files: Collection<String>): ProtoCompileResults {
-        context = ProtobufBoosterContext()
+        val generatingHash = (descriptorSet.descriptor.toByteArray().md5() + generators.md5()).md5().hex()
+        context = ProtobufBoosterContext(name = "Booster_$generatingHash")
         val results = files.map { generate(it) }
         val boostFunc = context.builder.build()
         val booster = if (boostFunc.body.isNotEmpty()) {

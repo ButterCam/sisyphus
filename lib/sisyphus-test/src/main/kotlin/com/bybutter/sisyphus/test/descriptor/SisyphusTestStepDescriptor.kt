@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.findServiceSupport
 import com.bybutter.sisyphus.protobuf.primitives.toTime
 import com.bybutter.sisyphus.reflect.uncheckedCast
 import com.bybutter.sisyphus.test.CallContext

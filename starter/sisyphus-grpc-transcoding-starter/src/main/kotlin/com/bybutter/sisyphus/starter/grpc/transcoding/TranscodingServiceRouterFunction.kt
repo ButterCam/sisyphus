@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.findServiceSupport
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
 import io.grpc.ServerServiceDefinition
 import org.springframework.web.reactive.function.server.HandlerFunction

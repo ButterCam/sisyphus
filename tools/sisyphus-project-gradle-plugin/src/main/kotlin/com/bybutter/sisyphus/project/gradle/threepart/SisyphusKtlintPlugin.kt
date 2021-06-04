@@ -17,18 +17,14 @@ class SisyphusKtlintPlugin : Plugin<Project> {
         }
 
         val extension = target.extensions.getByType(KtlintExtension::class.java)
-        extension.filter(
-            Action {
-                val pattern = "${File.separatorChar}generated${File.separatorChar}"
-                it.exclude {
-                    it.file.path.contains(pattern)
-                }
+        extension.filter {
+            val pattern = "${File.separatorChar}generated${File.separatorChar}"
+            it.exclude {
+                it.file.path.contains(pattern)
             }
-        )
-        extension.reporters(
-            Action<KtlintExtension.ReporterExtension> {
-                it.reporter(ReporterType.CHECKSTYLE)
-            }
-        )
+        }
+        extension.reporters {
+            it.reporter(ReporterType.CHECKSTYLE)
+        }
     }
 }

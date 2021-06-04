@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.starter.grpc.transcoding.codec
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.ProtobufDefinition
+import com.bybutter.sisyphus.protobuf.findMessageSupport
 import org.springframework.core.ResolvableType
 import org.springframework.core.codec.AbstractDataBufferDecoder
 import org.springframework.core.io.buffer.DataBuffer

@@ -4,10 +4,12 @@ import com.bybutter.sisyphus.protobuf.EnumSupport
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoEnum
-import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.coded.Writer
+import com.bybutter.sisyphus.protobuf.findEnumSupport
+import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 interface DynamicField<T> {
@@ -30,26 +32,58 @@ interface DynamicField<T> {
     override fun equals(other: Any?): Boolean
 
     companion object {
-        operator fun invoke(descriptor: FieldDescriptorProto): DynamicField<*> {
-            when (descriptor.type) {
-                FieldDescriptorProto.Type.DOUBLE -> TODO()
-                FieldDescriptorProto.Type.FLOAT -> TODO()
-                FieldDescriptorProto.Type.INT64 -> TODO()
-                FieldDescriptorProto.Type.UINT64 -> TODO()
-                FieldDescriptorProto.Type.INT32 -> TODO()
-                FieldDescriptorProto.Type.FIXED64 -> TODO()
-                FieldDescriptorProto.Type.FIXED32 -> TODO()
-                FieldDescriptorProto.Type.BOOL -> TODO()
-                FieldDescriptorProto.Type.STRING -> TODO()
-                FieldDescriptorProto.Type.GROUP -> TODO()
-                FieldDescriptorProto.Type.MESSAGE -> TODO()
-                FieldDescriptorProto.Type.BYTES -> TODO()
-                FieldDescriptorProto.Type.UINT32 -> TODO()
-                FieldDescriptorProto.Type.ENUM -> TODO()
-                FieldDescriptorProto.Type.SFIXED32 -> TODO()
-                FieldDescriptorProto.Type.SFIXED64 -> TODO()
-                FieldDescriptorProto.Type.SINT32 -> TODO()
-                FieldDescriptorProto.Type.SINT64 -> TODO()
+        operator fun invoke(message: DynamicMessageSupport, descriptor: FieldDescriptorProto): DynamicField<*> {
+            return if (descriptor.label == FieldDescriptorProto.Label.REPEATED) {
+                when (descriptor.type) {
+                    FieldDescriptorProto.Type.DOUBLE -> RepeatedDoubleDynamicField(descriptor)
+                    FieldDescriptorProto.Type.FLOAT -> RepeatedFloatDynamicField(descriptor)
+                    FieldDescriptorProto.Type.INT64 -> RepeatedInt64DynamicField(descriptor)
+                    FieldDescriptorProto.Type.UINT64 -> RepeatedUInt64DynamicField(descriptor)
+                    FieldDescriptorProto.Type.INT32 -> RepeatedInt32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.FIXED64 -> RepeatedFixed64DynamicField(descriptor)
+                    FieldDescriptorProto.Type.FIXED32 -> RepeatedFixed32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.BOOL -> RepeatedBooleanDynamicField(descriptor)
+                    FieldDescriptorProto.Type.STRING -> RepeatedStringDynamicField(descriptor)
+                    FieldDescriptorProto.Type.GROUP -> TODO()
+                    FieldDescriptorProto.Type.MESSAGE -> RepeatedMessageDynamicField<Message<*, *>>(
+                        message.reflection,
+                        descriptor
+                    )
+                    FieldDescriptorProto.Type.BYTES -> RepeatedBytesDynamicField(descriptor)
+                    FieldDescriptorProto.Type.UINT32 -> RepeatedUInt32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.ENUM -> RepeatedEnumDynamicField<ProtoEnum<*>>(
+                        message.reflection,
+                        descriptor
+                    )
+                    FieldDescriptorProto.Type.SFIXED32 -> RepeatedSFixed32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.SFIXED64 -> RepeatedSFixed64DynamicField(descriptor)
+                    FieldDescriptorProto.Type.SINT32 -> RepeatedSInt32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.SINT64 -> RepeatedSInt64DynamicField(descriptor)
+                }
+            } else {
+                when (descriptor.type) {
+                    FieldDescriptorProto.Type.DOUBLE -> DoubleDynamicField(descriptor)
+                    FieldDescriptorProto.Type.FLOAT -> FloatDynamicField(descriptor)
+                    FieldDescriptorProto.Type.INT64 -> Int64DynamicField(descriptor)
+                    FieldDescriptorProto.Type.UINT64 -> UInt64DynamicField(descriptor)
+                    FieldDescriptorProto.Type.INT32 -> Int32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.FIXED64 -> Fixed64DynamicField(descriptor)
+                    FieldDescriptorProto.Type.FIXED32 -> Fixed32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.BOOL -> BooleanDynamicField(descriptor)
+                    FieldDescriptorProto.Type.STRING -> StringDynamicField(descriptor)
+                    FieldDescriptorProto.Type.GROUP -> TODO()
+                    FieldDescriptorProto.Type.MESSAGE -> MessageDynamicField<Message<*, *>>(
+                        message.reflection,
+                        descriptor
+                    )
+                    FieldDescriptorProto.Type.BYTES -> BytesDynamicField(descriptor)
+                    FieldDescriptorProto.Type.UINT32 -> UInt32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.ENUM -> EnumDynamicField<ProtoEnum<*>>(message.reflection, descriptor)
+                    FieldDescriptorProto.Type.SFIXED32 -> SFixed32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.SFIXED64 -> SFixed64DynamicField(descriptor)
+                    FieldDescriptorProto.Type.SINT32 -> SInt32DynamicField(descriptor)
+                    FieldDescriptorProto.Type.SINT64 -> SInt64DynamicField(descriptor)
+                }
             }
         }
     }
@@ -597,10 +631,13 @@ class RepeatedSInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractRep
     }
 }
 
-class EnumDynamicField<T : ProtoEnum<T>>(descriptor: FieldDescriptorProto) : AbstractDynamicField<T>(descriptor) {
+class EnumDynamicField<T : ProtoEnum<T>>(
+    private val reflection: ProtoReflection,
+    descriptor: FieldDescriptorProto
+) : AbstractDynamicField<T>(descriptor) {
     override var value: T = defaultValue()
 
-    private val support = ProtoTypes.findEnumSupport(descriptor().typeName) as EnumSupport<T>
+    private val support = reflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
 
     override fun defaultValue(): T {
         return support()
@@ -620,9 +657,11 @@ class EnumDynamicField<T : ProtoEnum<T>>(descriptor: FieldDescriptorProto) : Abs
     }
 }
 
-class RepeatedEnumDynamicField<T : ProtoEnum<T>>(descriptor: FieldDescriptorProto) :
-    AbstractRepeatedDynamicField<T>(descriptor) {
-    private val support = ProtoTypes.findEnumSupport(descriptor().typeName) as EnumSupport<T>
+class RepeatedEnumDynamicField<T : ProtoEnum<T>>(
+    private val reflection: ProtoReflection,
+    descriptor: FieldDescriptorProto
+) : AbstractRepeatedDynamicField<T>(descriptor) {
+    private val support = reflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
 
     override fun writeTo(writer: Writer) {
         for (value in get()) {
@@ -638,10 +677,13 @@ class RepeatedEnumDynamicField<T : ProtoEnum<T>>(descriptor: FieldDescriptorProt
     }
 }
 
-class MessageDynamicField<T : Message<T, *>>(descriptor: FieldDescriptorProto) : AbstractDynamicField<T?>(descriptor) {
+class MessageDynamicField<T : Message<T, *>>(
+    private val reflection: ProtoReflection,
+    descriptor: FieldDescriptorProto
+) : AbstractDynamicField<T?>(descriptor) {
     override var value: T? = defaultValue()
 
-    private val support = ProtoTypes.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
+    private val support = reflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
 
     override fun defaultValue(): T? {
         return null
@@ -663,9 +705,11 @@ class MessageDynamicField<T : Message<T, *>>(descriptor: FieldDescriptorProto) :
     }
 }
 
-class RepeatedMessageDynamicField<T : Message<T, *>>(descriptor: FieldDescriptorProto) :
-    AbstractRepeatedDynamicField<T>(descriptor) {
-    private val support = ProtoTypes.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
+class RepeatedMessageDynamicField<T : Message<T, *>>(
+    private val reflection: ProtoReflection,
+    descriptor: FieldDescriptorProto
+) : AbstractRepeatedDynamicField<T>(descriptor) {
+    private val support = reflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
 
     override fun writeTo(writer: Writer) {
         for (value in get()) {

@@ -2,10 +2,13 @@ package com.bybutter.sisyphus.protobuf.json
 
 import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoEnum
+import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.security.base64
 
 interface JsonWriter {
+    fun reflection(): ProtoReflection
+
     fun beginObject()
 
     fun endObject()

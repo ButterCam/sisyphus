@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.protobuf.gson
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.ProtobufDefinition
+import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.json.readAny
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
@@ -27,7 +28,7 @@ object MessageTypeAdapterFactory : TypeAdapterFactory {
 
 class UnboxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
     override fun write(writer: JsonWriter, message: Message<*, *>) {
-        message.writeTo(GsonWriter(writer))
+        message.writeTo(GsonWriter(writer, message.support().reflection))
     }
 
     override fun read(reader: JsonReader): Message<*, *> {
@@ -37,7 +38,7 @@ class UnboxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
 
 class BoxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
     override fun write(writer: JsonWriter, message: Message<*, *>) {
-        message.writeTo(GsonWriter(writer))
+        message.writeTo(GsonWriter(writer, message.support().reflection))
     }
 
     override fun read(reader: JsonReader): Message<*, *> {
@@ -47,7 +48,7 @@ class BoxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
 
 class MessageTypeAdapter(private val clazz: Class<*>) : TypeAdapter<Message<*, *>>() {
     override fun write(writer: JsonWriter, message: Message<*, *>) {
-        message.writeTo(GsonWriter(writer))
+        message.writeTo(GsonWriter(writer, message.support().reflection))
     }
 
     override fun read(reader: JsonReader): Message<*, *> {

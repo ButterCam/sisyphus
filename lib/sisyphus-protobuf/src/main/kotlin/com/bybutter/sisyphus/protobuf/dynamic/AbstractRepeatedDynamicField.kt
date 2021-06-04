@@ -3,8 +3,9 @@ package com.bybutter.sisyphus.protobuf.dynamic
 import com.bybutter.sisyphus.collection.contentEquals
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
-abstract class AbstractRepeatedDynamicField<T>(private val descriptor: FieldDescriptorProto) :
-    DynamicField<MutableList<T>> {
+abstract class AbstractRepeatedDynamicField<T>(
+    private val descriptor: FieldDescriptorProto
+) : DynamicField<MutableList<T>> {
     protected val value: MutableList<T> = mutableListOf()
 
     override fun descriptor(): FieldDescriptorProto {

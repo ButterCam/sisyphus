@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.protobuf.primitives
 
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessageSupport
-import com.bybutter.sisyphus.protobuf.ProtoTypes
 
 /**
  * Wrap message to [Any].
@@ -19,5 +18,5 @@ fun Message<*, *>.toAny(): Any {
  * Unwrap any.
  */
 fun Any.toMessage(): Message<*, *> {
-    return (ProtoTypes.findSupport(this.typeUrl) as MessageSupport<*, *>).parse(this.value)
+    return (support().reflection.findSupport(this.typeUrl) as MessageSupport<*, *>).parse(this.value)
 }

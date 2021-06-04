@@ -17,6 +17,9 @@ abstract class MessageSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>> : 
         return "types.bybutter.com/${name.substring(1)}"
     }
 
+    override val reflection: ProtoReflection
+        get() = file().reflection
+
     @InternalProtoApi
     abstract fun newMutable(): TM
 

@@ -8,8 +8,9 @@ import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
-class DynamicMessage(private val support: DynamicMessageSupport) :
-    AbstractMutableMessage<DynamicMessage, DynamicMessage>() {
+class DynamicMessage(
+    private val support: DynamicMessageSupport
+) : AbstractMutableMessage<DynamicMessage, DynamicMessage>() {
     private val fields = mutableMapOf<Int, DynamicField<*>>()
 
     override fun computeHashCode(): Int {
@@ -34,14 +35,14 @@ class DynamicMessage(private val support: DynamicMessageSupport) :
     private fun <T> ensure(fieldName: String): DynamicField<T> {
         val field = support().fieldInfo(fieldName) ?: throw IllegalArgumentException("Unknown field $fieldName")
         return fields.getOrPut(field.number) {
-            DynamicField(field)
+            DynamicField(support, field)
         } as DynamicField<T>
     }
 
     private fun <T> ensure(fieldNumber: Int): DynamicField<T> {
         val field = support().fieldInfo(fieldNumber) ?: throw IllegalArgumentException("Unknown field $fieldNumber")
         return fields.getOrPut(field.number) {
-            DynamicField(field)
+            DynamicField(support, field)
         } as DynamicField<T>
     }
 

@@ -1,18 +1,21 @@
 package com.bybutter.sisyphus.protobuf.dynamic
 
 import com.bybutter.sisyphus.collection.contentEquals
-import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.coded.Writer
+import com.bybutter.sisyphus.protobuf.findMapEntryDescriptor
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
-class MapDynamicField<TKey, TValue>(private val descriptor: FieldDescriptorProto) :
-    DynamicField<MutableMap<TKey, TValue>> {
+class MapDynamicField<TKey, TValue>(
+    private val descriptor: FieldDescriptorProto,
+    private val reflection: ProtoReflection
+) : DynamicField<MutableMap<TKey, TValue>> {
     private val map = mutableMapOf<TKey, TValue>()
 
     private val mapEntryDescriptor =
-        ProtoTypes.findMapEntryDescriptor(descriptor().typeName) ?: throw IllegalStateException()
+        reflection.findMapEntryDescriptor(descriptor().typeName) ?: throw IllegalStateException()
 
     private val keyField = mapEntryDescriptor.field.first { it.number == 1 }
 

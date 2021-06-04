@@ -2,6 +2,8 @@ package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger
 
 import com.bybutter.sisyphus.api.http
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.findMessageSupport
+import com.bybutter.sisyphus.protobuf.findServiceSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.FileDescriptorProto
 import com.bybutter.sisyphus.starter.grpc.transcoding.EmptyRouterFunction

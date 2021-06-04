@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.jackson.javaType
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.ProtobufDefinition
+import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.json.readAny
 import com.bybutter.sisyphus.protobuf.primitives.Any
 import com.bybutter.sisyphus.protobuf.primitives.toAny

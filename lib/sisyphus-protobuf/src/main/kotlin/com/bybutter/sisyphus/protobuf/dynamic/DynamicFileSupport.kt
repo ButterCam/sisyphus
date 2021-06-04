@@ -1,10 +1,14 @@
 package com.bybutter.sisyphus.protobuf.dynamic
 
 import com.bybutter.sisyphus.protobuf.FileSupport
+import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.ProtoSupport
 import com.bybutter.sisyphus.protobuf.primitives.FileDescriptorProto
 
-class DynamicFileSupport(override val descriptor: FileDescriptorProto) : FileSupport() {
+class DynamicFileSupport(
+    override val descriptor: FileDescriptorProto,
+    override val reflection: ProtoReflection
+) : FileSupport() {
     override val name: String
         get() = descriptor.name
 

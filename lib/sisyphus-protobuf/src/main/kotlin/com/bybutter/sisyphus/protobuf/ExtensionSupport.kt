@@ -15,6 +15,9 @@ abstract class ExtensionSupport<T> : ProtoSupport<FieldDescriptorProto> {
 
     abstract fun default(): T?
 
+    override val reflection: ProtoReflection
+        get() = file().reflection
+
     open fun wrap(value: T): MessageExtension<T> {
         return MessageExtensionImpl(value, this)
     }

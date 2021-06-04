@@ -12,6 +12,6 @@ open class ProtoSerializer<T : Message<*, *>> : StdSerializer<T> {
     constructor(type: JavaType) : super(type)
 
     override fun serialize(value: T, gen: JsonGenerator, provider: SerializerProvider) {
-        value.writeTo(JacksonWriter(gen))
+        value.writeTo(JacksonWriter(gen, value.support().reflection))
     }
 }

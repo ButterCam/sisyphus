@@ -12,6 +12,8 @@ object RuntimeTypes {
 
     val MESSAGE = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.Message")
 
+    val PROTO_REFLECTION = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.ProtoReflection")
+
     val MESSAGE_SUPPORT = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.MessageSupport")
 
     val MESSAGE_EXTENSION = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.MessageExtension")

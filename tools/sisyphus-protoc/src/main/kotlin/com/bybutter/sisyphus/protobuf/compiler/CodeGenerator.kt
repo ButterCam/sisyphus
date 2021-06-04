@@ -105,6 +105,8 @@ import com.bybutter.sisyphus.protobuf.compiler.rxjava.SeparatedRxClientApiFileGe
 import com.bybutter.sisyphus.protobuf.compiler.rxjava.SeparatedRxClientGenerator
 import com.bybutter.sisyphus.reflect.getTypeArgument
 import com.bybutter.sisyphus.reflect.uncheckedCast
+import com.bybutter.sisyphus.security.md5
+import com.bybutter.sisyphus.security.md5Data
 import com.bybutter.sisyphus.spi.ServiceLoader
 import java.lang.reflect.ParameterizedType
 import java.util.Stack
@@ -349,5 +351,11 @@ class CodeGenerators {
                 }
             }
         }
+    }
+
+    fun md5(): ByteArray {
+        return this.generators.joinToString("\n") {
+            it.javaClass.canonicalName
+        }.md5Data()
     }
 }

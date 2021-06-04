@@ -23,8 +23,8 @@ class TypeReflectionFunction : RouterFunction<ServerResponse>, HandlerFunction<S
         val typeName = ".${request.path()}"
         val type = typeCache.getOrPut(request.path()) {
             when (val descriptor = ProtoTypes.findSupport(typeName)?.descriptor) {
-                is DescriptorProto -> descriptor.toType(typeName)
-                is EnumDescriptorProto -> descriptor.toEnum(typeName)
+                is DescriptorProto -> descriptor.toType(typeName, ProtoTypes)
+                is EnumDescriptorProto -> descriptor.toEnum(typeName, ProtoTypes)
                 else -> null
             }
         } ?: return Mono.empty()
