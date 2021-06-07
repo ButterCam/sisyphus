@@ -33,7 +33,7 @@ dependencies {
         api("com.android.tools.build:gradle:4.1.2")
         api("com.github.ben-manes:gradle-versions-plugin:0.28.0")
         api("com.github.os72:protoc-jar:3.11.4")
-        api("com.google.api.grpc:proto-google-common-protos:2.3.2")
+        api("com.google.api.grpc:proto-google-common-protos:2.2.2")
         api("com.google.api:api-common:1.10.3")
         api("com.google.api:api-compiler:0.0.8")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
