@@ -21,8 +21,7 @@ class SeparatedCoroutineServiceBoosterGenerator : GroupedGenerator<ProtobufBoost
 
         state.descriptor.services.forEach {
             state.target.builder.addStatement(
-                "%T.register(%T)",
-                RuntimeTypes.PROTO_TYPES,
+                "reflection.register(%T)",
                 it.className()
             )
         }

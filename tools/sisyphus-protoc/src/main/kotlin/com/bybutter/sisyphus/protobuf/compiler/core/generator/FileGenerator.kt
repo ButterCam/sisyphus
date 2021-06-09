@@ -17,7 +17,6 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.InternalFileGenerating
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
 import com.bybutter.sisyphus.protobuf.compiler.extends
 import com.bybutter.sisyphus.protobuf.compiler.function
-import com.bybutter.sisyphus.protobuf.compiler.getter
 import com.bybutter.sisyphus.protobuf.compiler.kFile
 import com.bybutter.sisyphus.protobuf.compiler.kObject
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
@@ -79,13 +78,6 @@ class FileSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
                 property("descriptor", RuntimeTypes.FILE_DESCRIPTOR_PROTO) {
                     this += KModifier.OVERRIDE
                     FileDescriptorGeneratingState(state, state.descriptor, this).advance()
-                }
-
-                property("reflection", RuntimeTypes.PROTO_REFLECTION) {
-                    this += KModifier.OVERRIDE
-                    getter {
-                        addStatement("return %T", RuntimeTypes.PROTO_TYPES)
-                    }
                 }
 
                 val result = mutableListOf<TypeName>()

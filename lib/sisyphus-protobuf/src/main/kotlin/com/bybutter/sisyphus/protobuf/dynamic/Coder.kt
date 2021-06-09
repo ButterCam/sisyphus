@@ -2,6 +2,7 @@ package com.bybutter.sisyphus.protobuf.dynamic
 
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoEnum
+import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.findEnumSupport
@@ -26,8 +27,8 @@ fun <T> Reader.read(type: FieldDescriptorProto.Type, typename: String): T {
         FieldDescriptorProto.Type.SFIXED64 -> sfixed64()
         FieldDescriptorProto.Type.SINT32 -> sint32()
         FieldDescriptorProto.Type.SINT64 -> sint64()
-        FieldDescriptorProto.Type.MESSAGE -> reflection.findMessageSupport(typename).parse(this, int32())
-        FieldDescriptorProto.Type.ENUM -> reflection.findEnumSupport(typename).invoke(int32())
+        FieldDescriptorProto.Type.MESSAGE -> ProtoReflection.findMessageSupport(typename).parse(this, int32())
+        FieldDescriptorProto.Type.ENUM -> ProtoReflection.findEnumSupport(typename).invoke(int32())
     } as T
 }
 

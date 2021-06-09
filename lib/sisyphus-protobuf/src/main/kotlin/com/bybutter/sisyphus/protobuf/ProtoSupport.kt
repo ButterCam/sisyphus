@@ -4,7 +4,6 @@ interface ProtoSupport<T> {
     val name: String
     val parent: ProtoSupport<*>
     val descriptor: T
-    val reflection: ProtoReflection
 
     fun file(): FileSupport {
         var support: ProtoSupport<*> = this

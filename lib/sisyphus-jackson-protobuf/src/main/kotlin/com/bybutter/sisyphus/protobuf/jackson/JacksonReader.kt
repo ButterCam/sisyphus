@@ -1,16 +1,10 @@
 package com.bybutter.sisyphus.protobuf.jackson
 
-import com.bybutter.sisyphus.protobuf.ProtoReflection
-import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.json.JsonReader
 import com.bybutter.sisyphus.protobuf.json.JsonToken
 import com.fasterxml.jackson.core.JsonParser
 
 class JacksonReader(private val parser: JsonParser) : JsonReader {
-    override fun reflection(): ProtoReflection {
-        return ProtoTypes
-    }
-
     override fun peek(): JsonToken {
         return parser.currentToken.token()
     }

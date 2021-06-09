@@ -1,13 +1,8 @@
 package com.bybutter.sisyphus.protobuf.gson
 
-import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.json.JsonWriter
 
-class GsonWriter(val writer: com.google.gson.stream.JsonWriter, private val refection: ProtoReflection) : JsonWriter {
-    override fun reflection(): ProtoReflection {
-        return refection
-    }
-
+class GsonWriter(val writer: com.google.gson.stream.JsonWriter) : JsonWriter {
     override fun beginObject() {
         writer.beginObject()
     }

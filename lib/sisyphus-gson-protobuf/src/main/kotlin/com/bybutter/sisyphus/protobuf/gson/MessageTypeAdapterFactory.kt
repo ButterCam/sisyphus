@@ -28,7 +28,7 @@ object MessageTypeAdapterFactory : TypeAdapterFactory {
 
 class UnboxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
     override fun write(writer: JsonWriter, message: Message<*, *>) {
-        message.writeTo(GsonWriter(writer, message.support().reflection))
+        message.writeTo(GsonWriter(writer))
     }
 
     override fun read(reader: JsonReader): Message<*, *> {
@@ -38,7 +38,7 @@ class UnboxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
 
 class BoxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
     override fun write(writer: JsonWriter, message: Message<*, *>) {
-        message.writeTo(GsonWriter(writer, message.support().reflection))
+        message.writeTo(GsonWriter(writer))
     }
 
     override fun read(reader: JsonReader): Message<*, *> {
@@ -48,7 +48,7 @@ class BoxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
 
 class MessageTypeAdapter(private val clazz: Class<*>) : TypeAdapter<Message<*, *>>() {
     override fun write(writer: JsonWriter, message: Message<*, *>) {
-        message.writeTo(GsonWriter(writer, message.support().reflection))
+        message.writeTo(GsonWriter(writer))
     }
 
     override fun read(reader: JsonReader): Message<*, *> {

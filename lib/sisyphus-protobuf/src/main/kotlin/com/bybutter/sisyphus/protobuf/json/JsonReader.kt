@@ -1,14 +1,11 @@
 package com.bybutter.sisyphus.protobuf.json
 
-import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.security.base64Decode
 
 /**
  * A json token stream reader
  */
 interface JsonReader {
-    fun reflection(): ProtoReflection
-
     /**
      * Get current json token at pointer.
      */

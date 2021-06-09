@@ -1,16 +1,11 @@
 package com.bybutter.sisyphus.protobuf.jackson
 
-import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.json.JsonWriter
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 
-class JacksonWriter(private val gen: JsonGenerator, private val reflection: ProtoReflection) : JsonWriter {
-    override fun reflection(): ProtoReflection {
-        return reflection
-    }
-
+class JacksonWriter(private val gen: JsonGenerator) : JsonWriter {
     override fun beginObject() {
         gen.writeStartObject()
     }

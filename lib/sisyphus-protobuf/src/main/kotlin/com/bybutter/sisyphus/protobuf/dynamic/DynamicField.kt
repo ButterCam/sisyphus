@@ -46,13 +46,11 @@ interface DynamicField<T> {
                     FieldDescriptorProto.Type.STRING -> RepeatedStringDynamicField(descriptor)
                     FieldDescriptorProto.Type.GROUP -> TODO()
                     FieldDescriptorProto.Type.MESSAGE -> RepeatedMessageDynamicField<Message<*, *>>(
-                        message.reflection,
                         descriptor
                     )
                     FieldDescriptorProto.Type.BYTES -> RepeatedBytesDynamicField(descriptor)
                     FieldDescriptorProto.Type.UINT32 -> RepeatedUInt32DynamicField(descriptor)
                     FieldDescriptorProto.Type.ENUM -> RepeatedEnumDynamicField<ProtoEnum<*>>(
-                        message.reflection,
                         descriptor
                     )
                     FieldDescriptorProto.Type.SFIXED32 -> RepeatedSFixed32DynamicField(descriptor)
@@ -73,12 +71,11 @@ interface DynamicField<T> {
                     FieldDescriptorProto.Type.STRING -> StringDynamicField(descriptor)
                     FieldDescriptorProto.Type.GROUP -> TODO()
                     FieldDescriptorProto.Type.MESSAGE -> MessageDynamicField<Message<*, *>>(
-                        message.reflection,
                         descriptor
                     )
                     FieldDescriptorProto.Type.BYTES -> BytesDynamicField(descriptor)
                     FieldDescriptorProto.Type.UINT32 -> UInt32DynamicField(descriptor)
-                    FieldDescriptorProto.Type.ENUM -> EnumDynamicField<ProtoEnum<*>>(message.reflection, descriptor)
+                    FieldDescriptorProto.Type.ENUM -> EnumDynamicField<ProtoEnum<*>>(descriptor)
                     FieldDescriptorProto.Type.SFIXED32 -> SFixed32DynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED64 -> SFixed64DynamicField(descriptor)
                     FieldDescriptorProto.Type.SINT32 -> SInt32DynamicField(descriptor)
@@ -393,7 +390,7 @@ class StringDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFiel
     }
 
     override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
+        if (wire == WireType.LENGTH_DELIMITED.ordinal) {
             set(reader.string())
         }
     }
@@ -632,12 +629,11 @@ class RepeatedSInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractRep
 }
 
 class EnumDynamicField<T : ProtoEnum<T>>(
-    private val reflection: ProtoReflection,
     descriptor: FieldDescriptorProto
 ) : AbstractDynamicField<T>(descriptor) {
-    override var value: T = defaultValue()
+    private val support = ProtoReflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
 
-    private val support = reflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
+    override var value: T = defaultValue()
 
     override fun defaultValue(): T {
         return support()
@@ -658,10 +654,9 @@ class EnumDynamicField<T : ProtoEnum<T>>(
 }
 
 class RepeatedEnumDynamicField<T : ProtoEnum<T>>(
-    private val reflection: ProtoReflection,
     descriptor: FieldDescriptorProto
 ) : AbstractRepeatedDynamicField<T>(descriptor) {
-    private val support = reflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
+    private val support = ProtoReflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
 
     override fun writeTo(writer: Writer) {
         for (value in get()) {
@@ -678,12 +673,11 @@ class RepeatedEnumDynamicField<T : ProtoEnum<T>>(
 }
 
 class MessageDynamicField<T : Message<T, *>>(
-    private val reflection: ProtoReflection,
     descriptor: FieldDescriptorProto
 ) : AbstractDynamicField<T?>(descriptor) {
-    override var value: T? = defaultValue()
+    private val support = ProtoReflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
 
-    private val support = reflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
+    override var value: T? = defaultValue()
 
     override fun defaultValue(): T? {
         return null
@@ -691,13 +685,13 @@ class MessageDynamicField<T : Message<T, *>>(
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
                 .message(value)
         }
     }
 
     override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
+        if (wire == WireType.LENGTH_DELIMITED.ordinal) {
             set(support.parse(reader, reader.int32()))
         } else {
             reader.skip(WireType.valueOf(wire))
@@ -706,20 +700,19 @@ class MessageDynamicField<T : Message<T, *>>(
 }
 
 class RepeatedMessageDynamicField<T : Message<T, *>>(
-    private val reflection: ProtoReflection,
     descriptor: FieldDescriptorProto
 ) : AbstractRepeatedDynamicField<T>(descriptor) {
-    private val support = reflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
+    private val support = ProtoReflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
 
     override fun writeTo(writer: Writer) {
         for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
                 .message(value)
         }
     }
 
     override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
+        if (wire == WireType.LENGTH_DELIMITED.ordinal) {
             get() += support.parse(reader, reader.int32())
         } else {
             reader.skip(WireType.valueOf(wire))

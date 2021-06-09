@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap
 open class LocalProtoReflection : ProtoReflection {
     private val protoToSupportMap: MutableMap<String, ProtoSupport<*>> = ConcurrentHashMap()
 
-    fun register(support: ProtoSupport<*>) {
+    override fun register(support: ProtoSupport<*>) {
         when (support) {
             is ExtensionSupport<*> -> support.extendee.registerExtension(support)
         }
@@ -17,7 +17,7 @@ open class LocalProtoReflection : ProtoReflection {
 
     override fun findSupport(name: String): ProtoSupport<*>? {
         if (name.contains('/')) {
-            return protoToSupportMap[ProtoReflection.getProtoNameByTypeUrl(name)] ?: protoToSupportMap[name]
+            return protoToSupportMap[".${name.substringAfterLast("/")}"] ?: protoToSupportMap[name]
         }
         return protoToSupportMap[name]
     }

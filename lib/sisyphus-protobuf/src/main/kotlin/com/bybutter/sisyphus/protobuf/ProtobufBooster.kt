@@ -6,20 +6,23 @@ interface ProtobufBooster {
     val order: Int
         get() = 0
 
-    operator fun invoke()
+    operator fun invoke(reflection: ProtoReflection)
 
     companion object {
-        private var initialized = false
+        private val reflections: MutableSet<ProtoReflection> = mutableSetOf()
 
-        fun boost() {
-            if (initialized) return
+        fun boost(reflection: ProtoReflection) {
+            if (reflections.contains(reflection)) return
+
             synchronized(this) {
-                if (initialized) return
+                if (reflections.contains(reflection)) return
+
                 val booster = ServiceLoader.load(ProtobufBooster::class.java)
                 booster.sortedBy { it.order }.forEach {
-                    it()
+                    it(reflection)
                 }
-                initialized = true
+
+                reflections += reflection
             }
         }
     }

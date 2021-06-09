@@ -15,7 +15,7 @@ import java.io.OutputStream
 
 abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Message<T, TM> {
     init {
-        ProtobufBooster.boost()
+        ProtoTypes
     }
 
     override fun fieldDescriptors(): List<FieldDescriptorProto> {

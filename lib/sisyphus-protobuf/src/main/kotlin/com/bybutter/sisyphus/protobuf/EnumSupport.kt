@@ -10,9 +10,6 @@ abstract class EnumSupport<T : ProtoEnum<T>> :
         (this.javaClass.getTypeArgument(EnumSupport::class.java, 0) as Class<T>).kotlin
     }
 
-    override val reflection: ProtoReflection
-        get() = file().reflection
-
     abstract fun values(): Array<T>
 
     private val numberMap by lazy {
