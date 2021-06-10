@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ComponentScan(basePackageClasses = [SisyphusJdbcAutoConfiguration::class])
 class SisyphusJdbcAutoConfiguration {
+
     @Bean
     @ConditionalOnMissingBean(value = [TransactionProvider::class])
     fun sisyphusTransactionProvider(): TransactionProvider {

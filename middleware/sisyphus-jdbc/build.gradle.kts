@@ -14,7 +14,6 @@ dependencies {
     runtimeOnly(Dependencies.postgresql)
 
     compileOnly(project(":lib:sisyphus-dsl"))
-
     testImplementation(Dependencies.h2)
     testImplementation(project(":lib:sisyphus-dsl"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")

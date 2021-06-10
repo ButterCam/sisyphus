@@ -1,19 +1,27 @@
-package com.bybutter.sisyphus.middleware.jdbc
+package com.bybutter.sisyphus.middleware.seata
 
+import com.bybutter.sisyphus.middleware.jdbc.DslContextFactory
+import com.bybutter.sisyphus.middleware.jdbc.JdbcDatabaseProperty
+import com.bybutter.sisyphus.middleware.jdbc.JooqConfigInterceptor
 import com.bybutter.sisyphus.middleware.jdbc.transaction.TransactionDelegatingDataSource
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.seata.rm.datasource.DataSourceProxy
 import org.jooq.Configuration
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
+import org.jooq.conf.RenderNameCase
+import org.jooq.conf.RenderQuotedNames
+import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.jooq.impl.DefaultConfiguration
 import org.jooq.tools.jdbc.JDBCUtils
 import javax.sql.DataSource
 
-abstract class AbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) :
+abstract class SeataAbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) :
     DslContextFactory {
     private val dataSources: MutableMap<Class<*>, DataSource> = hashMapOf()
+
     final override fun createContext(qualifier: Class<*>, property: JdbcDatabaseProperty): DSLContext {
         val url = buildJdbcUrl(property)
         val dataSource = createDatasource(qualifier, property)
@@ -32,31 +40,31 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
                 this.password = property.password
 
                 if (property.poolConfig?.poolName != null) {
-                    this.poolName = property.poolConfig.poolName
+                    this.poolName = property.poolConfig?.poolName
                 }
                 if (property.poolConfig?.minIdle != null) {
-                    this.minimumIdle = property.poolConfig.minIdle
+                    this.minimumIdle = property.poolConfig?.minIdle!!
                 }
                 if (property.poolConfig?.maxPoolSize != null) {
-                    this.maximumPoolSize = property.poolConfig.maxPoolSize
+                    this.maximumPoolSize = property.poolConfig?.maxPoolSize!!
                 }
                 if (property.poolConfig?.maxLifetime != null) {
-                    this.maxLifetime = property.poolConfig.maxLifetime
+                    this.maxLifetime = property.poolConfig?.maxLifetime!!
                 }
                 if (property.poolConfig?.connectionTimeout != null) {
-                    this.connectionTimeout = property.poolConfig.connectionTimeout
+                    this.connectionTimeout = property.poolConfig?.connectionTimeout!!
                 }
                 if (property.poolConfig?.idleTimeout != null) {
-                    this.idleTimeout = property.poolConfig.idleTimeout
+                    this.idleTimeout = property.poolConfig?.idleTimeout!!
                 }
                 if (property.poolConfig?.validationTimeout != null) {
-                    this.validationTimeout = property.poolConfig.validationTimeout
+                    this.validationTimeout = property.poolConfig?.validationTimeout!!
                 }
                 if (property.poolConfig?.connectionInitSql != null) {
-                    this.connectionInitSql = property.poolConfig.connectionInitSql
+                    this.connectionInitSql = property.poolConfig?.connectionInitSql!!
                 }
                 if (property.poolConfig?.connectionTestQuery != null) {
-                    this.connectionTestQuery = property.poolConfig.connectionTestQuery
+                    this.connectionTestQuery = property.poolConfig?.connectionTestQuery!!
                 }
             }
         )
@@ -64,8 +72,7 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
 
     override fun createDatasource(qualifier: Class<*>, property: JdbcDatabaseProperty): DataSource {
         return dataSources.getOrPut(qualifier) {
-            val url = buildJdbcUrl(property)
-            createDatasource(url, property)
+            DataSourceProxy(createDatasource(buildJdbcUrl(property), property))
         }
     }
 
@@ -75,9 +82,13 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         dialect: SQLDialect,
         interceptors: List<JooqConfigInterceptor>
     ): Configuration {
+        val settings = Settings()
+        settings.renderNameCase = RenderNameCase.AS_IS
+        settings.renderQuotedNames = RenderQuotedNames.NEVER
         val config: Configuration = DefaultConfiguration().apply {
             set(dialect)
             set(TransactionDelegatingDataSource(datasource))
+            set(settings)
         }
         return interceptors.fold(config) { c, h ->
             if (h.qualifier == null || h.qualifier == qualifier) {

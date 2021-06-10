@@ -141,6 +141,22 @@ object Dependencies {
     const val rocketMqAcl = "org.apache.rocketmq:rocketmq-acl"
 
     const val mongo = "org.mongodb:mongodb-driver-reactivestreams"
+
+    object Seata {
+        private const val group = "io.seata"
+        const val common = "$group:seata-common"
+        const val config = "$group:seata-config-core"
+        const val core = "$group:seata-core"
+        const val rm = "$group:seata-rm"
+        const val rmDatasource = "$group:seata-rm-datasource"
+        const val sqlparserCore = "$group:seata-sqlparser-core"
+        const val sqlparserDruid = "$group:seata-sqlparser-druid"
+        const val seataSpring = "$group:seata-spring"
+        const val tm = "$group:seata-tm"
+        const val serializerSeata = "$group:seata-serializer-seata"
+        const val serializerProtobuf = "$group:seata-serializer-protobuf"
+        const val grpc = "$group:seata-grpc"
+    }
 }
 
 val Project.managedDependencies: Project
