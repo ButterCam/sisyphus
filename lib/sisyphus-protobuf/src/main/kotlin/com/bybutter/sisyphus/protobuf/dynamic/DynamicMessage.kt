@@ -22,7 +22,7 @@ class DynamicMessage(
     }
 
     override fun equalsMessage(other: DynamicMessage): Boolean {
-        if (support() != other.support()) return false
+        if (support().name != other.support().name) return false
         return fields.contentEquals(other.fields)
     }
 

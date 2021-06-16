@@ -11,4 +11,15 @@ class DynamicEnum(
     override fun support(): EnumSupport<DynamicEnum> {
         return support
     }
+
+    override fun toString(): String {
+        return proto
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is ProtoEnum<*>) return false
+        if (support.name != other.support().name) return false
+        if (proto != other.proto) return false
+        return true
+    }
 }
