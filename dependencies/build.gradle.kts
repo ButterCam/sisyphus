@@ -21,7 +21,7 @@ dependencies {
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.5.0"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
     api(platform("org.junit:junit-bom:5.7.2"))
-    api(platform("org.springframework.boot:spring-boot-dependencies:2.4.5"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:2.5.1"))
     api(platform("com.fasterxml.jackson:jackson-bom:2.12.3"))
 
     constraints {
@@ -29,11 +29,11 @@ dependencies {
         api("com.alibaba.csp:sentinel-grpc-adapter:1.8.1")
         api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.1")
         api("com.alibaba.csp:sentinel-transport-simple-http:1.8.1")
-        api("com.aliyun.hbase:alihbase-client:2.8.4")
+        api("com.aliyun.hbase:alihbase-client:2.8.6")
         api("com.android.tools.build:gradle:4.1.2")
         api("com.github.ben-manes:gradle-versions-plugin:0.28.0")
         api("com.github.os72:protoc-jar:3.11.4")
-        api("com.google.api.grpc:proto-google-common-protos:2.2.2")
+        api("com.google.api.grpc:proto-google-common-protos:2.3.2")
         api("com.google.api:api-common:1.10.3")
         api("com.google.api:api-compiler:0.0.8")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
@@ -59,6 +59,6 @@ dependencies {
         api("org.jooq:jooq:3.14.11")
         api("org.mongodb:mongodb-driver-reactivestreams:4.2.3")
         api("org.reflections:reflections:0.9.12")
-        api("org.springframework.boot:spring-boot-gradle-plugin:2.4.5")
+        api("org.springframework.boot:spring-boot-gradle-plugin:2.5.1")
     }
 }

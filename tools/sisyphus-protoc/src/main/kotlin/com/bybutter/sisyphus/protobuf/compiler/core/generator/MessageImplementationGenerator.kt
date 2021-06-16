@@ -509,7 +509,7 @@ class MessageEqualsMessageFunctionGenerator : GroupedGenerator<MessageImplementa
                         for (field in state.descriptor.fields) {
                             MessageEqualsFunctionGeneratingState(state, field, this).advance()
                         }
-                        addStatement("return true")
+                        addStatement("return·true")
                     }
                 )
             }
@@ -525,13 +525,13 @@ class MessageFieldEqualsFunctionGenerator : GroupedGenerator<MessageEqualsFuncti
                 DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED, DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL -> {
                     if (state.descriptor.descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES) {
                         addStatement(
-                            "if (!%N.contentEquals(other.%N)) return false",
+                            "if (!%N.contentEquals(other.%N)) return·false",
                             state.descriptor.name(),
                             state.descriptor.name()
                         )
                     } else {
                         addStatement(
-                            "if (%N != other.%N) return false",
+                            "if (%N != other.%N) return·false",
                             state.descriptor.name(),
                             state.descriptor.name()
                         )
@@ -539,7 +539,7 @@ class MessageFieldEqualsFunctionGenerator : GroupedGenerator<MessageEqualsFuncti
                 }
                 DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED -> {
                     addStatement(
-                        "if (!%N.%M(other.%N)) return false", state.descriptor.name(),
+                        "if (!%N.%M(other.%N)) return·false", state.descriptor.name(),
                         RuntimeMethods.CONTENT_EQUALS, state.descriptor.name()
                     )
                 }
