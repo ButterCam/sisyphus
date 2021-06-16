@@ -44,7 +44,7 @@ suspend fun <T> StatefulRedisConnection<String, String>.lock(
             distributedLock.unlock()
         }
     } else {
-        throw Exception("加锁失败~")
+        throw IllegalStateException("Failed to get lock of '$key'")
     }
 }
 
@@ -78,7 +78,7 @@ suspend fun <T> StatefulRedisConnection<String, String>.tryLock(
             distributedLock.unlock()
         }
     } else {
-        throw Exception("加锁失败~")
+        throw IllegalStateException("Failed to get lock of '$key'")
     }
 }
 
