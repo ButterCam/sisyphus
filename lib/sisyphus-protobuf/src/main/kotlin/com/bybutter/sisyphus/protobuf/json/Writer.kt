@@ -3,7 +3,8 @@ package com.bybutter.sisyphus.protobuf.json
 import com.bybutter.sisyphus.protobuf.CustomProtoType
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoEnum
-import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.ProtoReflection
+import com.bybutter.sisyphus.protobuf.findMapEntryDescriptor
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
@@ -70,7 +71,7 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
             if (field.typeName == NullValue.name) {
                 nullValue()
             } else {
-                value(value as ProtoEnum)
+                value(value as ProtoEnum<*>)
             }
         }
         FieldDescriptorProto.Type.MESSAGE -> {
@@ -135,7 +136,7 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
 
 internal fun JsonWriter.map(value: Map<*, *>, field: FieldDescriptorProto) {
     if (field.typeName.isEmpty()) throw IllegalStateException()
-    val entry = ProtoTypes.findMapEntryDescriptor(field.typeName) ?: throw IllegalStateException()
+    val entry = ProtoReflection.findMapEntryDescriptor(field.typeName) ?: throw IllegalStateException()
     val valueDescriptor = entry.field.firstOrNull {
         it.number == 2
     } ?: throw IllegalStateException()

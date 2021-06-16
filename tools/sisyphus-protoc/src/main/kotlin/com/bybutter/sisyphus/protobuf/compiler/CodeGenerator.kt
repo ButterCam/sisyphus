@@ -1,19 +1,20 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
+import com.bybutter.sisyphus.protobuf.compiler.booster.ProtobufBoosterGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ApiFileGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.DescriptorFileGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumApiGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumBasicGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumRegisterGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumSupportBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.EnumSupportGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionApiGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionDefinitionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionRegisterGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionSupportBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.ExtensionSupportGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileBoosterGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileEnumChildGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileExtensionChildGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileMessageChildGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileSupportDescriptorGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.FileSupportGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.InternalFileGenerator
@@ -42,9 +43,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceFi
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInterfaceFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageInternalGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageMergeWithFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageParentRegisterGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageReadFieldFunctionGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageRegisterGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSetFieldInCurrentFunctionGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSupportBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageSupportFunctionGenerator
@@ -52,13 +51,13 @@ import com.bybutter.sisyphus.protobuf.compiler.core.generator.MessageWriteFields
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceBasicFieldGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.MutableMessageInterfaceFieldGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestEnumParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestExtensionParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestMessageParentRegisterGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumChildGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedEnumSupportGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionApiGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionChildGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedExtensionSupportGenerator
+import com.bybutter.sisyphus.protobuf.compiler.core.generator.NestedMessageChildGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofFieldImplementationInterceptorGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofImplementationGenerator
 import com.bybutter.sisyphus.protobuf.compiler.core.generator.OneofInterfaceGenerator
@@ -87,15 +86,14 @@ import com.bybutter.sisyphus.protobuf.compiler.resourcename.ResourceNameOneofKin
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineClientBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineClientMethodGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceBasicGenerator
+import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceChildGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceMethodGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceParentRegisterGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceRegisterGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportBasicGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.CoroutineServiceSupportMethodGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceApiFileGenerator
-import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceFileSupportGenerator
+import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceBoosterGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceInternalFileGenerator
 import com.bybutter.sisyphus.protobuf.compiler.rpc.SeparatedCoroutineServiceSupportBasicGenerator
@@ -107,6 +105,7 @@ import com.bybutter.sisyphus.protobuf.compiler.rxjava.SeparatedRxClientApiFileGe
 import com.bybutter.sisyphus.protobuf.compiler.rxjava.SeparatedRxClientGenerator
 import com.bybutter.sisyphus.reflect.getTypeArgument
 import com.bybutter.sisyphus.reflect.uncheckedCast
+import com.bybutter.sisyphus.security.md5Data
 import com.bybutter.sisyphus.spi.ServiceLoader
 import java.lang.reflect.ParameterizedType
 import java.util.Stack
@@ -172,6 +171,8 @@ class CodeGenerators {
     }
 
     fun basic(): CodeGenerators {
+        register(ProtobufBoosterGenerator())
+        register(FileBoosterGenerator())
         register(EnumApiGenerator())
         register(NestedEnumGenerator())
         register(EnumBasicGenerator())
@@ -229,15 +230,12 @@ class CodeGenerators {
         register(OneofMutableInterfaceGenerator())
         register(OneofImplementationGenerator())
         register(OneofFieldImplementationInterceptorGenerator())
-        register(MessageParentRegisterGenerator())
-        register(NestMessageParentRegisterGenerator())
-        register(EnumParentRegisterGenerator())
-        register(NestEnumParentRegisterGenerator())
-        register(ExtensionParentRegisterGenerator())
-        register(NestExtensionParentRegisterGenerator())
-        register(MessageRegisterGenerator())
-        register(EnumRegisterGenerator())
-        register(ExtensionRegisterGenerator())
+        register(FileMessageChildGenerator())
+        register(FileEnumChildGenerator())
+        register(FileExtensionChildGenerator())
+        register(NestedMessageChildGenerator())
+        register(NestedEnumChildGenerator())
+        register(NestedExtensionChildGenerator())
         return this
     }
 
@@ -269,18 +267,18 @@ class CodeGenerators {
         register(CoroutineServiceMethodGenerator())
         register(CoroutineServiceSupportBasicGenerator())
         register(CoroutineServiceSupportMethodGenerator())
-        register(CoroutineServiceParentRegisterGenerator())
-        register(CoroutineServiceRegisterGenerator())
+        register(CoroutineServiceChildGenerator())
         return this
     }
 
     fun separatedCoroutineService(): CodeGenerators {
+        register(ProtobufBoosterGenerator())
+        register(SeparatedCoroutineServiceBoosterGenerator())
         register(SeparatedCoroutineServiceGenerator())
         register(SeparatedCoroutineServiceSupportGenerator())
 
         register(SeparatedCoroutineServiceApiFileGenerator())
         register(SeparatedCoroutineServiceInternalFileGenerator())
-        register(SeparatedCoroutineServiceFileSupportGenerator())
         register(SeparatedCoroutineServiceSupportBasicGenerator())
 
         coroutineService()
@@ -352,5 +350,11 @@ class CodeGenerators {
                 }
             }
         }
+    }
+
+    fun md5(): ByteArray {
+        return this.generators.joinToString("\n") {
+            it.javaClass.canonicalName
+        }.md5Data()
     }
 }

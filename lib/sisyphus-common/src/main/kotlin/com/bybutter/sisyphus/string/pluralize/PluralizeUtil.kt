@@ -52,8 +52,8 @@ object PluralizeUtil {
 
     private fun restoreCase(word: String, token: String): String {
         if (word == token) return token
-        if (word.all { it.isLowerCase() }) return token.toLowerCase()
-        if (word.all { it.isUpperCase() }) return token.toUpperCase()
+        if (word.all { it.isLowerCase() }) return token.lowercase()
+        if (word.all { it.isUpperCase() }) return token.uppercase()
         if (word[0].isUpperCase() && word.substring(1).all { it.isLowerCase() }) return token.toPascalCase()
         return token
     }
@@ -66,7 +66,7 @@ object PluralizeUtil {
     ): String {
         if (word.isBlank()) return word
 
-        val token = word.toLowerCase()
+        val token = word.lowercase()
         if (keepMap.containsKey(token)) {
             return word
         }
@@ -107,7 +107,7 @@ object PluralizeUtil {
     ): Boolean {
         if (word.isBlank()) return false
 
-        val token = word.toLowerCase()
+        val token = word.lowercase()
         if (keepMap.containsKey(token)) {
             return true
         }

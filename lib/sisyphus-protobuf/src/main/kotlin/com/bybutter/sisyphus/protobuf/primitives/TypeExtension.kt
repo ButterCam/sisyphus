@@ -2,11 +2,12 @@ package com.bybutter.sisyphus.protobuf.primitives
 
 import com.bybutter.sisyphus.protobuf.EnumSupport
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.ProtoReflection
+import com.bybutter.sisyphus.protobuf.findMessageSupport
 
-fun DescriptorProto.toType(typeName: String): Type {
+fun DescriptorProto.toType(typeName: String, reflection: ProtoReflection): Type {
     return Type {
-        val support = ProtoTypes.findMessageSupport(typeName)
+        val support = reflection.findMessageSupport(typeName)
         this.name = this@toType.name
         for (fieldDescriptor in support.fieldDescriptors) {
             this.fields += fieldDescriptor.toField()
@@ -55,9 +56,9 @@ fun FieldDescriptorProto.toField(): Field {
     }
 }
 
-fun EnumDescriptorProto.toEnum(typeName: String): Enum {
+fun EnumDescriptorProto.toEnum(typeName: String, reflection: ProtoReflection): Enum {
     return Enum {
-        val support = ProtoTypes.findSupport(typeName) as EnumSupport<*>
+        val support = reflection.findSupport(typeName) as EnumSupport<*>
         this.name = this@toEnum.name
         this.enumvalue += this@toEnum.value.map { it.toEnumValue() }
         this@toEnum.options?.let {

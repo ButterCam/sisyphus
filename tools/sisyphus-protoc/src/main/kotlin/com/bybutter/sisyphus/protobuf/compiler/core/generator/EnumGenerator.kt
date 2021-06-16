@@ -17,6 +17,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageInterfaceGenera
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageSupportGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
 import com.bybutter.sisyphus.protobuf.compiler.extends
+import com.bybutter.sisyphus.protobuf.compiler.function
 import com.bybutter.sisyphus.protobuf.compiler.getter
 import com.bybutter.sisyphus.protobuf.compiler.implements
 import com.bybutter.sisyphus.protobuf.compiler.kClass
@@ -27,6 +28,7 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 
@@ -66,7 +68,7 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
                     .build()
             )
 
-            this implements RuntimeTypes.PROTO_ENUM
+            this implements RuntimeTypes.PROTO_ENUM.parameterizedBy(state.descriptor.className())
 
             constructor {
                 addParameter("number", Int::class)
@@ -79,6 +81,12 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
             property("proto", String::class.asTypeName()) {
                 this += KModifier.OVERRIDE
                 initializer("proto")
+            }
+
+            function("support") {
+                this += KModifier.OVERRIDE
+                returns(RuntimeTypes.ENUM_SUPPORT.parameterizedBy(state.descriptor.className()))
+                addStatement("return %T", state.descriptor.className())
             }
 
             companion {
@@ -131,7 +139,6 @@ class EnumSupportBasicGenerator : GroupedGenerator<EnumSupportGeneratingState> {
         state.target.apply {
             this += KModifier.ABSTRACT
             this extends RuntimeTypes.ENUM_SUPPORT.parameterizedBy(state.descriptor.className())
-            addSuperclassConstructorParameter("%T::class", state.descriptor.className())
             constructor {
                 this += KModifier.INTERNAL
             }
@@ -141,6 +148,12 @@ class EnumSupportBasicGenerator : GroupedGenerator<EnumSupportGeneratingState> {
                 getter {
                     addStatement("return %S", state.descriptor.fullProtoName())
                 }
+            }
+
+            function("values") {
+                this += KModifier.OVERRIDE
+                returns(Array::class.asClassName().parameterizedBy(state.descriptor.className()))
+                addStatement("return %T.values()", state.descriptor.className())
             }
 
             when (val parent = state.descriptor.parent) {

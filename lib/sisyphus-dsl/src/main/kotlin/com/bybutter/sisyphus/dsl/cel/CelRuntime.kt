@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.dsl.cel
 import com.bybutter.sisyphus.dsl.cel.grammar.CelParser
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.findMessageSupport
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter

@@ -8,7 +8,11 @@ object RuntimeAnnotations {
 }
 
 object RuntimeTypes {
+    val PROTOBUF_BOOSTER = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.ProtobufBooster")
+
     val MESSAGE = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.Message")
+
+    val PROTO_REFLECTION = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.ProtoReflection")
 
     val MESSAGE_SUPPORT = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.MessageSupport")
 
@@ -29,6 +33,8 @@ object RuntimeTypes {
     val PROTO_ENUM = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.ProtoEnum")
 
     val ENUM_SUPPORT = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.EnumSupport")
+
+    val PROTO_SUPPORT = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.ProtoSupport")
 
     val INTERNAL_PROTO_API = ClassName.bestGuess("com.bybutter.sisyphus.protobuf.InternalProtoApi")
 

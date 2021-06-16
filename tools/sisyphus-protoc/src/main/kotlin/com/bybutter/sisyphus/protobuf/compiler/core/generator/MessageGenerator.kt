@@ -14,7 +14,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.InternalFileGenerating
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageCompanionGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageImplementationGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageInterfaceGeneratingState
-import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageParentRegisterGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageParentGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MessageSupportGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.MutableMessageInterfaceGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
@@ -29,6 +29,9 @@ import com.bybutter.sisyphus.protobuf.compiler.property
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STAR
+import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 class MessageApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
@@ -50,7 +53,8 @@ class MessageInterfaceBasicGenerator : GroupedGenerator<MessageInterfaceGenerati
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         state.target.apply {
             addAnnotation(
-                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION).addMember("%S", state.descriptor.fullProtoName())
+                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION)
+                    .addMember("%S", state.descriptor.fullProtoName())
                     .build()
             )
             this implements RuntimeTypes.MESSAGE.parameterizedBy(
@@ -223,9 +227,16 @@ class MessageSupportBasicGenerator : GroupedGenerator<MessageSupportGeneratingSt
                 addStatement("return %T()", state.descriptor.implementationClassName())
             }
 
-            function("register") {
-                this += KModifier.OVERRIDE
-                MessageParentRegisterGeneratingState(state, state.descriptor, this).advance()
+            val result = mutableListOf<TypeName>()
+            MessageParentGeneratingState(state, state.descriptor, result).advance()
+            if (result.isNotEmpty()) {
+                function("children") {
+                    this += KModifier.OVERRIDE
+                    returns(
+                        Array::class.asTypeName().parameterizedBy(RuntimeTypes.PROTO_SUPPORT.parameterizedBy(STAR))
+                    )
+                    addStatement("return arrayOf(${result.joinToString(", ") { "%T" }})", *result.toTypedArray())
+                }
             }
 
             for (message in state.descriptor.messages) {

@@ -1,36 +1,46 @@
 package com.bybutter.sisyphus.protobuf
 
 import com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto
+import com.bybutter.sisyphus.reflect.getTypeArgument
 import kotlin.reflect.KClass
 
-abstract class EnumSupport<T : ProtoEnum>(val enumClass: KClass<T>) :
-    ProtoEnumDsl<T>,
+abstract class EnumSupport<T : ProtoEnum<T>> :
     ProtoSupport<EnumDescriptorProto> {
-    private val numberMap = enumClass.java.enumConstants.associate {
-        (it as ProtoEnum).number to (it as T)
+    val enumClass: KClass<T> by lazy {
+        (this.javaClass.getTypeArgument(EnumSupport::class.java, 0) as Class<T>).kotlin
     }
 
-    private val nameMap = enumClass.java.enumConstants.associate {
-        (it as ProtoEnum).proto to (it as T)
+    abstract fun values(): Array<T>
+
+    private val numberMap by lazy {
+        values().associateBy {
+            it.number
+        }
     }
 
-    override fun fromNumber(value: Int): T? {
+    private val nameMap by lazy {
+        values().associateBy {
+            it.proto
+        }
+    }
+
+    fun fromNumber(value: Int): T? {
         return numberMap[value]
     }
 
-    override fun fromProto(value: String): T? {
+    fun fromProto(value: String): T? {
         return nameMap[value]
     }
 
-    override fun invoke(): T {
-        return enumClass.java.enumConstants.first() as T
+    operator fun invoke(): T {
+        return values().first()
     }
 
-    override fun invoke(value: Int): T {
+    operator fun invoke(value: Int): T {
         return fromNumber(value) ?: invoke()
     }
 
-    override fun invoke(value: String): T {
+    operator fun invoke(value: String): T {
         return fromProto(value) ?: invoke()
     }
 }

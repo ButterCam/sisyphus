@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.protobuf.gson
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.ProtobufDefinition
+import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.json.readAny
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter

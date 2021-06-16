@@ -3,7 +3,10 @@ package com.bybutter.sisyphus.protobuf.json
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MutableMessage
-import com.bybutter.sisyphus.protobuf.ProtoTypes
+import com.bybutter.sisyphus.protobuf.ProtoReflection
+import com.bybutter.sisyphus.protobuf.findEnumSupport
+import com.bybutter.sisyphus.protobuf.findMapEntryDescriptor
+import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
@@ -137,7 +140,7 @@ internal fun MutableMessage<*, *>.readFields(reader: JsonReader) {
 
 internal fun JsonReader.readRepeated(field: FieldDescriptorProto): Any {
     if (field.type == FieldDescriptorProto.Type.MESSAGE) {
-        val entry = ProtoTypes.findMapEntryDescriptor(field.typeName)
+        val entry = ProtoReflection.findMapEntryDescriptor(field.typeName)
         if (entry != null) {
             val keyField = entry.field.first { it.number == 1 }
             val valueField = entry.field.first { it.number == 2 }
@@ -204,7 +207,7 @@ internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
                 nil()
                 NullValue.NULL_VALUE
             } else {
-                ProtoTypes.findEnumSupport(field.typeName).invoke(string())
+                ProtoReflection.findEnumSupport(field.typeName).invoke(string())
             }
         }
         FieldDescriptorProto.Type.MESSAGE -> {
@@ -226,7 +229,7 @@ internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
                 StringValue.name -> string().wrapper()
                 BytesValue.name -> bytes().wrapper()
                 else -> {
-                    ProtoTypes.findMessageSupport(field.typeName).invoke {
+                    ProtoReflection.findMessageSupport(field.typeName).invoke {
                         readRaw(this@readField)
                     }
                 }
@@ -261,7 +264,7 @@ internal fun JsonReader.readListValue(): ListValue {
 fun JsonReader.readAny(): Message<*, *> {
     ensure(JsonToken.BEGIN_OBJECT)
     next()
-    val message: MutableMessage<*, *> = ProtoTypes.findMessageSupport(typeToken()).newMutable()
+    val message: MutableMessage<*, *> = ProtoReflection.findMessageSupport(typeToken()).newMutable()
     when (message) {
         is MutableBoolValue,
         is MutableBytesValue,

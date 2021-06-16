@@ -107,7 +107,7 @@ class SisyphusTestSelectorResolver : SelectorResolver {
 
     private fun deserializeTestCase(filename: String, inputStream: InputStream): TestCase? {
         try {
-            return when (filename.substringAfterLast('.').toLowerCase()) {
+            return when (filename.substringAfterLast('.').lowercase()) {
                 "json" -> Json.deserialize(inputStream, TestCase::class.java)
                 "yaml", "yml" -> Yaml.deserialize(inputStream, TestCase::class.java)
                 else -> null

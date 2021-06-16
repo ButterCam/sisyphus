@@ -1,37 +1,17 @@
 package com.bybutter.sisyphus.protobuf.compiler.core.state
 
-import com.bybutter.sisyphus.protobuf.compiler.EnumDescriptor
-import com.bybutter.sisyphus.protobuf.compiler.ExtensionDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.FileDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.MessageDescriptor
-import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.TypeName
 
-class FileParentRegisterGeneratingState(
+class FileParentGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: FileDescriptor,
-    override val target: FunSpec.Builder
-) : ChildGeneratingState<FileDescriptor, FunSpec.Builder>
+    override val target: MutableList<TypeName>
+) : ChildGeneratingState<FileDescriptor, MutableList<TypeName>>
 
-class MessageParentRegisterGeneratingState(
+class MessageParentGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: MessageDescriptor,
-    override val target: FunSpec.Builder
-) : ChildGeneratingState<MessageDescriptor, FunSpec.Builder>
-
-class MessageRegisterGeneratingState(
-    override val parent: GeneratingState<*, *>,
-    override val descriptor: MessageDescriptor,
-    override val target: FunSpec.Builder
-) : ChildGeneratingState<MessageDescriptor, FunSpec.Builder>
-
-class EnumRegisterGeneratingState(
-    override val parent: GeneratingState<*, *>,
-    override val descriptor: EnumDescriptor,
-    override val target: FunSpec.Builder
-) : ChildGeneratingState<EnumDescriptor, FunSpec.Builder>
-
-class ExtensionRegisterGeneratingState(
-    override val parent: GeneratingState<*, *>,
-    override val descriptor: ExtensionDescriptor,
-    override val target: FunSpec.Builder
-) : ChildGeneratingState<ExtensionDescriptor, FunSpec.Builder>
+    override val target: MutableList<TypeName>
+) : ChildGeneratingState<MessageDescriptor, MutableList<TypeName>>

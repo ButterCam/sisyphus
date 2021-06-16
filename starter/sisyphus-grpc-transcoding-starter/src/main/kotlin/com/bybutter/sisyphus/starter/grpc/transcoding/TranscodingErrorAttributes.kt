@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.starter.grpc.transcoding
 import com.bybutter.sisyphus.rpc.Code
 import com.bybutter.sisyphus.rpc.Status
 import com.bybutter.sisyphus.rpc.invoke
+import org.springframework.boot.web.error.ErrorAttributeOptions
 import org.springframework.boot.web.reactive.error.ErrorAttributes
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -28,7 +29,7 @@ class TranscodingErrorAttributes : ErrorAttributes {
             ?: throw IllegalStateException("Missing exception attribute in ServerWebExchange")
     }
 
-    override fun getErrorAttributes(request: ServerRequest, includeStackTrace: Boolean): MutableMap<String, Any> {
+    override fun getErrorAttributes(request: ServerRequest, options: ErrorAttributeOptions?): MutableMap<String, Any> {
         val error = getError(request)
         val status = if (error is TranscodingNotSupportException) {
             Status {

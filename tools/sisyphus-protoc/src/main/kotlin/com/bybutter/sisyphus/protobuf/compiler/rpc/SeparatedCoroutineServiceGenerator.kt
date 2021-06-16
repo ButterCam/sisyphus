@@ -1,27 +1,33 @@
 package com.bybutter.sisyphus.protobuf.compiler.rpc
 
-import com.bybutter.sisyphus.io.replaceExtensionName
 import com.bybutter.sisyphus.protobuf.compiler.FileDescriptor
 import com.bybutter.sisyphus.protobuf.compiler.GeneratedKotlinFile
 import com.bybutter.sisyphus.protobuf.compiler.GroupedGenerator
-import com.bybutter.sisyphus.protobuf.compiler.RuntimeMethods
 import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.bybutter.sisyphus.protobuf.compiler.SortableGenerator
-import com.bybutter.sisyphus.protobuf.compiler.beginScope
+import com.bybutter.sisyphus.protobuf.compiler.booster.ProtobufBoosterGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileGeneratingState
-import com.bybutter.sisyphus.protobuf.compiler.core.state.FileSupportGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
-import com.bybutter.sisyphus.protobuf.compiler.extends
-import com.bybutter.sisyphus.protobuf.compiler.function
 import com.bybutter.sisyphus.protobuf.compiler.getter
 import com.bybutter.sisyphus.protobuf.compiler.kClass
 import com.bybutter.sisyphus.protobuf.compiler.kFile
-import com.bybutter.sisyphus.protobuf.compiler.kObject
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.buildCodeBlock
+
+class SeparatedCoroutineServiceBoosterGenerator : GroupedGenerator<ProtobufBoosterGeneratingState> {
+    override fun generate(state: ProtobufBoosterGeneratingState): Boolean {
+        state.target.order = -1000
+
+        state.descriptor.services.forEach {
+            state.target.builder.addStatement(
+                "reflection.register(%T)",
+                it.className()
+            )
+        }
+        return true
+    }
+}
 
 class SeparatedCoroutineServiceApiFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
@@ -45,45 +51,6 @@ class SeparatedCoroutineServiceInternalFileGenerator : GroupedGenerator<FileGene
                 }
             )
         }
-        return true
-    }
-}
-
-class SeparatedCoroutineServiceFileSupportGenerator : GroupedGenerator<RpcInternalFileGeneratingState> {
-    override fun generate(state: RpcInternalFileGeneratingState): Boolean {
-        state.target.addType(
-            kObject(state.descriptor.rpcFileMetadataName()) {
-                this extends RuntimeTypes.FILE_SUPPORT
-
-                property("name", String::class) {
-                    this += KModifier.OVERRIDE
-                    initializer("%S", state.descriptor.descriptor.name)
-                }
-
-                property("descriptor", RuntimeTypes.FILE_DESCRIPTOR_PROTO) {
-                    this += KModifier.OVERRIDE
-                    delegate(
-                        buildCodeBlock {
-                            beginScope("%M", RuntimeMethods.LAZY) {
-                                addStatement(
-                                    "readDescriptor(%S)",
-                                    state.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
-                                )
-                            }
-                        }
-                    )
-                }
-
-                function("register") {
-                    this += KModifier.OVERRIDE
-                    for (service in state.descriptor.services) {
-                        ServiceRegisterGeneratingState(state, service, this).advance()
-                    }
-                }
-
-                FileSupportGeneratingState(state, state.descriptor, this).advance()
-            }
-        )
         return true
     }
 }
@@ -134,7 +101,7 @@ class SeparatedCoroutineServiceSupportBasicGenerator :
         state.target.property("parent", RuntimeTypes.FILE_SUPPORT) {
             this += KModifier.OVERRIDE
             getter {
-                addStatement("return %T", state.descriptor.parent.rpcFileMetadataClassName())
+                addStatement("return %T", state.descriptor.parent.fileMetadataClassName())
             }
         }
         return true
@@ -143,12 +110,4 @@ class SeparatedCoroutineServiceSupportBasicGenerator :
 
 fun FileDescriptor.rpcKotlinFileName(): String {
     return "${kotlinFileName()}Rpc"
-}
-
-fun FileDescriptor.rpcFileMetadataName(): String {
-    return "${kotlinFileName()}RpcMetadata"
-}
-
-fun FileDescriptor.rpcFileMetadataClassName(): ClassName {
-    return ClassName(internalPackageName(), rpcFileMetadataName())
 }

@@ -11,13 +11,13 @@ object TitleCaseFormatter : BaseCaseFormatter() {
     )
 
     override fun formatWord(index: Int, word: CharSequence): CharSequence {
-        val lowerCase = word.toString().toLowerCase()
+        val lowerCase = word.toString().lowercase()
 
         return if (lowerCaseWord.contains(lowerCase)) {
             lowerCase
         } else {
             buildString {
-                append(lowerCase.first().toUpperCase())
+                append(lowerCase.first().uppercase())
                 append(lowerCase.substring(1))
             }
         }

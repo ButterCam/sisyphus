@@ -48,8 +48,8 @@ class ProtoTest {
             ),
             CodeGenerators().basic().resourceName().coroutineService().liteDescriptor().inlineDescriptor()
         )
-        for (s in source) {
-            val result = compiler.generate(s)
+        val results = compiler.generate(source)
+        for (result in results.results) {
             for (file in result.files) {
                 file.writeTo(Paths.get(System.getProperty("user.dir"), "src/test/java"))
             }

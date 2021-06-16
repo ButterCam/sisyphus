@@ -116,6 +116,6 @@ class TranscodingCallListener(private val body: String) : ClientCall.Listener<Me
     }
 
     companion object {
-        val IGNORE_GRPC_HEADER = setOf(HttpHeaders.CONTENT_TYPE.toLowerCase(), STATUS_META_KEY.name())
+        val IGNORE_GRPC_HEADER = setOf(HttpHeaders.CONTENT_TYPE.lowercase(), STATUS_META_KEY.name())
     }
 }

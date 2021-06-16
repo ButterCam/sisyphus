@@ -13,6 +13,7 @@ interface ProtoSupport<T> {
         return support
     }
 
-    fun register() {
+    fun children(): Array<ProtoSupport<*>> {
+        return arrayOf()
     }
 }

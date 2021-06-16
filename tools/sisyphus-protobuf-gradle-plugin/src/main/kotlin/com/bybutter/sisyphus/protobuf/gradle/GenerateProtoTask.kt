@@ -33,6 +33,9 @@ open class GenerateProtoTask : DefaultTask() {
 
     @TaskAction
     fun generateKotlin() {
+        output.deleteRecursively()
+        output.mkdirs()
+
         val descFile = protoPath.resolve("protodesc.pb")
         val desc = if (descFile.exists()) {
             DescriptorProtos.FileDescriptorSet.parseFrom(descFile.readBytes())
@@ -62,27 +65,18 @@ open class GenerateProtoTask : DefaultTask() {
         }
 
         val compiler = ProtobufCompiler(desc, mapping, protobuf.plugins.toCodeGenerators())
-        val fileSupports = StringBuilder()
-
-        for (sourceProto in source) {
-            val result = compiler.generate(sourceProto)
-
+        val results = compiler.generate(source)
+        for (result in results.results) {
+            val sourceProto = result.descriptor.descriptor.name
             if (protobuf.source) {
                 val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
-                val protoFile = Paths.get(resourceOutput.toPath().toString(), result.descriptor.descriptor.name)
+                val protoFile = Paths.get(resourceOutput.toPath().toString(), sourceProto)
                 Files.createDirectories(protoFile.parent)
                 Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
             }
-
             for (file in result.files) {
                 when (file) {
                     is GeneratedKotlinFile -> {
-                        for (member in file.file.members) {
-                            val spec = member as? TypeSpec ?: continue
-                            if (spec.superclass == RuntimeTypes.FILE_SUPPORT) {
-                                fileSupports.appendLine("${file.file.packageName}.${spec.name}")
-                            }
-                        }
                         file.writeTo(output.toPath())
                     }
                     is GeneratedDescriptorFile -> {
@@ -91,13 +85,16 @@ open class GenerateProtoTask : DefaultTask() {
                 }
             }
         }
-
-        val fileMetas = Paths.get(
-            resourceOutput.toPath().toString(),
-            "META-INF/services/${RuntimeTypes.FILE_SUPPORT.canonicalName}"
-        )
-        Files.createDirectories(fileMetas.parent)
-        Files.write(fileMetas, fileSupports.toString().toByteArray(Charset.defaultCharset()))
+        results.booster?.let {
+            it.writeTo(output.toPath())
+            val booster = Paths.get(
+                resourceOutput.toPath().toString(),
+                "META-INF/services/${RuntimeTypes.PROTOBUF_BOOSTER.canonicalName}"
+            )
+            val boosterName = "${it.packageName}.${(it.members.first() as TypeSpec).name}"
+            Files.createDirectories(booster.parent)
+            Files.write(booster, boosterName.toByteArray(Charset.defaultCharset()))
+        }
     }
 
     companion object {

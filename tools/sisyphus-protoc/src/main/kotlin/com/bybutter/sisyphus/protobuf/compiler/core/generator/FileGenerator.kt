@@ -11,7 +11,7 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.ApiFileGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.DescriptorGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileDescriptorGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileGeneratingState
-import com.bybutter.sisyphus.protobuf.compiler.core.state.FileParentRegisterGeneratingState
+import com.bybutter.sisyphus.protobuf.compiler.core.state.FileParentGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.FileSupportGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.InternalFileGeneratingState
 import com.bybutter.sisyphus.protobuf.compiler.core.state.advance
@@ -22,6 +22,10 @@ import com.bybutter.sisyphus.protobuf.compiler.kObject
 import com.bybutter.sisyphus.protobuf.compiler.plusAssign
 import com.bybutter.sisyphus.protobuf.compiler.property
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STAR
+import com.squareup.kotlinpoet.TypeName
+import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.buildCodeBlock
 
 class ApiFileGenerator : GroupedGenerator<FileGeneratingState> {
@@ -76,9 +80,16 @@ class FileSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
                     FileDescriptorGeneratingState(state, state.descriptor, this).advance()
                 }
 
-                function("register") {
-                    this += KModifier.OVERRIDE
-                    FileParentRegisterGeneratingState(state, state.descriptor, this).advance()
+                val result = mutableListOf<TypeName>()
+                FileParentGeneratingState(state, state.descriptor, result).advance()
+                if (result.isNotEmpty()) {
+                    function("children") {
+                        this += KModifier.OVERRIDE
+                        returns(
+                            Array::class.asTypeName().parameterizedBy(RuntimeTypes.PROTO_SUPPORT.parameterizedBy(STAR))
+                        )
+                        addStatement("return arrayOf(${result.joinToString(", ") { "%T" }})", *result.toTypedArray())
+                    }
                 }
 
                 FileSupportGeneratingState(state, state.descriptor, this).advance()
