@@ -80,3 +80,12 @@ internal fun RepositoryHandler.applyFromRepositoryKeys(
         }
     }
 }
+
+internal fun isClassExist(className: String): Boolean {
+    return try {
+        Class.forName(className)
+        true
+    } catch (ex: ClassNotFoundException) {
+        false
+    }
+}

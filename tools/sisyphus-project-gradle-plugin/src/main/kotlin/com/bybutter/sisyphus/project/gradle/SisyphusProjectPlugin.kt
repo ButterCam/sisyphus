@@ -25,8 +25,12 @@ class SisyphusProjectPlugin : Plugin<Project> {
         target.pluginManager.apply(ProjectLicensePlugin::class.java)
         target.pluginManager.apply(ProjectSigningPlugin::class.java)
         target.pluginManager.apply(SisyphusAntlrKotlinPlugin::class.java)
-        target.pluginManager.apply(SisyphusDockerPlugin::class.java)
-        target.pluginManager.apply(SisyphusKtlintPlugin::class.java)
+        if (isClassExist("com.palantir.gradle.docker.PalantirDockerPlugin")) {
+            target.pluginManager.apply(SisyphusDockerPlugin::class.java)
+        }
+        if (isClassExist("org.jlleitschuh.gradle.ktlint.KtlintExtension")) {
+            target.pluginManager.apply(SisyphusKtlintPlugin::class.java)
+        }
     }
 
     private fun applyBase(target: Project) {
