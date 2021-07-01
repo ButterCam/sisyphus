@@ -2,7 +2,7 @@ plugins {
     `java-library`
     `kotlin-dsl`
     id("idea")
-    id("com.bybutter.sisyphus.project") version "1.2.12"
+    id("com.bybutter.sisyphus.project") version "1.3.10"
 }
 
 dependencies {
