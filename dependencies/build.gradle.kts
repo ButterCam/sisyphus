@@ -28,7 +28,7 @@ dependencies {
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.2")
         api("com.alibaba.csp:sentinel-grpc-adapter:1.8.2")
         api("com.alibaba.csp:sentinel-parameter-flow-control:1.8.2")
-        api("com.alibaba.csp:sentinel-transport-simple-http:1.8.1")
+        api("com.alibaba.csp:sentinel-transport-simple-http:1.8.2")
         api("com.aliyun.hbase:alihbase-client:2.8.6")
         api("com.android.tools.build:gradle:4.1.2")
         api("com.github.ben-manes:gradle-versions-plugin:0.28.0")
