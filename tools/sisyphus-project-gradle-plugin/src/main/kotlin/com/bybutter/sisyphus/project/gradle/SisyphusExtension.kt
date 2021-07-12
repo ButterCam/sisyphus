@@ -2,11 +2,14 @@ package com.bybutter.sisyphus.project.gradle
 
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.dsl.ParsedModuleStringNotation
+import org.gradle.kotlin.dsl.SisyphusDevelopmentLayer
 
 open class SisyphusExtension(val project: Project) {
     var version: String
 
     val isDevelop: Boolean
+
+    val layer: SisyphusDevelopmentLayer
 
     val isSnapshot: Boolean
         get() {
@@ -20,7 +23,7 @@ open class SisyphusExtension(val project: Project) {
 
     var repositories: MutableMap<String, Repository> = hashMapOf()
 
-    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "jcenter", "portal", "google")
+    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "portal", "google")
 
     var releaseRepositories: MutableList<String> = mutableListOf("release")
 
@@ -85,6 +88,8 @@ open class SisyphusExtension(val project: Project) {
         }?.toMutableMap() ?: managedDependencies
 
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
+
+        layer = (project.findProperty("sisyphus.layer") as? String)?.let { SisyphusDevelopmentLayer.valueOf(it) } ?: SisyphusDevelopmentLayer.IMPLEMENTATION
     }
 
     companion object {

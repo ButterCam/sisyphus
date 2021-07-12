@@ -38,10 +38,6 @@ class ConfigArtifactProvider : EnvironmentPostProcessor, ApplicationListener<App
                     aether.registerMavenCentral()
                     null
                 }
-                "jcenter" -> properties.repositories[repositoryKey] ?: run {
-                    aether.registerJCenter()
-                    null
-                }
                 "portal" -> properties.repositories[repositoryKey] ?: run {
                     aether.registerGradlePortal()
                     null

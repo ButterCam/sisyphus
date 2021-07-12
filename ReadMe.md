@@ -86,6 +86,8 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    ```properties
    # [DEV,RT] Set developer name for developing environment.
    sisyphus.developer=higan
+   # [DEV] Set development layer for replacing version of dependencies, could be 'API', 'PLATFORM', 'FRAMEWORK'.
+   sisyphus.layer=FRAMEWORK
    # [RT] Set environment for configuration artifact.
    sisyphus.environment=production
    
@@ -98,10 +100,10 @@ Ready to rolling boulder with Sisyphus already? Hold on! We need to plan our rou
    sisyphus.repositories.snapshot.password=
    
    # Repositories for different usage, there are 4 embedded repositories.
-   # 'local'(maven local), 'central'(maven central), 'jcenter', 'portal'(gradle portal).
+   # 'local'(maven local), 'central'(maven central), 'portal'(gradle portal).
    
-   # [DEV,RT] Repositories for resolving dependencies, default value is 'local,central,jcenter,portal'.
-   sisyphus.dependency.repositories=local,central,jcenter,portal
+   # [DEV,RT] Repositories for resolving dependencies, default value is 'local,central,portal'.
+   sisyphus.dependency.repositories=local,central,portal
    # [DEV] Repositories for snapshot publishing, default value is 'snapshot'.
    sisyphus.snapshot.repositories=snapshot
    # [DEV] Repositories for release publishing, default value is 'release'.

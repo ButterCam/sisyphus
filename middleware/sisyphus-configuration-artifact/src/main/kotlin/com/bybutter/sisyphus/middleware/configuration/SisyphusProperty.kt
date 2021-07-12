@@ -16,7 +16,6 @@ data class TargetRepositorySetting(
     val repositories: List<String> = listOf(
         "local",
         "central",
-        "jcenter",
         "portal",
         "google"
     )
