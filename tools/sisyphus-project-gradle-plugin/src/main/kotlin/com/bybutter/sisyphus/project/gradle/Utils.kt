@@ -51,10 +51,6 @@ internal fun RepositoryHandler.applyFromRepositoryKeys(
                 this.mavenCentral()
                 null
             }
-            "jcenter" -> repositories[repositoryKey] ?: run {
-                this.jcenter()
-                null
-            }
             "portal" -> repositories[repositoryKey] ?: run {
                 this.gradlePluginPortal()
                 null

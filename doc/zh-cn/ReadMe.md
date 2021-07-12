@@ -68,6 +68,8 @@ Sisyphus 是我们用于提供黄油相机等产品 API 的后端框架，集成
    ```properties
    # [DEV,RT] 可选，设置开发者名称，当此属性被设置后，将会把项目的版本号改为 ‘<name>-SNAPSHOT’
    sisyphus.developer=higan
+   # [DEV] 可选，设置用于替换开发时依赖的开发层，可以为 'API', 'PLATFORM', 'FRAMEWORK'
+   sisyphus.layer=FRAMEWORK
    # [RT] 可选，设置配置 jar 中需要使用环境
    sisyphus.environment=production
    
@@ -80,10 +82,10 @@ Sisyphus 是我们用于提供黄油相机等产品 API 的后端框架，集成
    sisyphus.repositories.snapshot.password=
    
    # 不同用途的仓库配置，Sisyphus 内置了 5 种 Maven 仓库
-   # 'local'(maven local), 'central'(maven central), 'jcenter', 'portal'(gradle portal), 'google'
+   # 'local'(maven local), 'central'(maven central), 'portal'(gradle portal), 'google'
    
-   # [DEV,RT] 用于解析运行时依赖的 Maven 仓库，默认值为 'local,central,jcenter,portal,google'
-   sisyphus.dependency.repositories=local,central,jcenter,portal
+   # [DEV,RT] 用于解析运行时依赖的 Maven 仓库，默认值为 'local,central,portal,google'
+   sisyphus.dependency.repositories=local,central,portal
    # [DEV] 当版本号为快照版本时，需要推送到 Maven 仓库，默认值为 'snapshot'
    sisyphus.snapshot.repositories=snapshot
    # [DEV] 当版本号为 Release 版本时，需要推送到 Maven 仓库，默认值为 'release'

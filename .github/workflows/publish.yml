@@ -28,7 +28,7 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       - uses: ButterCam/setup-sisyphus-build@v1
         with:
-          dependency-repositories: local,central,jcenter,portal,google,snapshot
+          dependency-repositories: local,central,portal,google,snapshot
           snapshot-url: https://s01.oss.sonatype.org/content/repositories/snapshots
           snapshot-username: ${{ secrets.OSSRH_USERNAME }}
           snapshot-password: ${{ secrets.OSSRH_PASSWORD }}

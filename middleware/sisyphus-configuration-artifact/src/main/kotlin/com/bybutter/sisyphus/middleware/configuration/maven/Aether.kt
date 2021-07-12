@@ -58,10 +58,6 @@ class Aether {
         return registerRepository("https://repo.maven.apache.org/maven2/")
     }
 
-    fun registerJCenter(): RemoteRepository {
-        return registerRepository("https://jcenter.bintray.com/")
-    }
-
     fun registerGradlePortal(): RemoteRepository {
         return registerRepository("https://plugins.gradle.org/m2/")
     }
