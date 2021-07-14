@@ -1,10 +1,8 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
-import com.github.os72.protocjar.Protoc
-import com.github.os72.protocjar.ProtocVersion
+import com.bybutter.sisyphus.protoc.Protoc
 import com.google.protobuf.DescriptorProtos
 import java.io.File
-import java.io.FileNotFoundException
 import java.nio.file.Files
 
 object ProtocRunner {
@@ -15,24 +13,13 @@ object ProtocRunner {
 
         val outputFile = Files.createTempFile("out", ".pb")
         val arguments = arrayOf(
-            "-v${ProtocVersion.PROTOC_VERSION.mVersion}",
             "-o$outputFile",
             "-I$protoPath",
             "--include_imports",
             "--include_source_info",
             *source.toTypedArray()
         )
-
-        val result = try {
-            Protoc.extractProtoc(ProtocVersion.PROTOC_VERSION, false)
-            Protoc.runProtoc(arguments, System.out, System.out)
-        } catch (e: FileNotFoundException) {
-            Protoc.runProtoc("protoc", arguments.toList(), System.out, System.out)
-        }
-
-        if (result != 0) {
-            throw IllegalStateException("Protoc return '$result' with not zero value.")
-        }
+        Protoc.runProtoc(arguments)
 
         val bytes = outputFile.toFile().readBytes()
         return DescriptorProtos.FileDescriptorSet.parseFrom(bytes)

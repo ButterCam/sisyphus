@@ -16,6 +16,7 @@ include("tools:sisyphus-protoc")
 include("tools:sisyphus-project-gradle-plugin")
 include("tools:sisyphus-protobuf-gradle-plugin")
 include("tools:sisyphus-api-linter-runner")
+include("tools:sisyphus-protoc-runner")
 
 include("middleware:sisyphus-configuration-artifact")
 include("middleware:sisyphus-jdbc")
