@@ -9,6 +9,10 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder
 class Jackson2JsonCodecCustomizer : CodecCustomizer {
     override fun customize(configurer: CodecConfigurer) {
         configurer.defaultCodecs().jackson2JsonEncoder(Jackson2JsonEncoder(Json.mapper))
-        configurer.defaultCodecs().jackson2JsonDecoder(Jackson2JsonDecoder(Json.mapper))
+        configurer.defaultCodecs().jackson2JsonDecoder(
+            Jackson2JsonDecoder(Json.mapper).apply {
+                this.maxInMemorySize = 4 * 1024 * 1024
+            }
+        )
     }
 }

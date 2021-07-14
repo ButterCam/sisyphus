@@ -122,8 +122,6 @@ object Dependencies {
 
     const val h2 = "com.h2database:h2"
 
-    const val protoc = "com.github.os72:protoc-jar"
-
     const val kubeJavaClient = "io.kubernetes:client-java"
 
     const val retrofit = "com.squareup.retrofit2:retrofit"
