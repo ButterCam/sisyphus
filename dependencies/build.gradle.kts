@@ -45,7 +45,7 @@ dependencies {
         api("com.squareup.okhttp3:okhttp:4.9.1")
         api("com.squareup.retrofit2:retrofit:2.9.0")
         api("com.squareup:kotlinpoet:1.9.0")
-        api("io.github.resilience4j:resilience4j-retrofit:1.7.0")
+        api("io.github.resilience4j:resilience4j-retrofit:1.7.1")
         api("io.grpc:grpc-kotlin-stub:1.1.0")
         api("io.kubernetes:client-java:13.0.0")
         api("io.swagger.core.v3:swagger-core:2.1.10")
