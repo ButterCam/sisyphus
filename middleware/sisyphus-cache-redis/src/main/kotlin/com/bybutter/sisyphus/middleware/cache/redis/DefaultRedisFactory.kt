@@ -1,9 +1,9 @@
-package com.bybutter.sisyphus.middleware.redis
+package com.bybutter.sisyphus.middleware.cache.redis
 
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
 
-open class DefaultRedisClientFactory : RedisClientFactory {
+open class DefaultRedisFactory : RedisFactory {
     private val clients: MutableMap<String, RedisClient> = hashMapOf()
 
     override fun createClient(property: RedisProperty): RedisClient {

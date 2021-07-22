@@ -14,10 +14,10 @@ import kotlin.reflect.KClass
 )
 @Inherited
 annotation class MultiCacheEvict(
-    val cacheName: String = "",
     val key: String = "",
     val ttl: Long = 600,
     val cacheType: CacheType = CacheType.NORMAL,
+    val qualifier: KClass<*>,
     val cacheAdapter: KClass<out CacheAdapter> = CacheAdapter::class,
     val remCount: Int = 8
 )

@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.middleware.redis.cache
+package com.bybutter.sisyphus.middleware.cache.dsl
 
 import java.util.concurrent.TimeUnit
 
