@@ -38,7 +38,7 @@ dependencies {
         api("com.google.api:api-compiler:0.0.8")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
         api("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
-        api("com.netflix.nebula:gradle-info-plugin:9.3.0")
+        api("com.netflix.nebula:gradle-info-plugin:10.0.0")
         api("com.netflix.nebula:nebula-publishing-plugin:17.3.2")
         api("com.palantir.gradle.docker:gradle-docker:0.27.0")
         api("com.salesforce.servicelibs:rxgrpc-stub:1.0.1")
