@@ -21,7 +21,7 @@ dependencies {
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.5.10"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
     api(platform("org.junit:junit-bom:5.7.2"))
-    api(platform("org.springframework.boot:spring-boot-dependencies:2.5.2"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:2.5.3"))
     api(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
 
     constraints {
@@ -38,7 +38,7 @@ dependencies {
         api("com.google.api:api-compiler:0.0.8")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
         api("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
-        api("com.netflix.nebula:gradle-info-plugin:9.3.0")
+        api("com.netflix.nebula:gradle-info-plugin:10.0.0")
         api("com.netflix.nebula:nebula-publishing-plugin:17.3.2")
         api("com.palantir.gradle.docker:gradle-docker:0.27.0")
         api("com.salesforce.servicelibs:rxgrpc-stub:1.0.1")
@@ -59,6 +59,6 @@ dependencies {
         api("org.jooq:jooq:3.14.12")
         api("org.mongodb:mongodb-driver-reactivestreams:4.3.0")
         api("org.reflections:reflections:0.9.12")
-        api("org.springframework.boot:spring-boot-gradle-plugin:2.5.2")
+        api("org.springframework.boot:spring-boot-gradle-plugin:2.5.3")
     }
 }
