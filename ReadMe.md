@@ -1,17 +1,14 @@
-<p align="center">
+<h1 align="center">
+<p>
 <img src="doc/sisyphus_logo_github.svg" width="360px" alt="Sisyphus" />
 </p>
-
-<h1 align="center">Sisyphus </h1>
-
-<p align="center">
+<p>
 <a href="https://github.com/grpc-ecosystem/awesome-grpc"><img alt="Awesome gRPC" src="https://raw.githubusercontent.com/sindresorhus/awesome/main/media/badge.svg" /></a>
 <img src="https://img.shields.io/badge/jdk-11-green?logo=java" alt="JDK version"/>
 <img src="https://img.shields.io/badge/gradle-%5E6.5-green?logo=gradle" alt="Gradle version"/>
 <a href="https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom"><img src="https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom" alt="Maven Central"/></a>
 </p>
-
----
+</h1>
 
 Sisyphus is the way how we provide backend services. It integrates all tools and libraries needed for designing API
 which follows the [Google API Improvement Proposals](https://aip.bybutter.com).
