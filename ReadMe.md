@@ -1,6 +1,6 @@
 <h1 align="center">
 <p>
-<img src="doc/sisyphus_logo_github.svg" width="360px" alt="Sisyphus" />
+<img src="doc/sisyphus_logo_github.svg" width="180px" alt="Sisyphus" />
 </p>
 <p>
 <a href="https://github.com/grpc-ecosystem/awesome-grpc"><img alt="Awesome gRPC" src="https://raw.githubusercontent.com/sindresorhus/awesome/main/media/badge.svg" /></a>

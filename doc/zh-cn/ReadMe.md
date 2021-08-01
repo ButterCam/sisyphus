@@ -1,6 +1,14 @@
-# Sisyphus
-
-![JDK version](https://img.shields.io/badge/jdk-11-green?logo=java) ![Gradle Version](https://img.shields.io/badge/gradle-%5E6.5-green?logo=gradle) [![Maven Central](https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom)](https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom) [![Dependencies](https://img.shields.io/librariesio/release/maven/com.bybutter.sisyphus:sisyphus-dependencies)](https://libraries.io/maven/com.bybutter.sisyphus:sisyphus-dependencies)
+<h1 align="center">
+<p>
+<img src="../sisyphus_logo_github.svg" width="180px" alt="Sisyphus" />
+</p>
+<p>
+<a href="https://github.com/grpc-ecosystem/awesome-grpc"><img alt="Awesome gRPC" src="https://raw.githubusercontent.com/sindresorhus/awesome/main/media/badge.svg" /></a>
+<img src="https://img.shields.io/badge/jdk-11-green?logo=java" alt="JDK version"/>
+<img src="https://img.shields.io/badge/gradle-%5E6.5-green?logo=gradle" alt="Gradle version"/>
+<a href="https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom"><img src="https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom" alt="Maven Central"/></a>
+</p>
+</h1>
 
 Sisyphus 是我们用于提供黄油相机等产品 API 的后端框架，集成了所有我们用于设计遵循 [Google API 设计指南](https://aip.bybutter.com) 的 API 的工具和类库。
 
