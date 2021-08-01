@@ -1,6 +1,17 @@
-# Sisyphus
+<p align="center">
+<img src="doc/sisyphus_logo_github.svg" width="360px" alt="Sisyphus" />
+</p>
 
-![JDK version](https://img.shields.io/badge/jdk-11-green?logo=java) ![Gradle Version](https://img.shields.io/badge/gradle-%5E6.5-green?logo=gradle) [![Maven Central](https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom)](https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom) [![Dependencies](https://img.shields.io/librariesio/release/maven/com.bybutter.sisyphus:sisyphus-dependencies)](https://libraries.io/maven/com.bybutter.sisyphus:sisyphus-dependencies)
+<h1 align="center">Sisyphus </h1>
+
+<p align="center">
+<a href="https://github.com/grpc-ecosystem/awesome-grpc"><img alt="Awesome gRPC" src="https://raw.githubusercontent.com/sindresorhus/awesome/main/media/badge.svg" /></a>
+<img src="https://img.shields.io/badge/jdk-11-green?logo=java" alt="JDK version"/>
+<img src="https://img.shields.io/badge/gradle-%5E6.5-green?logo=gradle" alt="Gradle version"/>
+<a href="https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom"><img src="https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom" alt="Maven Central"/></a>
+</p>
+
+---
 
 Sisyphus is the way how we provide backend services. It integrates all tools and libraries needed for designing API
 which follows the [Google API Improvement Proposals](https://aip.bybutter.com).
