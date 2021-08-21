@@ -16,12 +16,12 @@ dependencies {
     api(platform("com.google.protobuf:protobuf-bom:3.17.3"))
     api(platform("io.grpc:grpc-bom:1.39.0"))
     api(platform("io.micrometer:micrometer-bom:1.7.3"))
-    api(platform("org.apache.maven:maven:3.8.1"))
+    api(platform("org.apache.maven:maven:3.8.2"))
     api(platform("org.apache.rocketmq:rocketmq-all:4.9.0"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.5.10"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
     api(platform("org.junit:junit-bom:5.7.2"))
-    api(platform("org.springframework.boot:spring-boot-dependencies:2.5.3"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:2.5.4"))
     api(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
 
     constraints {
@@ -40,7 +40,7 @@ dependencies {
         api("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
         api("com.netflix.nebula:gradle-info-plugin:10.0.0")
         api("com.netflix.nebula:nebula-publishing-plugin:17.3.3")
-        api("com.palantir.gradle.docker:gradle-docker:0.27.0")
+        api("com.palantir.gradle.docker:gradle-docker:0.28.0")
         api("com.salesforce.servicelibs:rxgrpc-stub:1.0.1")
         api("com.squareup.okhttp3:okhttp:4.9.1")
         api("com.squareup.retrofit2:retrofit:2.9.0")
