@@ -7,7 +7,7 @@ object Dependencies {
         const val stdlib = "$group:kotlin-stdlib-jdk8"
         const val reflect = "$group:kotlin-reflect"
         const val poet = "com.squareup:kotlinpoet"
-        const val plugin = "$group:kotlin-gradle-plugin"
+        const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin"
 
         object Coroutines {
             private const val group = "org.jetbrains.kotlinx"

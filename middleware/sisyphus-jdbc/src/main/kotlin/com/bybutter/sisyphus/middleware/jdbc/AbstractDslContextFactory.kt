@@ -16,7 +16,7 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
     final override fun createContext(qualifier: Class<*>, property: JdbcDatabaseProperty): DSLContext {
         val url = buildJdbcUrl(property)
         val datasource = createDatasource(url, property)
-        return DSL.using(createConfiguration(qualifier, datasource, JDBCUtils.dialect(url), configInterceptors))
+        return DSL.using(createConfiguration(qualifier, datasource, property.dialect ?: JDBCUtils.dialect(url), configInterceptors))
     }
 
     protected open fun buildJdbcUrl(property: JdbcDatabaseProperty): String {
