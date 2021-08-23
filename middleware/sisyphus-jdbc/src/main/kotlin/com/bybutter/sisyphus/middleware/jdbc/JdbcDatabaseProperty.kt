@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.middleware.jdbc
 
+import org.jooq.SQLDialect
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class JdbcDatabaseProperty(
@@ -9,7 +10,8 @@ data class JdbcDatabaseProperty(
     val parameters: Map<String, String> = mapOf(),
     @NestedConfigurationProperty
     val poolConfig: ConnectionPoolProperty? = null,
-    val qualifier: Class<*>
+    val qualifier: Class<*>,
+    val dialect: SQLDialect? = null,
 )
 
 data class ConnectionPoolProperty(
