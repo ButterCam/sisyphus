@@ -11,6 +11,6 @@ class StringConverter : ValueConverter<String> {
     }
 
     override fun convertBack(value: ByteArray): String {
-        return value.toString(Charset.defaultCharset())
+        return value.toString(Charsets.UTF_8)
     }
 }

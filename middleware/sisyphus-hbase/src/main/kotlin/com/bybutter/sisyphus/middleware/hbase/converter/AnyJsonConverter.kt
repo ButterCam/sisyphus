@@ -19,6 +19,6 @@ class AnyJsonConverter<T : Any> constructor(val type: JavaType) : ValueConverter
     }
 
     override fun convertBack(value: ByteArray): T {
-        return Json.deserialize(value.toString(Charset.defaultCharset()), type)
+        return Json.deserialize(value.toString(Charsets.UTF_8), type)
     }
 }
