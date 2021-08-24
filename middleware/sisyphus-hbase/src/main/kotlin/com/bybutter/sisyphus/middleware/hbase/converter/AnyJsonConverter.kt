@@ -5,7 +5,6 @@ import com.bybutter.sisyphus.middleware.hbase.ValueConverter
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.type.TypeFactory
-import java.nio.charset.Charset
 
 class AnyJsonConverter<T : Any> constructor(val type: JavaType) : ValueConverter<T> {
     companion object {
