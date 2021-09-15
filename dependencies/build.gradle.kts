@@ -20,7 +20,7 @@ dependencies {
     api(platform("org.apache.rocketmq:rocketmq-all:4.9.1"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.5.21"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
-    api(platform("org.junit:junit-bom:5.7.2"))
+    api(platform("org.junit:junit-bom:5.8.0"))
     api(platform("org.springframework.boot:spring-boot-dependencies:2.5.4"))
     api(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
 
