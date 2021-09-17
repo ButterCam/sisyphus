@@ -37,7 +37,7 @@ dependencies {
         api("com.google.api:api-common:2.0.2")
         api("com.google.api:api-compiler:0.0.8")
         api("com.gradle.publish:plugin-publish-plugin:0.12.0")
-        api("com.netflix.nebula:gradle-contacts-plugin:5.1.0")
+        api("com.netflix.nebula:gradle-contacts-plugin:6.0.0")
         api("com.netflix.nebula:gradle-info-plugin:11.0.0")
         api("com.netflix.nebula:nebula-publishing-plugin:17.3.3")
         api("com.palantir.gradle.docker:gradle-docker:0.28.0")
