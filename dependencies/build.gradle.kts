@@ -22,7 +22,7 @@ dependencies {
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
     api(platform("org.junit:junit-bom:5.8.0"))
     api(platform("org.springframework.boot:spring-boot-dependencies:2.5.4"))
-    api(platform("com.fasterxml.jackson:jackson-bom:2.12.4"))
+    api(platform("com.fasterxml.jackson:jackson-bom:2.12.5"))
 
     constraints {
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.2")
