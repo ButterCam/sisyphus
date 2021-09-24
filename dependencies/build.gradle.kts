@@ -14,7 +14,7 @@ javaPlatform {
 dependencies {
     api(platform(project(":sisyphus-bom")))
     api(platform("com.google.protobuf:protobuf-bom:3.18.0"))
-    api(platform("io.grpc:grpc-bom:1.40.1"))
+    api(platform("io.grpc:grpc-bom:1.41.0"))
     api(platform("io.micrometer:micrometer-bom:1.7.4"))
     api(platform("org.apache.maven:maven:3.8.2"))
     api(platform("org.apache.rocketmq:rocketmq-all:4.9.1"))
