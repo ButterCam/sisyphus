@@ -22,7 +22,7 @@ dependencies {
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
     api(platform("org.junit:junit-bom:5.8.1"))
     api(platform("org.springframework.boot:spring-boot-dependencies:2.5.5"))
-    api(platform("com.fasterxml.jackson:jackson-bom:2.12.5"))
+    api(platform("com.fasterxml.jackson:jackson-bom:2.13.0"))
 
     constraints {
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.2")
@@ -41,7 +41,7 @@ dependencies {
         api("com.netflix.nebula:gradle-info-plugin:11.0.0")
         api("com.netflix.nebula:nebula-publishing-plugin:18.0.0")
         api("com.palantir.gradle.docker:gradle-docker:0.30.0")
-        api("com.salesforce.servicelibs:rxgrpc-stub:1.2.0")
+        api("com.salesforce.servicelibs:rxgrpc-stub:1.2.3")
         api("com.squareup.okhttp3:okhttp:4.9.1")
         api("com.squareup.retrofit2:retrofit:2.9.0")
         api("com.squareup:kotlinpoet:1.10.1")
@@ -58,7 +58,7 @@ dependencies {
         api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
         api("org.jlleitschuh.gradle:ktlint-gradle:10.0.0")
         api("org.jooq:jooq:3.14.12")
-        api("org.mongodb:mongodb-driver-reactivestreams:4.3.2")
+        api("org.mongodb:mongodb-driver-reactivestreams:4.3.3")
         api("org.reflections:reflections:0.9.12")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.5.5")
     }
