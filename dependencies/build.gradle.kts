@@ -13,7 +13,7 @@ javaPlatform {
 
 dependencies {
     api(platform(project(":sisyphus-bom")))
-    api(platform("com.google.protobuf:protobuf-bom:3.18.0"))
+    api(platform("com.google.protobuf:protobuf-bom:3.18.1"))
     api(platform("io.grpc:grpc-bom:1.41.0"))
     api(platform("io.micrometer:micrometer-bom:1.7.4"))
     api(platform("org.apache.maven:maven:3.8.2"))
@@ -22,7 +22,7 @@ dependencies {
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
     api(platform("org.junit:junit-bom:5.8.1"))
     api(platform("org.springframework.boot:spring-boot-dependencies:2.5.5"))
-    api(platform("com.fasterxml.jackson:jackson-bom:2.12.5"))
+    api(platform("com.fasterxml.jackson:jackson-bom:2.13.0"))
 
     constraints {
         api("com.alibaba.csp:sentinel-datasource-redis:1.8.2")
