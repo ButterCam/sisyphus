@@ -5,7 +5,7 @@ import org.apache.rocketmq.client.consumer.MQPullConsumer
 import org.apache.rocketmq.client.consumer.MQPushConsumer
 import org.springframework.context.SmartLifecycle
 
-class ConsumerLifecycle(private val consumer: MQConsumer) : SmartLifecycle {
+class ConsumerLifecycle(private val consumer: MQConsumer, private val listener: MessageListener<*>) : SmartLifecycle {
     private var running = false
 
     override fun isRunning(): Boolean {
@@ -25,6 +25,7 @@ class ConsumerLifecycle(private val consumer: MQConsumer) : SmartLifecycle {
             is MQPushConsumer -> consumer.shutdown()
             is MQPullConsumer -> consumer.shutdown()
         }
+        listener.shutdown()
         running = false
     }
 }

@@ -4,6 +4,8 @@ import org.apache.rocketmq.common.message.MessageExt
 
 interface MessageListener<T> {
     suspend fun consumeMessage(messages: List<T>)
+
+    fun shutdown() {}
 }
 
 interface MessageConverter<T> {
