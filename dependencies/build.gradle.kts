@@ -21,7 +21,7 @@ dependencies {
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.5.21"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
     api(platform("org.junit:junit-bom:5.8.1"))
-    api(platform("org.springframework.boot:spring-boot-dependencies:2.5.5"))
+    api(platform("org.springframework.boot:spring-boot-dependencies:2.5.6"))
     api(platform("com.fasterxml.jackson:jackson-bom:2.13.0"))
 
     constraints {
@@ -44,7 +44,7 @@ dependencies {
         api("com.salesforce.servicelibs:rxgrpc-stub:1.2.3")
         api("com.squareup.okhttp3:okhttp:4.9.2")
         api("com.squareup.retrofit2:retrofit:2.9.0")
-        api("com.squareup:kotlinpoet:1.10.1")
+        api("com.squareup:kotlinpoet:1.10.2")
         api("io.github.resilience4j:resilience4j-retrofit:1.7.1")
         api("io.github.resilience4j:resilience4j-circuitbreaker:1.7.1")
         api("io.grpc:grpc-kotlin-stub:1.1.0")
