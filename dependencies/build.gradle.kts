@@ -48,7 +48,7 @@ dependencies {
         api("io.github.resilience4j:resilience4j-retrofit:1.7.1")
         api("io.github.resilience4j:resilience4j-circuitbreaker:1.7.1")
         api("io.grpc:grpc-kotlin-stub:1.1.0")
-        api("io.kubernetes:client-java:13.0.0")
+        api("io.kubernetes:client-java:13.0.1")
         api("io.swagger.core.v3:swagger-core:2.1.11")
         api("org.antlr:antlr4:4.9.2")
         api("org.apache.maven.wagon:wagon-http:3.4.3")
