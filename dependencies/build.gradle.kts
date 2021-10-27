@@ -13,7 +13,7 @@ javaPlatform {
 
 dependencies {
     api(platform(project(":sisyphus-bom")))
-    api(platform("com.google.protobuf:protobuf-bom:3.18.1"))
+    api(platform("com.google.protobuf:protobuf-bom:3.19.0"))
     api(platform("io.grpc:grpc-bom:1.41.0"))
     api(platform("io.micrometer:micrometer-bom:1.7.5"))
     api(platform("org.apache.maven:maven:3.8.3"))
@@ -44,7 +44,7 @@ dependencies {
         api("com.salesforce.servicelibs:rxgrpc-stub:1.2.3")
         api("com.squareup.okhttp3:okhttp:4.9.2")
         api("com.squareup.retrofit2:retrofit:2.9.0")
-        api("com.squareup:kotlinpoet:1.10.1")
+        api("com.squareup:kotlinpoet:1.10.2")
         api("io.github.resilience4j:resilience4j-retrofit:1.7.1")
         api("io.github.resilience4j:resilience4j-circuitbreaker:1.7.1")
         api("io.grpc:grpc-kotlin-stub:1.1.0")
