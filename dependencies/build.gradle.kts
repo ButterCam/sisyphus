@@ -15,7 +15,7 @@ dependencies {
     api(platform(project(":sisyphus-bom")))
     api(platform("com.google.protobuf:protobuf-bom:3.18.1"))
     api(platform("io.grpc:grpc-bom:1.41.0"))
-    api(platform("io.micrometer:micrometer-bom:1.7.4"))
+    api(platform("io.micrometer:micrometer-bom:1.7.5"))
     api(platform("org.apache.maven:maven:3.8.3"))
     api(platform("org.apache.rocketmq:rocketmq-all:4.9.1"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.5.21"))
@@ -48,7 +48,7 @@ dependencies {
         api("io.github.resilience4j:resilience4j-retrofit:1.7.1")
         api("io.github.resilience4j:resilience4j-circuitbreaker:1.7.1")
         api("io.grpc:grpc-kotlin-stub:1.1.0")
-        api("io.kubernetes:client-java:13.0.0")
+        api("io.kubernetes:client-java:13.0.1")
         api("io.swagger.core.v3:swagger-core:2.1.11")
         api("org.antlr:antlr4:4.9.2")
         api("org.apache.maven.wagon:wagon-http:3.4.3")
@@ -60,6 +60,6 @@ dependencies {
         api("org.jooq:jooq:3.14.12")
         api("org.mongodb:mongodb-driver-reactivestreams:4.3.3")
         api("org.reflections:reflections:0.9.12")
-        api("org.springframework.boot:spring-boot-gradle-plugin:2.5.5")
+        api("org.springframework.boot:spring-boot-gradle-plugin:2.5.6")
     }
 }
