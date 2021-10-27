@@ -82,12 +82,14 @@ class RocketMqRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
 
             val consumerName = "$BEAN_NAME_PREFIX:${listener}Consumer"
             val consumerDefinition = BeanDefinitionBuilder.genericBeanDefinition(SmartLifecycle::class.java) {
+                val listener = beanFactory.getBean<MessageListener<*>>(listener)
                 ConsumerLifecycle(
                     beanFactory.getBean(RocketMqResourceFactory::class.java)
-                        .createConsumer(consumer, annotation, beanFactory.getBean<MessageListener<*>>(listener))
+                        .createConsumer(consumer, annotation, listener)
                         .also {
                             logger.info("RocketMQ listener (${annotation.groupId}) registered on topic '${annotation.topic}(${annotation.filter})'.")
-                        }
+                        },
+                    listener
                 )
             }.beanDefinition
             consumerDefinition.addQualifier(AutowireCandidateQualifier(consumer.qualifier))
