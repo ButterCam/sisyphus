@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.protobuf.primitives
 
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.invoke
 import java.util.SortedMap
@@ -38,13 +39,17 @@ fun FieldMask.string(): String {
 }
 
 fun Message<*, *>.resolveMask(mask: FieldMask?): FieldMask {
-    mask?.paths?.isNullOrEmpty() ?: return FieldMask {
-        paths += this@resolveMask.support().fieldDescriptors.map { it.name }
+    return this@resolveMask.support().resolveMask(mask)
+}
+
+fun MessageSupport<*, *>.resolveMask(mask: FieldMask?): FieldMask {
+    mask?.paths?.isEmpty() ?: return FieldMask {
+        paths += this@resolveMask.fieldDescriptors.map { it.name }
     }
 
     return FieldMask {
         paths += mask.paths.mapNotNull {
-            this@resolveMask.support().fieldInfo(it)?.name
+            this@resolveMask.fieldInfo(it)?.name
         }.toSet()
     }
 }
