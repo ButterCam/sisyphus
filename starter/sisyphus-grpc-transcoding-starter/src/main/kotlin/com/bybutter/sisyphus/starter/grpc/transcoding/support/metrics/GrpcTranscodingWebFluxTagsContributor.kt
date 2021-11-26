@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.starter.grpc.transcoding.support.metrics
 import com.bybutter.sisyphus.starter.grpc.transcoding.TranscodingFunctions
 import com.bybutter.sisyphus.starter.grpc.transcoding.TranscodingRouterRule
 import com.google.api.pathtemplate.PathTemplate
-import io.grpc.MethodDescriptor
 import io.micrometer.core.instrument.Tag
 import io.micrometer.core.instrument.Tags
 import org.springframework.boot.actuate.metrics.web.reactive.server.WebFluxTagsContributor
