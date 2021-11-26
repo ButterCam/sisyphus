@@ -1,6 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.utils
 
-import com.bybutter.sisyphus.starter.grpc.transcoding.TranscodingServiceRouterFunction
+import com.bybutter.sisyphus.starter.grpc.transcoding.TranscodingHttpRouterFunction
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.Param
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.StringSchema
@@ -37,7 +37,7 @@ object SwaggerParams {
 
     fun fetchGrpcServiceNameParam(serviceName: String): HeaderParameter {
         return HeaderParameter().apply {
-            name = TranscodingServiceRouterFunction.GRPC_SERVICE_NAME_HEADER
+            name = TranscodingHttpRouterFunction.GRPC_SERVICE_NAME_HEADER
             required = false
             schema = StringSchema().apply {
                 setDefault(serviceName)

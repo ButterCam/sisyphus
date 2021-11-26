@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.middleware.jdbc.support.proto.filter
 
 import com.bybutter.sisyphus.dsl.filtering.grammar.FilterParser
+import com.bybutter.sisyphus.string.toCamelCase
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.Record
@@ -41,6 +42,7 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
 
     fun field(member: String, field: Any?, converter: ((Any?) -> Any?)? = null) {
         fieldMapping[member] = field
+        fieldMapping[member.toCamelCase()] = field
         converter?.let {
             converters[member] = converter
         }

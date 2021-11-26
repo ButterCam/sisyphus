@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.middleware.jdbc.support.proto.order
 
+import com.bybutter.sisyphus.string.toCamelCase
 import org.jooq.Field
 
 class CustomOrderByBuilder : OrderByBuilder() {
@@ -11,6 +12,7 @@ class CustomOrderByBuilder : OrderByBuilder() {
 
     fun field(member: String, field: Field<*>) {
         fieldMapping[member] = field
+        fieldMapping[member.toCamelCase()] = field
     }
 }
 

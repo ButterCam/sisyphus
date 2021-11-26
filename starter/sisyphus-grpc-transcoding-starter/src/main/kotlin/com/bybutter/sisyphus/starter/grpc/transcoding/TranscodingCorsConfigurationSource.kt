@@ -2,13 +2,9 @@ package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.api.HttpRule
 import com.bybutter.sisyphus.api.http
-import com.bybutter.sisyphus.protobuf.ProtoTypes
-import com.bybutter.sisyphus.protobuf.findServiceSupport
 import com.bybutter.sisyphus.string.PathMatcher
 import com.google.api.pathtemplate.PathTemplate
-import io.grpc.Server
 import io.grpc.ServerMethodDefinition
-import io.grpc.ServerServiceDefinition
 import org.springframework.http.HttpMethod
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsConfigurationSource
@@ -18,14 +14,15 @@ import org.springframework.web.server.ServerWebExchange
  * CORS config source for gRPC transcoding.
  */
 class TranscodingCorsConfigurationSource(
-    server: Server,
-    private val interceptors: Iterable<TranscodingCorsConfigurationInterceptor>,
-    enableServices: Collection<String> = listOf()
+    private val rules: Collection<TranscodingRouterRule>,
+    private val interceptors: Iterable<TranscodingCorsConfigurationInterceptor>
 ) : CorsConfigurationSource {
     private val corsConfigurations = mutableMapOf<String, CorsConfiguration>()
 
     init {
-        registerServer(server, enableServices)
+        for (rule in rules) {
+            registerRule(rule)
+        }
     }
 
     override fun getCorsConfiguration(exchange: ServerWebExchange): CorsConfiguration? {
@@ -39,45 +36,17 @@ class TranscodingCorsConfigurationSource(
         return corsConfigurations[pattern]
     }
 
-    private fun registerServer(server: Server, enableServices: Collection<String>) {
-        val services = enableServices.toSet()
-
-        // Resister all enable service in gRPC server.
-        for (service in server.services) {
-            if (services.isEmpty() || services.contains(service.serviceDescriptor.name)) {
-                registerService(service)
-            }
-        }
+    private fun registerRule(rule: TranscodingRouterRule) {
+        registerHttp(rule.http, rule.method)
     }
 
-    private fun registerService(service: ServerServiceDefinition) {
-        // Resister all method in gRPC service.
-        for (method in service.methods) {
-            registerMethod(method)
-        }
-    }
-
-    private fun registerMethod(method: ServerMethodDefinition<*, *>) {
-        // Ensure method proto registered.
-        val serice = method.methodDescriptor.serviceName?.let { ProtoTypes.findServiceSupport(".$it") }
-            ?: return
-        val proto = serice.descriptor.method.firstOrNull {
-            it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
-        }
-
-        // Ensure http rule existed.
-        val httpRule = proto?.options?.http ?: return
-
-        registerRule(httpRule, method)
-    }
-
-    private fun registerRule(rule: HttpRule, method: ServerMethodDefinition<*, *>) {
-        rule.pattern?.let {
+    private fun registerHttp(http: HttpRule, method: ServerMethodDefinition<*, *>) {
+        http.pattern?.let {
             registerPattern(it, method)
         }
 
-        for (additionalBinding in rule.additionalBindings) {
-            registerRule(rule, method)
+        for (additionalBinding in http.additionalBindings) {
+            registerHttp(additionalBinding, method)
         }
     }
 

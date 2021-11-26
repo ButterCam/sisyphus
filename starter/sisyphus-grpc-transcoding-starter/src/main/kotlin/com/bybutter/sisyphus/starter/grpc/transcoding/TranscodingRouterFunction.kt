@@ -1,10 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
-import com.bybutter.sisyphus.starter.grpc.LocalClientRepository.Companion.QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL
 import io.grpc.Channel
-import io.grpc.Server
-import org.springframework.context.ApplicationContext
-import org.springframework.context.ApplicationContextAware
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -16,24 +12,16 @@ import reactor.core.publisher.Mono
  * Http request router based on Spring webflux function,
  * provided Http+Json to gRpc+protobuf transcoding.
  */
-class TranscodingRouterFunction private constructor(
-    private val server: Server,
-    private val serviceRouters: List<RouterFunction<ServerResponse>>
-) : RouterFunction<ServerResponse>, ApplicationContextAware {
-
-    private lateinit var applicationContext: ApplicationContext
-
-    private val channel by lazy {
-        // Create channel for localhost gRpc server.
-        // We create channel lazily, because get server port will cause exceptions before server started.
-        applicationContext.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL) as Channel
-    }
+class TranscodingRouterFunction constructor(
+    private val serviceRouters: List<RouterFunction<ServerResponse>>,
+    private val transcodingChannel: Channel
+) : RouterFunction<ServerResponse> {
 
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
         val oldAttributes = request.attributes().toMap()
 
-        // Set the channel attribute for creating gRpc proxy calls.
-        request.attributes()[TranscodingFunctions.GRPC_PROXY_CHANNEL_ATTRIBUTE] = channel
+        // Set the channel attribute for creating gRPC proxy calls.
+        request.attributes()[TranscodingFunctions.GRPC_PROXY_CHANNEL_ATTRIBUTE] = transcodingChannel
 
         // TODO: For performance considerations, we just found the first matched router,
         //  maybe we should choose the longest template for multiple matched.
@@ -41,7 +29,7 @@ class TranscodingRouterFunction private constructor(
             it.route(request)
         }.next().switchIfEmpty(
             Mono.create<HandlerFunction<ServerResponse>> {
-                // Clear the attributes if we can't transcode current http request to gRpc.
+                // Clear the attributes if we can't transcode current http request to gRPC.
                 request.attributes().clear()
                 request.attributes() += oldAttributes
                 it.success()
@@ -51,25 +39,16 @@ class TranscodingRouterFunction private constructor(
 
     companion object {
         operator fun invoke(
-            server: Server,
-            enableServices: Collection<String> = listOf()
+            rules: Collection<TranscodingRouterRule>,
+            transcodingChannel: Channel,
         ): RouterFunction<ServerResponse> {
-            val enableServices = enableServices.toSet()
-            val serviceRouters = server.services.mapNotNull {
-                if (enableServices.isEmpty() || enableServices.contains(it.serviceDescriptor.name)) {
-                    TranscodingServiceRouterFunction(it)
-                } else {
-                    null
-                }
-            }
             // Return empty router if no service routers created.
-            if (serviceRouters.isEmpty()) return EmptyRouterFunction
+            if (rules.isEmpty()) return EmptyRouterFunction
 
-            return TranscodingRouterFunction(server, serviceRouters)
+            return TranscodingRouterFunction(
+                rules.map { TranscodingHttpRouterFunction(it) },
+                transcodingChannel
+            )
         }
-    }
-
-    override fun setApplicationContext(applicationContext: ApplicationContext) {
-        this.applicationContext = applicationContext
     }
 }

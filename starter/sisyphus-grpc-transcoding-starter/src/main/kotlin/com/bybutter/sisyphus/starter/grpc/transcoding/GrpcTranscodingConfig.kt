@@ -1,10 +1,12 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
 import com.bybutter.sisyphus.spring.BeanUtils
+import com.bybutter.sisyphus.starter.grpc.LocalClientRepository
 import com.bybutter.sisyphus.starter.grpc.ServiceRegistrar
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerAuthorizer
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerProperty
 import com.bybutter.sisyphus.starter.grpc.transcoding.support.swagger.SwaggerRouterFunction
+import io.grpc.Channel
 import io.grpc.Server
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
@@ -71,9 +73,19 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
         val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(RouterFunction::class.java) {
             val server =
                 (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
-            TranscodingRouterFunction(server, enableServices)
+
+            val channel =
+                (registry as ConfigurableListableBeanFactory).getBean(LocalClientRepository.QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL) as Channel
+
+            val rules = exportTranscodingRules(
+                BeanUtils.getSortedBeans(registry, TranscodingRouterRuleExporter::class.java).values,
+                server, enableServices
+            )
+
+            TranscodingRouterFunction(rules, channel)
         }
         definitionBuilder.addDependsOn(QUALIFIER_AUTO_CONFIGURED_GRPC_SWAGGER_ROUTER_FUNCTION)
+        definitionBuilder.addDependsOn(LocalClientRepository.QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL)
         registry.registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_TRANSCODING_ROUTER_FUNCTION,
             definitionBuilder.beanDefinition
@@ -115,12 +127,16 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
             val server =
                 (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
 
+            val rules = exportTranscodingRules(
+                BeanUtils.getSortedBeans(registry, TranscodingRouterRuleExporter::class.java).values,
+                server, enableServices
+            )
+
             // Create CORS config source for transcoding.
             TranscodingCorsConfigurationSource(
-                server,
+                rules,
                 // Try to get the default transcoding cors configuration factory form spring application context
                 BeanUtils.getSortedBeans(registry, TranscodingCorsConfigurationInterceptor::class.java).values,
-                enableServices
             )
         }
         registry.registerBeanDefinition(
@@ -151,6 +167,19 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
             QUALIFIER_AUTO_CONFIGURED_GRPC_SWAGGER_CORS_CONFIG,
             definitionBuilder.beanDefinition
         )
+    }
+
+    private fun exportTranscodingRules(
+        exporters: Collection<TranscodingRouterRuleExporter>,
+        server: Server,
+        enableServices: Collection<String>
+    ): List<TranscodingRouterRule> {
+        val enableServices = enableServices.toSet()
+        val rules = mutableListOf<TranscodingRouterRule>()
+        for (exporter in exporters) {
+            exporter.export(server, enableServices, rules)
+        }
+        return rules
     }
 
     companion object {
