@@ -28,7 +28,7 @@ object ServiceLoader {
                 it.trim()
             }.filter {
                 it.isNotBlank()
-            }.map {
+            }.distinct().map {
                 Class.forName(it).instance().uncheckedCast<T>()
             }.toMutableList()
 

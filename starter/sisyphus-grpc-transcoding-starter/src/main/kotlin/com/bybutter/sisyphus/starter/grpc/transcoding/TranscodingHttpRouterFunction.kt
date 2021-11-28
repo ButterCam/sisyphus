@@ -1,7 +1,5 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
-import com.bybutter.sisyphus.api.HttpRule
-import com.bybutter.sisyphus.api.http
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessagePatcher
@@ -10,16 +8,12 @@ import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.findEnumSupport
 import com.bybutter.sisyphus.protobuf.findMessageSupport
-import com.bybutter.sisyphus.protobuf.findServiceSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
 import com.bybutter.sisyphus.reflect.uncheckedCast
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientCall
 import io.grpc.Metadata
-import io.grpc.MethodDescriptor
-import io.grpc.ServerMethodDefinition
 import org.slf4j.LoggerFactory
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
@@ -27,22 +21,20 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 
-class TranscodingMethodRouterFunction private constructor(
-    private val method: ServerMethodDefinition<*, *>,
-    private val proto: MethodDescriptorProto,
-    private val rule: HttpRule
+class TranscodingHttpRouterFunction constructor(
+    private val rule: TranscodingRouterRule
 ) : RouterFunction<ServerResponse>, HandlerFunction<ServerResponse> {
-    private val requestPredicate = HttpRulePredicate(rule)
-    private val inputSupport: MessageSupport<*, *> = ProtoTypes.findMessageSupport(proto.inputType)
+    private val requestPredicate = HttpRulePredicate(rule.http)
+    private val inputSupport: MessageSupport<*, *> = ProtoTypes.findMessageSupport(rule.methodProto.inputType)
     private val bodyClass: Class<*>?
 
     init {
-        bodyClass = when (rule.body) {
+        bodyClass = when (rule.http.body) {
             "" -> null
-            "*" -> ProtoTypes.findMessageSupport(proto.inputType).messageClass.java
+            "*" -> ProtoTypes.findMessageSupport(rule.methodProto.inputType).messageClass.java
             else -> {
-                val field = inputSupport.fieldDescriptors.firstOrNull { it.name == rule.body }
-                    ?: throw IllegalStateException("Wrong http rule options, input message not contains body field '${rule.body}'.")
+                val field = inputSupport.fieldDescriptors.firstOrNull { it.name == rule.http.body }
+                    ?: throw IllegalStateException("Wrong http rule options, input message not contains body field '${rule.http.body}'.")
                 when (field.type) {
                     FieldDescriptorProto.Type.DOUBLE -> Double::class.java
                     FieldDescriptorProto.Type.FLOAT -> Float::class.java
@@ -68,10 +60,13 @@ class TranscodingMethodRouterFunction private constructor(
     }
 
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
+        val serviceName = request.headers().firstHeader(GRPC_SERVICE_NAME_HEADER)
+        if (!serviceName.isNullOrEmpty() && rule.service.serviceDescriptor.name != serviceName) {
+            return Mono.empty()
+        }
+
         // Set the method attributes
-        request.attributes()[TranscodingFunctions.METHOD_DEFINITION_ATTRIBUTE] = method
-        request.attributes()[TranscodingFunctions.METHOD_DESCRIPTOR_ATTRIBUTE] = method.methodDescriptor
-        request.attributes()[TranscodingFunctions.METHOD_PROTO_ATTRIBUTE] = proto
+        request.attributes()[TranscodingFunctions.TRANSCODING_RULE_ATTRIBUTE] = rule
 
         return if (requestPredicate.test(request)) {
             Mono.just(this)
@@ -83,10 +78,10 @@ class TranscodingMethodRouterFunction private constructor(
     @OptIn(InternalProtoApi::class)
     override fun handle(request: ServerRequest): Mono<ServerResponse> {
         val channel = request.attributes()[TranscodingFunctions.GRPC_PROXY_CHANNEL_ATTRIBUTE] as Channel
-        val call = channel.newCall(method.methodDescriptor, CallOptions.DEFAULT)
+        val call = channel.newCall(rule.method.methodDescriptor, CallOptions.DEFAULT)
             .uncheckedCast<ClientCall<Message<*, *>, Message<*, *>>>()
         val header = prepareHeader(request)
-        val listener = TranscodingCallListener(rule.responseBody)
+        val listener = TranscodingCallListener(rule.http.responseBody)
 
         call.start(listener, header)
         // gRPC transcoding only support the unary calls, so we request 2 message for response.
@@ -95,12 +90,12 @@ class TranscodingMethodRouterFunction private constructor(
         call.request(2)
 
         return request.bodyToMono(bodyClass).map {
-            when (rule.body) {
+            when (rule.http.body) {
                 "*" -> it as MutableMessage<*, *>
                 else -> {
                     // Create request message partly with HTTP request body.
                     inputSupport.newMutable().apply {
-                        this[rule.body] = it
+                        this[rule.http.body] = it
                     }
                 }
             }
@@ -127,8 +122,9 @@ class TranscodingMethodRouterFunction private constructor(
 
     private fun prepareHeader(request: ServerRequest): Metadata {
         val header = Metadata()
-        val exporters = request.attributes()[TranscodingFunctions.HEADER_EXPORTER_ATTRIBUTE] as? List<TranscodingHeaderExporter>
-            ?: listOf()
+        val exporters =
+            request.attributes()[TranscodingFunctions.HEADER_EXPORTER_ATTRIBUTE] as? List<TranscodingHeaderExporter>
+                ?: listOf()
 
         for (exporter in exporters) {
             exporter.export(request, header)
@@ -137,21 +133,8 @@ class TranscodingMethodRouterFunction private constructor(
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(TranscodingMethodRouterFunction::class.java)
+        private val logger = LoggerFactory.getLogger(TranscodingHttpRouterFunction::class.java)
 
-        operator fun invoke(method: ServerMethodDefinition<*, *>): RouterFunction<ServerResponse>? {
-            // Just support transcoding for unary gRPC calls.
-            if (method.methodDescriptor.type != MethodDescriptor.MethodType.UNARY)
-                return null
-            // Ensure method proto registered.
-            val service = ProtoTypes.findServiceSupport(".${method.methodDescriptor.serviceName}")
-            val proto = service.descriptor.method.firstOrNull {
-                it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
-            } ?: return null
-            // Ensure http rule existed.
-            val httpRule = proto.options?.http ?: return null
-
-            return TranscodingMethodRouterFunction(method, proto, httpRule)
-        }
+        const val GRPC_SERVICE_NAME_HEADER = "grpc-service-name"
     }
 }

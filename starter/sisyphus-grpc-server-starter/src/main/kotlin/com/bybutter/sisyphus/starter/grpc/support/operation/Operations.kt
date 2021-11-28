@@ -16,7 +16,7 @@ import com.bybutter.sisyphus.rpc.StatusException
 class Operations(private val supports: Iterable<OperationSupport>) : Operations() {
     override suspend fun listOperations(input: ListOperationsRequest): ListOperationsResponse {
         for (repository in supports) {
-            if (!repository.supportOperationParent(input.name)) continue
+            if (!repository.operationName.matches("${input.name}/operations/-")) continue
 
             return repository.listOperations(input)
         }
@@ -27,7 +27,7 @@ class Operations(private val supports: Iterable<OperationSupport>) : Operations(
 
     override suspend fun getOperation(input: GetOperationRequest): Operation {
         for (repository in supports) {
-            if (!repository.supportOperation(input.name)) continue
+            if (!repository.operationName.matches(input.name)) continue
 
             return repository.getOperation(input)
         }
@@ -37,7 +37,7 @@ class Operations(private val supports: Iterable<OperationSupport>) : Operations(
 
     override suspend fun deleteOperation(input: DeleteOperationRequest): Empty {
         for (repository in supports) {
-            if (!repository.supportOperation(input.name)) continue
+            if (!repository.operationName.matches(input.name)) continue
 
             return repository.deleteOperation(input)
         }
@@ -47,7 +47,7 @@ class Operations(private val supports: Iterable<OperationSupport>) : Operations(
 
     override suspend fun cancelOperation(input: CancelOperationRequest): Empty {
         for (repository in supports) {
-            if (!repository.supportOperation(input.name)) continue
+            if (!repository.operationName.matches(input.name)) continue
 
             return repository.cancelOperation(input)
         }
@@ -57,7 +57,7 @@ class Operations(private val supports: Iterable<OperationSupport>) : Operations(
 
     override suspend fun waitOperation(input: WaitOperationRequest): Operation {
         for (repository in supports) {
-            if (!repository.supportOperation(input.name)) continue
+            if (!repository.operationName.matches(input.name)) continue
 
             return repository.waitOperation(input)
         }
