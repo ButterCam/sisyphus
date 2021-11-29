@@ -1,8 +1,10 @@
 package org.gradle.kotlin.dsl
 
+import com.bybutter.sisyphus.project.gradle.SisyphusExtension
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.attributes.Attribute
-import org.gradle.api.attributes.HasConfigurableAttributes
 
 enum class SisyphusDevelopmentLayer {
     /**
@@ -30,12 +32,27 @@ enum class SisyphusDevelopmentLayer {
     }
 }
 
-infix fun Dependency.layer(layer: SisyphusDevelopmentLayer): Dependency {
-    if (this is HasConfigurableAttributes<*>) {
-        this.attributes {
-            it.attribute(SisyphusDevelopmentLayer.attribute, layer)
+fun <T : Dependency?> Project.apiLayer(dependency: T): T {
+    return layer(dependency, SisyphusDevelopmentLayer.API)
+}
+
+fun <T : Dependency?> Project.platformLayer(dependency: T): T {
+    return layer(dependency, SisyphusDevelopmentLayer.PLATFORM)
+}
+
+fun <T : Dependency?> Project.frameworkLayer(dependency: T): T {
+    return layer(dependency, SisyphusDevelopmentLayer.FRAMEWORK)
+}
+
+fun <T : Dependency?> Project.layer(dependency: T, layer: SisyphusDevelopmentLayer): T {
+    val sisyphus = extensions.findByType(SisyphusExtension::class.java) ?: return dependency
+    if (!sisyphus.isDevelop) return dependency
+    if (sisyphus.layer.ordinal < layer.ordinal) return dependency
+
+    if (dependency is ExternalModuleDependency) {
+        dependency.version {
+            it.require(sisyphus.version)
         }
     }
-
-    return this
+    return dependency
 }
