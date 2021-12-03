@@ -73,19 +73,19 @@ open class SisyphusExtension(val project: Project) {
             ?: dependencyRepositories
         releaseRepositories =
             (project.findProperty("sisyphus.release.repositories") as? String)?.split(',')?.toMutableList()
-                ?: releaseRepositories
+            ?: releaseRepositories
         snapshotRepositories =
             (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
-                ?: snapshotRepositories
+            ?: snapshotRepositories
         dockerPublishRegistries =
             (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
-                ?: dockerPublishRegistries
+            ?: dockerPublishRegistries
 
         managedDependencies =
             (project.findProperty("sisyphus.dependency.overriding") as? String)?.split(',')?.associate {
-                val moduleStringNotation = ParsedModuleStringNotation(it, "")
-                "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
-            }?.toMutableMap() ?: managedDependencies
+            val moduleStringNotation = ParsedModuleStringNotation(it, "")
+            "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
+        }?.toMutableMap() ?: managedDependencies
 
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
 
