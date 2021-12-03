@@ -13,7 +13,7 @@ javaPlatform {
 
 dependencies {
     api(platform(project(":sisyphus-bom")))
-    api(platform("com.google.protobuf:protobuf-bom:3.19.0"))
+    api(platform("com.google.protobuf:protobuf-bom:3.19.1"))
     api(platform("io.grpc:grpc-bom:1.41.0"))
     api(platform("io.micrometer:micrometer-bom:1.7.5"))
     api(platform("org.apache.maven:maven:3.8.3"))
@@ -59,7 +59,7 @@ dependencies {
         api("org.jlleitschuh.gradle:ktlint-gradle:10.0.0")
         api("org.jooq:jooq:3.14.12")
         api("org.mongodb:mongodb-driver-reactivestreams:4.3.3")
-        api("org.reflections:reflections:0.9.12")
+        api("org.reflections:reflections:0.10.2")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.5.4")
     }
 }
