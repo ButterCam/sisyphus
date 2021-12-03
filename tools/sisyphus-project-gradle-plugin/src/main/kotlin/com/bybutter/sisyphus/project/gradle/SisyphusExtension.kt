@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.project.gradle
 
 import org.gradle.api.Project
+import org.gradle.api.internal.artifacts.dsl.ParsedModuleStringNotation
 import org.gradle.kotlin.dsl.SisyphusDevelopmentLayer
 
 open class SisyphusExtension(val project: Project) {
@@ -29,6 +30,8 @@ open class SisyphusExtension(val project: Project) {
     var snapshotRepositories: MutableList<String> = mutableListOf("snapshot")
 
     var dockerPublishRegistries: MutableList<String> = mutableListOf()
+
+    var managedDependencies: MutableMap<String, ParsedModuleStringNotation> = mutableMapOf()
 
     val signKeyName: String?
 
@@ -78,9 +81,16 @@ open class SisyphusExtension(val project: Project) {
             (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
             ?: dockerPublishRegistries
 
+        managedDependencies =
+            (project.findProperty("sisyphus.dependency.overriding") as? String)?.split(',')?.associate {
+            val moduleStringNotation = ParsedModuleStringNotation(it, "")
+            "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
+        }?.toMutableMap() ?: managedDependencies
+
         signKeyName = project.findProperty("signing.gnupg.keyName") as? String
 
-        layer = (project.findProperty("sisyphus.layer") as? String)?.let { SisyphusDevelopmentLayer.valueOf(it) } ?: SisyphusDevelopmentLayer.IMPLEMENTATION
+        layer = (project.findProperty("sisyphus.layer") as? String)?.let { SisyphusDevelopmentLayer.valueOf(it) }
+            ?: SisyphusDevelopmentLayer.IMPLEMENTATION
     }
 
     companion object {
