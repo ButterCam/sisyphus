@@ -18,8 +18,7 @@ import org.junit.platform.engine.discovery.FileSelector
 import org.junit.platform.engine.discovery.PackageSelector
 import org.junit.platform.engine.support.discovery.SelectorResolver
 import org.reflections.Reflections
-import org.reflections.scanners.ResourcesScanner
-import org.reflections.util.FilterBuilder
+import org.reflections.scanners.Scanners
 import java.io.File
 import java.io.InputStream
 import java.util.Optional
@@ -67,12 +66,9 @@ class SisyphusTestSelectorResolver : SelectorResolver {
 
     override fun resolve(selector: PackageSelector, context: SelectorResolver.Context): SelectorResolver.Resolution {
         return SelectorResolver.Resolution.selectors(
-            Reflections(selector.packageName, ResourcesScanner())
-                .getResources(
-                    FilterBuilder().include(".*_test.yaml")
-                        .include(".*_test.yml")
-                        .include(".*_test.json")
-                ).map { DiscoverySelectors.selectClasspathResource(it) }.toSet()
+            Reflections(selector.packageName, Scanners.Resources)
+                .getResources(""".*_test\.(yml|yaml|json)""".toPattern())
+                .map { DiscoverySelectors.selectClasspathResource(it) }.toSet()
         )
     }
 
@@ -140,7 +136,7 @@ class SisyphusTestSelectorResolver : SelectorResolver {
 
         val step = step {
             this.name = this.name.takeIf { it.isNotBlank() } ?: this.id.takeIf { it.isNotBlank() }
-                ?: "${parent.displayName} Step$index"
+                    ?: "${parent.displayName} Step$index"
             this.authority = this.authority.takeIf { it.isNotBlank() } ?: "localhost:9090"
         }
 
