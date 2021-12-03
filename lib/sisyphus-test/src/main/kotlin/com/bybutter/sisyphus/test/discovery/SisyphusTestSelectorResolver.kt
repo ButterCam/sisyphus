@@ -136,7 +136,7 @@ class SisyphusTestSelectorResolver : SelectorResolver {
 
         val step = step {
             this.name = this.name.takeIf { it.isNotBlank() } ?: this.id.takeIf { it.isNotBlank() }
-                    ?: "${parent.displayName} Step$index"
+                ?: "${parent.displayName} Step$index"
             this.authority = this.authority.takeIf { it.isNotBlank() } ?: "localhost:9090"
         }
 
