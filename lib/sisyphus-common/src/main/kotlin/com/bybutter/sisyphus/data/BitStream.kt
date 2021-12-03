@@ -50,7 +50,8 @@ class BitInputStream(private val source: InputStream) : InputStream() {
         loop@ for (i in 0 until bits) {
             when (read()) {
                 1 -> int = int or (1 shl (bits - i - 1))
-                0 -> int
+                0 -> {
+                }
                 else -> break@loop
             }
             read++

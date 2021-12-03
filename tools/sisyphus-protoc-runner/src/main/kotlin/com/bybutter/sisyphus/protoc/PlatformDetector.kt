@@ -90,7 +90,7 @@ object PlatformDetector {
     }
 
     private fun String.normalize(): String {
-        return this.toLowerCase(Locale.US).replace("[^a-z0-9]+".toRegex(), "")
+        return this.lowercase(Locale.US).replace("[^a-z0-9]+".toRegex(), "")
     }
 }
 
