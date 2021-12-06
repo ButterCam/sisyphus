@@ -16,11 +16,11 @@ dependencies {
     api(platform("com.google.protobuf:protobuf-bom:3.19.1"))
     api(platform("io.grpc:grpc-bom:1.41.0"))
     api(platform("io.micrometer:micrometer-bom:1.7.5"))
-    api(platform("org.apache.maven:maven:3.8.3"))
+    api(platform("org.apache.maven:maven:3.8.4"))
     api(platform("org.apache.rocketmq:rocketmq-all:4.9.1"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.5.21"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
-    api(platform("org.junit:junit-bom:5.8.1"))
+    api(platform("org.junit:junit-bom:5.8.2"))
     api(platform("org.springframework.boot:spring-boot-dependencies:2.5.4"))
     api(platform("com.fasterxml.jackson:jackson-bom:2.13.0"))
 
