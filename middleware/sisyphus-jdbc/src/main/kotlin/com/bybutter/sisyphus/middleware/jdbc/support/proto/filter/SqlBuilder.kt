@@ -17,7 +17,11 @@ fun interface Join {
     fun joinTable(step: SelectJoinStep<*>): SelectJoinStep<*>
 }
 
-fun interface JooqConditionSupplier : Supplier<Condition>
+interface UniqueJoin : Join {
+    val key: Any
+}
+
+fun interface ConditionSupplier : Supplier<Condition>
 
 abstract class SqlBuilder<T : Record> {
     abstract val runtime: FilterRuntime

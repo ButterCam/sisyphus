@@ -16,9 +16,9 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
         private set
 
     override fun select(dsl: DSLContext, expressions: List<Any?>): SelectConditionStep<T> {
-        val joins = expressions.filterIsInstance<Join>().distinctBy { it.javaClass }
+        val joins = expressions.filterIsInstance<Join>().distinctBy { (it as? UniqueJoin)?.key ?: it.javaClass }
         val conditions = expressions.mapNotNull {
-            if (it is JooqConditionSupplier) {
+            if (it is ConditionSupplier) {
                 it.get()
             } else {
                 it as? Condition
@@ -69,8 +69,16 @@ fun Condition.withJoin(join: Join): Join {
     return ConditionWithJoin(this, join)
 }
 
-private class ConditionWithJoin(private val condition: Condition, join: Join) : Join by join, JooqConditionSupplier {
+private class ConditionWithJoin(private val condition: Condition, private val join: Join) : UniqueJoin,
+    ConditionSupplier {
     override fun get(): Condition {
         return condition
     }
+
+    override fun joinTable(step: SelectJoinStep<*>): SelectJoinStep<*> {
+        return join.joinTable(step)
+    }
+
+    override val key: Any
+        get() = join.javaClass
 }

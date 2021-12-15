@@ -20,43 +20,43 @@ open class FilterStandardLibrary {
         return value.not()
     }
 
-    fun and(left: JooqConditionSupplier, right: Condition): Condition {
+    fun and(left: ConditionSupplier, right: Condition): Condition {
         return left.get().and(right)
     }
 
-    fun or(left: JooqConditionSupplier, right: Condition): Condition {
+    fun or(left: ConditionSupplier, right: Condition): Condition {
         return left.get().or(right)
     }
 
-    fun union(left: JooqConditionSupplier, right: Condition): Condition {
+    fun union(left: ConditionSupplier, right: Condition): Condition {
         return left.get().and(right)
     }
 
-    fun and(left: Condition, right: JooqConditionSupplier): Condition {
+    fun and(left: Condition, right: ConditionSupplier): Condition {
         return left.and(right.get())
     }
 
-    fun or(left: Condition, right: JooqConditionSupplier): Condition {
+    fun or(left: Condition, right: ConditionSupplier): Condition {
         return left.or(right.get())
     }
 
-    fun union(left: Condition, right: JooqConditionSupplier): Condition {
+    fun union(left: Condition, right: ConditionSupplier): Condition {
         return left.and(right.get())
     }
 
-    fun and(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
+    fun and(left: ConditionSupplier, right: ConditionSupplier): Condition {
         return left.get().and(right.get())
     }
 
-    fun or(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
+    fun or(left: ConditionSupplier, right: ConditionSupplier): Condition {
         return left.get().or(right.get())
     }
 
-    fun union(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
+    fun union(left: ConditionSupplier, right: ConditionSupplier): Condition {
         return left.get().and(right.get())
     }
 
-    fun not(value: JooqConditionSupplier): Condition {
+    fun not(value: ConditionSupplier): Condition {
         return value.get().not()
     }
 
