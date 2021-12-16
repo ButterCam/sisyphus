@@ -69,7 +69,8 @@ fun Condition.withJoin(join: Join): Join {
     return ConditionWithJoin(this, join)
 }
 
-private class ConditionWithJoin(private val condition: Condition, private val join: Join) : UniqueJoin,
+private class ConditionWithJoin(private val condition: Condition, private val join: Join) :
+    UniqueJoin,
     ConditionSupplier {
     override fun get(): Condition {
         return condition
