@@ -4,6 +4,34 @@ import org.jooq.Condition
 import org.jooq.Field
 
 open class FilterStandardLibrary {
+    fun and(left: SqlFilterPart, right: SqlFilterPart): SqlFilterPart {
+        return left.and(right)
+    }
+
+    fun or(left: SqlFilterPart, right: SqlFilterPart): SqlFilterPart {
+        return left.or(right)
+    }
+
+    fun not(value: SqlFilterPart): SqlFilterPart {
+        return value.not()
+    }
+
+    fun and(left: SqlFilterPart, right: Condition): SqlFilterPart {
+        return left.and(right.filterPart())
+    }
+
+    fun or(left: SqlFilterPart, right: Condition): SqlFilterPart {
+        return left.or(right.filterPart())
+    }
+
+    fun and(left: Condition, right: SqlFilterPart): SqlFilterPart {
+        return left.filterPart().and(right)
+    }
+
+    fun or(left: Condition, right: SqlFilterPart): SqlFilterPart {
+        return left.filterPart().or(right)
+    }
+
     fun and(left: Condition, right: Condition): Condition {
         return left.and(right)
     }
@@ -12,52 +40,8 @@ open class FilterStandardLibrary {
         return left.or(right)
     }
 
-    fun union(left: Condition, right: Condition): Condition {
-        return left.and(right)
-    }
-
     fun not(value: Condition): Condition {
         return value.not()
-    }
-
-    fun and(left: JooqConditionSupplier, right: Condition): Condition {
-        return left.get().and(right)
-    }
-
-    fun or(left: JooqConditionSupplier, right: Condition): Condition {
-        return left.get().or(right)
-    }
-
-    fun union(left: JooqConditionSupplier, right: Condition): Condition {
-        return left.get().and(right)
-    }
-
-    fun and(left: Condition, right: JooqConditionSupplier): Condition {
-        return left.and(right.get())
-    }
-
-    fun or(left: Condition, right: JooqConditionSupplier): Condition {
-        return left.or(right.get())
-    }
-
-    fun union(left: Condition, right: JooqConditionSupplier): Condition {
-        return left.and(right.get())
-    }
-
-    fun and(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
-        return left.get().and(right.get())
-    }
-
-    fun or(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
-        return left.get().or(right.get())
-    }
-
-    fun union(left: JooqConditionSupplier, right: JooqConditionSupplier): Condition {
-        return left.get().and(right.get())
-    }
-
-    fun not(value: JooqConditionSupplier): Condition {
-        return value.get().not()
     }
 
     fun lessOrEquals(left: Field<*>, right: Any): Condition {
@@ -86,19 +70,19 @@ open class FilterStandardLibrary {
         return (left as Field<Any>).notEqual(right)
     }
 
-    fun has(left: Any?, right: Any?): Any {
-        if (left !is Field<*>) throw TODO()
+    fun has(left: Field<*>, right: Any?): Condition {
         if (right == "*") return left.isNotNull
         return when (right) {
+            "*" -> left.isNotNull
+            null -> left.isNull
             is String -> {
                 if (right.contains('*')) {
                     left.like(right.replace('*', '%'))
                 } else {
-                    (left as Field<Any>).eq(right)
+                    equals(left, right)
                 }
             }
-            null -> left.isNull
-            else -> (left as Field<Any?>).eq(right)
+            else -> equals(left, right)
         }
     }
 }

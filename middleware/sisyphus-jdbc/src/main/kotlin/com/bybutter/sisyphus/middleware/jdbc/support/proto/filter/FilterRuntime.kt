@@ -5,6 +5,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.extensionReceiverParameter
+import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.javaMethod
@@ -17,6 +18,10 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
             if (memberFunction.javaMethod?.canAccess(std) != true) continue
             memberFunctions.getOrPut(memberFunction.name) { mutableListOf() } += memberFunction
         }
+    }
+
+    fun <R> register(function: String, block: Function<R>) {
+        memberFunctions.getOrPut(function) { mutableListOf() } += block as KFunction<*>
     }
 
     fun invoke(function: String, arguments: List<Any?>): Any? {
@@ -32,7 +37,11 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
             it.compatibleWith(arguments)
         } ?: return block()
         return try {
-            func.call(std, *arguments.toTypedArray())
+            if (func.instanceParameter == null) {
+                func.call(*arguments.toTypedArray())
+            } else {
+                func.call(std, *arguments.toTypedArray())
+            }
         } catch (ex: InvocationTargetException) {
             throw ex.cause ?: ex
         } catch (e: Exception) {

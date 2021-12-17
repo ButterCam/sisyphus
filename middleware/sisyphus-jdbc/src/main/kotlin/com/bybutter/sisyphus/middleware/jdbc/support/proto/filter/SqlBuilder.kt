@@ -5,19 +5,10 @@ import com.bybutter.sisyphus.protobuf.primitives.Duration
 import com.bybutter.sisyphus.protobuf.primitives.Timestamp
 import com.bybutter.sisyphus.protobuf.primitives.toLocalDateTime
 import com.bybutter.sisyphus.protobuf.primitives.toTime
-import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.SelectConditionStep
-import org.jooq.SelectJoinStep
 import java.util.concurrent.TimeUnit
-import java.util.function.Supplier
-
-fun interface Join {
-    fun joinTable(step: SelectJoinStep<*>): SelectJoinStep<*>
-}
-
-fun interface JooqConditionSupplier : Supplier<Condition>
 
 abstract class SqlBuilder<T : Record> {
     abstract val runtime: FilterRuntime

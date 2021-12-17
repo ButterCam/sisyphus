@@ -16,5 +16,6 @@ class JavaBaseProjectPlugin : Plugin<Project> {
 
         val extension = target.extensions.getByType(SisyphusExtension::class.java)
         target.repositories.applyFromRepositoryKeys(extension.repositories, extension.dependencyRepositories)
+        target.pluginManager.apply(JavaDependenciesReplacePlugin::class.java)
     }
 }

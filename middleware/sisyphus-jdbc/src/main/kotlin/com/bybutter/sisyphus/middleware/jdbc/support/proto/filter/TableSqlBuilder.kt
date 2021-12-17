@@ -16,14 +16,20 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
         private set
 
     override fun select(dsl: DSLContext, expressions: List<Any?>): SelectConditionStep<T> {
-        val joins = expressions.filterIsInstance<Join>()
         val conditions = expressions.mapNotNull {
-            if (it is JooqConditionSupplier) {
-                it.get()
-            } else {
-                it as? Condition
+            when (it) {
+                is SqlFilterPart -> it.condition
+                is Condition -> it
+                else -> null
             }
         }
+        val joins = expressions.flatMap {
+            when (it) {
+                is SqlFilterPart -> it.joins
+                is Join -> listOf(it)
+                else -> null
+            }
+        }.distinctBy { it.javaClass }
 
         return dsl.select().from(table).run {
             joins.fold(this as SelectJoinStep<*>) { step, join ->
@@ -56,8 +62,13 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
         this.runtime = runtime
     }
 
+    @Deprecated("Use func method to register custom function", ReplaceWith("func"))
     fun library(library: FilterStandardLibrary) {
         this.runtime = FilterRuntime(library)
+    }
+
+    fun <R> func(function: String, block: Function<R>) {
+        this.runtime.register(function, block)
     }
 }
 
@@ -65,12 +76,10 @@ fun <T : Record> sqlBuilder(table: Table<T>, block: TableSqlBuilder<T>.() -> Uni
     return TableSqlBuilder(table).apply(block)
 }
 
-class ConditionWithJoin(private val condition: Condition, join: Join) : Join by join, JooqConditionSupplier {
-    override fun get(): Condition {
-        return condition
-    }
+fun Condition.withJoin(join: Join): SqlFilterPart {
+    return SqlFilterPart(this, listOf(join))
 }
 
-fun Condition.withJoin(join: Join): ConditionWithJoin {
-    return ConditionWithJoin(this, join)
+fun Condition.filterPart(): SqlFilterPart {
+    return SqlFilterPart(this, listOf())
 }
