@@ -69,4 +69,3 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
         return true
     }
 }
-
