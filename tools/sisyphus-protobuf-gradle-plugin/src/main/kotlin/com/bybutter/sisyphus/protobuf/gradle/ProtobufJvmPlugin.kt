@@ -75,6 +75,12 @@ class ProtobufJvmPlugin : BaseProtobufPlugin() {
             kotlinTask.dependsOn(generateProtoTask(sourceSet.name))
         }
 
+        val processResourcesTask = project.tasks.findByName(sourceSet.processResourcesTaskName)
+        if (extension.autoGenerating && processResourcesTask != null) {
+            processResourcesTask.dependsOn(generateProtoTask(sourceSet.name))
+            processResourcesTask.dependsOn(extractProtoTask(sourceSet.name))
+        }
+
         project.extensions.findByType(IdeaModel::class.java)?.apply {
             module.sourceDirs = module.sourceDirs + protoSrc(sourceSet.name)
             module.generatedSourceDirs.add(outDir(sourceSet.name))

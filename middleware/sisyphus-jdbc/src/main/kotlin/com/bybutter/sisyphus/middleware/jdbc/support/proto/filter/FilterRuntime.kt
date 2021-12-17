@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.middleware.jdbc.support.proto.filter
 
+import com.bybutter.sisyphus.reflect.LambdaFunction
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -21,7 +22,7 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
     }
 
     fun <R> register(function: String, block: Function<R>) {
-        memberFunctions.getOrPut(function) { mutableListOf() } += block as KFunction<*>
+        memberFunctions.getOrPut(function) { mutableListOf() } += LambdaFunction(block)
     }
 
     fun invoke(function: String, arguments: List<Any?>): Any? {
