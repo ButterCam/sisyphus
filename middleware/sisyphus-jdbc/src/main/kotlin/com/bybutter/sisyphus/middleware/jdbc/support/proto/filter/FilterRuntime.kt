@@ -77,6 +77,14 @@ class LambdaFunction<R>(private val function: Function<R>) : KFunction<R> by fun
     override val arity: Int
         get() = (function as kotlin.jvm.internal.FunctionBase<R>).arity
 
+    override fun call(vararg args: Any?): R {
+        return invoke(*args)
+    }
+
+    override fun callBy(args: Map<KParameter, Any?>): R {
+        TODO()
+    }
+
     override fun invoke(vararg args: Any?): R {
         return when (args.size) {
             0 -> (function as Function0<R>).invoke()
@@ -366,4 +374,10 @@ class LambdaFunction<R>(private val function: Function<R>) : KFunction<R> by fun
             else -> (function as FunctionN<R>).invoke(*args)
         }
     }
+}
+
+fun main() {
+    val test : () -> Unit = {}
+    val t = LambdaFunction(test)
+    t.invoke()
 }
