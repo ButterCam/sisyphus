@@ -27,7 +27,7 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
             when (it) {
                 is SqlFilterPart -> it.joins
                 is Join -> listOf(it)
-                else -> null
+                else -> listOf()
             }
         }.distinctBy { it.javaClass }
 
