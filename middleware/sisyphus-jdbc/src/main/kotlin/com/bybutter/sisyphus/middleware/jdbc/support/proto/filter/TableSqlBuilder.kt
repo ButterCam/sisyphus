@@ -62,13 +62,8 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
         this.runtime = runtime
     }
 
-    @Deprecated("Use func method to register custom function", ReplaceWith("func"))
     fun library(library: FilterStandardLibrary) {
         this.runtime = FilterRuntime(library)
-    }
-
-    fun <R> func(function: String, block: Function<R>) {
-        this.runtime.register(function, block)
     }
 }
 
