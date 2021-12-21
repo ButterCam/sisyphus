@@ -19,6 +19,7 @@ import org.junit.platform.engine.discovery.PackageSelector
 import org.junit.platform.engine.support.discovery.SelectorResolver
 import org.reflections.Reflections
 import org.reflections.scanners.Scanners
+import org.reflections.util.ConfigurationBuilder
 import java.io.File
 import java.io.InputStream
 import java.util.Optional
@@ -66,7 +67,7 @@ class SisyphusTestSelectorResolver : SelectorResolver {
 
     override fun resolve(selector: PackageSelector, context: SelectorResolver.Context): SelectorResolver.Resolution {
         return SelectorResolver.Resolution.selectors(
-            Reflections(selector.packageName, Scanners.Resources)
+            Reflections(ConfigurationBuilder().forPackages(selector.packageName).addScanners(Scanners.Resources))
                 .getResources(""".*_test\.(yml|yaml|json)""".toPattern())
                 .map { DiscoverySelectors.selectClasspathResource(it) }.toSet()
         )
