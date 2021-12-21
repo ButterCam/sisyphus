@@ -7,6 +7,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry
 import io.github.resilience4j.retrofit.CircuitBreakerCallAdapter
 import okhttp3.OkHttpClient
 import org.reflections.Reflections
+import org.reflections.util.ConfigurationBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBeansOfType
@@ -45,7 +46,7 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
 
         // Obtain the class with RetrofitClient annotation under the specified path through reflection.
         val classes = basePackageNames.fold(mutableSetOf<Class<*>>()) { acc, s ->
-            acc.addAll(Reflections(s).getTypesAnnotatedWith(RetrofitClient::class.java))
+            acc.addAll(Reflections(ConfigurationBuilder().forPackages(s)).getTypesAnnotatedWith(RetrofitClient::class.java))
             acc
         }
 

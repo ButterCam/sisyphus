@@ -19,6 +19,7 @@ class LambdaFunction<R>(private val function: Function<R>) : KFunction<R> by fun
         TODO()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun invoke(vararg args: Any?): R {
         return when (args.size) {
             0 -> (function as Function0<R>).invoke()
