@@ -1,1 +1,1 @@
-com.bybutter.sisyphus.middleware.grpc.RemoteClientRepository
+com.bybutter.sisyphus.middleware.grpc.property.PropertyClientRepository

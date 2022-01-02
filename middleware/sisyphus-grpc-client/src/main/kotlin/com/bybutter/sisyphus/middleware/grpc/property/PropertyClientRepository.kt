@@ -1,8 +1,12 @@
-package com.bybutter.sisyphus.middleware.grpc
+package com.bybutter.sisyphus.middleware.grpc.property
 
+import com.bybutter.sisyphus.middleware.grpc.ChannelBuilderInterceptor
+import com.bybutter.sisyphus.middleware.grpc.ClientBuilderInterceptor
+import com.bybutter.sisyphus.middleware.grpc.ClientRegistrar
+import com.bybutter.sisyphus.middleware.grpc.ClientRepository
+import com.bybutter.sisyphus.middleware.grpc.ManagedChannelLifecycle
 import com.bybutter.sisyphus.rpc.CallOptionsInterceptor
 import com.bybutter.sisyphus.spring.BeanUtils
-import io.grpc.CallOptions
 import io.grpc.ClientInterceptor
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.getBean
@@ -11,7 +15,7 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.core.env.Environment
 
-class RemoteClientRepository : ClientRepository {
+class PropertyClientRepository : ClientRepository {
 
     override var order: Int = Int.MAX_VALUE - 1000
 
@@ -37,7 +41,7 @@ class RemoteClientRepository : ClientRepository {
                 val client = getClientFromService(service)
                 val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
                     interceptStub(
-                        createGrpcClient(client, channel, optionsInterceptors.values, CallOptions.DEFAULT),
+                        createGrpcClient(client, channel, optionsInterceptors.values, property.options),
                         builderInterceptors.values,
                         clientInterceptors.values
                     )
