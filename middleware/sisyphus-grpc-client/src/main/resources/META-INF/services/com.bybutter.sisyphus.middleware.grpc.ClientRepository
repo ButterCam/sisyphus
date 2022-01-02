@@ -1,1 +1,2 @@
 com.bybutter.sisyphus.middleware.grpc.property.PropertyClientRepository
+com.bybutter.sisyphus.middleware.grpc.proxy.ProxyClientRepository
