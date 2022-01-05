@@ -11,6 +11,8 @@ import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.findEnumSupport
 import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
+import com.bybutter.sisyphus.protobuf.primitives.toAny
+import com.bybutter.sisyphus.protobuf.primitives.toMessage
 
 interface DynamicField<T> {
     fun descriptor(): FieldDescriptorProto
@@ -45,9 +47,13 @@ interface DynamicField<T> {
                     FieldDescriptorProto.Type.BOOL -> RepeatedBooleanDynamicField(descriptor)
                     FieldDescriptorProto.Type.STRING -> RepeatedStringDynamicField(descriptor)
                     FieldDescriptorProto.Type.GROUP -> TODO()
-                    FieldDescriptorProto.Type.MESSAGE -> RepeatedMessageDynamicField<Message<*, *>>(
-                        descriptor
-                    )
+                    FieldDescriptorProto.Type.MESSAGE -> {
+                        if (descriptor.typeName == com.bybutter.sisyphus.protobuf.primitives.Any.name) {
+                            RepeatedAnyDynamicField(descriptor)
+                        } else {
+                            RepeatedMessageDynamicField<Message<*, *>>(descriptor)
+                        }
+                    }
                     FieldDescriptorProto.Type.BYTES -> RepeatedBytesDynamicField(descriptor)
                     FieldDescriptorProto.Type.UINT32 -> RepeatedUInt32DynamicField(descriptor)
                     FieldDescriptorProto.Type.ENUM -> RepeatedEnumDynamicField<ProtoEnum<*>>(
@@ -70,9 +76,13 @@ interface DynamicField<T> {
                     FieldDescriptorProto.Type.BOOL -> BooleanDynamicField(descriptor)
                     FieldDescriptorProto.Type.STRING -> StringDynamicField(descriptor)
                     FieldDescriptorProto.Type.GROUP -> TODO()
-                    FieldDescriptorProto.Type.MESSAGE -> MessageDynamicField<Message<*, *>>(
-                        descriptor
-                    )
+                    FieldDescriptorProto.Type.MESSAGE -> {
+                        if (descriptor.typeName == com.bybutter.sisyphus.protobuf.primitives.Any.name) {
+                            AnyDynamicField(descriptor)
+                        } else {
+                            MessageDynamicField<Message<*, *>>(descriptor)
+                        }
+                    }
                     FieldDescriptorProto.Type.BYTES -> BytesDynamicField(descriptor)
                     FieldDescriptorProto.Type.UINT32 -> UInt32DynamicField(descriptor)
                     FieldDescriptorProto.Type.ENUM -> EnumDynamicField<ProtoEnum<*>>(descriptor)
@@ -714,6 +724,51 @@ class RepeatedMessageDynamicField<T : Message<T, *>>(
     override fun read(reader: Reader, field: Int, wire: Int) {
         if (wire == WireType.LENGTH_DELIMITED.ordinal) {
             get() += support.parse(reader, reader.int32())
+        } else {
+            reader.skip(WireType.valueOf(wire))
+        }
+    }
+}
+
+class AnyDynamicField(
+    descriptor: FieldDescriptorProto
+) : AbstractDynamicField<Message<*, *>?>(descriptor) {
+    override var value: Message<*, *>? = defaultValue()
+
+    override fun defaultValue(): Message<*, *>? {
+        return null
+    }
+
+    override fun writeTo(writer: Writer) {
+        if (has()) {
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
+                .message(value?.toAny())
+        }
+    }
+
+    override fun read(reader: Reader, field: Int, wire: Int) {
+        if (wire == WireType.LENGTH_DELIMITED.ordinal) {
+            set(com.bybutter.sisyphus.protobuf.primitives.Any.parse(reader, reader.int32()).toMessage())
+        } else {
+            reader.skip(WireType.valueOf(wire))
+        }
+    }
+}
+
+class RepeatedAnyDynamicField(
+    descriptor: FieldDescriptorProto
+) : AbstractRepeatedDynamicField<Message<*, *>>(descriptor) {
+
+    override fun writeTo(writer: Writer) {
+        for (value in get()) {
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
+                .message(value.toAny())
+        }
+    }
+
+    override fun read(reader: Reader, field: Int, wire: Int) {
+        if (wire == WireType.LENGTH_DELIMITED.ordinal) {
+            get() += com.bybutter.sisyphus.protobuf.primitives.Any.parse(reader, reader.int32()).toMessage()
         } else {
             reader.skip(WireType.valueOf(wire))
         }
