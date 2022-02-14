@@ -36,6 +36,22 @@ internal fun JsonWriter.fields(value: Message<*, *>) {
     }
 }
 
+internal fun JsonWriter.safeLong(value: Long) {
+    if (value in Int.MIN_VALUE..Int.MAX_VALUE) {
+        value(value)
+    } else {
+        value(value.toString())
+    }
+}
+
+internal fun JsonWriter.safeULong(value: ULong) {
+    if (value <= UInt.MAX_VALUE) {
+        value(value)
+    } else {
+        value(value.toString())
+    }
+}
+
 internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
     if (value == null) return nullValue()
     if (value is CustomProtoType<*>) return field(value.value(), field)
@@ -55,9 +71,9 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
         FieldDescriptorProto.Type.FLOAT -> value(value as Float)
         FieldDescriptorProto.Type.SFIXED64,
         FieldDescriptorProto.Type.SINT64,
-        FieldDescriptorProto.Type.INT64 -> value(value as Long)
+        FieldDescriptorProto.Type.INT64 -> safeLong(value as Long)
         FieldDescriptorProto.Type.FIXED64,
-        FieldDescriptorProto.Type.UINT64 -> value(value as ULong)
+        FieldDescriptorProto.Type.UINT64 -> safeULong(value as ULong)
         FieldDescriptorProto.Type.SFIXED32,
         FieldDescriptorProto.Type.SINT32,
         FieldDescriptorProto.Type.INT32 -> value(value as Int)

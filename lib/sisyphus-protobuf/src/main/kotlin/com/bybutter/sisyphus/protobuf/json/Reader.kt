@@ -207,7 +207,11 @@ internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
                 nil()
                 NullValue.NULL_VALUE
             } else {
-                ProtoReflection.findEnumSupport(field.typeName).invoke(string())
+                when (peek()) {
+                    JsonToken.STRING -> ProtoReflection.findEnumSupport(field.typeName).invoke(string())
+                    JsonToken.NUMBER -> ProtoReflection.findEnumSupport(field.typeName).invoke(int())
+                    else -> TODO()
+                }
             }
         }
         FieldDescriptorProto.Type.MESSAGE -> {
