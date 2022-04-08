@@ -50,7 +50,11 @@ class GsonReader(val reader: com.google.gson.stream.JsonReader) : JsonReader {
     }
 
     override fun long(): Long {
-        if (bufferedPeek() == com.google.gson.stream.JsonToken.NUMBER) return numberValue!!.toLong() else TODO()
+        return when (bufferedPeek()) {
+            com.google.gson.stream.JsonToken.NUMBER -> numberValue!!.toLong()
+            com.google.gson.stream.JsonToken.STRING -> stringValue!!.toLong()
+            else -> TODO()
+        }
     }
 
     override fun float(): Float {

@@ -18,27 +18,27 @@ class JacksonReader(private val parser: JsonParser) : JsonReader {
     }
 
     override fun string(): String {
-        return parser.text
+        return parser.valueAsString
     }
 
     override fun int(): Int {
-        return parser.intValue
+        return parser.valueAsInt
     }
 
     override fun long(): Long {
-        return parser.longValue
+        return parser.valueAsLong
     }
 
     override fun float(): Float {
-        return parser.floatValue
+        return parser.valueAsDouble.toFloat()
     }
 
     override fun double(): Double {
-        return parser.doubleValue
+        return parser.valueAsDouble
     }
 
     override fun bool(): Boolean {
-        return parser.booleanValue
+        return parser.valueAsBoolean
     }
 
     override fun skipChildren() {

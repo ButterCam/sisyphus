@@ -34,7 +34,7 @@ message TestStep {
   // of [TestStep] and [TestResult] will be invalid id.
   string id = 1;
 
-  // Display title of test step, it will be [name] if not set.
+  // Display title of test step, it will be [id] if not set.
   string name = 2;
 
   // CEL script for determining whether to execute the step.
@@ -52,7 +52,7 @@ message TestStep {
   // The input of method.
   google.protobuf.Any input = 6;
 
-  // CEL script for preparing metadata.
+  // CEL script for preparing input.
   // Using current [TestStep] as context of CEL executing.
   // In addition, you can use name of test step to get [TestResult] struct
   // of test steps which have been executed before.

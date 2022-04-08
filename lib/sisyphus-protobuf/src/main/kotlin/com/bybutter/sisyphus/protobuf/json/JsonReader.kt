@@ -43,7 +43,7 @@ interface JsonReader {
     fun int(): Int
 
     /**
-     * Ensure pointer at [JsonToken.NUMBER] and get the long value, this operation
+     * Ensure pointer at [JsonToken.NUMBER] or [JsonToken.STRING] and get the long value, this operation
      * will not advance the pointer.
      */
     fun long(): Long
@@ -57,7 +57,7 @@ interface JsonReader {
     }
 
     /**
-     * Ensure pointer at [JsonToken.NUMBER] and get the ulong value, this operation
+     * Ensure pointer at [JsonToken.NUMBER] or [JsonToken.STRING] and get the ulong value, this operation
      * will not advance the pointer.
      */
     fun ulong(): ULong {

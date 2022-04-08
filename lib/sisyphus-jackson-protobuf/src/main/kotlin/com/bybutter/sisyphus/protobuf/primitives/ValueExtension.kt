@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.protobuf.primitives
 
+import com.bybutter.sisyphus.jackson.toJson
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 
@@ -52,4 +53,9 @@ fun String.toBooleanOrNull(): Boolean? {
     } else {
         null
     }
+}
+
+fun main() {
+    val t = DescriptorProto.file().descriptor.toJson()
+    t
 }
