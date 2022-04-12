@@ -24,10 +24,9 @@ class CoroutineExecuteHintContext :
     fun wrapSql(sql: String): String {
         val used = mutableSetOf<String>()
         var result = sql
-        while (hints.isNotEmpty()) {
-            val hint = hints.pop()
-            if (used.add(hint.key())) {
-                result = hint.wrapSql(result)
+        hints.toList().reversed().forEach {
+            if (used.add(it.key())) {
+                result = it.wrapSql(result)
             }
         }
         return result
