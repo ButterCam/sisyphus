@@ -14,7 +14,7 @@ javaPlatform {
 dependencies {
     api(platform(project(":sisyphus-bom")))
     api(platform("com.google.protobuf:protobuf-bom:3.19.1"))
-    api(platform("io.grpc:grpc-bom:1.41.0"))
+    api(platform("io.grpc:grpc-bom:1.45.1"))
     api(platform("io.micrometer:micrometer-bom:1.7.5"))
     api(platform("org.apache.maven:maven:3.8.3"))
     api(platform("org.apache.rocketmq:rocketmq-all:4.9.1"))
@@ -47,7 +47,7 @@ dependencies {
         api("com.squareup:kotlinpoet:1.10.2")
         api("io.github.resilience4j:resilience4j-retrofit:1.7.1")
         api("io.github.resilience4j:resilience4j-circuitbreaker:1.7.1")
-        api("io.grpc:grpc-kotlin-stub:1.2.0")
+        api("io.grpc:grpc-kotlin-stub:1.2.1")
         api("io.kubernetes:client-java:13.0.1")
         api("io.swagger.core.v3:swagger-core:2.1.11")
         api("org.antlr:antlr4:4.9.2")
