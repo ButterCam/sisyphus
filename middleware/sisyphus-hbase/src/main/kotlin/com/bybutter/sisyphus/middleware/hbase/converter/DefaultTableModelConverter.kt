@@ -9,6 +9,7 @@ import com.bybutter.sisyphus.middleware.hbase.TableModelConverter
 import com.bybutter.sisyphus.middleware.hbase.ValueConverter
 import com.bybutter.sisyphus.middleware.hbase.annotation.HColumn
 import com.bybutter.sisyphus.middleware.hbase.getDefaultValueConverter
+import com.bybutter.sisyphus.reflect.instance
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition
 import org.apache.hadoop.hbase.client.Result
@@ -25,8 +26,8 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
         }
     }
 
-    override fun convertBack(value: T): Map<ByteArray, Map<ByteArray, ByteArray>> {
-        val map = mutableMapOf<ByteArrayHashingWrapper, MutableMap<ByteArrayHashingWrapper, ByteArray>>()
+    override fun convertBack(value: T): Map<ByteArray, Map<ByteArray, ByteArray?>> {
+        val map = mutableMapOf<ByteArrayHashingWrapper, MutableMap<ByteArrayHashingWrapper, ByteArray?>>()
 
         for (it in beanDescription.findProperties()) {
             writeByteArrayValue(value, listOf(), it, map)
@@ -60,7 +61,7 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
             }
         }
         val converter: ValueConverter<Any>? = (
-            converterType?.java?.newInstance()
+            converterType?.instance()
                 ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>
             ) as? ValueConverter<Any>
 
@@ -75,7 +76,7 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
             converter ?: throw IllegalArgumentException("Can't convert byte array to type '${returnType.typeName}'.")
             property.setter.callOnWith(
                 instance,
-                map[name]?.get(qualifier)?.firstEntry()?.value?.let { converter.convertBack(it) }
+                map[name]?.get(qualifier)?.firstEntry()?.value?.takeIf { it.isNotEmpty() }?.let { converter.convertBack(it) }
             )
             return
         }
@@ -84,7 +85,7 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
             converter ?: throw IllegalArgumentException("Can't convert byte array to type '${returnType.typeName}'.")
             property.setter.callOnWith(
                 instance,
-                map[pre[0]]?.get(name)?.firstEntry()?.value?.let { converter.convertBack(it) }
+                map[pre[0]]?.get(name)?.firstEntry()?.value?.takeIf { it.isNotEmpty() }?.let { converter.convertBack(it) }
             )
             return
         }
@@ -103,7 +104,7 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
         instance: Any,
         pre: List<ByteArray>,
         property: BeanPropertyDefinition,
-        map: MutableMap<ByteArrayHashingWrapper, MutableMap<ByteArrayHashingWrapper, ByteArray>>
+        map: MutableMap<ByteArrayHashingWrapper, MutableMap<ByteArrayHashingWrapper, ByteArray?>>
     ) {
         val returnType = property.getter.type
         val propertyColumnInfo = property.getter?.getAnnotation(HColumn::class.java)
@@ -123,10 +124,10 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
                 it
             }
         }
-        val converter: ValueConverter<Any>? = (
-            converterType?.java?.newInstance()
+        val converter: ValueConverter<Any?>? = (
+            converterType?.instance()
                 ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>
-            ) as? ValueConverter<Any>
+            ) as? ValueConverter<Any?>
 
         if (qualifier != null && pre.isNotEmpty()) {
             throw IllegalArgumentException("Set qualifier for three level property.")
@@ -137,29 +138,22 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
 
         if (qualifier != null) {
             converter ?: throw IllegalArgumentException("Can't convert byte array to type '${returnType.typeName}'.")
-            property.getter.callOn(instance)?.let {
-                map.trySet(name.hashWrapper(), qualifier.hashWrapper(), converter.convert(it))
-            }
+            map.trySet(name.hashWrapper(), qualifier.hashWrapper(), property.getter.callOn(instance)?.let { converter.convert(it) })
             return
         }
 
         if (pre.isNotEmpty()) {
             converter ?: throw IllegalArgumentException("Can't convert byte array to type '${returnType.typeName}'.")
-            property.getter.callOn(instance)?.let {
-                map.trySet(pre[0].hashWrapper(), name.hashWrapper(), converter.convert(it))
-            }
+            map.trySet(pre[0].hashWrapper(), name.hashWrapper(), property.getter.callOn(instance)?.let { converter.convert(it) })
             return
         }
 
-        property.getter.callOn(instance)?.apply {
-            for (it in returnType.beanDescription.findProperties()) {
-                writeByteArrayValue(this, listOf(name), it, map)
-            }
+        for (it in returnType.beanDescription.findProperties()) {
+            writeByteArrayValue(property.getter.callOn(instance), listOf(name), it, map)
         }
     }
 
-    private fun <T1, T2, T3> MutableMap<T1, MutableMap<T2, T3>>.trySet(key1: T1, key2: T2, value: T3?) {
-        value ?: return
+    private fun <T1, T2, T3> MutableMap<T1, MutableMap<T2, T3>>.trySet(key1: T1, key2: T2, value: T3) {
         if (this.containsKey(key1)) {
             this[key1]?.set(key2, value)
         } else {
