@@ -11,7 +11,7 @@ import org.apache.hadoop.hbase.client.Result
 interface TableModelConverter<T> {
     fun convert(value: Result): T
 
-    fun convertBack(value: T): Map<ByteArray, Map<ByteArray, ByteArray>>
+    fun convertBack(value: T): Map<ByteArray, Map<ByteArray, ByteArray?>>
 }
 
 internal inline fun <reified T> getDefaultTableModelConverter(): TableModelConverter<T>? where T : DtoModel {
