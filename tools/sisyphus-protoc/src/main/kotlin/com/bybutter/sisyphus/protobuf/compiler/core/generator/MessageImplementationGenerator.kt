@@ -713,28 +713,28 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                 )
                 message -> addStatement(
                     "writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            WireFormat.WIRETYPE_LENGTH_DELIMITED
-                        )
+                    makeTag(
+                        state.descriptor.descriptor.number,
+                        WireFormat.WIRETYPE_LENGTH_DELIMITED
+                    )
                     }).${if (any) "any" else "message"}(this.%N)",
                     state.descriptor.name()
                 )
                 proto3Optional -> addStatement(
                     "this.%N?.let{ writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            type.wireType
-                        )
+                    makeTag(
+                        state.descriptor.descriptor.number,
+                        type.wireType
+                    )
                     }).$writeMethod(it) }",
                     state.descriptor.name()
                 )
                 else -> addStatement(
                     "writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            type.wireType
-                        )
+                    makeTag(
+                        state.descriptor.descriptor.number,
+                        type.wireType
+                    )
                     }).$writeMethod(this.%N)",
                     state.descriptor.name()
                 )
