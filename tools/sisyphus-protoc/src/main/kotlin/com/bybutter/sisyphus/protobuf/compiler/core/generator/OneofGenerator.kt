@@ -35,6 +35,8 @@ import com.squareup.kotlinpoet.buildCodeBlock
 class OneofInterfaceGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
     override fun generate(state: MessageInterfaceGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
+            if (oneof.proto3Optional()) continue
+
             state.target.property(
                 oneof.fieldName(),
                 oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true)
@@ -93,6 +95,8 @@ class OneofKindTypeBasicGenerator : GroupedGenerator<OneofKindTypeGeneratingStat
 class OneofMutableInterfaceGenerator : GroupedGenerator<MutableMessageInterfaceGeneratingState> {
     override fun generate(state: MutableMessageInterfaceGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
+            if (oneof.proto3Optional()) continue
+
             state.target.property(
                 oneof.fieldName(),
                 oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true)
@@ -108,6 +112,8 @@ class OneofMutableInterfaceGenerator : GroupedGenerator<MutableMessageInterfaceG
 class OneofImplementationGenerator : GroupedGenerator<MessageImplementationGeneratingState> {
     override fun generate(state: MessageImplementationGeneratingState): Boolean {
         for (oneof in state.descriptor.oneofs) {
+            if (oneof.proto3Optional()) continue
+
             state.target.property(
                 oneof.fieldName(),
                 oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true)
@@ -128,6 +134,7 @@ class OneofFieldImplementationInterceptorGenerator :
     override val order: Int = -1000
 
     override fun generate(state: FieldImplementationGeneratingState): Boolean {
+        if (state.descriptor.descriptor.proto3Optional) return false
         val oneOf = state.descriptor.oneof() ?: return false
 
         state.target.property(state.descriptor.name(), state.descriptor.mutableFieldType()) {
