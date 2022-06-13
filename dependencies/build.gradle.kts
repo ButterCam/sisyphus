@@ -16,7 +16,7 @@ dependencies {
     api(platform("com.google.protobuf:protobuf-bom:3.19.1"))
     api(platform("io.grpc:grpc-bom:1.45.1"))
     api(platform("io.micrometer:micrometer-bom:1.7.5"))
-    api(platform("org.apache.maven:maven:3.8.3"))
+    api(platform("org.apache.maven:maven:3.8.6"))
     api(platform("org.apache.rocketmq:rocketmq-all:4.9.1"))
     api(platform("org.jetbrains.kotlin:kotlin-bom:1.5.21"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
