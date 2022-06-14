@@ -16,7 +16,8 @@ data class RetrofitProperty(
     val clientBuilderInterceptors: List<Class<out OkHttpClientBuilderInterceptor>>? = null,
     val enableCircuitBreaker: Boolean? = null,
     @NestedConfigurationProperty
-    val circuitBreakerProperty: CircuitBreakerProperty? = null
+    val circuitBreakerProperty: CircuitBreakerProperty? = null,
+    val extensions: Map<String, Any> = mapOf()
 )
 
 /**

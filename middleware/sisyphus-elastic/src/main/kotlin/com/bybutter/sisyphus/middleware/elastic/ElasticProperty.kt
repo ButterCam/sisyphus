@@ -8,7 +8,8 @@ data class ElasticProperty(
     val host: String,
     val port: Int,
     val userName: String? = null,
-    val password: String? = null
+    val password: String? = null,
+    val extensions: Map<String, Any> = mapOf()
 )
 
 data class ElasticProperties(

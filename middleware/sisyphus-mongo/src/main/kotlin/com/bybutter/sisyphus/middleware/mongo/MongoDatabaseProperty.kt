@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty
 
 data class MongoDatabaseProperty(
     val url: String,
-    val publicUrl: String,
-    val qualifier: Class<*>
+    val qualifier: Class<*>,
+    val extensions: Map<String, Any> = mapOf()
 )
 
 data class MongoDatabaseProperties(
