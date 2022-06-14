@@ -643,6 +643,7 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                 state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED
             val optional =
                 state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL
+            val proto3Optional = state.descriptor.descriptor.proto3Optional
             val type = WireFormat.FieldType.values()[state.descriptor.descriptor.type.ordinal]
             val packed = repeated && type.isPackable
             val writeMethod = type.name.lowercase()
@@ -717,6 +718,15 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                         WireFormat.WIRETYPE_LENGTH_DELIMITED
                     )
                     }).${if (any) "any" else "message"}(this.%N)",
+                    state.descriptor.name()
+                )
+                proto3Optional -> addStatement(
+                    "this.%N?.let{ writer.tag(${
+                    makeTag(
+                        state.descriptor.descriptor.number,
+                        type.wireType
+                    )
+                    }).$writeMethod(it) }",
                     state.descriptor.name()
                 )
                 else -> addStatement(

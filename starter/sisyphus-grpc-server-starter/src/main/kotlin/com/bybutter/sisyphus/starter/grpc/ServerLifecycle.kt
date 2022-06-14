@@ -22,6 +22,7 @@ class ServerLifecycle(private val shutdown: Shutdown, private vararg val servers
             it.start()
         }
         running = true
+        startDaemonAwaitThread()
         logger.info("Running gRPC server via netty on port: ${servers.firstOrNull()?.port}")
     }
 
@@ -49,6 +50,14 @@ class ServerLifecycle(private val shutdown: Shutdown, private vararg val servers
             else -> {
                 stop()
                 callback.run()
+            }
+        }
+    }
+
+    private fun startDaemonAwaitThread() {
+        thread(name = "grpc-deamon") {
+            servers.forEach {
+                it.awaitTermination()
             }
         }
     }

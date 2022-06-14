@@ -61,6 +61,10 @@ fun DescriptorNode<DescriptorProtos.FieldDescriptorProto>.defaultValue(): CodeBl
         add("mutableListOf()")
         return@buildCodeBlock
     }
+    if (descriptor.proto3Optional) {
+        add("null")
+        return@buildCodeBlock
+    }
 
     when (descriptor.type) {
         DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE -> add("0.0")
@@ -127,6 +131,9 @@ fun DescriptorNode<DescriptorProtos.FieldDescriptorProto>.fieldType(): TypeName 
         }
         DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL -> {
             if (descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE) {
+                return elementType().copy(true)
+            }
+            if (descriptor.proto3Optional) {
                 return elementType().copy(true)
             }
             return elementType()

@@ -6,5 +6,6 @@ data class GrpcChannelProperty(
     val name: String,
     val target: String,
     val services: Set<Class<*>>,
-    val options: CallOptions = CallOptions.DEFAULT
+    val options: CallOptions = CallOptions.DEFAULT,
+    val extensions: Map<String, Any> = mapOf()
 )

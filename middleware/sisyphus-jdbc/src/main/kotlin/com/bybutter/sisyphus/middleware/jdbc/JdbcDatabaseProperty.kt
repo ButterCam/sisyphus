@@ -12,6 +12,7 @@ data class JdbcDatabaseProperty(
     val poolConfig: ConnectionPoolProperty? = null,
     val qualifier: Class<*>,
     val dialect: SQLDialect? = null,
+    val extensions: Map<String, Any> = mapOf()
 )
 
 data class ConnectionPoolProperty(

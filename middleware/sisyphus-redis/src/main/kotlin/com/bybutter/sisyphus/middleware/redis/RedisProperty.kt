@@ -7,7 +7,8 @@ data class RedisProperty(
     val host: String,
     val port: Int,
     val password: String,
-    val database: Int = 0
+    val database: Int = 0,
+    val extensions: Map<String, Any> = mapOf()
 )
 
 data class RedisProperties(

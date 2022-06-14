@@ -12,7 +12,8 @@ data class MessageQueueProperty(
     val vhost: String,
     val exchange: String?,
     val queue: String?,
-    val confirmType: CachingConnectionFactory.ConfirmType?
+    val confirmType: CachingConnectionFactory.ConfirmType?,
+    val extensions: Map<String, Any> = mapOf()
 )
 
 data class MessageQueueProperties(

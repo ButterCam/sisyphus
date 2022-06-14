@@ -110,47 +110,76 @@ class MessageImplementationFieldBasicGenerator : GroupedGenerator<FieldImplement
 
         when (state.descriptor.descriptor.label) {
             DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL -> {
-                state.target.property("_${state.descriptor.hasFunction()}", Boolean::class.java.asTypeName()) {
-                    this += KModifier.PRIVATE
-                    mutable()
-                    initializer("false")
-                }
+                val fieldType = state.descriptor.mutableFieldType()
 
-                state.target.property(state.descriptor.name(), state.descriptor.mutableFieldType()) {
-                    this += KModifier.OVERRIDE
-                    mutable()
-                    initializer(state.descriptor.defaultValue())
-                    getter {
-                        addStatement(
-                            "return if(_${state.descriptor.hasFunction()}) field else %L",
-                            state.descriptor.defaultValue()
-                        )
-                    }
-                    setter {
-                        addParameter("value", state.descriptor.mutableFieldType())
-                        addStatement("field = value")
-                        if (state.descriptor.mutableFieldType().isNullable) {
-                            addStatement("_${state.descriptor.hasFunction()} = value != null")
-                        } else {
-                            addStatement("_${state.descriptor.hasFunction()} = true")
+                if (fieldType.isNullable) {
+                    state.target.property(state.descriptor.name(), state.descriptor.mutableFieldType()) {
+                        this += KModifier.OVERRIDE
+                        mutable()
+                        initializer("null")
+                        setter {
+                            addParameter("value", state.descriptor.mutableFieldType())
+                            addStatement("field = value")
                         }
                     }
-                }
 
-                state.target.function(state.descriptor.hasFunction()) {
-                    this += KModifier.OVERRIDE
-                    returns(Boolean::class.java)
-                    addStatement("return _${state.descriptor.hasFunction()}")
-                }
+                    state.target.function(state.descriptor.hasFunction()) {
+                        this += KModifier.OVERRIDE
+                        returns(Boolean::class.java)
+                        addStatement("return %N != null", state.descriptor.name())
+                    }
 
-                state.target.function(state.descriptor.clearFunction()) {
-                    this += KModifier.OVERRIDE
-                    returns(state.descriptor.fieldType().copy(true))
-                    addStatement("if (!${state.descriptor.hasFunction()}()) return null")
-                    beginControlFlow("return %N.also", state.descriptor.name())
-                    addStatement("%N = %L", state.descriptor.name(), state.descriptor.defaultValue())
-                    addStatement("_${state.descriptor.hasFunction()} = false")
-                    endControlFlow()
+                    state.target.function(state.descriptor.clearFunction()) {
+                        this += KModifier.OVERRIDE
+                        returns(state.descriptor.fieldType().copy(true))
+                        addStatement("if (!${state.descriptor.hasFunction()}()) return null")
+                        beginControlFlow("return %N.also", state.descriptor.name())
+                        addStatement("%N = null", state.descriptor.name())
+                        endControlFlow()
+                    }
+                } else {
+                    state.target.property("_${state.descriptor.hasFunction()}", Boolean::class.java.asTypeName()) {
+                        this += KModifier.PRIVATE
+                        mutable()
+                        initializer("false")
+                    }
+
+                    state.target.property(state.descriptor.name(), state.descriptor.mutableFieldType()) {
+                        this += KModifier.OVERRIDE
+                        mutable()
+                        initializer(state.descriptor.defaultValue())
+                        getter {
+                            addStatement(
+                                "return if(_${state.descriptor.hasFunction()}) field else %L",
+                                state.descriptor.defaultValue()
+                            )
+                        }
+                        setter {
+                            addParameter("value", state.descriptor.mutableFieldType())
+                            addStatement("field = value")
+                            if (state.descriptor.mutableFieldType().isNullable) {
+                                addStatement("_${state.descriptor.hasFunction()} = value != null")
+                            } else {
+                                addStatement("_${state.descriptor.hasFunction()} = true")
+                            }
+                        }
+                    }
+
+                    state.target.function(state.descriptor.hasFunction()) {
+                        this += KModifier.OVERRIDE
+                        returns(Boolean::class.java)
+                        addStatement("return _${state.descriptor.hasFunction()}")
+                    }
+
+                    state.target.function(state.descriptor.clearFunction()) {
+                        this += KModifier.OVERRIDE
+                        returns(state.descriptor.fieldType().copy(true))
+                        addStatement("if (!${state.descriptor.hasFunction()}()) return null")
+                        beginControlFlow("return %N.also", state.descriptor.name())
+                        addStatement("%N = %L", state.descriptor.name(), state.descriptor.defaultValue())
+                        addStatement("_${state.descriptor.hasFunction()} = false")
+                        endControlFlow()
+                    }
                 }
             }
             DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED -> {
