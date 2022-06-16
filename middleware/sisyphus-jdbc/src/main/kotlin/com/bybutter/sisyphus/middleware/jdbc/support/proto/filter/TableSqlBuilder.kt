@@ -47,15 +47,19 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
     }
 
     fun field(member: String, field: Any?, converter: ((Any?) -> Any?)? = null) {
+        val camelCaseMember = toCamelCase(member)
         fieldMapping[member] = field
-        fieldMapping[member.toCamelCase()] = field
+        fieldMapping[camelCaseMember] = field
         converter?.let {
-            converters[member] = converter
+            converters[member] = it
+            converters[camelCaseMember] = it
         }
     }
 
     fun converter(member: String, converter: (Any?) -> (Any?)) {
+        val camelCaseMember = toCamelCase(member)
         converters[member] = converter
+        converters[camelCaseMember] = converter
     }
 
     fun runtime(runtime: FilterRuntime) {
@@ -64,6 +68,10 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
 
     fun library(library: FilterStandardLibrary) {
         this.runtime = FilterRuntime(library)
+    }
+
+    private fun toCamelCase(field: String): String {
+        return field.split(".").map { it.toCamelCase() }.joinToString(".")
     }
 }
 
