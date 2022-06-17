@@ -49,7 +49,7 @@ dependencies {
         api("org.apache.maven.wagon:wagon-http:3.5.1")
         api("org.eclipse.jgit:org.eclipse.jgit:6.2.0.202206071550-r")
         api("org.gradle.kotlin:plugins:1.3.6")
-        api("org.jetbrains.kotlin:kotlin-allopen:1.6.21")
+        api("org.jetbrains.kotlin:kotlin-allopen:1.7.0")
         api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
         api("org.jlleitschuh.gradle:ktlint-gradle:10.3.0")
         api("org.jooq:jooq:3.16.6")
