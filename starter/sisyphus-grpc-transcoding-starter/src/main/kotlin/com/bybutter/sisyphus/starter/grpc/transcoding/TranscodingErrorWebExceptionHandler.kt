@@ -23,10 +23,10 @@ import org.springframework.web.reactive.function.server.router
 @Suppress("LeakingThis")
 class TranscodingErrorWebExceptionHandler(
     errorAttributes: ErrorAttributes,
-    resourceProperties: WebProperties.Resources,
+    properties: WebProperties,
     applicationContext: ApplicationContext,
     serverCodecConfigurer: ServerCodecConfigurer
-) : AbstractErrorWebExceptionHandler(errorAttributes, resourceProperties, applicationContext) {
+) : AbstractErrorWebExceptionHandler(errorAttributes, properties.resources, applicationContext) {
 
     init {
         // Safe for use `this` in init function, because the handler is a [Component] and just spring need it be open.

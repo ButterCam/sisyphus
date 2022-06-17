@@ -31,7 +31,7 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
             }
         }.distinctBy { it.javaClass }
 
-        return dsl.select().from(table).run {
+        return dsl.select(*table.fields()).from(table).run {
             joins.fold(this as SelectJoinStep<*>) { step, join ->
                 join.joinTable(step)
             }
