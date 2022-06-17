@@ -50,7 +50,7 @@ dependencies {
         api("org.eclipse.jgit:org.eclipse.jgit:6.2.0.202206071550-r")
         api("org.gradle.kotlin:plugins:1.3.6")
         api("org.jetbrains.kotlin:kotlin-allopen:1.6.21")
-        api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
+        api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0")
         api("org.jlleitschuh.gradle:ktlint-gradle:10.3.0")
         api("org.jooq:jooq:3.16.6")
         api("org.mongodb:mongodb-driver-reactivestreams:4.6.1")
