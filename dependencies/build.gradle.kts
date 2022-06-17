@@ -39,7 +39,7 @@ dependencies {
         api("com.salesforce.servicelibs:rxgrpc-stub:1.2.3")
         api("com.squareup.okhttp3:okhttp:4.10.0")
         api("com.squareup.retrofit2:retrofit:2.9.0")
-        api("com.squareup:kotlinpoet:1.11.0")
+        api("com.squareup:kotlinpoet:1.12.0")
         api("io.github.resilience4j:resilience4j-retrofit:1.7.1")
         api("io.github.resilience4j:resilience4j-circuitbreaker:1.7.1")
         api("io.grpc:grpc-kotlin-stub:1.3.0")
