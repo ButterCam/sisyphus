@@ -48,5 +48,9 @@ pluginBundle {
         "sisyphus" {
             tags = listOf("sisyphus", "project")
         }
+
+        "sisyphus-deploy" {
+            tags = listOf("sisyphus", "deploy")
+        }
     }
 }
