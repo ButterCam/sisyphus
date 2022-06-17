@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.impl.DSL.field
+import org.jooq.impl.DSL.name
 import org.jooq.impl.DSL.table
 import org.jooq.impl.SQLDataType
 import org.junit.jupiter.api.Assertions
@@ -104,8 +105,8 @@ class TransactionTest {
     }
 
     private fun createUser(dsl: DSLContext, name: String) {
-        dsl.insertInto(table("USER"))
-            .set(field("NAME", String::class.java), name)
+        dsl.insertInto(userTable)
+            .set(nameField, name)
             .execute()
     }
 
@@ -118,8 +119,8 @@ class TransactionTest {
     }
 
     private fun getUser(dsl: DSLContext, name: String): Record? {
-        return dsl.selectFrom(table("USER"))
-            .where(field("NAME", String::class.java).eq(name))
+        return dsl.selectFrom(userTable)
+            .where(nameField.eq(name))
             .fetchOne()
     }
 
@@ -136,10 +137,14 @@ class TransactionTest {
     }
 
     private fun initializeTable(dsl: DSLContext) {
-        dsl.dropTableIfExists("USER").execute()
-        dsl.createTable("USER")
-            .column("ID", SQLDataType.INTEGER.identity(true))
-            .column("NAME", SQLDataType.VARCHAR.length(64))
+        dsl.dropTableIfExists(userTable).execute()
+        dsl.createTable(userTable)
+            .column(idField)
+            .column(nameField)
             .execute()
     }
+
+    private val userTable = table(name("user"))
+    private val nameField = field(name("user", "name"), String::class.java)
+    private val idField = field(name("user", "id"), SQLDataType.INTEGER.identity(true))
 }
