@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf.json
 import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoEnum
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.bybutter.sisyphus.security.base64
 import com.bybutter.sisyphus.security.base64WithPadding
 
 interface JsonWriter {
