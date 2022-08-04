@@ -4,6 +4,7 @@ import com.bybutter.sisyphus.dsl.filtering.grammar.FilterParser
 import com.bybutter.sisyphus.string.toCamelCase
 import org.jooq.Condition
 import org.jooq.DSLContext
+import org.jooq.Field
 import org.jooq.Record
 import org.jooq.SelectConditionStep
 import org.jooq.SelectJoinStep
@@ -15,7 +16,17 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
     final override var runtime: FilterRuntime = FilterRuntime()
         private set
 
-    override fun select(dsl: DSLContext, expressions: List<Any?>): SelectConditionStep<T> {
+    override fun buildSelect(
+        dsl: DSLContext,
+        expressions: List<Any?>,
+        vararg fields: Field<*>
+    ): SelectConditionStep<T> {
+        val selectedFields = if (fields.isEmpty()) {
+            table.fields()
+        } else {
+            fields
+        }
+
         val conditions = expressions.mapNotNull {
             when (it) {
                 is SqlFilterPart -> it.condition
@@ -31,7 +42,7 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
             }
         }.distinctBy { it.javaClass }
 
-        return dsl.select(*table.fields()).from(table).run {
+        return dsl.select(*selectedFields).from(table).run {
             joins.fold(this as SelectJoinStep<*>) { step, join ->
                 join.joinTable(step)
             }
