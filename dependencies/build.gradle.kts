@@ -35,7 +35,7 @@ dependencies {
         api("com.netflix.nebula:gradle-contacts-plugin:6.0.0")
         api("com.netflix.nebula:gradle-info-plugin:11.3.3")
         api("com.netflix.nebula:nebula-publishing-plugin:18.4.0")
-        api("com.palantir.gradle.docker:gradle-docker:0.33.0")
+        api("com.palantir.gradle.docker:gradle-docker:0.34.0")
         api("com.salesforce.servicelibs:rxgrpc-stub:1.2.3")
         api("com.squareup.okhttp3:okhttp:4.10.0")
         api("com.squareup.retrofit2:retrofit:2.9.0")
