@@ -9,6 +9,7 @@ interface RocketMqResourceFactory {
     fun createConsumer(
         consumerProperty: RocketMqConsumerProperty,
         metadata: MessageConsumer,
-        listener: MessageListener<*>
+        listener: MessageListener<*>,
+        loggers: List<RocketMqLogger>
     ): MQConsumer
 }

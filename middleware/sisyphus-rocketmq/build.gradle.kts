@@ -11,4 +11,5 @@ dependencies {
 
     api(Dependencies.rocketMq)
     implementation(Dependencies.rocketMqAcl)
+    compileOnly("org.springframework.boot:spring-boot-starter-actuator")
 }

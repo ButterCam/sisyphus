@@ -4,9 +4,11 @@ import com.bybutter.sisyphus.middleware.rocketmq.ConsumerLifecycle
 import com.bybutter.sisyphus.middleware.rocketmq.MessageConsumer
 import com.bybutter.sisyphus.middleware.rocketmq.MessageListener
 import com.bybutter.sisyphus.middleware.rocketmq.RocketMqConsumerProperty
+import com.bybutter.sisyphus.middleware.rocketmq.RocketMqLogger
 import com.bybutter.sisyphus.middleware.rocketmq.RocketMqProducerProperty
 import com.bybutter.sisyphus.middleware.rocketmq.RocketMqProperties
 import com.bybutter.sisyphus.middleware.rocketmq.RocketMqResourceFactory
+import com.bybutter.sisyphus.spring.BeanUtils
 import org.apache.rocketmq.client.producer.MQProducer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition
@@ -82,10 +84,16 @@ class RocketMqRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
 
             val consumerName = "$BEAN_NAME_PREFIX:${listener}Consumer"
             val consumerDefinition = BeanDefinitionBuilder.genericBeanDefinition(SmartLifecycle::class.java) {
+                val addedLogger = mutableSetOf<String>()
+                val loggers = BeanUtils.getSortedBeans(beanFactory, RocketMqLogger::class.java).values.mapNotNull {
+                    if (it.id.isNotEmpty() && addedLogger.contains(it.id)) return@mapNotNull null
+                    addedLogger += it.id
+                    it
+                }
                 val listener = beanFactory.getBean<MessageListener<*>>(listener)
                 ConsumerLifecycle(
                     beanFactory.getBean(RocketMqResourceFactory::class.java)
-                        .createConsumer(consumer, annotation, listener)
+                        .createConsumer(consumer, annotation, listener, loggers)
                         .also {
                             logger.info("RocketMQ listener (${annotation.groupId}) registered on topic '${annotation.topic}(${annotation.filter})'.")
                         },

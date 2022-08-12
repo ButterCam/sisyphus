@@ -7,6 +7,7 @@ import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.core.env.PropertiesPropertySource
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.Properties
 
 /**
@@ -21,7 +22,7 @@ class GradlePropertiesProvider : EnvironmentPostProcessor {
     private fun registerRootGradleProperties(environment: ConfigurableEnvironment) {
         registerProperties(
             "rootGradleProperties",
-            Path.of(System.getProperty("user.home"), ".gradle", GRADLE_PROPERTIES),
+            Paths.get(System.getProperty("user.home"), ".gradle", GRADLE_PROPERTIES),
             environment
         )
     }
@@ -29,7 +30,7 @@ class GradlePropertiesProvider : EnvironmentPostProcessor {
     private fun registerWorkspaceGradleProperties(environment: ConfigurableEnvironment) {
         registerProperties(
             "rootGradleProperties",
-            Path.of(System.getProperty("user.dir"), GRADLE_PROPERTIES),
+            Paths.get(System.getProperty("user.dir"), GRADLE_PROPERTIES),
             environment
         )
     }

@@ -15,6 +15,7 @@ include("lib:sisyphus-test")
 include("tools:sisyphus-protoc")
 include("tools:sisyphus-project-gradle-plugin")
 include("tools:sisyphus-protobuf-gradle-plugin")
+include("tools:sisyphus-k8s-gradle-plugin")
 include("tools:sisyphus-api-linter-runner")
 include("tools:sisyphus-protoc-runner")
 

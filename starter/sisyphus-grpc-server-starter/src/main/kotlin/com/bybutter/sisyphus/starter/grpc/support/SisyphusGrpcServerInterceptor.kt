@@ -29,6 +29,7 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
         val addedLogger = mutableSetOf<String>()
         loggers.mapNotNull {
             if (it.id.isNotEmpty() && addedLogger.contains(it.id)) return@mapNotNull null
+            addedLogger += it.id
             it
         }
     }

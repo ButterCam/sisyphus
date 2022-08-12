@@ -45,7 +45,8 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
     override fun createConsumer(
         consumerProperty: RocketMqConsumerProperty,
         metadata: MessageConsumer,
-        listener: MessageListener<*>
+        listener: MessageListener<*>,
+        loggers: List<RocketMqLogger>
     ): MQConsumer {
         val listener = listener as MessageListener<Any?>
         val hook = if (consumerProperty.aclAccessKey != null && consumerProperty.aclSecretKey != null) {
@@ -84,32 +85,39 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
             when (metadata.type) {
                 ConsumerType.ORDERLY -> {
                     this.registerMessageListener { msgs: MutableList<MessageExt>, context: ConsumeOrderlyContext ->
+                        val start = System.nanoTime()
                         try {
                             runBlocking(Dispatchers.IO) {
                                 listener.consumeMessage(msgs.map { converter.convert(it) })
                             }
+                            loggers.forEach {
+                                it.log(metadata.topic, metadata.groupId, listener, msgs, System.nanoTime() - start, null)
+                            }
                             ConsumeOrderlyStatus.SUCCESS
                         } catch (e: Exception) {
-                            listenerLogger.error(
-                                "Consume message '${msgs.firstOrNull()?.msgId}' with exception on topic '${context.messageQueue.topic}'",
-                                e
-                            )
+                            loggers.forEach {
+                                it.log(metadata.topic, metadata.groupId, listener, msgs, System.nanoTime() - start, e)
+                            }
                             ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT
                         }
                     }
                 }
+
                 ConsumerType.CONCURRENTLY -> {
                     this.registerMessageListener { msgs: MutableList<MessageExt>, context: ConsumeConcurrentlyContext ->
+                        val start = System.nanoTime()
                         try {
                             runBlocking(Dispatchers.IO) {
                                 listener.consumeMessage(msgs.map { converter.convert(it) })
                             }
+                            loggers.forEach {
+                                it.log(metadata.topic, metadata.groupId, listener, msgs, System.nanoTime() - start, null)
+                            }
                             ConsumeConcurrentlyStatus.CONSUME_SUCCESS
                         } catch (e: Exception) {
-                            listenerLogger.error(
-                                "Consume message '${msgs.firstOrNull()?.msgId}' with exception on topic '${context.messageQueue.topic}'",
-                                e
-                            )
+                            loggers.forEach {
+                                it.log(metadata.topic, metadata.groupId, listener, msgs, System.nanoTime() - start, e)
+                            }
                             ConsumeConcurrentlyStatus.RECONSUME_LATER
                         }
                     }

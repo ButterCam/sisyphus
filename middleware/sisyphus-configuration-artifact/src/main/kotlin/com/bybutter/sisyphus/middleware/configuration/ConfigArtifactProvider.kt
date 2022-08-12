@@ -88,6 +88,6 @@ class ConfigArtifactProvider : EnvironmentPostProcessor, ApplicationListener<App
     companion object {
         private val aether = Aether()
 
-        private val logger = DeferredLog()
+        val logger = DeferredLog()
     }
 }
