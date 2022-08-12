@@ -29,13 +29,6 @@ gradlePlugin {
             description = "Easy configure develop environment for project based on sisyphus framework."
             implementationClass = "com.bybutter.sisyphus.project.gradle.SisyphusProjectPlugin"
         }
-
-        create("sisyphus-deploy") {
-            id = "com.bybutter.sisyphus.deploy"
-            displayName = "Sisyphus Deploy Plugin"
-            description = "Deploy sisyphus project to environments."
-            implementationClass = "com.bybutter.sisyphus.project.gradle.SisyphusDeployPlugin"
-        }
     }
 }
 
@@ -47,10 +40,6 @@ pluginBundle {
     (plugins) {
         "sisyphus" {
             tags = listOf("sisyphus", "project")
-        }
-
-        "sisyphus-deploy" {
-            tags = listOf("sisyphus", "deploy")
         }
     }
 }
