@@ -4,8 +4,10 @@ import org.springframework.beans.factory.config.YamlPropertiesFactoryBean
 import org.springframework.core.env.PropertiesPropertySource
 import org.springframework.core.env.PropertySource
 import org.springframework.core.io.FileUrlResource
+import java.net.JarURLConnection
 import java.net.URL
 import java.util.Properties
+import kotlin.io.path.Path
 
 abstract class ConfigFormatFilePropertyExporter : FileConfigPropertyExporter() {
     abstract val names: Collection<String>
@@ -28,6 +30,14 @@ abstract class ConfigFormatFilePropertyExporter : FileConfigPropertyExporter() {
     }
 
     override fun read(url: URL): PropertySource<*>? {
+        when (val connection = url.openConnection()) {
+            is JarURLConnection -> {
+                ConfigArtifactProvider.logger.info("Load config '${connection.entryName}' from artifact '${Path(connection.jarFile.name).fileName}'")
+            }
+            else -> {
+                ConfigArtifactProvider.logger.info("Load config from $url")
+            }
+        }
         return when {
             url.path.endsWith(".properties") -> readFromProperties(url)
             url.path.endsWith(".yaml") || url.path.endsWith(".yml") -> readFromYaml(url)
