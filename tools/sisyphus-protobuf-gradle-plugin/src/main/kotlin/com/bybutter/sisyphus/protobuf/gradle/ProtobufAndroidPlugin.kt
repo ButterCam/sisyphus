@@ -88,7 +88,7 @@ class ProtobufAndroidPlugin : BaseProtobufPlugin() {
         generateProtoTask(variant.name)
 
         if (extension.autoGenerating) {
-            val kotlinTask = project.tasks.findByName(compileKotlinTaskName(variant.name)) as? SourceTask
+            val kotlinTask = project.tasks.findByName(compileKotlinTaskName(variant.name))
             kotlinTask?.dependsOn(generateProtoTask(variant.name))
             variant.processJavaResourcesProvider.configure {
                 it.dependsOn(generateProtoTask(variant.name))

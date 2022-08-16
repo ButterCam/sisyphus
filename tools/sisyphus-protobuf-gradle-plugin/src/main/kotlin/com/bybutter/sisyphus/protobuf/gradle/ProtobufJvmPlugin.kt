@@ -70,7 +70,7 @@ class ProtobufJvmPlugin : BaseProtobufPlugin() {
     }
 
     private fun afterApplySourceSet(sourceSet: SourceSet) {
-        val kotlinTask = project.tasks.findByName(compileKotlinTaskName(sourceSet.name)) as? SourceTask
+        val kotlinTask = project.tasks.findByName(compileKotlinTaskName(sourceSet.name))
         if (extension.autoGenerating && kotlinTask != null) {
             kotlinTask.dependsOn(generateProtoTask(sourceSet.name))
         }
