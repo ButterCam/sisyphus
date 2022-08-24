@@ -3,6 +3,7 @@ package com.bybutter.sisyphus.starter.grpc
 import com.bybutter.sisyphus.longrunning.OperationSupport
 import com.bybutter.sisyphus.middleware.grpc.RpcServiceImpl
 import com.bybutter.sisyphus.spring.BeanUtils
+import com.bybutter.sisyphus.starter.grpc.support.health.v1.HealthService
 import com.bybutter.sisyphus.starter.grpc.support.operation.Operations
 import com.bybutter.sisyphus.starter.grpc.support.reflection.ReflectionService
 import com.bybutter.sisyphus.starter.grpc.support.reflection.ReflectionServiceAlpha
@@ -104,8 +105,12 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
         builder.addService(Operations(operationSupports.values.toList()))
         builder.addService(ReflectionServiceAlpha())
         builder.addService(ReflectionService())
+        val healthService = HealthService()
+        builder.addService(healthService)
 
-        return builder.build()
+        return builder.build().apply {
+            healthService.initServer(this)
+        }
     }
 
     companion object {

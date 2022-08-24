@@ -132,10 +132,16 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
             if (!method.descriptor.clientStreaming) {
                 state.target.function(method.name()) {
                     this += KModifier.INLINE
-                    if (returnEmpty) {
-                        returns(RuntimeTypes.COMPLETABLE)
-                    } else {
-                        returns(RuntimeTypes.SINGLE.parameterizedBy(method.outputMessage().className()))
+                    when {
+                        returnEmpty -> {
+                            returns(RuntimeTypes.COMPLETABLE)
+                        }
+                        method.descriptor.serverStreaming -> {
+                            returns(RuntimeTypes.FLOWABLE.parameterizedBy(method.outputMessage().className()))
+                        }
+                        else -> {
+                            returns(RuntimeTypes.SINGLE.parameterizedBy(method.outputMessage().className()))
+                        }
                     }
 
                     addParameter("block", LambdaTypeName.get(method.inputMessage().mutableClassName(), listOf(), UNIT))

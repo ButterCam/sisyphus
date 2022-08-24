@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf.gradle
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.SourceTask
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
 class ProtobufJvmPlugin : BaseProtobufPlugin() {
@@ -70,7 +69,7 @@ class ProtobufJvmPlugin : BaseProtobufPlugin() {
     }
 
     private fun afterApplySourceSet(sourceSet: SourceSet) {
-        val kotlinTask = project.tasks.findByName(compileKotlinTaskName(sourceSet.name)) as? SourceTask
+        val kotlinTask = project.tasks.findByName(compileKotlinTaskName(sourceSet.name))
         if (extension.autoGenerating && kotlinTask != null) {
             kotlinTask.dependsOn(generateProtoTask(sourceSet.name))
         }
