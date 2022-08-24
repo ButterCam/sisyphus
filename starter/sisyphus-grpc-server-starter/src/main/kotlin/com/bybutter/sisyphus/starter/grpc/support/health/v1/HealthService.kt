@@ -10,7 +10,7 @@ class HealthService : Health() {
     private var server: Server? = null
 
     fun initServer(server: Server) {
-        if(this.server != null && this.server != server)
+        if (this.server != null && this.server != server)
             throw IllegalArgumentException("Server is already set")
         this.server = server
     }
@@ -22,9 +22,11 @@ class HealthService : Health() {
     }
 
     override fun watch(input: HealthCheckRequest): Flow<HealthCheckResponse> = flow {
-        emit(HealthCheckResponse {
-            status = checkService(input.service) ?: throw StatusException(Code.UNIMPLEMENTED)
-        })
+        emit(
+            HealthCheckResponse {
+                status = checkService(input.service) ?: throw StatusException(Code.UNIMPLEMENTED)
+            }
+        )
     }
 
     private fun checkService(service: String): HealthCheckResponse.ServingStatus? {

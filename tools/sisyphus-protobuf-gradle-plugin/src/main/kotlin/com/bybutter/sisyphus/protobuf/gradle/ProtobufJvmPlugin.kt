@@ -3,7 +3,6 @@ package com.bybutter.sisyphus.protobuf.gradle
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.SourceTask
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
 class ProtobufJvmPlugin : BaseProtobufPlugin() {

@@ -4,7 +4,6 @@ import com.android.build.api.dsl.AndroidSourceSet
 import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.SourceTask
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
 class ProtobufAndroidPlugin : BaseProtobufPlugin() {

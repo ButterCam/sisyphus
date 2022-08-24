@@ -20,5 +20,5 @@ protobuf {
         "io.grpc.reflection.v1" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1",
         "io.grpc.reflection.v1alpha" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha",
         "io.grpc.health.v1" to "com.bybutter.sisyphus.starter.grpc.support.health.v1",
-        )
+    )
 }
