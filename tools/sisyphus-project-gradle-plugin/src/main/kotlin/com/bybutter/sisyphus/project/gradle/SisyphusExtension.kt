@@ -2,49 +2,78 @@ package com.bybutter.sisyphus.project.gradle
 
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.dsl.ParsedModuleStringNotation
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.SisyphusDevelopmentLayer
 
 open class SisyphusExtension(val project: Project) {
-    var version: String
+    val developer: Property<String> = project.objects.property(String::class.java)
 
-    val isDevelop: Boolean
+    val layer: Property<SisyphusDevelopmentLayer> =
+        project.objects.property(SisyphusDevelopmentLayer::class.java).value(SisyphusDevelopmentLayer.IMPLEMENTATION)
 
-    val layer: SisyphusDevelopmentLayer
+    val repositories: MapProperty<String, Repository> =
+        project.objects.mapProperty(String::class.java, Repository::class.java).empty()
 
-    val isSnapshot: Boolean
-        get() {
-            return version.endsWith("-SNAPSHOT")
-        }
+    val dependencyRepositories: ListProperty<String> =
+        project.objects.listProperty(String::class.java).value(listOf("local", "central", "portal", "google"))
 
-    val isRelease: Boolean
-        get() {
-            return !isSnapshot
-        }
+    val releaseRepositories: ListProperty<String> =
+        project.objects.listProperty(String::class.java).value(listOf("release"))
 
-    var repositories: MutableMap<String, Repository> = hashMapOf()
+    val snapshotRepositories: ListProperty<String> =
+        project.objects.listProperty(String::class.java).value(listOf("snapshot"))
 
-    var dependencyRepositories: MutableList<String> = mutableListOf("local", "central", "portal", "google")
+    val dockerPublishRegistries: ListProperty<String> = project.objects.listProperty(String::class.java).empty()
 
-    var releaseRepositories: MutableList<String> = mutableListOf("release")
-
-    var snapshotRepositories: MutableList<String> = mutableListOf("snapshot")
-
-    var dockerPublishRegistries: MutableList<String> = mutableListOf()
-
-    var managedDependencies: MutableMap<String, ParsedModuleStringNotation> = mutableMapOf()
-
-    val signKeyName: String?
+    val managedDependencies: MapProperty<String, ParsedModuleStringNotation> =
+        project.objects.mapProperty(String::class.java, ParsedModuleStringNotation::class.java).empty()
 
     init {
-        val developer: String? = project.findProperty("sisyphus.developer") as? String
-        isDevelop = developer != null
+        developer.set(project.findProperty("sisyphus.developer") as? String)
+        for (key in project.properties.keys) {
+            val result = repositoryUrlRegex.matchEntire(key) ?: continue
+            val repositoryName = result.groupValues[1]
+
+            val url = project.findProperty("sisyphus.repositories.$repositoryName.url") as? String ?: continue
+            val username = project.findProperty("sisyphus.repositories.$repositoryName.username") as? String
+            val password = project.findProperty("sisyphus.repositories.$repositoryName.password") as? String
+
+            repositories.put(repositoryName, Repository(url, username, password))
+        }
+
+        (project.findProperty("sisyphus.dependency.repositories") as? String)?.split(',')?.let {
+            dependencyRepositories.set(it)
+        }
+        (project.findProperty("sisyphus.release.repositories") as? String)?.split(',')?.let {
+            releaseRepositories.set(it)
+        }
+        (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.let {
+            snapshotRepositories.set(it)
+        }
+        (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.let {
+            dockerPublishRegistries.set(it)
+        }
+        (project.findProperty("sisyphus.dependency.overriding") as? String)?.split(',')?.associate {
+            val moduleStringNotation = ParsedModuleStringNotation(it, "")
+            "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
+        }?.let {
+            managedDependencies.set(it)
+        }
+        (project.findProperty("sisyphus.layer") as? String)?.let { SisyphusDevelopmentLayer.valueOf(it) }?.let {
+            layer.set(it)
+        }
+    }
+
+    fun recommendVersion(): String? {
         val branchName: String? = System.getenv("BRANCH_NAME")
         val githubRef: String? = System.getenv("GITHUB_REF")
         val tagName: String? = System.getenv("TAG_NAME")
         val buildVersion: String? = System.getenv("BUILD_VERSION")
 
-        version = when {
-            developer != null -> "$developer-SNAPSHOT"
+        return when {
+            !developer.orNull.isNullOrEmpty() -> "${developer.get()}-SNAPSHOT"
             buildVersion != null -> "$buildVersion"
             tagName != null -> "$tagName"
             branchName != null -> "$branchName-SNAPSHOT"
@@ -54,43 +83,9 @@ open class SisyphusExtension(val project: Project) {
                     githubRef
                 )?.groupValues?.get(1)
                 }-SNAPSHOT"
-            else -> project.version as String
+
+            else -> null
         }
-
-        for (key in project.properties.keys) {
-            val result = repositoryUrlRegex.matchEntire(key) ?: continue
-            val repositoryName = result.groupValues[1]
-
-            val url = project.findProperty("sisyphus.repositories.$repositoryName.url") as? String ?: continue
-            val username = project.findProperty("sisyphus.repositories.$repositoryName.username") as? String
-            val password = project.findProperty("sisyphus.repositories.$repositoryName.password") as? String
-
-            repositories[repositoryName] = Repository(url, username, password)
-        }
-
-        dependencyRepositories =
-            (project.findProperty("sisyphus.dependency.repositories") as? String)?.split(',')?.toMutableList()
-            ?: dependencyRepositories
-        releaseRepositories =
-            (project.findProperty("sisyphus.release.repositories") as? String)?.split(',')?.toMutableList()
-            ?: releaseRepositories
-        snapshotRepositories =
-            (project.findProperty("sisyphus.snapshot.repositories") as? String)?.split(',')?.toMutableList()
-            ?: snapshotRepositories
-        dockerPublishRegistries =
-            (project.findProperty("sisyphus.docker.repositories") as? String)?.split(',')?.toMutableList()
-            ?: dockerPublishRegistries
-
-        managedDependencies =
-            (project.findProperty("sisyphus.dependency.overriding") as? String)?.split(',')?.associate {
-            val moduleStringNotation = ParsedModuleStringNotation(it, "")
-            "${moduleStringNotation.group}:${moduleStringNotation.name}" to moduleStringNotation
-        }?.toMutableMap() ?: managedDependencies
-
-        signKeyName = project.findProperty("signing.gnupg.keyName") as? String
-
-        layer = (project.findProperty("sisyphus.layer") as? String)?.let { SisyphusDevelopmentLayer.valueOf(it) }
-            ?: SisyphusDevelopmentLayer.IMPLEMENTATION
     }
 
     companion object {

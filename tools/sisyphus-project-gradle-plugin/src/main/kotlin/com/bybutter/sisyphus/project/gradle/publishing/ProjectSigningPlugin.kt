@@ -19,7 +19,7 @@ class ProjectSigningPlugin : Plugin<Project> {
         val sisyphus = target.extensions.getByType(SisyphusExtension::class.java)
         val publishing = target.extensions.getByType(PublishingExtension::class.java)
 
-        if (!sisyphus.signKeyName.isNullOrEmpty()) {
+        if (target.hasProperty("signing.gnupg.keyName")) {
             target.pluginManager.apply(SigningPlugin::class.java)
             val signing = target.extensions.getByType(SigningExtension::class.java)
             signing.useGpgCmd()

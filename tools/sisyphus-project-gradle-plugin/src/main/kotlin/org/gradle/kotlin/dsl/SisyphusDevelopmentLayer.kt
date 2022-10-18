@@ -46,12 +46,12 @@ fun <T : Dependency?> Project.frameworkLayer(dependency: T): T {
 
 fun <T : Dependency?> Project.layer(dependency: T, layer: SisyphusDevelopmentLayer): T {
     val sisyphus = extensions.findByType(SisyphusExtension::class.java) ?: return dependency
-    if (!sisyphus.isDevelop) return dependency
-    if (sisyphus.layer.ordinal < layer.ordinal) return dependency
+    if (!sisyphus.developer.isPresent) return dependency
+    if (sisyphus.layer.get().ordinal < layer.ordinal) return dependency
 
     if (dependency is ExternalModuleDependency) {
         dependency.version {
-            it.require(sisyphus.version)
+            it.require(this@layer.version.toString())
         }
     }
     return dependency

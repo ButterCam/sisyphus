@@ -3,6 +3,8 @@ package com.bybutter.sisyphus.project.gradle.publishing
 import com.bybutter.sisyphus.project.gradle.SisyphusExtension
 import com.bybutter.sisyphus.project.gradle.applyFromRepositoryKeys
 import com.bybutter.sisyphus.project.gradle.ensurePlugin
+import com.bybutter.sisyphus.project.gradle.isRelease
+import com.bybutter.sisyphus.project.gradle.isSnapshot
 import com.bybutter.sisyphus.project.gradle.tryApplyPluginClass
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -21,11 +23,11 @@ class ProjectPublishingPlugin : Plugin<Project> {
         val sisyphus = target.extensions.getByType(SisyphusExtension::class.java)
         val publishing = target.extensions.getByType(PublishingExtension::class.java)
 
-        if (sisyphus.isRelease) {
-            publishing.repositories.applyFromRepositoryKeys(sisyphus.repositories, sisyphus.releaseRepositories)
+        if (target.isRelease()) {
+            publishing.repositories.applyFromRepositoryKeys(sisyphus.repositories.get(), sisyphus.releaseRepositories.get())
         }
-        if (sisyphus.isSnapshot) {
-            publishing.repositories.applyFromRepositoryKeys(sisyphus.repositories, sisyphus.snapshotRepositories)
+        if (target.isSnapshot()) {
+            publishing.repositories.applyFromRepositoryKeys(sisyphus.repositories.get(), sisyphus.snapshotRepositories.get())
         }
     }
 }

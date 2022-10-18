@@ -10,7 +10,7 @@ class JavaDependenciesReplacePlugin : Plugin<Project> {
 
         target.configurations.all {
             it.resolutionStrategy.eachDependency { detail ->
-                extension.managedDependencies["${detail.requested.group}:${detail.requested.name}"]?.let { moduleStringNotation ->
+                extension.managedDependencies.getting("${detail.requested.group}:${detail.requested.name}")?.orNull?.let { moduleStringNotation ->
                     detail.useVersion(moduleStringNotation.version)
                     detail.because("The version of current dependency managed by Sisyphus Property")
                 }
