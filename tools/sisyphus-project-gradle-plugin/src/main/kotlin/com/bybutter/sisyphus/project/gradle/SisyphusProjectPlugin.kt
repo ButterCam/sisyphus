@@ -25,7 +25,7 @@ class SisyphusProjectPlugin : Plugin<Project> {
         target.pluginManager.apply(ProjectLicensePlugin::class.java)
         target.pluginManager.apply(ProjectSigningPlugin::class.java)
         target.pluginManager.apply(SisyphusAntlrKotlinPlugin::class.java)
-        if (isClassExist("com.palantir.gradle.docker.PalantirDockerPlugin")) {
+        if (isClassExist("com.bmuschko.gradle.docker.DockerRemoteApiPlugin")) {
             target.pluginManager.apply(SisyphusDockerPlugin::class.java)
         }
         if (isClassExist("org.jlleitschuh.gradle.ktlint.KtlintExtension")) {
@@ -35,6 +35,10 @@ class SisyphusProjectPlugin : Plugin<Project> {
 
     private fun applyBase(target: Project) {
         val extension = target.extensions.create("sisyphus", SisyphusExtension::class.java, target)
-        target.version = extension.version
+        if (target.version.toString() == Project.DEFAULT_VERSION) {
+            extension.recommendVersion()?.let {
+                target.version = it
+            }
+        }
     }
 }

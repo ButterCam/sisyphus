@@ -12,7 +12,6 @@ dependencies {
     implementation(Dependencies.Kotlin.reflect)
     implementation(Dependencies.Kotlin.plugin)
     implementation(Dependencies.kubeJavaClient)
-    compileOnly("com.palantir.gradle.docker:gradle-docker")
 }
 
 gradlePlugin {

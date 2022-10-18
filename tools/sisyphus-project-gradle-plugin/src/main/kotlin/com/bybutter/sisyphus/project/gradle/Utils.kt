@@ -4,6 +4,14 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import java.net.URI
 
+internal fun Project.isSnapshot(): Boolean {
+    return version.toString().endsWith("-SNAPSHOT")
+}
+
+internal fun Project.isRelease(): Boolean {
+    return !isSnapshot()
+}
+
 internal fun Project.ensurePlugin(vararg ids: String, block: (Project) -> Unit): Boolean {
     for (id in ids) {
         if (!pluginManager.hasPlugin(id)) {
@@ -47,18 +55,22 @@ internal fun RepositoryHandler.applyFromRepositoryKeys(
                 this.mavenLocal()
                 null
             }
+
             "central" -> repositories[repositoryKey] ?: run {
                 this.mavenCentral()
                 null
             }
+
             "portal" -> repositories[repositoryKey] ?: run {
                 this.gradlePluginPortal()
                 null
             }
+
             "google" -> repositories[repositoryKey] ?: run {
                 this.google()
                 null
             }
+
             else -> repositories[repositoryKey]
         }
 
@@ -84,4 +96,13 @@ internal fun isClassExist(className: String): Boolean {
     } catch (ex: ClassNotFoundException) {
         false
     }
+}
+
+fun getJavaMajorVersion(): Int? {
+    val javaVersion = System.getProperty("java.version")
+    return if (javaVersion.startsWith("1.")) {
+        javaVersion.substring(2, 3)
+    } else {
+        javaVersion.substringBefore('.')
+    }.toIntOrNull()
 }
