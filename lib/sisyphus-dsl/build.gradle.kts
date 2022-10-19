@@ -12,9 +12,14 @@ dependencies {
     api(project(":lib:sisyphus-grpc"))
 
     implementation(project(":lib:sisyphus-common"))
+    implementation("org.antlr:antlr4-runtime")
 
     antlr(platform(project(":sisyphus-dependencies")))
-    antlr(Dependencies.antlr4)
+    antlr("org.antlr:antlr4")
 
     testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+configurations {
+    api.get().setExtendsFrom(api.get().extendsFrom.filter { it.name != "antlr" })
 }
