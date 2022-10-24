@@ -12,7 +12,7 @@ dependencies {
     api(project(":lib:sisyphus-grpc"))
 
     implementation(project(":lib:sisyphus-common"))
-    implementation("org.antlr:antlr4-runtime")
+    api("org.antlr:antlr4-runtime")
 
     antlr(platform(project(":sisyphus-dependencies")))
     antlr("org.antlr:antlr4")
