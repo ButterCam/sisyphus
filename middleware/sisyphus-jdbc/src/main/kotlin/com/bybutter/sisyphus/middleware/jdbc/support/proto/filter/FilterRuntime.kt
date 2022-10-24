@@ -23,7 +23,7 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
     fun invoke(function: String, arguments: List<Any?>): Any? {
         return invokeOrDefault(function, arguments) {
             throw NoSuchMethodException(
-                "Can't find function '$function(${arguments.joinToString(", ") { it?.javaClass?.canonicalName ?: "null" }})' in CEL standard library."
+                "Can't find function '$function(${arguments.joinToString(", ") { it?.javaClass?.canonicalName ?: "null" }})' in filter standard library."
             )
         }
     }

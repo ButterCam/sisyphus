@@ -24,6 +24,18 @@ abstract class SqlBuilder<T : Record> {
         return buildSelect(dsl, FilterVisitor.DEFAULT.build(this, filter), *fields)
     }
 
+    open fun select(dsl: DSLContext, filter: FilterParser.FilterContext): SelectConditionStep<T> {
+        return selectFields(dsl, filter)
+    }
+
+    open fun selectFields(
+        dsl: DSLContext,
+        filter: FilterParser.FilterContext,
+        vararg fields: Field<*>
+    ): SelectConditionStep<T> {
+        return buildSelect(dsl, FilterVisitor.DEFAULT.visit(this, filter), *fields)
+    }
+
     open fun condition(filter: String): Condition {
         val conditions = FilterVisitor.DEFAULT.build(this, filter).mapNotNull {
             when (it) {
