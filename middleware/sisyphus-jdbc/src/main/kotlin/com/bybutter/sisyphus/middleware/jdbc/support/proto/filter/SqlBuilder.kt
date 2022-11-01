@@ -21,7 +21,7 @@ abstract class SqlBuilder<T : Record> {
     }
 
     open fun selectFields(dsl: DSLContext, filter: String, vararg fields: Field<*>): SelectConditionStep<T> {
-        return buildSelect(dsl, FilterVisitor.DEFAULT.build(this, filter), *fields)
+        return buildSelect(dsl, expressions(filter), *fields)
     }
 
     open fun select(dsl: DSLContext, filter: FilterParser.FilterContext): SelectConditionStep<T> {
@@ -33,18 +33,26 @@ abstract class SqlBuilder<T : Record> {
         filter: FilterParser.FilterContext,
         vararg fields: Field<*>
     ): SelectConditionStep<T> {
-        return buildSelect(dsl, FilterVisitor.DEFAULT.visit(this, filter), *fields)
+        return buildSelect(dsl, expressions(filter), *fields)
     }
 
     open fun condition(filter: String): Condition {
-        val conditions = FilterVisitor.DEFAULT.build(this, filter).mapNotNull {
+        val conditions = expressions(filter).flatMap {
             when (it) {
-                is Condition -> it
-                is SqlFilterPart -> it.condition
-                else -> null
+                is Condition -> listOf(it)
+                is ConditionProvider -> it.provideConditions()
+                else -> listOf()
             }
         }
         return DSL.and(conditions)
+    }
+
+    open fun expressions(filter: String): List<Any?> {
+        return FilterVisitor.DEFAULT.build(this, filter)
+    }
+
+    open fun expressions(filter: FilterParser.FilterContext): List<Any?> {
+        return FilterVisitor.DEFAULT.visit(this, filter)
     }
 
     protected abstract fun buildSelect(

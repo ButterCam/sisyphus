@@ -5,6 +5,7 @@ import com.bybutter.sisyphus.string.toCamelCase
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.Field
+import org.jooq.OrderField
 import org.jooq.Record
 import org.jooq.SelectConditionStep
 import org.jooq.SelectJoinStep
@@ -27,16 +28,16 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
             fields
         }
 
-        val conditions = expressions.mapNotNull {
+        val conditions = expressions.flatMap {
             when (it) {
-                is SqlFilterPart -> it.condition
-                is Condition -> it
-                else -> null
+                is Condition -> listOf(it)
+                is ConditionProvider -> it.provideConditions()
+                else -> listOf()
             }
         }
         val joins = expressions.flatMap {
             when (it) {
-                is SqlFilterPart -> it.joins
+                is JoinProvider -> it.provideJoins()
                 is Join -> listOf(it)
                 else -> listOf()
             }
@@ -91,9 +92,13 @@ fun <T : Record> sqlBuilder(table: Table<T>, block: TableSqlBuilder<T>.() -> Uni
 }
 
 fun Condition.withJoin(join: Join): SqlFilterPart {
-    return SqlFilterPart(this, listOf(join))
+    return SqlFilterPart(this, listOf(join), listOf())
+}
+
+fun Condition.orderBy(vararg orderBy: OrderField<*>): SqlFilterPart {
+    return SqlFilterPart(this, listOf(), orderBy.toList())
 }
 
 fun Condition.filterPart(): SqlFilterPart {
-    return SqlFilterPart(this, listOf())
+    return SqlFilterPart(this, listOf(), listOf())
 }

@@ -5,3 +5,7 @@ import org.jooq.SelectJoinStep
 fun interface Join {
     fun joinTable(step: SelectJoinStep<*>): SelectJoinStep<*>
 }
+
+fun interface JoinProvider {
+    fun provideJoins(): List<Join>
+}
