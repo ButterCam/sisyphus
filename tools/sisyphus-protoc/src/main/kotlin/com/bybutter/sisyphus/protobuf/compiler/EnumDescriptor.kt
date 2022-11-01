@@ -1,6 +1,9 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
+import com.bybutter.sisyphus.collection.contentEquals
+import com.bybutter.sisyphus.protobuf.compiler.util.escapeDoc
 import com.google.protobuf.DescriptorProtos
+import com.google.protobuf.DescriptorProtos.EnumDescriptorProto
 import com.squareup.kotlinpoet.ClassName
 
 class EnumDescriptor(
@@ -58,5 +61,30 @@ class EnumDescriptor(
             is FileDescriptor -> ".${parent.descriptor.`package`}.${descriptor.name}"
             else -> TODO()
         }
+    }
+
+    fun path(): List<Int> {
+        val path = mutableListOf<Int>()
+        when (parent) {
+            is MessageDescriptor -> {
+                path += parent.path()
+                path += DescriptorProtos.DescriptorProto.ENUM_TYPE_FIELD_NUMBER
+                path += parent.descriptor.enumTypeList.indexOf(descriptor)
+            }
+
+            is FileDescriptor -> {
+                path += DescriptorProtos.FileDescriptorProto.ENUM_TYPE_FIELD_NUMBER
+                path += parent.descriptor.enumTypeList.indexOf(descriptor)
+            }
+        }
+        return path
+    }
+
+    fun document(): String {
+        return escapeDoc(
+            file().descriptor.sourceCodeInfo?.locationList?.firstOrNull {
+                it.pathList.contentEquals(path())
+            }?.leadingComments ?: ""
+        )
     }
 }

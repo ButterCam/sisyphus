@@ -64,11 +64,14 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
     override fun generate(state: EnumGeneratingState): Boolean {
         state.target.apply {
             addAnnotation(
-                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION).addMember("%S", state.descriptor.fullProtoName())
+                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION)
+                    .addMember("%S", state.descriptor.fullProtoName())
                     .build()
             )
 
             this implements RuntimeTypes.PROTO_ENUM.parameterizedBy(state.descriptor.className())
+
+            addKdoc(state.descriptor.document())
 
             constructor {
                 addParameter("number", Int::class)
@@ -98,6 +101,7 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
                 state.target.addEnumConstant(
                     value.name(),
                     TypeSpec.anonymousClassBuilder()
+                        .addKdoc(value.document())
                         .addSuperclassConstructorParameter("%L", value.descriptor.number)
                         .addSuperclassConstructorParameter("%S", value.descriptor.name)
                         .build()
