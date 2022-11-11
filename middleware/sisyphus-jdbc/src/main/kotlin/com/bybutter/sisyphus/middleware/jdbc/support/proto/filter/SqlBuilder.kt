@@ -1,17 +1,12 @@
 package com.bybutter.sisyphus.middleware.jdbc.support.proto.filter
 
 import com.bybutter.sisyphus.dsl.filtering.grammar.FilterParser
-import com.bybutter.sisyphus.protobuf.primitives.Duration
-import com.bybutter.sisyphus.protobuf.primitives.Timestamp
-import com.bybutter.sisyphus.protobuf.primitives.toLocalDateTime
-import com.bybutter.sisyphus.protobuf.primitives.toTime
 import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.Field
 import org.jooq.Record
 import org.jooq.SelectConditionStep
 import org.jooq.impl.DSL
-import java.util.concurrent.TimeUnit
 
 abstract class SqlBuilder<T : Record> {
     abstract val runtime: FilterRuntime
@@ -62,12 +57,4 @@ abstract class SqlBuilder<T : Record> {
     ): SelectConditionStep<T>
 
     abstract fun member(member: FilterParser.MemberContext): Any?
-
-    open fun value(member: FilterParser.MemberContext, value: Any?): Any? {
-        return when (value) {
-            is Timestamp -> value.toLocalDateTime()
-            is Duration -> value.toTime(TimeUnit.MILLISECONDS)
-            else -> value
-        }
-    }
 }

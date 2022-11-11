@@ -13,80 +13,120 @@ open class FilterVisitor {
     }
 
     fun visit(builder: SqlBuilder<*>, filter: FilterParser.FilterContext): List<Any?> {
-        return filter.e.map {
+        return filter.expression().map {
             visit(builder, it)
         }
     }
 
     protected open fun visit(builder: SqlBuilder<*>, expr: FilterParser.ExpressionContext): Any? {
-        return expr.e.fold(visit(builder, expr.init)) { cond, seq ->
-            builder.runtime.invoke("and", listOf(cond, visit(builder, seq)))
+        return expr.factor().fold<FilterParser.FactorContext, Any?>(null) { a, b ->
+            val right = visit(builder, b)
+            a?.let {
+                builder.runtime.invoke("and", listOf(a, right))
+            } ?: right
         }
     }
 
     protected open fun visit(builder: SqlBuilder<*>, factor: FilterParser.FactorContext): Any? {
-        return factor.e.fold(visit(builder, factor.init)) { cond, e ->
-            builder.runtime.invoke("or", listOf(cond, visit(builder, e)))
+        return factor.term().fold<FilterParser.TermContext, Any?>(null) { a, b ->
+            val right = visit(builder, b)
+            a?.let {
+                builder.runtime.invoke("or", listOf(a, right))
+            } ?: right
         }
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, condition: FilterParser.ConditionContext): Any? {
-        return when (condition) {
-            is FilterParser.NotConditionContext -> {
-                builder.runtime.invoke("not", listOf(visit(builder, condition.expression())))
-            }
-            is FilterParser.CompareConditionContext -> {
-                val field = visit(builder, condition.left)
-                val value = builder.value(condition.left, visit(builder, condition.right))
-                val op = condition.comparator().text
-                return when (op) {
-                    "<=" -> builder.runtime.invoke("lessOrEquals", listOf(field, value))
-                    "<" -> builder.runtime.invoke("lessThan", listOf(field, value))
-                    ">=" -> builder.runtime.invoke("greaterOrEqual", listOf(field, value))
-                    ">" -> builder.runtime.invoke("greaterThan", listOf(field, value))
-                    "=" -> builder.runtime.invoke("equals", listOf(field, value))
-                    "!=" -> builder.runtime.invoke("notEquals", listOf(field, value))
-                    ":" -> builder.runtime.invoke("has", listOf(field, value))
-                    else -> TODO()
-                }
-            }
-            is FilterParser.FunConditionContext -> visit(builder, condition.function())
-            else -> throw IllegalStateException()
+    protected open fun visit(builder: SqlBuilder<*>, term: FilterParser.TermContext): Any? {
+        val result = visit(builder, term.simple())
+
+        if (term.NOT() != null) {
+            return builder.runtime.invoke("not", listOf(result))
         }
+
+        if (term.MINUS() != null) {
+            return builder.runtime.invoke("unaryMinus", listOf(result))
+        }
+
+        return result
+    }
+
+    protected open fun visit(builder: SqlBuilder<*>, condition: FilterParser.SimpleContext): Any? {
+        condition.restriction()?.let {
+            return visit(builder, it)
+        }
+
+        return visit(builder, condition.composite())
+    }
+
+    protected open fun visit(builder: SqlBuilder<*>, restriction: FilterParser.RestrictionContext): Any? {
+        val field = visit(builder, restriction.comparable())
+
+        restriction.comparator()?.let {
+            val value = visit(builder, restriction.arg())
+            return when (it.text) {
+                "<=" -> builder.runtime.invoke("lessOrEquals", listOf(field, value))
+                "<" -> builder.runtime.invoke("lessThan", listOf(field, value))
+                ">=" -> builder.runtime.invoke("greaterOrEqual", listOf(field, value))
+                ">" -> builder.runtime.invoke("greaterThan", listOf(field, value))
+                "=" -> builder.runtime.invoke("equals", listOf(field, value))
+                "!=" -> builder.runtime.invoke("notEquals", listOf(field, value))
+                ":" -> builder.runtime.invoke("has", listOf(field, value))
+                else -> TODO()
+            }
+        }
+
+        return field
+    }
+
+    protected open fun visit(builder: SqlBuilder<*>, comparable: FilterParser.ComparableContext): Any? {
+        comparable.function()?.let {
+            return visit(builder, it)
+        }
+
+        return visit(builder, comparable.member())
     }
 
     protected open fun visit(builder: SqlBuilder<*>, member: FilterParser.MemberContext): Any? {
         return builder.member(member)
     }
 
+    protected open fun visit(builder: SqlBuilder<*>, composite: FilterParser.CompositeContext): Any? {
+        return visit(builder, composite.expression())
+    }
+
+    protected open fun visit(builder: SqlBuilder<*>, args: FilterParser.ArgListContext): List<Any?> {
+        return args.arg().map { visit(builder, it) }
+    }
+
+    protected open fun visit(builder: SqlBuilder<*>, arg: FilterParser.ArgContext): Any? {
+        arg.comparable()?.let {
+            return visit(builder, it)
+        }
+
+        arg.composite()?.let {
+            return visit(builder, it)
+        }
+
+        return visit(builder, arg.value())
+    }
+
     protected open fun visit(builder: SqlBuilder<*>, value: FilterParser.ValueContext): Any? {
-        value.member()?.let { return visit(builder, it) }
-        value.literal()?.let { return visit(builder, it) }
-        value.function()?.let { return visit(builder, it) }
-        return null
-    }
-
-    protected open fun visit(builder: SqlBuilder<*>, function: FilterParser.FunctionContext): Any? {
-        return builder.runtime.invoke(function.name.text, visit(builder, function.argList()))
-    }
-
-    protected open fun visit(builder: SqlBuilder<*>, argList: FilterParser.ArgListContext?): List<Any?> {
-        return argList?.args?.map { visit(builder, it) } ?: listOf()
-    }
-
-    protected open fun visit(builder: SqlBuilder<*>, literal: FilterParser.LiteralContext): Any? {
-        return when (literal) {
-            is FilterParser.IntContext -> literal.text.toLong()
-            is FilterParser.UintContext -> literal.text.substring(0, literal.text.length - 1).toULong()
-            is FilterParser.DoubleContext -> literal.text.toDouble()
-            is FilterParser.StringContext -> visit(builder, literal)
+        return when (value) {
+            is FilterParser.IntContext -> value.text.toLong()
+            is FilterParser.UintContext -> value.text.substring(0, value.text.length - 1).toULong()
+            is FilterParser.DoubleContext -> value.text.toDouble()
+            is FilterParser.StringContext -> visit(builder, value)
+            is FilterParser.DurationContext -> Duration(value.text)
+            is FilterParser.TimestampContext -> Timestamp(value.text)
             is FilterParser.BoolTrueContext -> true
             is FilterParser.BoolFalseContext -> false
             is FilterParser.NullContext -> null
-            is FilterParser.DurationContext -> Duration(literal.text)
-            is FilterParser.TimestampContext -> Timestamp(literal.text)
-            else -> throw UnsupportedOperationException("Unsupported literal expression '${literal.text}'.")
+            else -> null
         }
+    }
+
+    protected open fun visit(builder: SqlBuilder<*>, function: FilterParser.FunctionContext): Any? {
+        return builder.runtime.invoke(function.name().joinToString(".") { it.text }, visit(builder, function.argList()))
     }
 
     protected open fun visit(builder: SqlBuilder<*>, value: FilterParser.StringContext): String {
