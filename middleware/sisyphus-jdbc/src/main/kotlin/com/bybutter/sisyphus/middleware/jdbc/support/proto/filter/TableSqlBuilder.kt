@@ -12,8 +12,7 @@ import org.jooq.SelectJoinStep
 import org.jooq.Table
 
 open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder<T>() {
-    private val fieldMapping = mutableMapOf<String, Any?>()
-    private val converters = mutableMapOf<String, (Any?) -> (Any?)>()
+    private val fieldMapping = mutableMapOf<String, Any>()
     final override var runtime: FilterRuntime = FilterRuntime()
         private set
 
@@ -54,24 +53,11 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
         return fieldMapping[member.text]
     }
 
-    override fun value(member: FilterParser.MemberContext, value: Any?): Any? {
-        return converters[member.text]?.invoke(value) ?: super.value(member, value)
-    }
-
-    fun field(member: String, field: Any?, converter: ((Any?) -> Any?)? = null) {
+    fun field(member: String, field: Field<*>, converter: ((Any?) -> Any?)? = null) {
         val camelCaseMember = toCamelCase(member)
-        fieldMapping[member] = field
-        fieldMapping[camelCaseMember] = field
-        converter?.let {
-            converters[member] = it
-            converters[camelCaseMember] = it
-        }
-    }
-
-    fun converter(member: String, converter: (Any?) -> (Any?)) {
-        val camelCaseMember = toCamelCase(member)
-        converters[member] = converter
-        converters[camelCaseMember] = converter
+        val fieldOrHandle = FieldHandle.wrap(field, converter)
+        fieldMapping[member] = fieldOrHandle
+        fieldMapping[camelCaseMember] = fieldOrHandle
     }
 
     fun runtime(runtime: FilterRuntime) {

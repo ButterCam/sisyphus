@@ -47,8 +47,7 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
 
     private fun KFunction<*>.compatibleWith(arguments: List<Any?>): Boolean {
         return compatibleWith(
-            listOfNotNull(this.extensionReceiverParameter) + this.valueParameters,
-            arguments
+            listOfNotNull(this.extensionReceiverParameter) + this.valueParameters, arguments
         )
     }
 
