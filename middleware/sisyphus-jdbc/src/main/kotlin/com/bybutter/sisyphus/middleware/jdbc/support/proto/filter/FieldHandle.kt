@@ -15,12 +15,12 @@ interface FieldHandle {
         }
     }
 
-    private data class Default(private val field: Field<*>, private val converter: (Any?) -> Any?) {
-        fun field(): Field<*> {
+    private data class Default(private val field: Field<*>, private val converter: (Any?) -> Any?) : FieldHandle {
+        override fun field(): Field<*> {
             return field
         }
 
-        fun valueConverter(): (Any?) -> Any? {
+        override fun valueConverter(): (Any?) -> Any? {
             return converter
         }
     }
