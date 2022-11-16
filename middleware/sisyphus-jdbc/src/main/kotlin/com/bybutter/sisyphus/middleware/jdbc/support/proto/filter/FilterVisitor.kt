@@ -126,9 +126,12 @@ open class FilterVisitor {
     }
 
     protected open fun visit(builder: SqlBuilder<*>, function: FilterParser.FunctionContext): Any? {
-        return builder.runtime.invoke(function.name().joinToString(".") { it.text }, function.argList()?.let {
-            visit(builder, it)
-        } ?: listOf())
+        return builder.runtime.invoke(
+            function.name().joinToString(".") { it.text },
+            function.argList()?.let {
+                visit(builder, it)
+            } ?: listOf()
+        )
     }
 
     protected open fun visit(builder: SqlBuilder<*>, value: FilterParser.StringContext): String {
