@@ -54,7 +54,7 @@ dependencies {
         api("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
         api("org.jlleitschuh.gradle:ktlint-gradle:10.3.0")
         api("org.jooq:jooq:3.17.2")
-        api("org.mongodb:mongodb-driver-reactivestreams:4.6.1")
+        api("org.mongodb:mongodb-driver-reactivestreams:4.8.1")
         api("org.reflections:reflections:0.10.2")
         api("org.springframework.boot:spring-boot-gradle-plugin:2.7.2")
     }
