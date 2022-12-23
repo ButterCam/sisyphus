@@ -47,7 +47,7 @@ dependencies {
         api("io.swagger.core.v3:swagger-core:2.2.1")
         api("org.antlr:antlr4:4.10.1")
         api("org.antlr:antlr4-runtime:4.10.1")
-        api("org.apache.maven.wagon:wagon-http:3.5.1")
+        api("org.apache.maven.wagon:wagon-http:3.5.3")
         api("org.eclipse.jgit:org.eclipse.jgit:6.2.0.202206071550-r")
         api("org.gradle.kotlin:plugins:1.3.6")
         api("org.jetbrains.kotlin:kotlin-allopen:1.7.10")
