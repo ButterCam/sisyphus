@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.support.metrics
 
+import com.bybutter.sisyphus.starter.grpc.support.IncomingRequestLogger
 import com.bybutter.sisyphus.starter.grpc.support.RequestInfo
 import com.bybutter.sisyphus.starter.grpc.support.RequestLogger
 import io.grpc.Metadata
@@ -9,11 +10,11 @@ import io.micrometer.core.instrument.MeterRegistry
 import java.time.Duration
 
 /**
- * RequestLogger for micrometer timers, it will create two timers for sisyphus,
+ * RequestLogger for micrometer timers, it will create a timer and a counter for sisyphus,
  * 'sisyphus_grpc_requests' will statistics all requests,
- * 'sisyphus_grpc_incoming_requests' will statistics all incoming requests which has 'host' header and not be 'localhost'.
+ * 'sisyphus_incoming_grpc_requests' will count all incoming requests even it not be process over.
  */
-class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogger {
+class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogger, IncomingRequestLogger {
     override val id: String = MicrometerRequestLogger::class.java.typeName
 
     override fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long) {
@@ -27,16 +28,14 @@ class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogg
             "status", status.code.name,
             "exception", status.cause?.javaClass?.name ?: "None"
         ).record(costDuration)
+    }
 
-        if (host != null && !host.startsWith("localhost")) {
-            registry.timer(
-                "sisyphus_grpc_incoming_requests",
-                "service", call.methodDescriptor.serviceName,
-                "method", call.methodDescriptor.fullMethodName,
-                "status", status.code.name,
-                "exception", status.cause?.javaClass?.name ?: "None"
-            ).record(costDuration)
-        }
+    override fun log(call: ServerCall<*, *>, inputHeader: Metadata) {
+        registry.counter(
+            "sisyphus_incoming_grpc_requests",
+            "service", call.methodDescriptor.serviceName,
+            "method", call.methodDescriptor.fullMethodName,
+        )
     }
 
     companion object {
