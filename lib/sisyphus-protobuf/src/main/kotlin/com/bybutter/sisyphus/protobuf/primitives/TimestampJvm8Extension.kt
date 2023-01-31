@@ -124,4 +124,3 @@ internal fun Timestamp.stringJvm8(): String {
 internal fun Timestamp.Companion.stringJvm8(seconds: Long, nanos: Int): String {
     return Instant.ofEpochSecond(seconds, nanos.toLong()).toString()
 }
-

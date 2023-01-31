@@ -46,26 +46,35 @@ class JsonTest {
     fun `json test`() {
         val raw = MapMessageTest {
             this.startValue = 1
-            this.messageMapValue += mapOf("foo" to MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, "bar" to MapMessageTest.NestedMessage {
-                this.int32Value = 2
-            })
+            this.messageMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to MapMessageTest.NestedMessage {
+                    this.int32Value = 2
+                }
+            )
             this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
             this.endValue = 2
             this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")
             this.timestamp = Timestamp.now()
             this.duration = Duration(8L, 0L, 0L)
-            this.anyMapValue += mapOf("foo" to MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, "bar" to PackedTest {
-                this.values += listOf(1, 2, 3, 4, 5, 6)
-            })
-            this.anyListValue += listOf(MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, PackedTest {
-                this.values += listOf(1, 2, 3, 4, 5, 6)
-            })
+            this.anyMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
+            this.anyListValue += listOf(
+                MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
         }
 
         val json = raw.toJson()
@@ -79,26 +88,35 @@ class JsonTest {
     fun `yaml test`() {
         val raw = MapMessageTest {
             this.startValue = 1
-            this.messageMapValue += mapOf("foo" to MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, "bar" to MapMessageTest.NestedMessage {
-                this.int32Value = 2
-            })
+            this.messageMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to MapMessageTest.NestedMessage {
+                    this.int32Value = 2
+                }
+            )
             this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
             this.endValue = 2
             this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")
             this.timestamp = Timestamp.now()
             this.duration = Duration(8L, 0L, 0L)
-            this.anyMapValue += mapOf("foo" to MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, "bar" to PackedTest {
-                this.values += listOf(1, 2, 3, 4, 5, 6)
-            })
-            this.anyListValue += listOf(MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, PackedTest {
-                this.values += listOf(1, 2, 3, 4, 5, 6)
-            })
+            this.anyMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
+            this.anyListValue += listOf(
+                MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                }
+            )
         }
 
         val yml = raw.toYaml()
@@ -136,45 +154,59 @@ class JsonTest {
     fun `list test`() {
         val raw = MapMessageTest {
             this.startValue = 1
-            this.messageMapValue += mapOf("foo" to MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, "bar" to MapMessageTest.NestedMessage {
-                this.int32Value = 2
-            })
+            this.messageMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to MapMessageTest.NestedMessage {
+                    this.int32Value = 2
+                }
+            )
             this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
             this.endValue = 2
             this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")
             this.timestamp = Timestamp.now()
             this.duration = Duration(8L, 0L, 0L)
-            this.anyMapValue += mapOf("foo" to MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, "bar" to PackedTest {
-                this.values += listOf(1, 2, 3, 4, 5, 6)
-            })
-            this.anyListValue += listOf(MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, PackedTest {
-                this.values += listOf(1, 2, 3, 4, 5, 6)
-            }, Value {
-                this.stringValue = "test"
-            }, Value {
-                this.boolValue = false
-            }, Value {
-                this.numberValue = 123.456
-            }, Value {
-                this.listValue = ListValue {
-                    value("test")
-                    value(1.0)
-                    struct {
-                        field("string", "test")
-                        field("number", 2.0)
-                    }
-                    list {
-                        value("test")
-                        value(3.0)
-                    }
+            this.anyMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
                 }
-            }, Timestamp.now(), Duration(1.234), FieldMask("test1", "foo", "bar"))
+            )
+            this.anyListValue += listOf(
+                MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                },
+                Value {
+                    this.stringValue = "test"
+                },
+                Value {
+                    this.boolValue = false
+                },
+                Value {
+                    this.numberValue = 123.456
+                },
+                Value {
+                    this.listValue = ListValue {
+                        value("test")
+                        value(1.0)
+                        struct {
+                            field("string", "test")
+                            field("number", 2.0)
+                        }
+                        list {
+                            value("test")
+                            value(3.0)
+                        }
+                    }
+                },
+                Timestamp.now(), Duration(1.234), FieldMask("test1", "foo", "bar")
+            )
         }
 
         val json = listOf(raw, raw).toJson()
@@ -198,45 +230,59 @@ class JsonTest {
     fun `dynamic test`() {
         val raw = MapMessageTest {
             this.startValue = 1
-            this.messageMapValue += mapOf("foo" to MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, "bar" to MapMessageTest.NestedMessage {
-                this.int32Value = 2
-            })
+            this.messageMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to MapMessageTest.NestedMessage {
+                    this.int32Value = 2
+                }
+            )
             this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
             this.endValue = 2
             this.oneTest = MapMessageTest.OneTest.StringOneofValue("test")
             this.timestamp = Timestamp.now()
             this.duration = Duration(8L, 0L, 0L)
-            this.anyMapValue += mapOf("foo" to MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, "bar" to PackedTest {
-                this.values += listOf(1, 2, 3, 4, 5, 6)
-            })
-            this.anyListValue += listOf(MapMessageTest.NestedMessage {
-                this.int32Value = 1
-            }, PackedTest {
-                this.values += listOf(1, 2, 3, 4, 5, 6)
-            }, Value {
-                this.stringValue = "test"
-            }, Value {
-                this.boolValue = false
-            }, Value {
-                this.numberValue = 123.456
-            }, Value {
-                this.listValue = ListValue {
-                    value("test")
-                    value(1.0)
-                    struct {
-                        field("string", "test")
-                        field("number", 2.0)
-                    }
-                    list {
-                        value("test")
-                        value(3.0)
-                    }
+            this.anyMapValue += mapOf(
+                "foo" to MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                "bar" to PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
                 }
-            }, Timestamp.now(), Duration(1.234), FieldMask("test1", "foo", "bar"))
+            )
+            this.anyListValue += listOf(
+                MapMessageTest.NestedMessage {
+                    this.int32Value = 1
+                },
+                PackedTest {
+                    this.values += listOf(1, 2, 3, 4, 5, 6)
+                },
+                Value {
+                    this.stringValue = "test"
+                },
+                Value {
+                    this.boolValue = false
+                },
+                Value {
+                    this.numberValue = 123.456
+                },
+                Value {
+                    this.listValue = ListValue {
+                        value("test")
+                        value(1.0)
+                        struct {
+                            field("string", "test")
+                            field("number", 2.0)
+                        }
+                        list {
+                            value("test")
+                            value(3.0)
+                        }
+                    }
+                },
+                Timestamp.now(), Duration(1.234), FieldMask("test1", "foo", "bar")
+            )
         }
         val json = raw.toJson()
 

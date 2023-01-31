@@ -57,5 +57,3 @@ abstract class AbstractDynamicField<T>(
         return false
     }
 }
-
-

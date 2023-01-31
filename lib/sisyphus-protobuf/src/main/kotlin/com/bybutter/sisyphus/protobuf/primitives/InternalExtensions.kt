@@ -36,7 +36,6 @@ internal fun Message<*, *>.timestampString(): String {
     val nanos = get<Int>(Timestamp.NANOS_FIELD_NUMBER)
 
     return Timestamp.string(seconds, nanos)
-
 }
 
 internal fun Message<*, *>.durationString(): String {

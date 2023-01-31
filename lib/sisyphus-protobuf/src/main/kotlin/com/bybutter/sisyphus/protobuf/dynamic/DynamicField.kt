@@ -233,7 +233,6 @@ class Int32DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDyna
         }
     }
 
-
     override fun read0(reader: Reader, field: Int, wire: Int) {
         set(reader.int32())
     }
