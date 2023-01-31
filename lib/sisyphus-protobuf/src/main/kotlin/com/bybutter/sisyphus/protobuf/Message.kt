@@ -101,6 +101,8 @@ interface Message<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Cloneable {
     fun extensions(): Map<Int, MessageExtension<*>>
 
     fun unknownFields(): UnknownFields
+
+    fun annotations(): List<Any>
 }
 
 @OptIn(InternalProtoApi::class)
@@ -143,4 +145,6 @@ interface MutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Messa
     fun readFrom(reader: Reader)
 
     fun readFrom(reader: JsonReader)
+
+    fun annotation(value: Any)
 }

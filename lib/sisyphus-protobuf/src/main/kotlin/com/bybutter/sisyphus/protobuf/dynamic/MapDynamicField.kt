@@ -10,12 +10,12 @@ import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 class MapDynamicField<TKey, TValue>(
     private val descriptor: FieldDescriptorProto,
-    private val reflection: ProtoReflection
 ) : DynamicField<MutableMap<TKey, TValue>> {
     private val map = mutableMapOf<TKey, TValue>()
 
-    private val mapEntryDescriptor =
-        reflection.findMapEntryDescriptor(descriptor().typeName) ?: throw IllegalStateException()
+    private val mapEntryDescriptor by lazy {
+        ProtoReflection.findMapEntryDescriptor(descriptor().typeName)!!
+    }
 
     private val keyField = mapEntryDescriptor.field.first { it.number == 1 }
 
@@ -62,10 +62,10 @@ class MapDynamicField<TKey, TValue>(
         map.forEach { (k, v) ->
             writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
                 .beginLd()
-                .tag(valueField.number, WireType.ofType(keyField.type))
+                .tag(keyField.number, WireType.ofType(keyField.type))
                 .write(keyField.type, k)
                 .tag(valueField.number, WireType.ofType(valueField.type))
-                .write(keyField.type, k)
+                .write(valueField.type, v)
                 .endLd()
         }
     }
@@ -87,6 +87,7 @@ class MapDynamicField<TKey, TValue>(
                 if (this.javaClass != other.javaClass) return false
                 get().contentEquals(other.get() as Map<TKey, TValue>) && descriptor().number == other.descriptor().number
             }
+
             else -> false
         }
     }

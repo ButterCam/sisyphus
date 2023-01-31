@@ -18,6 +18,13 @@ fun Message<*, *>.toAny(): Any {
 /**
  * Unwrap any.
  */
-fun Any.toMessage(): Message<*, *> {
-    return (ProtoReflection.findSupport(this.typeUrl) as MessageSupport<*, *>).parse(this.value)
+fun Any.toMessage(): Message<*, *>? {
+    val support = ProtoReflection.findSupport(this.typeUrl) as? MessageSupport<*, *> ?: return null
+    return support.parse(this.value)
 }
+
+/**
+ * An annotation to mark current Any resolved failed when parsing protos.
+ * When encoding this message, should not re-wrap it to Any.
+ */
+internal object AnyResolveFailed

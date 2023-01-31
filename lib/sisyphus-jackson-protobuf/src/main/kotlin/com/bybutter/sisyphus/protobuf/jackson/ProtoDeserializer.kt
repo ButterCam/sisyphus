@@ -23,7 +23,7 @@ open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
         val rawClass = handledType().javaType.rawClass
         return when (rawClass) {
             Any::class.java -> {
-                JacksonReader(p).readAny().toAny()
+                JacksonReader(p).readAny()?.toAny()
             }
             Message::class.java -> {
                 JacksonReader(p).readAny()

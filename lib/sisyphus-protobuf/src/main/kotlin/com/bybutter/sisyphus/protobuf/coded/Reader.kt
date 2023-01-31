@@ -79,7 +79,11 @@ class Reader(private val inputStream: InputStream) {
 
     inline fun packed(wireType: Int, block: (Reader) -> Unit) {
         when (wireType) {
-            WireType.VARINT.ordinal -> block(this)
+            WireType.VARINT.ordinal,
+            WireType.FIXED32.ordinal,
+            WireType.FIXED64.ordinal,
+            -> block(this)
+
             WireType.LENGTH_DELIMITED.ordinal -> nested(block)
             else -> throw IllegalStateException("Packed value must be VARINT or LENGTH_DELIMITED wire type.")
         }

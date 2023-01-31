@@ -50,6 +50,22 @@ fun Timestamp.Companion.tryParse(value: String): Timestamp? {
     }
 }
 
+internal fun Timestamp.Companion.string(seconds: Long, nanos: Int): String {
+    return if (useJvm7) {
+        stringJvm7(seconds, nanos)
+    } else {
+        stringJvm8(seconds, nanos)
+    }
+}
+
+internal fun Timestamp.Companion.parsePayload(value: String): Pair<Long, Int> {
+    return if (useJvm7) {
+        parsePayloadJvm7(value)
+    } else {
+        parsePayloadJvm8(value)
+    }
+}
+
 operator fun Timestamp.Companion.invoke(seconds: Long, nanos: Int = 0): Timestamp {
     return Timestamp {
         this.seconds = seconds
@@ -78,13 +94,18 @@ operator fun Duration.Companion.invoke(value: String): Duration {
 }
 
 fun Duration.Companion.tryParse(value: String): Duration? {
+    val (seconds, nanos) = Duration.tryParsePayload(value) ?: return null
+    return Duration(seconds, nanos)
+}
+
+internal fun Duration.Companion.tryParsePayload(value: String): Pair<Long, Int>? {
     val result = durationRegex.matchEntire(value) ?: return null
 
     val sign = if (result.groupValues[1].isEmpty()) 1 else -1
     val seconds = result.groupValues[2].toLong() * sign
     val nanos = result.groupValues[3].rightPadding(9, '0').toInt() * sign
 
-    return Duration(seconds, nanos)
+    return seconds to nanos
 }
 
 operator fun Duration.Companion.invoke(seconds: Long, nanos: Int = 0): Duration {
@@ -118,10 +139,10 @@ operator fun Duration.Companion.invoke(nanos: BigInteger): Duration {
 operator fun Duration.Companion.invoke(hours: Long, minutes: Long, seconds: Long, nanos: Int = 0): Duration {
     return Duration(
         (
-            TimeUnit.HOURS.toNanos(hours) + TimeUnit.MINUTES.toNanos(minutes) + TimeUnit.SECONDS.toNanos(
-                seconds
-            ) + nanos
-            ).toBigInteger()
+                TimeUnit.HOURS.toNanos(hours) + TimeUnit.MINUTES.toNanos(minutes) + TimeUnit.SECONDS.toNanos(
+                    seconds
+                ) + nanos
+                ).toBigInteger()
     )
 }
 
@@ -216,10 +237,14 @@ operator fun Duration.compareTo(other: Duration): Int {
 }
 
 fun Duration.string(): String = buildString {
-    append(this@string.seconds)
-    if (this@string.nanos != 0) {
+    return Duration.string(seconds, nanos)
+}
+
+internal fun Duration.Companion.string(seconds: Long, nanos: Int): String = buildString {
+    append(seconds)
+    if (nanos != 0) {
         append('.')
-        append(abs(this@string.nanos).toString().leftPadding(9, '0').trimEnd('0'))
+        append(abs(nanos).toString().leftPadding(9, '0').trimEnd('0'))
     }
     append('s')
 }

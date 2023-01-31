@@ -23,6 +23,8 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
 
     private var extensions: MutableMap<Int, MessageExtension<*>>? = null
 
+    private var annotations: MutableList<Any>? = null
+
     private inline fun unknownFields(block: UnknownFields.() -> Unit) {
         (this.unknownFields ?: UnknownFields()).apply {
             block()
@@ -32,6 +34,17 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
 
     override fun unknownFields(): UnknownFields {
         return unknownFields ?: UnknownFields.empty
+    }
+
+    override fun annotations(): List<Any> {
+        return annotations ?: emptyList()
+    }
+
+    override fun annotation(value: Any) {
+        (this.annotations ?: mutableListOf()).apply {
+            this += value
+            annotations = this
+        }
     }
 
     private inline fun extensions(block: MutableMap<Int, MessageExtension<*>>.() -> Unit) {
@@ -119,12 +132,14 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
                     }
                     current.getFieldInCurrent(field)
                 }
+
                 is MutableMap<*, *> -> {
                     if (index == fieldPart.size - 1) {
                         return current.remove(field)
                     }
                     current[field]
                 }
+
                 else -> throw IllegalStateException("Nested property must be message")
             }
         }

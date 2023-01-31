@@ -5,6 +5,7 @@ import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoEnum
 import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.findMapEntryDescriptor
+import com.bybutter.sisyphus.protobuf.primitives.AnyResolveFailed
 import com.bybutter.sisyphus.protobuf.primitives.BoolValue
 import com.bybutter.sisyphus.protobuf.primitives.BytesValue
 import com.bybutter.sisyphus.protobuf.primitives.DoubleValue
@@ -22,8 +23,10 @@ import com.bybutter.sisyphus.protobuf.primitives.Timestamp
 import com.bybutter.sisyphus.protobuf.primitives.UInt32Value
 import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 import com.bybutter.sisyphus.protobuf.primitives.Value
-import com.bybutter.sisyphus.protobuf.primitives.string
-import com.bybutter.sisyphus.protobuf.primitives.toMessage
+import com.bybutter.sisyphus.protobuf.primitives.durationString
+import com.bybutter.sisyphus.protobuf.primitives.fieldMaskString
+import com.bybutter.sisyphus.protobuf.primitives.timestampString
+import com.bybutter.sisyphus.protobuf.primitives.unwrapAny
 
 internal fun JsonWriter.fields(value: Message<*, *>) {
     for ((field, fieldValue) in value) {
@@ -71,14 +74,22 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
         FieldDescriptorProto.Type.FLOAT -> value(value as Float)
         FieldDescriptorProto.Type.SFIXED64,
         FieldDescriptorProto.Type.SINT64,
-        FieldDescriptorProto.Type.INT64 -> safeLong(value as Long)
+        FieldDescriptorProto.Type.INT64,
+        -> safeLong(value as Long)
+
         FieldDescriptorProto.Type.FIXED64,
-        FieldDescriptorProto.Type.UINT64 -> safeULong(value as ULong)
+        FieldDescriptorProto.Type.UINT64,
+        -> safeULong(value as ULong)
+
         FieldDescriptorProto.Type.SFIXED32,
         FieldDescriptorProto.Type.SINT32,
-        FieldDescriptorProto.Type.INT32 -> value(value as Int)
+        FieldDescriptorProto.Type.INT32,
+        -> value(value as Int)
+
         FieldDescriptorProto.Type.UINT32,
-        FieldDescriptorProto.Type.FIXED32 -> value(value as UInt)
+        FieldDescriptorProto.Type.FIXED32,
+        -> value(value as UInt)
+
         FieldDescriptorProto.Type.BOOL -> value(value as Boolean)
         FieldDescriptorProto.Type.STRING -> value(value as String)
         FieldDescriptorProto.Type.GROUP -> TODO()
@@ -90,60 +101,19 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
                 value(value as ProtoEnum<*>)
             }
         }
+
         FieldDescriptorProto.Type.MESSAGE -> {
-            when (field.typeName) {
-                com.bybutter.sisyphus.protobuf.primitives.Any.name -> {
-                    any(value as Message<*, *>)
-                }
-                Timestamp.name -> {
-                    value((value as Timestamp).string())
-                }
-                Duration.name -> {
-                    value((value as Duration).string())
-                }
-                FieldMask.name -> {
-                    value((value as FieldMask).string())
-                }
-                Struct.name -> {
-                    value((value as Struct))
-                }
-                Value.name -> {
-                    value((value as Value))
-                }
-                DoubleValue.name -> {
-                    value((value as DoubleValue).value)
-                }
-                FloatValue.name -> {
-                    value((value as FloatValue).value)
-                }
-                Int64Value.name -> {
-                    value((value as Int64Value).value)
-                }
-                UInt64Value.name -> {
-                    value((value as UInt64Value).value)
-                }
-                Int32Value.name -> {
-                    value((value as Int32Value).value)
-                }
-                UInt32Value.name -> {
-                    value((value as UInt32Value).value)
-                }
-                BoolValue.name -> {
-                    value((value as BoolValue).value)
-                }
-                StringValue.name -> {
-                    value((value as StringValue).value)
-                }
-                BytesValue.name -> {
-                    value((value as BytesValue).value)
-                }
-                ListValue.name -> {
-                    value(value as ListValue)
-                }
-                else -> {
-                    beginObject()
-                    fields(value as Message<*, *>)
-                    endObject()
+            if (!wellknown(field.typeName, value as Message<*, *>)) {
+                when (field.typeName) {
+                    com.bybutter.sisyphus.protobuf.primitives.Any.name -> {
+                        any(value)
+                    }
+
+                    else -> {
+                        beginObject()
+                        fields(value)
+                        endObject()
+                    }
                 }
             }
         }
@@ -169,129 +139,194 @@ internal fun JsonWriter.map(value: Map<*, *>, field: FieldDescriptorProto) {
     endObject()
 }
 
-internal fun JsonWriter.any(value: Message<*, *>) {
-    if (value is com.bybutter.sisyphus.protobuf.primitives.Any) {
-        return any(value.toMessage())
+internal fun JsonWriter.wellknown(type: String, value: Message<*, *>): Boolean {
+    when (type) {
+        Timestamp.name -> value(value.timestampString())
+
+        Duration.name -> value(value.durationString())
+
+        FieldMask.name -> value(value.fieldMaskString())
+
+        DoubleValue.name -> value(value.get<Double>(DoubleValue.VALUE_FIELD_NUMBER))
+
+        FloatValue.name -> value(value.get<Float>(FloatValue.VALUE_FIELD_NUMBER))
+
+        Int64Value.name -> value(value.get<Long>(Int64Value.VALUE_FIELD_NUMBER))
+
+        UInt64Value.name -> value(value.get<ULong>(UInt64Value.VALUE_FIELD_NUMBER))
+
+        Int32Value.name -> value(value.get<Int>(Int32Value.VALUE_FIELD_NUMBER))
+
+        UInt32Value.name -> value(value.get<UInt>(UInt32Value.VALUE_FIELD_NUMBER))
+
+        BoolValue.name -> value(value.get<Boolean>(BoolValue.VALUE_FIELD_NUMBER))
+
+        StringValue.name -> value(value.get<String>(StringValue.VALUE_FIELD_NUMBER))
+
+        BytesValue.name -> value(value.get<ByteArray>(BytesValue.VALUE_FIELD_NUMBER))
+
+        Struct.name -> jsonStruct(value)
+
+        Value.name -> jsonValue(value)
+
+        ListValue.name -> jsonList(value)
+
+        else -> return false
     }
+
+    return true
+}
+
+internal fun JsonWriter.any(value: Message<*, *>, recursion: Boolean = true) {
+    // If we already unwrapped the value, just encode it to json.
+    if (value.type() != com.bybutter.sisyphus.protobuf.primitives.Any.name) {
+        return unwrappedAny(value)
+    }
+
+    if (!value.annotations().contains(AnyResolveFailed)) {
+        if (recursion) {
+            // If we got an unresolved Any
+            any(value.unwrapAny(), false)
+        } else {
+            // If we got a nested Any
+            unwrappedAny(value)
+        }
+        return
+    }
+
+    // We got a resolve failed Any, encode it with base64 value.
+    beginObject()
+    typeToken(value.get<String>(com.bybutter.sisyphus.protobuf.primitives.Any.TYPE_URL_FIELD_NUMBER))
+    fieldName("value")
+    value(value.get<ByteArray>(com.bybutter.sisyphus.protobuf.primitives.Any.VALUE_FIELD_NUMBER))
+    endObject()
+}
+
+internal fun JsonWriter.unwrappedAny(value: Message<*, *>) {
     beginObject()
     typeToken(value.support())
-    when (value) {
-        is Timestamp -> {
+    when (value.type()) {
+        Timestamp.name -> {
             fieldName("value")
-            value(value.string())
+            value(value.timestampString())
         }
-        is Duration -> {
+
+        Duration.name -> {
             fieldName("value")
-            value(value.string())
+            value(value.durationString())
         }
-        is FieldMask -> {
+
+        FieldMask.name -> {
             fieldName("value")
-            value(value.string())
+            value(value.fieldMaskString())
         }
-        is Value -> {
+
+        DoubleValue.name -> {
             fieldName("value")
-            value(value)
+            value(value.get<Double>(DoubleValue.VALUE_FIELD_NUMBER))
         }
-        is ListValue -> {
+
+        FloatValue.name -> {
             fieldName("value")
-            value(value)
+            value(value.get<Float>(FloatValue.VALUE_FIELD_NUMBER))
         }
-        is Struct -> {
+
+        Int64Value.name -> {
             fieldName("value")
-            value(value)
+            value(value.get<Long>(Int64Value.VALUE_FIELD_NUMBER))
         }
-        is DoubleValue -> {
+
+        UInt64Value.name -> {
             fieldName("value")
-            value(value.value)
+            value(value.get<ULong>(UInt64Value.VALUE_FIELD_NUMBER))
         }
-        is FloatValue -> {
+
+        Int32Value.name -> {
             fieldName("value")
-            value(value.value)
+            value(value.get<Int>(Int32Value.VALUE_FIELD_NUMBER))
         }
-        is Int32Value -> {
+
+        UInt32Value.name -> {
             fieldName("value")
-            value(value.value)
+            value(value.get<UInt>(UInt32Value.VALUE_FIELD_NUMBER))
         }
-        is Int64Value -> {
+
+        BoolValue.name -> {
             fieldName("value")
-            value(value.value)
+            value(value.get<Boolean>(BoolValue.VALUE_FIELD_NUMBER))
         }
-        is UInt32Value -> {
+
+        StringValue.name -> {
             fieldName("value")
-            value(value.value)
+            value(value.get<String>(StringValue.VALUE_FIELD_NUMBER))
         }
-        is UInt64Value -> {
+
+        BytesValue.name -> {
             fieldName("value")
-            value(value.value)
+            value(value.get<ByteArray>(BytesValue.VALUE_FIELD_NUMBER))
         }
-        is BoolValue -> {
+
+        Struct.name -> {
             fieldName("value")
-            value(value.value)
+            jsonStruct(value)
         }
-        is StringValue -> {
+
+        Value.name -> {
             fieldName("value")
-            value(value.value)
+            jsonValue(value)
         }
-        is BytesValue -> {
+
+        ListValue.name -> {
             fieldName("value")
-            value(value.value)
+            jsonList(value)
         }
+
         else -> fields(value)
     }
     endObject()
 }
 
-internal fun JsonWriter.value(value: Value) {
-    when (val kind = value.kind) {
-        is Value.Kind.BoolValue -> value(kind.value)
-        is Value.Kind.NumberValue -> value(kind.value)
-        is Value.Kind.StringValue -> value(kind.value)
-        is Value.Kind.StructValue -> value(kind.value)
-        is Value.Kind.ListValue -> value(kind.value)
-        is Value.Kind.NullValue -> nullValue()
+internal fun JsonWriter.jsonValue(value: Message<*, *>) {
+    when {
+        value.has(Value.BOOL_VALUE_FIELD_NUMBER) -> value(value.get<Boolean>(Value.BOOL_VALUE_FIELD_NUMBER))
+        value.has(Value.NUMBER_VALUE_FIELD_NUMBER) -> value(value.get<Double>(Value.NUMBER_VALUE_FIELD_NUMBER))
+        value.has(Value.STRING_VALUE_FIELD_NUMBER) -> value(value.get<String>(Value.STRING_VALUE_FIELD_NUMBER))
+        value.has(Value.STRUCT_VALUE_FIELD_NUMBER) -> jsonStruct(value[Value.STRUCT_VALUE_FIELD_NUMBER])
+        value.has(Value.LIST_VALUE_FIELD_NUMBER) -> jsonList(value[Value.LIST_VALUE_FIELD_NUMBER])
+        value.has(Value.NULL_VALUE_FIELD_NAME) -> nullValue()
         else -> nullValue()
     }
 }
 
-internal fun JsonWriter.value(value: Struct) {
+internal fun JsonWriter.jsonStruct(value: Message<*, *>) {
     beginObject()
-    value.fields.forEach { (k, v) ->
+    value.get<Map<String, Message<*, *>>>(Struct.FIELDS_FIELD_NUMBER).forEach { (k, v) ->
         fieldName(k)
-        value(v)
+        jsonValue(v)
     }
     endObject()
 }
 
-internal fun JsonWriter.value(value: ListValue) {
+internal fun JsonWriter.jsonList(value: Message<*, *>) {
     beginArray()
-    value.values.forEach {
-        value(it)
+    value.get<List<Message<*, *>>>(ListValue.VALUES_FIELD_NUMBER).forEach {
+        jsonValue(it)
     }
     endArray()
 }
 
 internal fun JsonWriter.message(value: Message<*, *>) {
-    when (value) {
-        is Timestamp -> value(value.string())
-        is Duration -> value(value.string())
-        is FieldMask -> value(value.string())
-        is Value -> value(value)
-        is ListValue -> value(value)
-        is Struct -> value(value)
-        is DoubleValue -> value(value.value)
-        is FloatValue -> value(value.value)
-        is Int32Value -> value(value.value)
-        is Int64Value -> value(value.value)
-        is UInt32Value -> value(value.value)
-        is UInt64Value -> value(value.value)
-        is BoolValue -> value(value.value)
-        is StringValue -> value(value.value)
-        is BytesValue -> value(value.value)
-        is com.bybutter.sisyphus.protobuf.primitives.Any -> any(value)
-        else -> {
-            beginObject()
-            fields(value)
-            endObject()
+    if (!wellknown(value.type(), value)) {
+        when (value.type()) {
+            com.bybutter.sisyphus.protobuf.primitives.Any.name -> {
+                any(value)
+            }
+
+            else -> {
+                beginObject()
+                fields(value)
+                endObject()
+            }
         }
     }
 }
