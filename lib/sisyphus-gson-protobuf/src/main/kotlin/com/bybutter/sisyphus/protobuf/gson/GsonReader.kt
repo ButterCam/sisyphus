@@ -23,6 +23,7 @@ class GsonReader(val reader: com.google.gson.stream.JsonReader) : JsonReader {
                 com.google.gson.stream.JsonToken.BEGIN_OBJECT -> reader.beginObject()
                 com.google.gson.stream.JsonToken.END_OBJECT -> reader.endObject()
                 com.google.gson.stream.JsonToken.NULL -> reader.nextNull()
+                else -> {}
             }
         }
         return token!!

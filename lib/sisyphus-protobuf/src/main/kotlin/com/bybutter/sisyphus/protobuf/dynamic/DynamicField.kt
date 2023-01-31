@@ -1,8 +1,6 @@
 package com.bybutter.sisyphus.protobuf.dynamic
 
-import com.bybutter.sisyphus.protobuf.EnumSupport
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoEnum
 import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.coded.Reader
@@ -55,16 +53,13 @@ interface DynamicField<T> {
                         } else if (descriptor.typeName == com.bybutter.sisyphus.protobuf.primitives.Any.name) {
                             RepeatedAnyDynamicField(descriptor)
                         } else {
-                            RepeatedMessageDynamicField<Message<*, *>>(descriptor)
+                            RepeatedMessageDynamicField(descriptor)
                         }
                     }
 
                     FieldDescriptorProto.Type.BYTES -> RepeatedBytesDynamicField(descriptor)
                     FieldDescriptorProto.Type.UINT32 -> RepeatedUInt32DynamicField(descriptor)
-                    FieldDescriptorProto.Type.ENUM -> RepeatedEnumDynamicField<ProtoEnum<*>>(
-                        descriptor
-                    )
-
+                    FieldDescriptorProto.Type.ENUM -> RepeatedEnumDynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED32 -> RepeatedSFixed32DynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED64 -> RepeatedSFixed64DynamicField(descriptor)
                     FieldDescriptorProto.Type.SINT32 -> RepeatedSInt32DynamicField(descriptor)
@@ -86,13 +81,13 @@ interface DynamicField<T> {
                         if (descriptor.typeName == com.bybutter.sisyphus.protobuf.primitives.Any.name) {
                             AnyDynamicField(descriptor)
                         } else {
-                            MessageDynamicField<Message<*, *>>(descriptor)
+                            MessageDynamicField(descriptor)
                         }
                     }
 
                     FieldDescriptorProto.Type.BYTES -> BytesDynamicField(descriptor)
                     FieldDescriptorProto.Type.UINT32 -> UInt32DynamicField(descriptor)
-                    FieldDescriptorProto.Type.ENUM -> EnumDynamicField<ProtoEnum<*>>(descriptor)
+                    FieldDescriptorProto.Type.ENUM -> EnumDynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED32 -> SFixed32DynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED64 -> SFixed64DynamicField(descriptor)
                     FieldDescriptorProto.Type.SINT32 -> SInt32DynamicField(descriptor)
@@ -552,14 +547,14 @@ class RepeatedSInt32DynamicField(descriptor: FieldDescriptorProto) :
     }
 }
 
-class EnumDynamicField<T : ProtoEnum<T>>(
+class EnumDynamicField(
     descriptor: FieldDescriptorProto,
-) : AbstractPackableDynamicField<T>(descriptor) {
-    private val support = ProtoReflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
+) : AbstractPackableDynamicField<ProtoEnum<*>>(descriptor) {
+    private val support = ProtoReflection.findEnumSupport(descriptor().typeName)
 
-    override var value: T = defaultValue()
+    override var value: ProtoEnum<*> = defaultValue()
 
-    override fun defaultValue(): T {
+    override fun defaultValue(): ProtoEnum<*> {
         return support()
     }
 
@@ -574,28 +569,28 @@ class EnumDynamicField<T : ProtoEnum<T>>(
     }
 }
 
-class RepeatedEnumDynamicField<T : ProtoEnum<T>>(
+class RepeatedEnumDynamicField(
     descriptor: FieldDescriptorProto,
-) : AbstractRepeatedPackableDynamicField<T>(descriptor) {
-    private val support = ProtoReflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
+) : AbstractRepeatedPackableDynamicField<ProtoEnum<*>>(descriptor) {
+    private val support = ProtoReflection.findEnumSupport(descriptor().typeName)
 
     override fun read0(reader: Reader, field: Int, wire: Int) {
         get() += support(reader.int32())
     }
 
-    override fun write0(writer: Writer, value: T) {
+    override fun write0(writer: Writer, value: ProtoEnum<*>) {
         writer.enum(value)
     }
 }
 
-class MessageDynamicField<T : Message<T, *>>(
+class MessageDynamicField(
     descriptor: FieldDescriptorProto,
-) : AbstractDynamicField<T?>(descriptor) {
-    private val support = ProtoReflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
+) : AbstractDynamicField<Message<*, *>?>(descriptor) {
+    private val support = ProtoReflection.findMessageSupport(descriptor().typeName)
 
-    override var value: T? = defaultValue()
+    override var value: Message<*, *>? = defaultValue()
 
-    override fun defaultValue(): T? {
+    override fun defaultValue(): Message<*, *>? {
         return null
     }
 
@@ -614,10 +609,10 @@ class MessageDynamicField<T : Message<T, *>>(
     }
 }
 
-class RepeatedMessageDynamicField<T : Message<T, *>>(
+class RepeatedMessageDynamicField(
     descriptor: FieldDescriptorProto,
-) : AbstractRepeatedDynamicField<T>(descriptor) {
-    private val support = ProtoReflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
+) : AbstractRepeatedDynamicField<Message<*, *>>(descriptor) {
+    private val support = ProtoReflection.findMessageSupport(descriptor().typeName)
 
     override fun writeTo(writer: Writer) {
         for (value in get()) {

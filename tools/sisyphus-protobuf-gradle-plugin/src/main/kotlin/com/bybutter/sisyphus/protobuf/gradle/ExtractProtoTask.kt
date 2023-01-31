@@ -3,7 +3,8 @@ package com.bybutter.sisyphus.protobuf.gradle
 import com.bybutter.sisyphus.io.toUnixPath
 import com.bybutter.sisyphus.protobuf.compiler.ProtocRunner
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
@@ -19,16 +20,16 @@ import java.nio.file.attribute.BasicFileAttributes
 
 open class ExtractProtoTask : DefaultTask() {
     @get:OutputDirectory
-    lateinit var resourceOutput: File
+    val resourceOutput: DirectoryProperty = project.objects.directoryProperty()
 
     @get:OutputDirectory
-    lateinit var protoPath: File
+    val protoPath: DirectoryProperty = project.objects.directoryProperty()
 
     @get:InputFiles
-    lateinit var protoCompileFiles: FileCollection
+    val protoCompileFiles: ConfigurableFileCollection = project.objects.fileCollection()
 
     @get:InputFiles
-    lateinit var protoApiFiles: FileCollection
+    val protoApiFiles: ConfigurableFileCollection = project.objects.fileCollection()
 
     @get:Internal
     lateinit var protobuf: ProtobufExtension
@@ -91,7 +92,7 @@ open class ExtractProtoTask : DefaultTask() {
             sourceProtos += protoName
             sourceFileMapping[protoName] = file.toString()
         }
-        val targetFile = protoPath.toPath().resolve(name)
+        val targetFile = protoPath.asFile.get().toPath().resolve(name)
         Files.createDirectories(targetFile.parent)
         Files.deleteIfExists(targetFile)
         Files.write(targetFile, value)
@@ -99,8 +100,8 @@ open class ExtractProtoTask : DefaultTask() {
 
     @TaskAction
     fun extractProto() {
-        resourceOutput.deleteRecursively()
-        resourceOutput.mkdirs()
+        resourceOutput.asFile.get().deleteRecursively()
+        resourceOutput.asFile.get().mkdirs()
 
         scannedMapping += protobuf.mapping
 
@@ -114,20 +115,20 @@ open class ExtractProtoTask : DefaultTask() {
 
         if (protobuf.mapping.isNotEmpty()) {
             Files.write(
-                Paths.get(resourceOutput.toPath().toString(), "protomap"),
+                Paths.get(resourceOutput.asFile.get().toPath().toString(), "protomap"),
                 protobuf.mapping.map { "${it.key}=${it.value}" }
             )
         }
 
-        val desc = ProtocRunner.generate(protoPath, sourceProtos)
-        Files.write(Paths.get(protoPath.toPath().toString(), "protodesc.pb"), desc.toByteArray())
+        val desc = ProtocRunner.generate(protoPath.asFile.get(), sourceProtos)
+        Files.write(Paths.get(protoPath.asFile.get().toPath().toString(), "protodesc.pb"), desc.toByteArray())
         Files.write(
-            Paths.get(protoPath.toPath().toString(), "protomap"),
+            Paths.get(protoPath.asFile.get().toPath().toString(), "protomap"),
             scannedMapping.map { "${it.key}=${it.value}" }
         )
-        Files.write(Paths.get(protoPath.toPath().toString(), "protosrc"), sourceProtos)
+        Files.write(Paths.get(protoPath.asFile.get().toPath().toString(), "protosrc"), sourceProtos)
         Files.write(
-            Paths.get(protoPath.toPath().toString(), "protofile"),
+            Paths.get(protoPath.asFile.get().toPath().toString(), "protofile"),
             sourceFileMapping.map { "${it.key}=${it.value}" }
         )
     }

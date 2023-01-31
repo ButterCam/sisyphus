@@ -8,11 +8,11 @@ import com.bybutter.sisyphus.protobuf.compiler.RuntimeTypes
 import com.google.protobuf.DescriptorProtos
 import com.squareup.kotlinpoet.TypeSpec
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -20,30 +20,30 @@ import java.nio.file.StandardCopyOption
 
 open class GenerateProtoTask : DefaultTask() {
     @get:InputDirectory
-    lateinit var protoPath: File
+    val protoPath: DirectoryProperty = project.objects.directoryProperty()
 
     @get:OutputDirectory
-    lateinit var output: File
+    val output: DirectoryProperty = project.objects.directoryProperty()
 
     @get:OutputDirectory
-    lateinit var resourceOutput: File
+    val resourceOutput: DirectoryProperty = project.objects.directoryProperty()
 
     @get:Internal
     lateinit var protobuf: ProtobufExtension
 
     @TaskAction
     fun generateKotlin() {
-        output.deleteRecursively()
-        output.mkdirs()
+        output.asFile.get().deleteRecursively()
+        output.asFile.get().mkdirs()
 
-        val descFile = protoPath.resolve("protodesc.pb")
+        val descFile = protoPath.get().file("protodesc.pb").asFile
         val desc = if (descFile.exists()) {
             DescriptorProtos.FileDescriptorSet.parseFrom(descFile.readBytes())
         } else {
             return
         }
 
-        val mappingFile = protoPath.resolve("protomap")
+        val mappingFile = protoPath.get().file("protomap").asFile
         val mapping = if (mappingFile.exists()) {
             mappingFile.readLines().mapNotNull {
                 val map = it.split('=')
@@ -57,7 +57,7 @@ open class GenerateProtoTask : DefaultTask() {
             mapOf()
         }
 
-        val sourceFile = protoPath.resolve("protosrc")
+        val sourceFile = protoPath.get().file("protosrc").asFile
         val source = if (sourceFile.exists()) {
             sourceFile.readLines().toSet()
         } else {
@@ -69,26 +69,27 @@ open class GenerateProtoTask : DefaultTask() {
         for (result in results.results) {
             val sourceProto = result.descriptor.descriptor.name
             if (protobuf.source) {
-                val sourceProtoFile = protoPath.resolve(sourceProto).toPath()
-                val protoFile = Paths.get(resourceOutput.toPath().toString(), sourceProto)
+                val sourceProtoFile = protoPath.get().file(sourceProto).asFile.toPath()
+                val protoFile = Paths.get(resourceOutput.get().asFile.toPath().toString(), sourceProto)
                 Files.createDirectories(protoFile.parent)
                 Files.copy(sourceProtoFile, protoFile, StandardCopyOption.REPLACE_EXISTING)
             }
             for (file in result.files) {
                 when (file) {
                     is GeneratedKotlinFile -> {
-                        file.writeTo(output.toPath())
+                        file.writeTo(output.get().asFile.toPath())
                     }
+
                     is GeneratedDescriptorFile -> {
-                        file.writeTo(resourceOutput.toPath())
+                        file.writeTo(resourceOutput.get().asFile.toPath())
                     }
                 }
             }
         }
         results.booster?.let {
-            it.writeTo(output.toPath())
+            it.writeTo(output.get().asFile.toPath())
             val booster = Paths.get(
-                resourceOutput.toPath().toString(),
+                resourceOutput.get().asFile.toPath().toString(),
                 "META-INF/services/${RuntimeTypes.PROTOBUF_BOOSTER.canonicalName}"
             )
             val boosterName = "${it.packageName}.${(it.members.first() as TypeSpec).name}"
