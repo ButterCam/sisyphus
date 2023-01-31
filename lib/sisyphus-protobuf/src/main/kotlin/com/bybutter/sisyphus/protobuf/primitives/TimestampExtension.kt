@@ -137,13 +137,9 @@ operator fun Duration.Companion.invoke(nanos: BigInteger): Duration {
 }
 
 operator fun Duration.Companion.invoke(hours: Long, minutes: Long, seconds: Long, nanos: Int = 0): Duration {
-    return Duration(
-        (
-                TimeUnit.HOURS.toNanos(hours) + TimeUnit.MINUTES.toNanos(minutes) + TimeUnit.SECONDS.toNanos(
-                    seconds
-                ) + nanos
-                ).toBigInteger()
-    )
+    val totalSeconds =
+        TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes) + TimeUnit.SECONDS.toSeconds(seconds)
+    return Duration(totalSeconds, nanos)
 }
 
 fun Timestamp.toBigInteger(): BigInteger {
