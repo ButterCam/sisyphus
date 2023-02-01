@@ -1,18 +1,17 @@
 package com.bybutter.sisyphus.protobuf.dynamic
 
-import com.bybutter.sisyphus.protobuf.EnumSupport
 import com.bybutter.sisyphus.protobuf.Message
-import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.ProtoEnum
 import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.coded.WireType
 import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.findEnumSupport
+import com.bybutter.sisyphus.protobuf.findMapEntryDescriptor
 import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
-import com.bybutter.sisyphus.protobuf.primitives.toAny
-import com.bybutter.sisyphus.protobuf.primitives.toMessage
+import com.bybutter.sisyphus.protobuf.primitives.unwrapAny
+import com.bybutter.sisyphus.protobuf.primitives.wrapAny
 
 interface DynamicField<T> {
     fun descriptor(): FieldDescriptorProto
@@ -48,17 +47,19 @@ interface DynamicField<T> {
                     FieldDescriptorProto.Type.STRING -> RepeatedStringDynamicField(descriptor)
                     FieldDescriptorProto.Type.GROUP -> TODO()
                     FieldDescriptorProto.Type.MESSAGE -> {
-                        if (descriptor.typeName == com.bybutter.sisyphus.protobuf.primitives.Any.name) {
+                        val support = ProtoReflection.findMapEntryDescriptor(descriptor.typeName)
+                        if (support?.options?.mapEntry == true) {
+                            MapDynamicField<Any, Any>(descriptor)
+                        } else if (descriptor.typeName == com.bybutter.sisyphus.protobuf.primitives.Any.name) {
                             RepeatedAnyDynamicField(descriptor)
                         } else {
-                            RepeatedMessageDynamicField<Message<*, *>>(descriptor)
+                            RepeatedMessageDynamicField(descriptor)
                         }
                     }
+
                     FieldDescriptorProto.Type.BYTES -> RepeatedBytesDynamicField(descriptor)
                     FieldDescriptorProto.Type.UINT32 -> RepeatedUInt32DynamicField(descriptor)
-                    FieldDescriptorProto.Type.ENUM -> RepeatedEnumDynamicField<ProtoEnum<*>>(
-                        descriptor
-                    )
+                    FieldDescriptorProto.Type.ENUM -> RepeatedEnumDynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED32 -> RepeatedSFixed32DynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED64 -> RepeatedSFixed64DynamicField(descriptor)
                     FieldDescriptorProto.Type.SINT32 -> RepeatedSInt32DynamicField(descriptor)
@@ -80,12 +81,13 @@ interface DynamicField<T> {
                         if (descriptor.typeName == com.bybutter.sisyphus.protobuf.primitives.Any.name) {
                             AnyDynamicField(descriptor)
                         } else {
-                            MessageDynamicField<Message<*, *>>(descriptor)
+                            MessageDynamicField(descriptor)
                         }
                     }
+
                     FieldDescriptorProto.Type.BYTES -> BytesDynamicField(descriptor)
                     FieldDescriptorProto.Type.UINT32 -> UInt32DynamicField(descriptor)
-                    FieldDescriptorProto.Type.ENUM -> EnumDynamicField<ProtoEnum<*>>(descriptor)
+                    FieldDescriptorProto.Type.ENUM -> EnumDynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED32 -> SFixed32DynamicField(descriptor)
                     FieldDescriptorProto.Type.SFIXED64 -> SFixed64DynamicField(descriptor)
                     FieldDescriptorProto.Type.SINT32 -> SInt32DynamicField(descriptor)
@@ -96,7 +98,7 @@ interface DynamicField<T> {
     }
 }
 
-class DoubleDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Double>(descriptor) {
+class DoubleDynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Double>(descriptor) {
     override var value: Double = defaultValue()
 
     override fun defaultValue(): Double {
@@ -105,34 +107,27 @@ class DoubleDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFiel
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.FIXED64)
-                .double(get())
+            writer.tag(descriptor().number, WireType.FIXED64).double(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED64.ordinal) {
-            set(reader.double())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.double())
     }
 }
 
-class RepeatedDoubleDynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<Double>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.FIXED64)
-                .double(value)
-        }
+class RepeatedDoubleDynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<Double>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.double()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED64.ordinal) {
-            get() += reader.double()
-        }
+    override fun write0(writer: Writer, value: Double) {
+        writer.double(value)
     }
 }
 
-class FloatDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Float>(descriptor) {
+class FloatDynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Float>(descriptor) {
     override var value: Float = defaultValue()
 
     override fun defaultValue(): Float {
@@ -141,34 +136,27 @@ class FloatDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.FIXED32)
-                .float(get())
+            writer.tag(descriptor().number, WireType.FIXED32).float(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED32.ordinal) {
-            set(reader.float())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.float())
     }
 }
 
-class RepeatedFloatDynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<Float>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.FIXED32)
-                .float(value)
-        }
+class RepeatedFloatDynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<Float>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.float()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED32.ordinal) {
-            get() += reader.float()
-        }
+    override fun write0(writer: Writer, value: Float) {
+        writer.float(value)
     }
 }
 
-class Int64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Long>(descriptor) {
+class Int64DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Long>(descriptor) {
     override var value: Long = defaultValue()
 
     override fun defaultValue(): Long {
@@ -177,34 +165,27 @@ class Int64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .int64(get())
+            writer.tag(descriptor().number, WireType.VARINT).int64(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            set(reader.int64())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.int64())
     }
 }
 
-class RepeatedInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<Long>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .int64(value)
-        }
+class RepeatedInt64DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<Long>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.int64()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        reader.packed(wire) {
-            get() += reader.int64()
-        }
+    override fun write0(writer: Writer, value: Long) {
+        writer.int64(value)
     }
 }
 
-class UInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<ULong>(descriptor) {
+class UInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<ULong>(descriptor) {
     override var value: ULong = defaultValue()
 
     override fun defaultValue(): ULong {
@@ -213,34 +194,28 @@ class UInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFiel
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .uint64(get())
+            writer.tag(descriptor().number, WireType.VARINT).uint64(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            set(reader.uint64())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.uint64())
     }
 }
 
-class RepeatedUInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<ULong>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .uint64(value)
-        }
+class RepeatedUInt64DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<ULong>(descriptor) {
+
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.uint64()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        reader.packed(wire) {
-            get() += reader.uint64()
-        }
+    override fun write0(writer: Writer, value: ULong) {
+        writer.uint64(value)
     }
 }
 
-class Int32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Int>(descriptor) {
+class Int32DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Int>(descriptor) {
     override var value: Int = defaultValue()
 
     override fun defaultValue(): Int {
@@ -249,34 +224,28 @@ class Int32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .int32(get())
+            writer.tag(descriptor().number, WireType.VARINT).int32(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            set(reader.int32())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.int32())
     }
 }
 
-class RepeatedInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<Int>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .int32(value)
-        }
+class RepeatedInt32DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<Int>(descriptor) {
+
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.int32()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        reader.packed(wire) {
-            get() += reader.int32()
-        }
+    override fun write0(writer: Writer, value: Int) {
+        writer.int32(value)
     }
 }
 
-class Fixed64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<ULong>(descriptor) {
+class Fixed64DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<ULong>(descriptor) {
     override var value: ULong = defaultValue()
 
     override fun defaultValue(): ULong {
@@ -285,34 +254,27 @@ class Fixed64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFie
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.FIXED64)
-                .fixed64(get())
+            writer.tag(descriptor().number, WireType.FIXED64).fixed64(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED64.ordinal) {
-            set(reader.fixed64())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.fixed64())
     }
 }
 
-class RepeatedFixed64DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<ULong>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.FIXED64)
-                .fixed64(value)
-        }
+class RepeatedFixed64DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<ULong>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.fixed64()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED64.ordinal) {
-            get() += reader.fixed64()
-        }
+    override fun write0(writer: Writer, value: ULong) {
+        writer.fixed64(value)
     }
 }
 
-class Fixed32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<UInt>(descriptor) {
+class Fixed32DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<UInt>(descriptor) {
     override var value: UInt = defaultValue()
 
     override fun defaultValue(): UInt {
@@ -321,34 +283,27 @@ class Fixed32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFie
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.FIXED32)
-                .fixed32(get())
+            writer.tag(descriptor().number, WireType.FIXED32).fixed32(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED32.ordinal) {
-            set(reader.fixed32())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.fixed32())
     }
 }
 
-class RepeatedFixed32DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<UInt>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.FIXED32)
-                .fixed32(value)
-        }
+class RepeatedFixed32DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<UInt>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.fixed32()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED32.ordinal) {
-            get() += reader.fixed32()
-        }
+    override fun write0(writer: Writer, value: UInt) {
+        writer.fixed32(value)
     }
 }
 
-class BooleanDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Boolean>(descriptor) {
+class BooleanDynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Boolean>(descriptor) {
     override var value: Boolean = defaultValue()
 
     override fun defaultValue(): Boolean {
@@ -357,31 +312,24 @@ class BooleanDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFie
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .bool(get())
+            writer.tag(descriptor().number, WireType.VARINT).bool(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            set(reader.bool())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.bool())
     }
 }
 
 class RepeatedBooleanDynamicField(descriptor: FieldDescriptorProto) :
-    AbstractRepeatedDynamicField<Boolean>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .bool(value)
-        }
+    AbstractRepeatedPackableDynamicField<Boolean>(descriptor) {
+
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.bool()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            get() += reader.bool()
-        }
+    override fun write0(writer: Writer, value: Boolean) {
+        writer.bool(value)
     }
 }
 
@@ -394,8 +342,7 @@ class StringDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFiel
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
-                .string(get())
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED).string(get())
         }
     }
 
@@ -409,8 +356,7 @@ class StringDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFiel
 class RepeatedStringDynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<String>(descriptor) {
     override fun writeTo(writer: Writer) {
         for (value in get()) {
-            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
-                .string(value)
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED).string(value)
         }
     }
 
@@ -430,13 +376,12 @@ class BytesDynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
-                .bytes(get())
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED).bytes(get())
         }
     }
 
     override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
+        if (wire == WireType.LENGTH_DELIMITED.ordinal) {
             set(reader.bytes())
         }
     }
@@ -446,8 +391,7 @@ class RepeatedBytesDynamicField(descriptor: FieldDescriptorProto) :
     AbstractRepeatedDynamicField<ByteArray>(descriptor) {
     override fun writeTo(writer: Writer) {
         for (value in get()) {
-            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
-                .bytes(value)
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED).bytes(value)
         }
     }
 
@@ -458,7 +402,7 @@ class RepeatedBytesDynamicField(descriptor: FieldDescriptorProto) :
     }
 }
 
-class UInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<UInt>(descriptor) {
+class UInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<UInt>(descriptor) {
     override var value: UInt = defaultValue()
 
     override fun defaultValue(): UInt {
@@ -467,34 +411,27 @@ class UInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFiel
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .uint32(get())
+            writer.tag(descriptor().number, WireType.VARINT).uint32(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            set(reader.uint32())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.uint32())
     }
 }
 
-class RepeatedUInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<UInt>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .uint32(value)
-        }
+class RepeatedUInt32DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<UInt>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.uint32()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        reader.packed(wire) {
-            get() += reader.uint32()
-        }
+    override fun write0(writer: Writer, value: UInt) {
+        writer.uint32(value)
     }
 }
 
-class SFixed64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Long>(descriptor) {
+class SFixed64DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Long>(descriptor) {
     override var value: Long = defaultValue()
 
     override fun defaultValue(): Long {
@@ -503,34 +440,27 @@ class SFixed64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFi
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.FIXED64)
-                .sfixed64(get())
+            writer.tag(descriptor().number, WireType.FIXED64).sfixed64(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED64.ordinal) {
-            set(reader.sfixed64())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.sfixed64())
     }
 }
 
-class RepeatedSFixed64DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<Long>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.FIXED64)
-                .sfixed64(value)
-        }
+class RepeatedSFixed64DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<Long>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.sfixed64()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED64.ordinal) {
-            get() += reader.sfixed64()
-        }
+    override fun write0(writer: Writer, value: Long) {
+        writer.sfixed64(value)
     }
 }
 
-class SFixed32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Int>(descriptor) {
+class SFixed32DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Int>(descriptor) {
     override var value: Int = defaultValue()
 
     override fun defaultValue(): Int {
@@ -539,34 +469,27 @@ class SFixed32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFi
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.FIXED32)
-                .sfixed32(get())
+            writer.tag(descriptor().number, WireType.FIXED32).sfixed32(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED32.ordinal) {
-            set(reader.sfixed32())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.sfixed32())
     }
 }
 
-class RepeatedSFixed32DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<Int>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.FIXED32)
-                .sfixed32(value)
-        }
+class RepeatedSFixed32DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<Int>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.sfixed32()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.FIXED32.ordinal) {
-            get() += reader.sfixed32()
-        }
+    override fun write0(writer: Writer, value: Int) {
+        writer.sfixed32(value)
     }
 }
 
-class SInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Long>(descriptor) {
+class SInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Long>(descriptor) {
     override var value: Long = defaultValue()
 
     override fun defaultValue(): Long {
@@ -575,34 +498,27 @@ class SInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFiel
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .sint64(get())
+            writer.tag(descriptor().number, WireType.VARINT).sint64(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            set(reader.sint64())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.sint64())
     }
 }
 
-class RepeatedSInt64DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<Long>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .sint64(value)
-        }
+class RepeatedSInt64DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<Long>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.sint64()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        reader.packed(wire) {
-            get() += reader.sint64()
-        }
+    override fun write0(writer: Writer, value: Long) {
+        writer.sint64(value)
     }
 }
 
-class SInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicField<Int>(descriptor) {
+class SInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractPackableDynamicField<Int>(descriptor) {
     override var value: Int = defaultValue()
 
     override fun defaultValue(): Int {
@@ -611,92 +527,76 @@ class SInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractDynamicFiel
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .sint32(get())
+            writer.tag(descriptor().number, WireType.VARINT).sint32(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            set(reader.sint32())
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(reader.sint32())
     }
 }
 
-class RepeatedSInt32DynamicField(descriptor: FieldDescriptorProto) : AbstractRepeatedDynamicField<Int>(descriptor) {
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .sint32(value)
-        }
+class RepeatedSInt32DynamicField(descriptor: FieldDescriptorProto) :
+    AbstractRepeatedPackableDynamicField<Int>(descriptor) {
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += reader.sint32()
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        reader.packed(wire) {
-            get() += reader.sint32()
-        }
+    override fun write0(writer: Writer, value: Int) {
+        writer.sint32(value)
     }
 }
 
-class EnumDynamicField<T : ProtoEnum<T>>(
-    descriptor: FieldDescriptorProto
-) : AbstractDynamicField<T>(descriptor) {
-    private val support = ProtoReflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
+class EnumDynamicField(
+    descriptor: FieldDescriptorProto,
+) : AbstractPackableDynamicField<ProtoEnum<*>>(descriptor) {
+    private val support = ProtoReflection.findEnumSupport(descriptor().typeName)
 
-    override var value: T = defaultValue()
+    override var value: ProtoEnum<*> = defaultValue()
 
-    override fun defaultValue(): T {
+    override fun defaultValue(): ProtoEnum<*> {
         return support()
     }
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .enum(get())
+            writer.tag(descriptor().number, WireType.VARINT).enum(get())
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        if (wire == WireType.VARINT.ordinal) {
-            set(support(reader.int32()))
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        set(support(reader.int32()))
     }
 }
 
-class RepeatedEnumDynamicField<T : ProtoEnum<T>>(
-    descriptor: FieldDescriptorProto
-) : AbstractRepeatedDynamicField<T>(descriptor) {
-    private val support = ProtoReflection.findEnumSupport(descriptor().typeName) as EnumSupport<T>
+class RepeatedEnumDynamicField(
+    descriptor: FieldDescriptorProto,
+) : AbstractRepeatedPackableDynamicField<ProtoEnum<*>>(descriptor) {
+    private val support = ProtoReflection.findEnumSupport(descriptor().typeName)
 
-    override fun writeTo(writer: Writer) {
-        for (value in get()) {
-            writer.tag(descriptor().number, WireType.VARINT)
-                .enum(value)
-        }
+    override fun read0(reader: Reader, field: Int, wire: Int) {
+        get() += support(reader.int32())
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
-        reader.packed(wire) {
-            get() += support(reader.int32())
-        }
+    override fun write0(writer: Writer, value: ProtoEnum<*>) {
+        writer.enum(value)
     }
 }
 
-class MessageDynamicField<T : Message<T, *>>(
-    descriptor: FieldDescriptorProto
-) : AbstractDynamicField<T?>(descriptor) {
-    private val support = ProtoReflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
+class MessageDynamicField(
+    descriptor: FieldDescriptorProto,
+) : AbstractDynamicField<Message<*, *>?>(descriptor) {
+    private val support = ProtoReflection.findMessageSupport(descriptor().typeName)
 
-    override var value: T? = defaultValue()
+    override var value: Message<*, *>? = defaultValue()
 
-    override fun defaultValue(): T? {
+    override fun defaultValue(): Message<*, *>? {
         return null
     }
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
-                .message(value)
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED).message(value)
         }
     }
 
@@ -709,15 +609,14 @@ class MessageDynamicField<T : Message<T, *>>(
     }
 }
 
-class RepeatedMessageDynamicField<T : Message<T, *>>(
-    descriptor: FieldDescriptorProto
-) : AbstractRepeatedDynamicField<T>(descriptor) {
-    private val support = ProtoReflection.findMessageSupport(descriptor().typeName) as MessageSupport<T, *>
+class RepeatedMessageDynamicField(
+    descriptor: FieldDescriptorProto,
+) : AbstractRepeatedDynamicField<Message<*, *>>(descriptor) {
+    private val support = ProtoReflection.findMessageSupport(descriptor().typeName)
 
     override fun writeTo(writer: Writer) {
         for (value in get()) {
-            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
-                .message(value)
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED).message(value)
         }
     }
 
@@ -731,7 +630,7 @@ class RepeatedMessageDynamicField<T : Message<T, *>>(
 }
 
 class AnyDynamicField(
-    descriptor: FieldDescriptorProto
+    descriptor: FieldDescriptorProto,
 ) : AbstractDynamicField<Message<*, *>?>(descriptor) {
     override var value: Message<*, *>? = defaultValue()
 
@@ -741,14 +640,16 @@ class AnyDynamicField(
 
     override fun writeTo(writer: Writer) {
         if (has()) {
-            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
-                .message(value?.toAny())
+            val value = value ?: return
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED).message(value.wrapAny())
         }
     }
 
     override fun read(reader: Reader, field: Int, wire: Int) {
         if (wire == WireType.LENGTH_DELIMITED.ordinal) {
-            set(com.bybutter.sisyphus.protobuf.primitives.Any.parse(reader, reader.int32()).toMessage())
+            val support = ProtoReflection.findMessageSupport(com.bybutter.sisyphus.protobuf.primitives.Any.name)
+            val any = support.parse(reader, reader.int32())
+            set(any.unwrapAny() ?: any)
         } else {
             reader.skip(WireType.valueOf(wire))
         }
@@ -756,19 +657,20 @@ class AnyDynamicField(
 }
 
 class RepeatedAnyDynamicField(
-    descriptor: FieldDescriptorProto
+    descriptor: FieldDescriptorProto,
 ) : AbstractRepeatedDynamicField<Message<*, *>>(descriptor) {
 
     override fun writeTo(writer: Writer) {
         for (value in get()) {
-            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED)
-                .message(value.toAny())
+            writer.tag(descriptor().number, WireType.LENGTH_DELIMITED).message(value.wrapAny())
         }
     }
 
     override fun read(reader: Reader, field: Int, wire: Int) {
         if (wire == WireType.LENGTH_DELIMITED.ordinal) {
-            get() += com.bybutter.sisyphus.protobuf.primitives.Any.parse(reader, reader.int32()).toMessage()
+            val support = ProtoReflection.findMessageSupport(com.bybutter.sisyphus.protobuf.primitives.Any.name)
+            val any = support.parse(reader, reader.int32())
+            get() += any.unwrapAny() ?: any
         } else {
             reader.skip(WireType.valueOf(wire))
         }

@@ -22,13 +22,33 @@ fun Timestamp.toSql(): java.sql.Timestamp {
     return result
 }
 
-fun LocalDateTime.toProto(): Timestamp = Timestamp {
-    seconds = this@toProto.toInstant(defaultOffset).epochSecond
+fun LocalDateTime.toProto(offset: ZoneOffset = defaultOffset): Timestamp = Timestamp {
+    seconds = this@toProto.toInstant(offset).epochSecond
     nanos = this@toProto.nano
 }
 
 fun Timestamp.toLocalDateTime(offset: ZoneOffset = defaultOffset): LocalDateTime {
     return LocalDateTime.ofEpochSecond(seconds, nanos, offset)
+}
+
+fun Timestamp.toInstant(offset: ZoneOffset = defaultOffset): Instant {
+    return Instant.ofEpochSecond(seconds, nanos.toLong())
+}
+
+fun Timestamp.toZonedDataTime(zone: ZoneId = ZoneId.systemDefault()): ZonedDateTime {
+    return ZonedDateTime.ofInstant(toInstant(), zone)
+}
+
+fun Timestamp.toOffsetDataTime(offset: ZoneOffset = defaultOffset): OffsetDateTime {
+    return OffsetDateTime.of(toLocalDateTime(offset), offset)
+}
+
+fun Timestamp.Companion.currentZoneOffset(): ZoneOffset {
+    return defaultOffset
+}
+
+fun Timestamp.Companion.currentZoneId(): ZoneId {
+    return ZoneId.systemDefault()
 }
 
 operator fun Timestamp.Companion.invoke(
@@ -39,7 +59,7 @@ operator fun Timestamp.Companion.invoke(
     minute: Int = 0,
     second: Int = 0,
     nano: Int = 0,
-    zoneId: ZoneId = ZoneId.systemDefault()
+    zoneId: ZoneId = ZoneId.systemDefault(),
 ): Timestamp {
     val instant = ZonedDateTime.of(year, month.value, day, hour, minute, second, nano, zoneId).toInstant()
     return Timestamp {
@@ -56,7 +76,7 @@ operator fun Timestamp.Companion.invoke(
     minute: Int = 0,
     second: Int = 0,
     nano: Int = 0,
-    zoneId: ZoneId = ZoneId.systemDefault()
+    zoneId: ZoneId = ZoneId.systemDefault(),
 ): Timestamp {
     val instant = ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId).toInstant()
     return Timestamp {
@@ -84,6 +104,11 @@ internal fun Timestamp.Companion.parseJvm8(value: String): Timestamp {
     }
 }
 
+internal fun Timestamp.Companion.parsePayloadJvm8(value: String): Pair<Long, Int> {
+    val instant = ZonedDateTime.parse(value).toInstant()
+    return instant.epochSecond to instant.nano
+}
+
 internal fun Timestamp.Companion.nowJvm8(): Timestamp {
     val instant = Instant.now()
     return Timestamp {
@@ -94,4 +119,8 @@ internal fun Timestamp.Companion.nowJvm8(): Timestamp {
 
 internal fun Timestamp.stringJvm8(): String {
     return this.toInstant().toString()
+}
+
+internal fun Timestamp.Companion.stringJvm8(seconds: Long, nanos: Int): String {
+    return Instant.ofEpochSecond(seconds, nanos.toLong()).toString()
 }

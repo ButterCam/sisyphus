@@ -93,10 +93,10 @@ abstract class BaseProtobufPlugin : Plugin<Project> {
             name,
             ExtractProtoTask::class.java
         ) {
-            it.resourceOutput = metadataDir(sourceSetName)
-            it.protoPath = workDir(sourceSetName)
-            it.protoApiFiles = protoApiFiles(sourceSetName)
-            it.protoCompileFiles = protoCompileFiles(sourceSetName)
+            it.resourceOutput.set(metadataDir(sourceSetName))
+            it.protoPath.set(workDir(sourceSetName))
+            it.protoApiFiles.from(protoApiFiles(sourceSetName))
+            it.protoCompileFiles.from(protoCompileFiles(sourceSetName))
             it.group = "proto"
             it.description = "Extract protos for '$sourceSetName' source set."
             it.protobuf = extension
@@ -112,9 +112,9 @@ abstract class BaseProtobufPlugin : Plugin<Project> {
             name,
             GenerateProtoTask::class.java
         ) {
-            it.protoPath = workDir(sourceSetName)
-            it.output = outDir(sourceSetName)
-            it.resourceOutput = metadataDir(sourceSetName)
+            it.protoPath.set(workDir(sourceSetName))
+            it.output.set(outDir(sourceSetName))
+            it.resourceOutput.set(metadataDir(sourceSetName))
             it.group = "proto"
             it.description = "Generate protos for '$sourceSetName' source set."
             it.protobuf = extension

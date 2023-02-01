@@ -2,6 +2,7 @@ package com.bybutter.sisyphus.protobuf.json
 
 import com.bybutter.sisyphus.protobuf.InternalProtoApi
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.protobuf.MessageSupport
 import com.bybutter.sisyphus.protobuf.MutableMessage
 import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.findEnumSupport
@@ -24,96 +25,100 @@ import com.bybutter.sisyphus.protobuf.primitives.Timestamp
 import com.bybutter.sisyphus.protobuf.primitives.UInt32Value
 import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 import com.bybutter.sisyphus.protobuf.primitives.Value
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableBoolValue
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableBytesValue
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableDoubleValue
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableDuration
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableFieldMask
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableFloatValue
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableInt32Value
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableInt64Value
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableListValue
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStringValue
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableStruct
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableTimestamp
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableUInt32Value
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableUInt64Value
-import com.bybutter.sisyphus.protobuf.primitives.internal.MutableValue
-import com.bybutter.sisyphus.protobuf.primitives.invoke
-import com.bybutter.sisyphus.protobuf.primitives.wrapper
-import java.time.ZonedDateTime
+import com.bybutter.sisyphus.protobuf.primitives.parsePayload
+import com.bybutter.sisyphus.protobuf.primitives.tryParsePayload
 
 internal fun MutableMessage<*, *>.readRaw(reader: JsonReader) {
-    when (this) {
-        is MutableTimestamp -> {
+    when (this.type()) {
+        Timestamp.name -> {
             reader.ensure(JsonToken.STRING)
-            val instant = ZonedDateTime.parse(reader.string()).toInstant()
-            seconds = instant.epochSecond
-            nanos = instant.nano
+            val (seconds, nanos) = Timestamp.parsePayload(reader.string())
+            set(Timestamp.SECONDS_FIELD_NUMBER, seconds)
+            set(Timestamp.NANOS_FIELD_NUMBER, nanos)
         }
-        is MutableDuration -> {
+
+        Duration.name -> {
             reader.ensure(JsonToken.STRING)
-            val read = Duration(reader.string())
-            seconds = read.seconds
-            nanos = read.nanos
+            val (seconds, nanos) = Duration.tryParsePayload(reader.string()) ?: (0L to 0)
+            set(Duration.SECONDS_FIELD_NUMBER, seconds)
+            set(Duration.NANOS_FIELD_NUMBER, nanos)
         }
-        is MutableFieldMask -> {
+
+        FieldMask.name -> {
             reader.ensure(JsonToken.STRING)
-            paths += reader.string().split(',').map { it.trim() }
+            set(FieldMask.PATHS_FIELD_NUMBER, reader.string().split(',').map { it.trim() })
         }
-        is MutableStruct -> {
+
+        Struct.name -> {
             reader.ensure(JsonToken.BEGIN_OBJECT)
+            val map = mutableMapOf<Any, Any>()
             while (reader.next() != JsonToken.END_OBJECT) {
-                fields[reader.nameAndNext()] = reader.readValue()
+                map[reader.nameAndNext()] = reader.readValue()
             }
+            set(Struct.FIELDS_FIELD_NUMBER, map)
         }
-        is MutableValue -> {
+
+        Value.name -> {
             when (reader.peek()) {
-                JsonToken.BEGIN_OBJECT -> structValue = reader.readStruct()
-                JsonToken.BEGIN_ARRAY -> listValue = reader.readListValue()
-                JsonToken.STRING -> stringValue = reader.string()
-                JsonToken.NUMBER -> numberValue = reader.double()
-                JsonToken.BOOL -> boolValue = reader.bool()
+                JsonToken.BEGIN_OBJECT -> set(Value.STRUCT_VALUE_FIELD_NUMBER, reader.readStruct())
+                JsonToken.BEGIN_ARRAY -> set(Value.LIST_VALUE_FIELD_NUMBER, reader.readListValue())
+                JsonToken.STRING -> set(Value.STRING_VALUE_FIELD_NUMBER, reader.string())
+                JsonToken.NUMBER -> set(Value.NUMBER_VALUE_FIELD_NUMBER, reader.double())
+                JsonToken.BOOL -> set(Value.BOOL_VALUE_FIELD_NUMBER, reader.bool())
                 JsonToken.NULL -> {
                     reader.nil()
-                    nullValue = NullValue.NULL_VALUE
+                    set(Value.NULL_VALUE_FIELD_NUMBER, ProtoReflection.findEnumSupport(NullValue.name).invoke(0))
                 }
+
                 else -> throw IllegalStateException()
             }
         }
-        is MutableListValue -> {
+
+        ListValue.name -> {
             reader.ensure(JsonToken.BEGIN_ARRAY)
+            val list = mutableListOf<Message<*, *>>()
             while (reader.next() != JsonToken.END_ARRAY) {
-                values += reader.readValue()
+                list += reader.readValue()
             }
+            set(ListValue.VALUES_FIELD_NUMBER, list)
         }
-        is MutableDoubleValue -> {
-            value = reader.double()
+
+        DoubleValue.name -> {
+            set(DoubleValue.VALUE_FIELD_NUMBER, reader.double())
         }
-        is MutableFloatValue -> {
-            value = reader.float()
+
+        FloatValue.name -> {
+            set(FloatValue.VALUE_FIELD_NUMBER, reader.float())
         }
-        is MutableInt32Value -> {
-            value = reader.int()
+
+        Int32Value.name -> {
+            set(Int32Value.VALUE_FIELD_NUMBER, reader.int())
         }
-        is MutableInt64Value -> {
-            value = reader.long()
+
+        Int64Value.name -> {
+            set(Int64Value.VALUE_FIELD_NUMBER, reader.long())
         }
-        is MutableUInt32Value -> {
-            value = reader.uint()
+
+        UInt32Value.name -> {
+            set(UInt32Value.VALUE_FIELD_NUMBER, reader.int())
         }
-        is MutableUInt64Value -> {
-            value = reader.ulong()
+
+        UInt64Value.name -> {
+            set(UInt64Value.VALUE_FIELD_NUMBER, reader.long())
         }
-        is MutableBoolValue -> {
-            value = reader.bool()
+
+        BoolValue.name -> {
+            set(BoolValue.VALUE_FIELD_NUMBER, reader.bool())
         }
-        is MutableStringValue -> {
-            value = reader.string()
+
+        StringValue.name -> {
+            set(StringValue.VALUE_FIELD_NUMBER, reader.string())
         }
-        is MutableBytesValue -> {
-            value = reader.bytes()
+
+        BytesValue.name -> {
+            set(BytesValue.VALUE_FIELD_NUMBER, reader.bytes())
         }
+
         else -> {
             reader.ensure(JsonToken.BEGIN_OBJECT)
             readFields(reader)
@@ -153,14 +158,22 @@ internal fun JsonReader.readRepeated(field: FieldDescriptorProto): Any {
                 val key = when (keyField.type) {
                     FieldDescriptorProto.Type.SINT64,
                     FieldDescriptorProto.Type.SFIXED64,
-                    FieldDescriptorProto.Type.INT64 -> keyName.toLong()
+                    FieldDescriptorProto.Type.INT64,
+                    -> keyName.toLong()
+
                     FieldDescriptorProto.Type.FIXED64,
-                    FieldDescriptorProto.Type.UINT64 -> keyName.toULong()
+                    FieldDescriptorProto.Type.UINT64,
+                    -> keyName.toULong()
+
                     FieldDescriptorProto.Type.SINT32,
                     FieldDescriptorProto.Type.SFIXED32,
-                    FieldDescriptorProto.Type.INT32 -> keyName.toInt()
+                    FieldDescriptorProto.Type.INT32,
+                    -> keyName.toInt()
+
                     FieldDescriptorProto.Type.UINT32,
-                    FieldDescriptorProto.Type.FIXED32 -> keyName.toUInt()
+                    FieldDescriptorProto.Type.FIXED32,
+                    -> keyName.toUInt()
+
                     FieldDescriptorProto.Type.BOOL -> keyName == "true"
                     FieldDescriptorProto.Type.STRING -> keyName
                     else -> throw IllegalStateException()
@@ -190,14 +203,22 @@ internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
         FieldDescriptorProto.Type.FLOAT -> float()
         FieldDescriptorProto.Type.SFIXED64,
         FieldDescriptorProto.Type.SINT64,
-        FieldDescriptorProto.Type.INT64 -> long()
+        FieldDescriptorProto.Type.INT64,
+        -> long()
+
         FieldDescriptorProto.Type.FIXED64,
-        FieldDescriptorProto.Type.UINT64 -> ulong()
+        FieldDescriptorProto.Type.UINT64,
+        -> ulong()
+
         FieldDescriptorProto.Type.SFIXED32,
         FieldDescriptorProto.Type.SINT32,
-        FieldDescriptorProto.Type.INT32 -> int()
+        FieldDescriptorProto.Type.INT32,
+        -> int()
+
         FieldDescriptorProto.Type.UINT32,
-        FieldDescriptorProto.Type.FIXED32 -> uint()
+        FieldDescriptorProto.Type.FIXED32,
+        -> uint()
+
         FieldDescriptorProto.Type.BOOL -> bool()
         FieldDescriptorProto.Type.STRING -> string()
         FieldDescriptorProto.Type.GROUP -> TODO()
@@ -214,24 +235,10 @@ internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
                 }
             }
         }
+
         FieldDescriptorProto.Type.MESSAGE -> {
             when (field.typeName) {
                 com.bybutter.sisyphus.protobuf.primitives.Any.name -> readAny()
-                Timestamp.name -> Timestamp(string())
-                Duration.name -> Duration(string())
-                FieldMask.name -> FieldMask(string())
-                Struct.name -> readStruct()
-                Value.name -> readValue()
-                ListValue.name -> readListValue()
-                DoubleValue.name -> double().wrapper()
-                FloatValue.name -> float().wrapper()
-                Int64Value.name -> long().wrapper()
-                UInt64Value.name -> ulong().wrapper()
-                Int32Value.name -> int().wrapper()
-                UInt32Value.name -> uint().wrapper()
-                BoolValue.name -> bool().wrapper()
-                StringValue.name -> string().wrapper()
-                BytesValue.name -> bytes().wrapper()
                 else -> {
                     ProtoReflection.findMessageSupport(field.typeName).invoke {
                         readRaw(this@readField)
@@ -246,51 +253,57 @@ internal fun JsonReader.ensure(token: JsonToken) {
     if (peek() != token) throw IllegalStateException()
 }
 
-internal fun JsonReader.readStruct(): Struct {
-    return Struct {
+internal fun JsonReader.readStruct(): Message<*, *> {
+    return ProtoReflection.findMessageSupport(Struct.name).invoke {
         readRaw(this@readStruct)
     }
 }
 
-internal fun JsonReader.readValue(): Value {
-    return Value {
+internal fun JsonReader.readValue(): Message<*, *> {
+    return ProtoReflection.findMessageSupport(Value.name).invoke {
         readRaw(this@readValue)
     }
 }
 
-internal fun JsonReader.readListValue(): ListValue {
-    return ListValue {
+internal fun JsonReader.readListValue(): Message<*, *> {
+    return ProtoReflection.findMessageSupport(ListValue.name).invoke {
         readRaw(this@readListValue)
     }
 }
 
 @OptIn(InternalProtoApi::class)
-fun JsonReader.readAny(): Message<*, *> {
+fun JsonReader.readAny(): Message<*, *>? {
     ensure(JsonToken.BEGIN_OBJECT)
     next()
-    val message: MutableMessage<*, *> = ProtoReflection.findMessageSupport(typeToken()).newMutable()
-    when (message) {
-        is MutableBoolValue,
-        is MutableBytesValue,
-        is MutableDoubleValue,
-        is MutableDuration,
-        is MutableFieldMask,
-        is MutableFloatValue,
-        is MutableInt32Value,
-        is MutableInt64Value,
-        is MutableListValue,
-        is MutableStringValue,
-        is MutableStruct,
-        is MutableTimestamp,
-        is MutableUInt32Value,
-        is MutableUInt64Value,
-        is MutableValue -> {
-            if (nameAndNext() == "value") {
-                message.readRaw(this)
-            } else {
-                skipChildren()
+    val typeUrl = typeToken()
+    val support = ProtoReflection.findSupport(typeUrl) as? MessageSupport<*, *> ?: return null
+    val message: MutableMessage<*, *> = support.newMutable()
+    when (message.type()) {
+        BoolValue.name,
+        BytesValue.name,
+        DoubleValue.name,
+        Duration.name,
+        FieldMask.name,
+        FloatValue.name,
+        Int32Value.name,
+        Int64Value.name,
+        ListValue.name,
+        StringValue.name,
+        Struct.name,
+        Timestamp.name,
+        UInt32Value.name,
+        UInt64Value.name,
+        Value.name,
+        -> {
+            while (next() != JsonToken.END_OBJECT) {
+                if (nameAndNext() == "value") {
+                    message.readRaw(this)
+                } else {
+                    skipChildren()
+                }
             }
         }
+
         else -> message.readFields(this)
     }
     return message

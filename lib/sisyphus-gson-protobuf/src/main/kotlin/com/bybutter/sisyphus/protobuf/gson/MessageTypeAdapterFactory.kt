@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.protobuf.gson
 
 import com.bybutter.sisyphus.protobuf.Message
+import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.ProtobufDefinition
 import com.bybutter.sisyphus.protobuf.findMessageSupport
@@ -32,7 +33,7 @@ class UnboxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
     }
 
     override fun read(reader: JsonReader): Message<*, *> {
-        return GsonReader(reader).readAny()
+        return GsonReader(reader).readAny() ?: throw IllegalStateException("Resolve any message failed.")
     }
 }
 
@@ -42,7 +43,12 @@ class BoxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
     }
 
     override fun read(reader: JsonReader): Message<*, *> {
-        return GsonReader(reader).readAny()
+        val message = GsonReader(reader).readAny() ?: throw IllegalStateException("Resolve any message failed.")
+
+        return ProtoReflection.findMessageSupport(com.bybutter.sisyphus.protobuf.primitives.Any.name).invoke {
+            set(com.bybutter.sisyphus.protobuf.primitives.Any.TYPE_URL_FIELD_NUMBER, message.support().typeUrl())
+            set(com.bybutter.sisyphus.protobuf.primitives.Any.VALUE_FIELD_NUMBER, message.toProto())
+        }
     }
 }
 
@@ -52,8 +58,7 @@ class MessageTypeAdapter(private val clazz: Class<*>) : TypeAdapter<Message<*, *
     }
 
     override fun read(reader: JsonReader): Message<*, *> {
-        val fullName =
-            clazz.getAnnotation(ProtobufDefinition::class.java)?.name ?: throw IllegalStateException()
+        val fullName = clazz.getAnnotation(ProtobufDefinition::class.java)?.name ?: throw IllegalStateException()
         return ProtoTypes.findMessageSupport(fullName).invoke {
             readFrom(GsonReader(reader))
         }

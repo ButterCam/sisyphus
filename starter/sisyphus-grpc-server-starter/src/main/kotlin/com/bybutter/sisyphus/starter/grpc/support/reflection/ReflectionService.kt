@@ -32,15 +32,20 @@ class ReflectionService : ServerReflection() {
                     is ServerReflectionRequest.MessageRequest.FileContainingSymbol -> {
                         messageResponse = getFileContainingSymbol(messageRequest.value)
                     }
+
                     is ServerReflectionRequest.MessageRequest.FileContainingExtension -> {
                         messageResponse = getFileContainingExtension(messageRequest.value)
                     }
+
                     is ServerReflectionRequest.MessageRequest.AllExtensionNumbersOfType -> {
                         messageResponse = getAllExtensionNumbersOfType(messageRequest.value)
                     }
+
                     is ServerReflectionRequest.MessageRequest.ListServices -> {
                         messageResponse = listService(messageRequest.value)
                     }
+
+                    null -> {}
                 }
             }
 

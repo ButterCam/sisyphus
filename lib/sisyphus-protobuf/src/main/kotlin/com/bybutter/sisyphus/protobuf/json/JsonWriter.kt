@@ -47,7 +47,11 @@ interface JsonWriter {
     }
 
     fun typeToken(support: MessageSupport<*, *>) {
+        typeToken(support.typeUrl())
+    }
+
+    fun typeToken(typeUrl: String) {
         fieldName("@type")
-        value(support.typeUrl())
+        value(typeUrl)
     }
 }

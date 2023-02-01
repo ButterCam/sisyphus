@@ -104,6 +104,7 @@ interface JsonReader {
             when (next()) {
                 JsonToken.BEGIN_ARRAY, JsonToken.BEGIN_OBJECT -> stack++
                 JsonToken.END_ARRAY, JsonToken.END_OBJECT -> stack--
+                else -> {}
             }
         }
     }

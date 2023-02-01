@@ -23,6 +23,9 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
     private var loggers: List<RequestLogger> = listOf()
 
     @Autowired(required = false)
+    private var incomingLogger: List<IncomingRequestLogger> = listOf()
+
+    @Autowired(required = false)
     private var statusRenderers: List<StatusRenderer> = listOf()
 
     private val uniqueLoggers: List<RequestLogger> by lazy {
@@ -34,12 +37,23 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
         }
     }
 
+    private val uniqueIncomingLoggers: List<IncomingRequestLogger> by lazy {
+        val addedLogger = mutableSetOf<String>()
+        incomingLogger.mapNotNull {
+            if (it.id.isNotEmpty() && addedLogger.contains(it.id)) return@mapNotNull null
+            addedLogger += it.id
+            it
+        }
+    }
+
     override fun <ReqT : Any, RespT : Any> interceptCall(
         call: ServerCall<ReqT, RespT>,
         headers: Metadata,
-        next: ServerCallHandler<ReqT, RespT>
+        next: ServerCallHandler<ReqT, RespT>,
     ): ServerCall.Listener<ReqT> {
         val context = Context.current().withValue(RequestLogger.REQUEST_CONTEXT_KEY, RequestInfo(headers))
+
+        logIncomingRequest(call, headers)
 
         return try {
             Contexts.interceptCall(
@@ -57,7 +71,7 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
     private class SisyphusGrpcServerCall<ReqT, RespT>(
         call: ServerCall<ReqT, RespT>,
         private val loggers: List<RequestLogger>,
-        private val statusRenderers: List<StatusRenderer>
+        private val statusRenderers: List<StatusRenderer>,
     ) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
         private val requestNanoTime = System.nanoTime()
 
@@ -100,6 +114,16 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
             } catch (e: Exception) {
                 // Ignore
             }
+        }
+    }
+
+    private fun logIncomingRequest(call: ServerCall<*, *>, headers: Metadata) {
+        try {
+            for (logger in uniqueIncomingLoggers) {
+                logger.log(call, headers)
+            }
+        } catch (e: Exception) {
+            // Ignore
         }
     }
 
