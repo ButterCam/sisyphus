@@ -13,7 +13,8 @@ import io.grpc.StatusRuntimeException
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
-interface MessageMarshaller<T : Message<T, TM>, TM : MutableMessage<T, TM>> : MethodDescriptor.Marshaller<T>,
+interface MessageMarshaller<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
+    MethodDescriptor.Marshaller<T>,
     Metadata.BinaryMarshaller<T>
 
 private class MessageMarshallerImpl<T : Message<T, TM>, TM : MutableMessage<T, TM>>(private val support: MessageSupport<T, TM>) :
