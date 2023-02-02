@@ -67,14 +67,17 @@ operator fun Status.Companion.invoke(exception: Throwable): Status {
             code = exception.status.code.value()
             exception.status.description?.let { message = it }
         }
+
         is StatusRuntimeException -> Status {
             code = exception.status.code.value()
             exception.status.description?.let { message = it }
         }
+
         is com.bybutter.sisyphus.rpc.StatusException -> Status {
             code = exception.code
             exception.message?.let { message = it }
         }
+
         is ClientStatusException -> exception.status
         else -> Status {
             code = Code.INTERNAL.number
@@ -109,7 +112,7 @@ operator fun ResourceInfo.Companion.invoke(
     resourceType: String,
     resourceName: String,
     description: String,
-    owner: String = ""
+    owner: String = "",
 ): ResourceInfo {
     return ResourceInfo {
         this.resourceType = resourceType
@@ -161,9 +164,9 @@ operator fun RetryInfo.Companion.invoke(number: Long, unit: TimeUnit = TimeUnit.
 
 operator fun DebugInfo.Companion.invoke(exception: Throwable): DebugInfo {
     return DebugInfo {
-        exception.message?.let { this.detail = it }
-        this.stackEntries += exception.stackTrace.map {
-            it.toString()
+        this.detail = exception.toString()
+        exception.stackTrace.forEach {
+            this.stackEntries += it.toString()
         }
     }
 }
