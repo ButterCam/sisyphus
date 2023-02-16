@@ -4,6 +4,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
 import com.bmuschko.gradle.docker.tasks.image.DockerSaveImage
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile.Instruction
 import com.bybutter.sisyphus.project.gradle.SisyphusExtension
 import com.bybutter.sisyphus.project.gradle.getJavaMajorVersion
 import com.bybutter.sisyphus.project.gradle.threepart.docker.ExtractBootJarLayer
@@ -13,6 +14,7 @@ import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Sync
@@ -56,13 +58,25 @@ class SisyphusDockerPlugin : Plugin<Project> {
             it.from(sisyphusDocker.baseImage.get())
             it.environmentVariable("PROJECT_NAME", "\$PROJECT_NAME")
             it.environmentVariable("PROJECT_VERSION", "\$PROJECT_VERSION")
+            sisyphusDocker.env.get().forEach { (key, value) ->
+                it.environmentVariable(key, value)
+            }
 
             it.exposePort(sisyphusDocker.ports)
+
+            sisyphusDocker.baseInstructions.get().forEach { instruction ->
+                it.instructions.add(instruction)
+            }
 
             bootJar.layered.layerOrder.forEach { layer ->
                 it.copyFile("$layer/", "./")
                 it.runCommand("true")
             }
+
+            sisyphusDocker.instructions.get().forEach { instruction ->
+                it.instructions.add(instruction)
+            }
+
             it.entryPoint(
                 "java",
                 *sisyphusDocker.jvmArgs.get().toTypedArray(),
@@ -103,7 +117,11 @@ class SisyphusDockerPlugin : Plugin<Project> {
         }
     }
 
-    private fun registerDockerPush(target: Project, sisyphusDocker: SisyphusDockerExtension, sisyphus: SisyphusExtension) {
+    private fun registerDockerPush(
+        target: Project,
+        sisyphusDocker: SisyphusDockerExtension,
+        sisyphus: SisyphusExtension
+    ) {
         val registries = sisyphus.dockerPublishRegistries.get().associate {
             it to sisyphus.repositories.getting(it).orNull
         }
@@ -157,6 +175,9 @@ open class SisyphusDockerExtension(factory: ObjectFactory, sisyphus: SisyphusExt
     val ports: ListProperty<Int> = factory.listProperty(Int::class.java).empty()
     val images: SetProperty<String> = factory.setProperty(String::class.java).empty()
     val jvmArgs: ListProperty<String> = factory.listProperty(String::class.java).empty()
+    val env: MapProperty<String, String> = factory.mapProperty(String::class.java, String::class.java).empty()
+    val baseInstructions: ListProperty<Instruction> = factory.listProperty(Instruction::class.java).empty()
+    val instructions: ListProperty<Instruction> = factory.listProperty(Instruction::class.java).empty()
 
     init {
         when (val version = getJavaMajorVersion()) {
@@ -182,5 +203,25 @@ open class SisyphusDockerExtension(factory: ObjectFactory, sisyphus: SisyphusExt
                 }
             }
         )
+    }
+
+    fun baseInstructions(configure: ListProperty<Instruction>.() -> Unit) {
+        configure(baseInstructions)
+    }
+
+    fun instructions(configure: ListProperty<Instruction>.() -> Unit) {
+        configure(instructions)
+    }
+
+    fun ListProperty<Instruction>.copyFile(source: String, destination: String) {
+        add(Dockerfile.CopyFileInstruction(Dockerfile.CopyFile(source, destination)))
+    }
+
+    fun ListProperty<Instruction>.addFile(source: String, destination: String) {
+        add(Dockerfile.AddFileInstruction(Dockerfile.File(source, destination)))
+    }
+
+    fun ListProperty<Instruction>.runCommand(command: String) {
+        add(Dockerfile.RunCommandInstruction(command))
     }
 }
