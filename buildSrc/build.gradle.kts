@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("com.bybutter.sisyphus:sisyphus-dependencies:1.5.31"))
+    implementation(platform("com.bybutter.sisyphus:sisyphus-dependencies:1.6.10"))
     implementation("com.bybutter.sisyphus.tools:sisyphus-protobuf-gradle-plugin")
     implementation("com.bybutter.sisyphus.tools:sisyphus-project-gradle-plugin")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")

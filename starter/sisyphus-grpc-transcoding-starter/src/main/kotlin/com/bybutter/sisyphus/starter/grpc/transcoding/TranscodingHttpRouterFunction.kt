@@ -38,16 +38,14 @@ class TranscodingHttpRouterFunction constructor(
                 when (field.type) {
                     FieldDescriptorProto.Type.DOUBLE -> Double::class.java
                     FieldDescriptorProto.Type.FLOAT -> Float::class.java
-                    FieldDescriptorProto.Type.SINT64,
-                    FieldDescriptorProto.Type.SFIXED64,
-                    FieldDescriptorProto.Type.INT64 -> Long::class.java
+                    FieldDescriptorProto.Type.SINT64, FieldDescriptorProto.Type.SFIXED64, FieldDescriptorProto.Type.INT64 -> Long::class.java
+
                     FieldDescriptorProto.Type.UINT64 -> ULong::class.java
-                    FieldDescriptorProto.Type.SINT32,
-                    FieldDescriptorProto.Type.SFIXED32,
-                    FieldDescriptorProto.Type.INT32 -> Int::class.java
+                    FieldDescriptorProto.Type.SINT32, FieldDescriptorProto.Type.SFIXED32, FieldDescriptorProto.Type.INT32 -> Int::class.java
+
                     FieldDescriptorProto.Type.FIXED64 -> ULong::class.java
-                    FieldDescriptorProto.Type.UINT32,
-                    FieldDescriptorProto.Type.FIXED32 -> UInt::class.java
+                    FieldDescriptorProto.Type.UINT32, FieldDescriptorProto.Type.FIXED32 -> UInt::class.java
+
                     FieldDescriptorProto.Type.BOOL -> Boolean::class.java
                     FieldDescriptorProto.Type.STRING -> String::class.java
                     FieldDescriptorProto.Type.BYTES -> ByteArray::class.java
@@ -81,13 +79,24 @@ class TranscodingHttpRouterFunction constructor(
         val call = channel.newCall(rule.method.methodDescriptor, CallOptions.DEFAULT)
             .uncheckedCast<ClientCall<Message<*, *>, Message<*, *>>>()
         val header = prepareHeader(request)
-        val listener = TranscodingCallListener(rule.http.responseBody)
+
+        val isServerStreaming = !rule.method.methodDescriptor.type.serverSendsOneMessage()
+        val listener = if (isServerStreaming) {
+            TranscodingStreamingCallListener(call)
+        } else {
+            TranscodingUnaryCallListener(rule.http.responseBody)
+        }
 
         call.start(listener, header)
-        // gRPC transcoding only support the unary calls, so we request 2 message for response.
-        // Server will try to return 2 messages, but just 1 message returned, so server will return
-        // once and told client there is no more messages, call will be closed.
-        call.request(2)
+
+        if (isServerStreaming) {
+            call.request(1)
+        } else {
+            // We request 2 message for unary calls.
+            // Server will try to return 2 messages, but just 1 message returned, so server will return
+            // once and told client there is no more messages, call will be closed.
+            call.request(2)
+        }
 
         return request.bodyToMono(bodyClass).map {
             when (rule.http.body) {

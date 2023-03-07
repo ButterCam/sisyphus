@@ -6,7 +6,6 @@ import com.bybutter.sisyphus.protobuf.ProtoTypes
 import com.bybutter.sisyphus.protobuf.findServiceSupport
 import com.bybutter.sisyphus.protobuf.primitives.MethodDescriptorProto
 import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
-import io.grpc.MethodDescriptor
 import io.grpc.Server
 import io.grpc.ServerMethodDefinition
 import io.grpc.ServerServiceDefinition
@@ -40,8 +39,8 @@ class HttpTranscodingRouterRuleExporter : TranscodingRouterRuleExporter {
     private fun exportServices(service: ServerServiceDefinition, rules: MutableList<TranscodingRouterRule>) {
         val serviceProto = ProtoTypes.findServiceSupport(".${service.serviceDescriptor.name}").descriptor
         for (method in service.methods) {
-            // Just support transcoding for unary gRPC calls.
-            if (method.methodDescriptor.type != MethodDescriptor.MethodType.UNARY) continue
+            // Just support non-client-streaming method.
+            if (!method.methodDescriptor.type.clientSendsOneMessage()) continue
             // Ensure method proto registered.
             val methodProto = serviceProto.method.firstOrNull {
                 it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
