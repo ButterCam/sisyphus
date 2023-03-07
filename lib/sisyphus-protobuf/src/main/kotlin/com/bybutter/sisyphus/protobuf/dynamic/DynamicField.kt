@@ -548,7 +548,7 @@ class RepeatedSInt32DynamicField(descriptor: FieldDescriptorProto) :
 }
 
 class EnumDynamicField(
-    descriptor: FieldDescriptorProto,
+    descriptor: FieldDescriptorProto
 ) : AbstractPackableDynamicField<ProtoEnum<*>>(descriptor) {
     private val support = ProtoReflection.findEnumSupport(descriptor().typeName)
 
@@ -570,7 +570,7 @@ class EnumDynamicField(
 }
 
 class RepeatedEnumDynamicField(
-    descriptor: FieldDescriptorProto,
+    descriptor: FieldDescriptorProto
 ) : AbstractRepeatedPackableDynamicField<ProtoEnum<*>>(descriptor) {
     private val support = ProtoReflection.findEnumSupport(descriptor().typeName)
 
@@ -584,7 +584,7 @@ class RepeatedEnumDynamicField(
 }
 
 class MessageDynamicField(
-    descriptor: FieldDescriptorProto,
+    descriptor: FieldDescriptorProto
 ) : AbstractDynamicField<Message<*, *>?>(descriptor) {
     private val support = ProtoReflection.findMessageSupport(descriptor().typeName)
 
@@ -610,7 +610,7 @@ class MessageDynamicField(
 }
 
 class RepeatedMessageDynamicField(
-    descriptor: FieldDescriptorProto,
+    descriptor: FieldDescriptorProto
 ) : AbstractRepeatedDynamicField<Message<*, *>>(descriptor) {
     private val support = ProtoReflection.findMessageSupport(descriptor().typeName)
 
@@ -630,7 +630,7 @@ class RepeatedMessageDynamicField(
 }
 
 class AnyDynamicField(
-    descriptor: FieldDescriptorProto,
+    descriptor: FieldDescriptorProto
 ) : AbstractDynamicField<Message<*, *>?>(descriptor) {
     override var value: Message<*, *>? = defaultValue()
 
@@ -657,7 +657,7 @@ class AnyDynamicField(
 }
 
 class RepeatedAnyDynamicField(
-    descriptor: FieldDescriptorProto,
+    descriptor: FieldDescriptorProto
 ) : AbstractRepeatedDynamicField<Message<*, *>>(descriptor) {
 
     override fun writeTo(writer: Writer) {

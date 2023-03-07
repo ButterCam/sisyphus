@@ -10,8 +10,9 @@ class HealthService : Health() {
     private var server: Server? = null
 
     fun initServer(server: Server) {
-        if (this.server != null && this.server != server)
+        if (this.server != null && this.server != server) {
             throw IllegalArgumentException("Server is already set")
+        }
         this.server = server
     }
 

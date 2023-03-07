@@ -24,7 +24,8 @@ interface KubernetesResourceSupport<T> {
                 val patch = V1Patch(resource.cluster.api.json.serialize(k8sResource))
                 patchResourceCall(resource, patch)
             },
-            V1Patch.PATCH_FORMAT_STRATEGIC_MERGE_PATCH, resource.cluster.api
+            V1Patch.PATCH_FORMAT_STRATEGIC_MERGE_PATCH,
+            resource.cluster.api
         )
     }
 

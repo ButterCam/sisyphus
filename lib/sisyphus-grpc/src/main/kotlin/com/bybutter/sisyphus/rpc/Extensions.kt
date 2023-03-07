@@ -112,7 +112,7 @@ operator fun ResourceInfo.Companion.invoke(
     resourceType: String,
     resourceName: String,
     description: String,
-    owner: String = "",
+    owner: String = ""
 ): ResourceInfo {
     return ResourceInfo {
         this.resourceType = resourceType

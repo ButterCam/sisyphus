@@ -23,4 +23,4 @@ jobs:
           dependency-repositories: local,central,portal,google,snapshot
           snapshot-url: https://s01.oss.sonatype.org/content/repositories/snapshots
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: gradle build --no-daemon

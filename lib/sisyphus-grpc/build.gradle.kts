@@ -8,12 +8,11 @@ plugins {
 description = "Sisyphus customized gRPC runtime"
 
 dependencies {
-    api(project(":lib:sisyphus-protobuf"))
-    api(Dependencies.Grpc.api)
-    api("com.google.api:api-common")
+    api(projects.lib.sisyphusProtobuf)
+    api(libs.grpc.api)
+    api(libs.google.apiCommon)
 
-    proto(platform(project(":sisyphus-dependencies")))
-    proto(Dependencies.Proto.grpcProto)
+    proto(libs.google.commonProtos)
 }
 
 protobuf {

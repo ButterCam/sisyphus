@@ -9,15 +9,13 @@ plugins {
 description = "Utils and toolkit for building gRPC service easier"
 
 dependencies {
-    api(project(":lib:sisyphus-grpc"))
+    api(libs.antlr4.runtime)
+    api(projects.lib.sisyphusGrpc)
+    implementation(projects.lib.sisyphusCommon)
 
-    implementation(project(":lib:sisyphus-common"))
-    api("org.antlr:antlr4-runtime")
+    antlr(libs.antlr4)
 
-    antlr(platform(project(":sisyphus-dependencies")))
-    antlr("org.antlr:antlr4")
-
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(libs.junit.jupiter)
 }
 
 configurations {

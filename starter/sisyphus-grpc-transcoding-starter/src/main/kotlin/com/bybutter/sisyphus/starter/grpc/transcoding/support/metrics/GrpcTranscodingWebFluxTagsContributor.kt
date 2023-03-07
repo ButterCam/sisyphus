@@ -16,15 +16,20 @@ class GrpcTranscodingWebFluxTagsContributor : WebFluxTagsContributor {
 
         if (rule == null || pathTemplate == null) {
             return Tags.of(
-                "grpc_method", "None",
-                "grpc_service", "None"
+                "grpc_method",
+                "None",
+                "grpc_service",
+                "None"
             )
         }
 
         return Tags.of(
-            "grpc_method", rule.method.methodDescriptor.fullMethodName,
-            "grpc_service", rule.service.serviceDescriptor.name,
-            "uri", pathTemplate.toString()
+            "grpc_method",
+            rule.method.methodDescriptor.fullMethodName,
+            "grpc_service",
+            rule.service.serviceDescriptor.name,
+            "uri",
+            pathTemplate.toString()
         )
     }
 }

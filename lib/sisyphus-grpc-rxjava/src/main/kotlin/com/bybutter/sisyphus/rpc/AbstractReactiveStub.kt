@@ -52,7 +52,8 @@ abstract class AbstractReactiveStub<T : AbstractReactiveStub<T>>(
             { req, res ->
                 io.grpc.stub.ClientCalls.asyncUnaryCall(
                     channel.newCall(method, options),
-                    req, res
+                    req,
+                    res
                 )
             },
             options
@@ -69,7 +70,8 @@ abstract class AbstractReactiveStub<T : AbstractReactiveStub<T>>(
             { req, res ->
                 io.grpc.stub.ClientCalls.asyncServerStreamingCall(
                     channel.newCall(method, options),
-                    req, res
+                    req,
+                    res
                 )
             },
             options

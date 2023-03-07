@@ -134,7 +134,8 @@ class CelEngineTest {
         val result = engine.eval(
             """ .sisyphus.api.cel.test.ConditionalTest {
             | condition: true
-            |} """.trimMargin()
+            |} 
+            """.trimMargin()
         )
         result
     }

@@ -8,13 +8,12 @@ plugins {
 description = "Sisyphus customized gRPC runtime for RxJava2(client only)"
 
 dependencies {
-    api(project(":lib:sisyphus-grpc"))
-    api("com.salesforce.servicelibs:rxgrpc-stub")
-    api("io.reactivex.rxjava2:rxjava")
-    api("io.grpc:grpc-stub")
+    api(projects.lib.sisyphusGrpc)
+    api(libs.grpc.stub)
+    api(libs.grpc.rxjava)
+    api(libs.rxjava)
 
-    proto(platform(project(":sisyphus-dependencies")))
-    proto(Dependencies.Proto.grpcProto)
+    proto(libs.google.commonProtos)
 }
 
 protobuf {

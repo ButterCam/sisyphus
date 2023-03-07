@@ -40,7 +40,7 @@ jobs:
           gradle-portal-secret: ${{ secrets.GRADLE_PUBLISH_SECRET }}
           gpg-key-name: ${{ secrets.GPG_KEY_NAME }}
       - name: Publish with Gradle
-        run: ./gradlew publish --no-daemon
+        run: gradle publish --no-daemon
       - name: Publish plugins to Gradle Portal
         if: ${{ github.event_name == 'release' }}
-        run: ./gradlew publishPlugins --no-daemon
+        run: gradle publishPlugins --no-daemon

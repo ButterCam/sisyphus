@@ -7,5 +7,6 @@ plugins {
 description = "Common lib of Sisyphus Project"
 
 dependencies {
-    compileOnly(Dependencies.Spring.Boot.boot)
+    compileOnly(libs.spring.boot)
+    compileOnly(libs.kotlin.coroutines)
 }

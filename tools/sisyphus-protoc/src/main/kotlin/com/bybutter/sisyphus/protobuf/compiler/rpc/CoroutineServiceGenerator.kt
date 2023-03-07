@@ -200,25 +200,29 @@ class CoroutineClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                     !method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                         addStatement(
                             "return unaryCall(%T.${method.name()}, input, %T())",
-                            method.parent.className(), RuntimeTypes.METADATA
+                            method.parent.className(),
+                            RuntimeTypes.METADATA
                         )
                     }
                     method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                         addStatement(
                             "return clientStreaming(%T.${method.name()}, input, %T())",
-                            method.parent.className(), RuntimeTypes.METADATA
+                            method.parent.className(),
+                            RuntimeTypes.METADATA
                         )
                     }
                     !method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                         addStatement(
                             "return serverStreaming(%T.${method.name()}, input, %T())",
-                            method.parent.className(), RuntimeTypes.METADATA
+                            method.parent.className(),
+                            RuntimeTypes.METADATA
                         )
                     }
                     method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                         addStatement(
                             "return bidiStreaming(%T.${method.name()}, input, %T())",
-                            method.parent.className(), RuntimeTypes.METADATA
+                            method.parent.className(),
+                            RuntimeTypes.METADATA
                         )
                     }
                 }

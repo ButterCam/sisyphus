@@ -7,15 +7,17 @@ plugins {
 description = "Middleware for using JDBC in Sisyphus Project"
 
 dependencies {
-    api(Dependencies.jooq)
-    implementation(Dependencies.hikari)
+    api(libs.spring.boot)
+    api(libs.jooq)
+    api(libs.kotlin.coroutines)
+    implementation(libs.hikari)
 
-    runtimeOnly(Dependencies.mysql)
-    runtimeOnly(Dependencies.postgresql)
+    runtimeOnly(libs.mysql.connector)
+    runtimeOnly(libs.postgresql.connector)
 
-    compileOnly(project(":lib:sisyphus-dsl"))
+    compileOnly(projects.lib.sisyphusDsl)
 
-    testImplementation(Dependencies.h2)
-    testImplementation(project(":lib:sisyphus-dsl"))
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(projects.lib.sisyphusDsl)
+    testImplementation(libs.h2)
+    testImplementation(libs.spring.boot.test)
 }

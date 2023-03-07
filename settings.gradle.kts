@@ -1,4 +1,5 @@
 rootProject.name = "sisyphus"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include("lib:sisyphus-common")
 include("lib:sisyphus-dsl")
@@ -13,10 +14,7 @@ include("lib:sisyphus-grpc-rxjava")
 include("lib:sisyphus-test")
 
 include("tools:sisyphus-protoc")
-include("tools:sisyphus-project-gradle-plugin")
-include("tools:sisyphus-protobuf-gradle-plugin")
 include("tools:sisyphus-k8s-gradle-plugin")
-include("tools:sisyphus-api-linter-runner")
 include("tools:sisyphus-protoc-runner")
 
 include("middleware:sisyphus-configuration-artifact")
@@ -38,7 +36,5 @@ include("starter:sisyphus-grpc-transcoding-starter")
 include("starter:sisyphus-protobuf-type-server-starter")
 include("starter:sisyphus-spring-boot-test-starter")
 
-include("dependencies")
-project(":dependencies").name = "sisyphus-dependencies"
 include("bom")
 project(":bom").name = "sisyphus-bom"

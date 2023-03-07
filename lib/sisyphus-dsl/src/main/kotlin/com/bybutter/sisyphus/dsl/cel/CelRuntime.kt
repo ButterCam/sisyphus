@@ -82,10 +82,12 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
 
     private fun KFunction<*>.compatibleWith(th: Any?, arguments: List<Any?>): Boolean {
         val thType = this.extensionReceiverParameter?.type?.classifier as? KClass<*>
-        if (th == null && thType == null) return compatibleWith(
-            listOfNotNull(this.extensionReceiverParameter) + this.valueParameters,
-            arguments
-        )
+        if (th == null && thType == null) {
+            return compatibleWith(
+                listOfNotNull(this.extensionReceiverParameter) + this.valueParameters,
+                arguments
+            )
+        }
         if (th == null || thType == null) return false
         if (!thType.isInstance(th)) return false
         return compatibleWith(valueParameters, arguments)

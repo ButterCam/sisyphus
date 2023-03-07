@@ -81,7 +81,9 @@ open class ModelProxy constructor(
     override fun equals(other: Any?): Boolean {
         return if (other is DtoModel) {
             super.equals(Proxy.getInvocationHandler(other))
-        } else super.equals(other)
+        } else {
+            super.equals(other)
+        }
     }
 
     override fun hashCode(): Int {

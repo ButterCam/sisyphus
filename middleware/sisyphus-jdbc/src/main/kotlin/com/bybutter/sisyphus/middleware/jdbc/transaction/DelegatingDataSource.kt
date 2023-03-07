@@ -10,6 +10,8 @@ open class DelegatingDataSource(protected val delegate: DataSource) : DataSource
     override fun <T : Any> unwrap(iface: Class<T>): T {
         return if (iface.isInstance(this)) {
             this as T
-        } else delegate.unwrap(iface)
+        } else {
+            delegate.unwrap(iface)
+        }
     }
 }

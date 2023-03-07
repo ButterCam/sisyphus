@@ -61,7 +61,8 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
                     ?: MixAll.DEFAULT_CONSUMER_GROUP,
                 hook,
                 AllocateMessageQueueAveragely(),
-                true, consumerProperty.traceTopic
+                true,
+                consumerProperty.traceTopic
             )
         } else {
             DefaultMQPushConsumer(
@@ -77,9 +78,13 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
             }
             this.subscribe(
                 metadata.topic,
-                if (metadata.filterType == ExpressionType.TAG) MessageSelector.byTag(metadata.filter) else MessageSelector.bySql(
-                    metadata.filter
-                )
+                if (metadata.filterType == ExpressionType.TAG) {
+                    MessageSelector.byTag(metadata.filter)
+                } else {
+                    MessageSelector.bySql(
+                        metadata.filter
+                    )
+                }
             )
             val converter = metadata.converter.instance()
             when (metadata.type) {

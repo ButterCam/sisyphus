@@ -148,7 +148,9 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
             is CelParser.SelectOrCallContext -> {
                 if (member.open != null) {
                     engine.runtime.invokeMarco(
-                        this, visit(member.member()), member.IDENTIFIER().text,
+                        this,
+                        visit(member.member()),
+                        member.IDENTIFIER().text,
                         member.args?.e
                             ?: listOf()
                     ) { return it }
@@ -189,12 +191,15 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
             is CelParser.IdentOrGlobalCallContext -> {
                 if (primary.op != null) {
                     engine.runtime.invokeMarco(
-                        this, null, primary.IDENTIFIER().text,
+                        this,
+                        null,
+                        primary.IDENTIFIER().text,
                         primary.args?.e
                             ?: listOf()
                     ) { return it }
                     engine.runtime.invoke(
-                        null, primary.IDENTIFIER().text,
+                        null,
+                        primary.IDENTIFIER().text,
                         primary.args?.e?.map { visit(it) }
                             ?: listOf()
                     )

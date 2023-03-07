@@ -7,17 +7,17 @@ plugins {
 description = "Proto compiler for Sisyphus customized Protobuf runtime"
 
 dependencies {
-    api(project(":lib:sisyphus-common"))
-    api(project(":tools:sisyphus-protoc-runner"))
-    api(Dependencies.Kotlin.poet)
-    api(Dependencies.Proto.base)
+    api(libs.kotlinpoet)
 
-    implementation(Dependencies.Proto.grpcProto)
-    implementation("com.google.api:api-common")
+    implementation(projects.lib.sisyphusCommon)
+    implementation(projects.tools.sisyphusProtocRunner)
+    implementation(libs.protobuf.java)
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.google.commonProtos)
+    implementation(libs.google.apiCommon)
+    implementation(libs.rxjava)
 
-    implementation("io.reactivex.rxjava2:rxjava")
-
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation(project(":lib:sisyphus-grpc-coroutine"))
-    testImplementation(project(":lib:sisyphus-grpc-rxjava"))
+    testImplementation(libs.junit.jupiter)
+    testImplementation(projects.lib.sisyphusGrpcCoroutine)
+    testImplementation(projects.lib.sisyphusGrpcRxjava)
 }

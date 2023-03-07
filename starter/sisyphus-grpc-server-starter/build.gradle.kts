@@ -8,17 +8,20 @@ plugins {
 description = "Starter for building gRPC server in Sisyphus Framework"
 
 dependencies {
-    api(project(":middleware:sisyphus-grpc-client"))
-    api(project(":middleware:sisyphus-configuration-artifact"))
-    implementation("io.grpc:grpc-core")
-    compileOnly(Dependencies.Spring.Boot.actuator)
-    runtimeOnly(Dependencies.Grpc.netty)
+    api(projects.middleware.sisyphusGrpcClient)
+    api(projects.middleware.sisyphusConfigurationArtifact)
+    implementation(libs.grpc.core)
+
+    compileOnly(libs.spring.boot.actuator)
+    runtimeOnly(libs.grpc.netty)
+
+    testImplementation(libs.spring.boot.test)
 }
 
 protobuf {
     packageMapping(
         "io.grpc.reflection.v1" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1",
         "io.grpc.reflection.v1alpha" to "com.bybutter.sisyphus.starter.grpc.support.reflection.v1alpha",
-        "io.grpc.health.v1" to "com.bybutter.sisyphus.starter.grpc.support.health.v1",
+        "io.grpc.health.v1" to "com.bybutter.sisyphus.starter.grpc.support.health.v1"
     )
 }

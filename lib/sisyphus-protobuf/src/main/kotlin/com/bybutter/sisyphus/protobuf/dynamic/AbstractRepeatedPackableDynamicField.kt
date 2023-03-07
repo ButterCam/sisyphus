@@ -6,7 +6,7 @@ import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 abstract class AbstractRepeatedPackableDynamicField<T>(
-    descriptor: FieldDescriptorProto,
+    descriptor: FieldDescriptorProto
 ) : AbstractRepeatedDynamicField<T>(descriptor) {
     abstract fun read0(reader: Reader, field: Int, wire: Int)
 

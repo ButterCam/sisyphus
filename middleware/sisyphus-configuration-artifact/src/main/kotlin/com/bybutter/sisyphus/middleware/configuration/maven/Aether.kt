@@ -22,6 +22,7 @@ import org.eclipse.aether.transport.wagon.WagonProvider
 import org.eclipse.aether.transport.wagon.WagonTransporterFactory
 import org.eclipse.aether.util.repository.AuthenticationBuilder
 import org.eclipse.aether.util.version.GenericVersionScheme
+import org.eclipse.aether.version.VersionScheme
 import java.io.File
 
 class Aether {
@@ -69,7 +70,9 @@ class Aether {
     fun registerRepository(url: String, user: String? = null, password: String? = null): RemoteRepository {
         val authentication = if (user != null && password != null) {
             AuthenticationBuilder().addUsername(user).addPassword(password).build()
-        } else null
+        } else {
+            null
+        }
 
         val result = RemoteRepository.Builder("", "default", url).apply {
             if (authentication != null) {
@@ -135,6 +138,6 @@ class Aether {
     }
 
     companion object {
-        private val versionScheme = GenericVersionScheme()
+        private val versionScheme: VersionScheme = GenericVersionScheme()
     }
 }

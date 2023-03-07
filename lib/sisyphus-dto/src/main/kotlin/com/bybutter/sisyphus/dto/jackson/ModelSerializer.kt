@@ -27,7 +27,8 @@ internal class ModelSerializer : BeanSerializerBase {
         filteredProperties: Array<out BeanPropertyWriter>?
     ) : super(
         source,
-        properties, filteredProperties
+        properties,
+        filteredProperties
     )
 
     constructor(source: ModelSerializer, toIgnore: MutableSet<String>?, toInclude: MutableSet<String>?) : super(

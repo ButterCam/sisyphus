@@ -37,7 +37,8 @@ class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase) :
             if (result != true) {
                 throw AssertionFailedError(
                     "Assertion '$assert' failed in test '$displayName'.",
-                    true, result
+                    true,
+                    result
                 )
             }
         }

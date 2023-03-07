@@ -82,7 +82,9 @@ object PathMatcher {
                 // string:  a/bc/
                 return if (pc == sc) {
                     normalMatch(pat, p + 1, str, si + 1, pathDelimiters)
-                } else false
+                } else {
+                    false
+                }
                 // Not matched string in current path part.
                 //             ↓        ↓
                 // pattern: a/*      a/*d

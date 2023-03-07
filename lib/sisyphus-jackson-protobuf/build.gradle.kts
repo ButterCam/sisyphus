@@ -7,6 +7,6 @@ plugins {
 description = "Jackson support for Sisyphus protobuf runtime customized message"
 
 dependencies {
-    api(project(":lib:sisyphus-jackson"))
-    api(project(":lib:sisyphus-protobuf"))
+    api(projects.lib.sisyphusJackson)
+    api(projects.lib.sisyphusProtobuf)
 }

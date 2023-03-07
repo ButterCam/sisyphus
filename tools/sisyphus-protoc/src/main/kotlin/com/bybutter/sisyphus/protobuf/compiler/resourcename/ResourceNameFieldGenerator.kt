@@ -299,14 +299,16 @@ class ResourceNameMessageFieldReadFunctionGenerator :
             state.target.apply {
                 addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N += %T(reader.string())",
-                    state.descriptor.name(), resource.className()
+                    state.descriptor.name(),
+                    resource.className()
                 )
             }
         } else {
             state.target.apply {
                 addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N = %T(reader.string())",
-                    state.descriptor.name(), resource.className()
+                    state.descriptor.name(),
+                    resource.className()
                 )
             }
         }

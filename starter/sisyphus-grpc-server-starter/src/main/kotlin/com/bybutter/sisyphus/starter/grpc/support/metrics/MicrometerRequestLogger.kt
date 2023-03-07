@@ -33,8 +33,10 @@ class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogg
     override fun log(call: ServerCall<*, *>, inputHeader: Metadata) {
         registry.counter(
             "sisyphus_incoming_grpc_requests",
-            "service", call.methodDescriptor.serviceName,
-            "method", call.methodDescriptor.fullMethodName,
+            "service",
+            call.methodDescriptor.serviceName,
+            "method",
+            call.methodDescriptor.fullMethodName
         )
     }
 

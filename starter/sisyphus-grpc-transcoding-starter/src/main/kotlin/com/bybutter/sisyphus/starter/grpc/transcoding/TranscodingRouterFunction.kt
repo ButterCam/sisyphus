@@ -40,7 +40,7 @@ class TranscodingRouterFunction constructor(
     companion object {
         operator fun invoke(
             rules: Collection<TranscodingRouterRule>,
-            transcodingChannel: Channel,
+            transcodingChannel: Channel
         ): RouterFunction<ServerResponse> {
             // Return empty router if no service routers created.
             if (rules.isEmpty()) return EmptyRouterFunction

@@ -8,15 +8,14 @@ plugins {
 description = "Sisyphus customized Protobuf runtime for Kotlin"
 
 dependencies {
-    api(project(":lib:sisyphus-common"))
+    api(projects.lib.sisyphusCommon)
 
-    proto(platform(project(":sisyphus-dependencies")))
-    proto(Dependencies.Proto.base)
+    proto(libs.protobuf.java)
 
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation(project(":lib:sisyphus-grpc"))
-    testImplementation(project(":lib:sisyphus-gson-protobuf"))
-    testImplementation(project(":lib:sisyphus-jackson-protobuf"))
+    testImplementation(libs.junit.jupiter)
+    testImplementation(projects.lib.sisyphusGrpc)
+    testImplementation(projects.lib.sisyphusGsonProtobuf)
+    testImplementation(projects.lib.sisyphusJacksonProtobuf)
 }
 
 protobuf {

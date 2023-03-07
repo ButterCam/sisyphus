@@ -7,5 +7,6 @@ plugins {
 description = "Starter for configure spring boot environment in Sisyphus Test Framework"
 
 dependencies {
-    api(project(":lib:sisyphus-test"))
+    api(libs.spring.boot)
+    api(projects.lib.sisyphusTest)
 }

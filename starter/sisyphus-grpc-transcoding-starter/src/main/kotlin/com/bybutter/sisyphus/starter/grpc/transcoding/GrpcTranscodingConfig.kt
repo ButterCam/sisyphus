@@ -79,7 +79,8 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
 
             val rules = exportTranscodingRules(
                 BeanUtils.getSortedBeans(registry, TranscodingRouterRuleExporter::class.java).values,
-                server, enableServices
+                server,
+                enableServices
             )
 
             TranscodingRouterFunction(rules, channel)
@@ -129,14 +130,15 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
 
             val rules = exportTranscodingRules(
                 BeanUtils.getSortedBeans(registry, TranscodingRouterRuleExporter::class.java).values,
-                server, enableServices
+                server,
+                enableServices
             )
 
             // Create CORS config source for transcoding.
             TranscodingCorsConfigurationSource(
                 rules,
                 // Try to get the default transcoding cors configuration factory form spring application context
-                BeanUtils.getSortedBeans(registry, TranscodingCorsConfigurationInterceptor::class.java).values,
+                BeanUtils.getSortedBeans(registry, TranscodingCorsConfigurationInterceptor::class.java).values
             )
         }
         registry.registerBeanDefinition(

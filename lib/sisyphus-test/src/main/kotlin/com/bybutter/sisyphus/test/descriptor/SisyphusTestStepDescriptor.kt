@@ -167,7 +167,8 @@ class SisyphusTestStepDescriptor(id: UniqueId, val step: TestStep) :
             if (result != true) {
                 throw AssertionFailedError(
                     "Assertion '$assert' failed in test '${parent.get().displayName}.$displayName'.",
-                    true, result
+                    true,
+                    result
                 )
             }
         }

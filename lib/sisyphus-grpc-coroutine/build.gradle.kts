@@ -8,15 +8,16 @@ plugins {
 description = "Sisyphus customized gRPC runtime for Kotlin coroutine(full support)"
 
 dependencies {
-    api(project(":lib:sisyphus-grpc"))
-    api(Dependencies.Grpc.stub)
-    api(Dependencies.Grpc.kotlin) {
+    api(projects.lib.sisyphusGrpc)
+    api(libs.kotlin.coroutines)
+    api(libs.grpc.stub)
+    api(libs.grpc.kotlin) {
         exclude("io.grpc", "grpc-protobuf")
     }
 
-    implementation(project(":lib:sisyphus-jackson"))
+    implementation(projects.lib.sisyphusJackson)
 
-    proto(project(":lib:sisyphus-grpc"))
+    proto(libs.google.commonProtos)
 }
 
 protobuf {
