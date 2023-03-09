@@ -7,10 +7,11 @@ plugins {
 description = "Middleware for manage configuration of Sisyphus Project"
 
 dependencies {
-    implementation(project(":lib:sisyphus-common"))
-    implementation(Dependencies.Maven.resolver)
-    implementation(Dependencies.Maven.resolverConnector)
-    implementation(Dependencies.Maven.resolverWagon)
-    implementation(Dependencies.Maven.wagonFile)
-    implementation(Dependencies.Maven.wagonHttp)
+    api(libs.spring.boot)
+    implementation(libs.maven.resolver)
+    implementation(libs.maven.resolver.connector)
+    implementation(libs.maven.resolver.wagon)
+    implementation(libs.maven.wagon.file)
+    implementation(libs.maven.wagon.http)
+    implementation(projects.lib.sisyphusCommon)
 }

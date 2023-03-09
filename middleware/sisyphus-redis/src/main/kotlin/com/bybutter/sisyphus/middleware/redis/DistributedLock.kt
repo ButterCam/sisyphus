@@ -90,8 +90,9 @@ private class DistributedLock(private var key: String, private val redis: Statef
     suspend fun lock(waitTime: Long, leaseTime: Long, timeUnit: TimeUnit): Boolean {
         val endTime = System.currentTimeMillis() + timeUnit.toMillis(waitTime)
         while (System.currentTimeMillis() < endTime) {
-            if (lock(leaseTime, timeUnit))
+            if (lock(leaseTime, timeUnit)) {
                 return true
+            }
             delay(100)
         }
         return false

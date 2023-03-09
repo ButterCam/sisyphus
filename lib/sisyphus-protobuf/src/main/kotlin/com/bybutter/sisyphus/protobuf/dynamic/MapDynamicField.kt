@@ -9,7 +9,7 @@ import com.bybutter.sisyphus.protobuf.findMapEntryDescriptor
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 class MapDynamicField<TKey, TValue>(
-    private val descriptor: FieldDescriptorProto,
+    private val descriptor: FieldDescriptorProto
 ) : DynamicField<MutableMap<TKey, TValue>> {
     private val map = mutableMapOf<TKey, TValue>()
 

@@ -7,8 +7,9 @@ plugins {
 description = "Middleware for using AMQP in Sisyphus Project"
 
 dependencies {
-    implementation(project(":lib:sisyphus-dto"))
-    implementation(project(":lib:sisyphus-jackson"))
+    implementation(projects.lib.sisyphusDto)
+    implementation(projects.lib.sisyphusJackson)
 
-    api(Dependencies.Spring.Framework.amqp)
+    api(libs.spring.boot)
+    api(libs.spring.framework.amqp)
 }

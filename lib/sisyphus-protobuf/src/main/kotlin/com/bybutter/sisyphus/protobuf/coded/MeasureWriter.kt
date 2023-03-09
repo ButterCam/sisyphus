@@ -37,57 +37,46 @@ class MeasureWriter : Writer {
     }
 
     override fun uint32(value: UInt): MeasureWriter {
-
         return append(value.toInt().varintSize)
     }
 
     override fun sint32(value: Int): MeasureWriter {
-
         return append(value.encodeZigZag().varintSize)
     }
 
     override fun fixed32(value: UInt): MeasureWriter {
-
         return append(4)
     }
 
     override fun sfixed32(value: Int): MeasureWriter {
-
         return append(4)
     }
 
     override fun int64(value: Long): MeasureWriter {
-
         return append(value.varintSize)
     }
 
     override fun uint64(value: ULong): MeasureWriter {
-
         return append(value.toLong().varintSize)
     }
 
     override fun sint64(value: Long): MeasureWriter {
-
         return append(value.encodeZigZag().varintSize)
     }
 
     override fun fixed64(value: ULong): MeasureWriter {
-
         return append(8)
     }
 
     override fun sfixed64(value: Long): MeasureWriter {
-
         return append(8)
     }
 
     override fun float(value: Float): MeasureWriter {
-
         return append(4)
     }
 
     override fun double(value: Double): MeasureWriter {
-
         return append(8)
     }
 
@@ -138,7 +127,7 @@ class MeasureWriter : Writer {
 
     class LdMark private constructor(
         private val parent: LdMark? = null,
-        private val list: MutableList<LdMark> = parent?.list ?: mutableListOf(),
+        private val list: MutableList<LdMark> = parent?.list ?: mutableListOf()
     ) {
         constructor() : this(null)
 

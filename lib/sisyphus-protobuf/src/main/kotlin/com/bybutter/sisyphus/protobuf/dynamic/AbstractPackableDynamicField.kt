@@ -4,7 +4,7 @@ import com.bybutter.sisyphus.protobuf.coded.Reader
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 abstract class AbstractPackableDynamicField<T>(
-    descriptor: FieldDescriptorProto,
+    descriptor: FieldDescriptorProto
 ) : AbstractDynamicField<T>(descriptor) {
     abstract fun read0(reader: Reader, field: Int, wire: Int)
 

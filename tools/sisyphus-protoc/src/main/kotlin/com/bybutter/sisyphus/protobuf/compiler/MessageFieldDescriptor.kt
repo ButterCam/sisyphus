@@ -152,7 +152,9 @@ fun DescriptorNode<DescriptorProtos.FieldDescriptorProto>.mutableFieldType(): Ty
             MAP -> MUTABLE_MAP.parameterizedBy(name.typeArguments)
             else -> TODO()
         }
-    } else return fieldType()
+    } else {
+        return fieldType()
+    }
 }
 
 fun DescriptorNode<DescriptorProtos.FieldDescriptorProto>.mapEntry(): MessageDescriptor? {

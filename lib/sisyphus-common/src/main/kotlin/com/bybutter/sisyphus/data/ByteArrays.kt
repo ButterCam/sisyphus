@@ -111,15 +111,17 @@ inline fun ByteArray.trim(predicate: (Byte) -> Boolean): ByteArray {
         val match = predicate(this[index])
 
         if (!startFound) {
-            if (!match)
+            if (!match) {
                 startFound = true
-            else
+            } else {
                 startIndex += 1
+            }
         } else {
-            if (!match)
+            if (!match) {
                 break
-            else
+            } else {
                 endIndex -= 1
+            }
         }
     }
 
@@ -128,16 +130,18 @@ inline fun ByteArray.trim(predicate: (Byte) -> Boolean): ByteArray {
 
 inline fun ByteArray.trimStart(predicate: (Byte) -> Boolean): ByteArray {
     for (index in this.indices)
-        if (!predicate(this[index]))
+        if (!predicate(this[index])) {
             return copyOfRange(index, size)
+        }
 
     return byteArrayOf()
 }
 
 inline fun ByteArray.trimEnd(predicate: (Byte) -> Boolean): ByteArray {
     for (index in this.indices.reversed())
-        if (!predicate(this[index]))
+        if (!predicate(this[index])) {
             return copyOfRange(0, index + 1)
+        }
 
     return byteArrayOf()
 }

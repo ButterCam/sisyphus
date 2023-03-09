@@ -1,6 +1,6 @@
 plugins {
     `java-platform`
-    id("nebula.maven-publish")
+    id("com.netflix.nebula.maven-publish")
     sisyphus
 }
 

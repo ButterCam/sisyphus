@@ -81,7 +81,7 @@ class Reader(private val inputStream: InputStream) {
         when (wireType) {
             WireType.VARINT.ordinal,
             WireType.FIXED32.ordinal,
-            WireType.FIXED64.ordinal,
+            WireType.FIXED64.ordinal
             -> block(this)
 
             WireType.LENGTH_DELIMITED.ordinal -> nested(block)

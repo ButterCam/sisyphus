@@ -52,7 +52,9 @@ object ResourceFields {
         val resource = resource(field) ?: return field.mutableFieldType()
         return if (field.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED) {
             MUTABLE_LIST.parameterizedBy(resource.className())
-        } else fieldType(field)
+        } else {
+            fieldType(field)
+        }
     }
 
     val extensionRegistry = ExtensionRegistry.newInstance().apply {

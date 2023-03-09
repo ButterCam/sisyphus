@@ -221,7 +221,6 @@ class ResourceNameCompanionBasicGenerator : GroupedGenerator<ResourceNameCompani
 class ResourceNameCompanionInvokeGenerator : GroupedGenerator<ResourceNameCompanionGeneratingState> {
     override fun generate(state: ResourceNameCompanionGeneratingState): Boolean {
         state.target.apply {
-
             for (template in state.descriptor.templates) {
                 val uniqueFields = template.vars() - state.descriptor.commonFields
                 val functionName = if (uniqueFields.isEmpty()) {

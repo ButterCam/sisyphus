@@ -1,5 +1,4 @@
 import com.bybutter.sisyphus.project.gradle.SisyphusProjectPlugin
-import com.github.benmanes.gradle.versions.VersionsPlugin
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaLibraryPlugin
@@ -8,13 +7,12 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.ide.idea.IdeaPlugin
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val Project.java: Project
     get() {
         pluginManager.apply(JavaLibraryPlugin::class.java)
         pluginManager.apply(SisyphusProjectPlugin::class.java)
-
-        managedDependencies
 
         tasks.withType<JavaCompile> {
             sourceCompatibility = JavaVersion.VERSION_1_8.majorVersion
@@ -23,21 +21,37 @@ val Project.java: Project
         return this
     }
 
+val Project.kotlin: Project
+    get() {
+        apply {
+            plugin("kotlin")
+            plugin("kotlin-spring")
+            plugin("org.jlleitschuh.gradle.ktlint")
+        }
+
+        dependencies {
+            add("api", "org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+            add("implementation", "org.jetbrains.kotlin:kotlin-reflect")
+        }
+
+        tasks.withType<KotlinCompile> {
+            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+        }
+
+        return this
+    }
+
 val Project.next: Project
     get() {
         pluginManager.apply(IdeaPlugin::class.java)
-        pluginManager.apply(VersionsPlugin::class.java)
 
-        java.kotlin.managedDependencies
+        java.kotlin
 
         tasks.withType<Test> {
             useJUnitPlatform()
         }
 
-        tasks.withType<JavaCompile> {
-            sourceCompatibility = JavaVersion.VERSION_1_8.majorVersion
-            targetCompatibility = JavaVersion.VERSION_1_8.majorVersion
-        }
         return this
     }
 
@@ -46,10 +60,6 @@ val Project.middleware: Project
         next
 
         group = "com.bybutter.sisyphus.middleware"
-
-        dependencies {
-            "api"(Dependencies.Spring.Boot.boot)
-        }
         return this
     }
 
@@ -61,28 +71,11 @@ val Project.lib: Project
         return this
     }
 
-val Project.proto: Project
-    get() {
-        java
-
-        group = "com.bybutter.sisyphus.proto"
-
-        pluginManager.apply(JavaLibraryPlugin::class.java)
-        pluginManager.apply(SisyphusProjectPlugin::class.java)
-
-        return this
-    }
-
 val Project.starter: Project
     get() {
         next
 
         group = "com.bybutter.sisyphus.starter"
-
-        dependencies {
-            "api"(Dependencies.Spring.Boot.boot)
-            "testImplementation"(Dependencies.Spring.Boot.test)
-        }
         return this
     }
 

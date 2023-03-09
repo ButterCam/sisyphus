@@ -7,9 +7,12 @@ plugins {
 description = "Middleware for using RocketMQ in Sisyphus Project"
 
 dependencies {
-    implementation(project(":lib:sisyphus-common"))
+    api(libs.spring.boot)
+    api(libs.rocketmq)
 
-    api(Dependencies.rocketMq)
-    implementation(Dependencies.rocketMqAcl)
-    compileOnly("org.springframework.boot:spring-boot-starter-actuator")
+    implementation(libs.rocketmq.acl)
+    implementation(libs.kotlin.coroutines)
+    implementation(projects.lib.sisyphusCommon)
+
+    compileOnly(libs.spring.boot.actuator)
 }

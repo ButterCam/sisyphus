@@ -158,20 +158,20 @@ internal fun JsonReader.readRepeated(field: FieldDescriptorProto): Any {
                 val key = when (keyField.type) {
                     FieldDescriptorProto.Type.SINT64,
                     FieldDescriptorProto.Type.SFIXED64,
-                    FieldDescriptorProto.Type.INT64,
+                    FieldDescriptorProto.Type.INT64
                     -> keyName.toLong()
 
                     FieldDescriptorProto.Type.FIXED64,
-                    FieldDescriptorProto.Type.UINT64,
+                    FieldDescriptorProto.Type.UINT64
                     -> keyName.toULong()
 
                     FieldDescriptorProto.Type.SINT32,
                     FieldDescriptorProto.Type.SFIXED32,
-                    FieldDescriptorProto.Type.INT32,
+                    FieldDescriptorProto.Type.INT32
                     -> keyName.toInt()
 
                     FieldDescriptorProto.Type.UINT32,
-                    FieldDescriptorProto.Type.FIXED32,
+                    FieldDescriptorProto.Type.FIXED32
                     -> keyName.toUInt()
 
                     FieldDescriptorProto.Type.BOOL -> keyName == "true"
@@ -203,20 +203,20 @@ internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
         FieldDescriptorProto.Type.FLOAT -> float()
         FieldDescriptorProto.Type.SFIXED64,
         FieldDescriptorProto.Type.SINT64,
-        FieldDescriptorProto.Type.INT64,
+        FieldDescriptorProto.Type.INT64
         -> long()
 
         FieldDescriptorProto.Type.FIXED64,
-        FieldDescriptorProto.Type.UINT64,
+        FieldDescriptorProto.Type.UINT64
         -> ulong()
 
         FieldDescriptorProto.Type.SFIXED32,
         FieldDescriptorProto.Type.SINT32,
-        FieldDescriptorProto.Type.INT32,
+        FieldDescriptorProto.Type.INT32
         -> int()
 
         FieldDescriptorProto.Type.UINT32,
-        FieldDescriptorProto.Type.FIXED32,
+        FieldDescriptorProto.Type.FIXED32
         -> uint()
 
         FieldDescriptorProto.Type.BOOL -> bool()
@@ -293,7 +293,7 @@ fun JsonReader.readAny(): Message<*, *>? {
         Timestamp.name,
         UInt32Value.name,
         UInt64Value.name,
-        Value.name,
+        Value.name
         -> {
             while (next() != JsonToken.END_OBJECT) {
                 if (nameAndNext() == "value") {

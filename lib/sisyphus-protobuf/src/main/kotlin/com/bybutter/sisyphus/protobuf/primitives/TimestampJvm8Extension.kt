@@ -59,7 +59,7 @@ operator fun Timestamp.Companion.invoke(
     minute: Int = 0,
     second: Int = 0,
     nano: Int = 0,
-    zoneId: ZoneId = ZoneId.systemDefault(),
+    zoneId: ZoneId = ZoneId.systemDefault()
 ): Timestamp {
     val instant = ZonedDateTime.of(year, month.value, day, hour, minute, second, nano, zoneId).toInstant()
     return Timestamp {
@@ -76,7 +76,7 @@ operator fun Timestamp.Companion.invoke(
     minute: Int = 0,
     second: Int = 0,
     nano: Int = 0,
-    zoneId: ZoneId = ZoneId.systemDefault(),
+    zoneId: ZoneId = ZoneId.systemDefault()
 ): Timestamp {
     val instant = ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId).toInstant()
     return Timestamp {

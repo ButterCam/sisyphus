@@ -49,7 +49,7 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
     override fun <ReqT : Any, RespT : Any> interceptCall(
         call: ServerCall<ReqT, RespT>,
         headers: Metadata,
-        next: ServerCallHandler<ReqT, RespT>,
+        next: ServerCallHandler<ReqT, RespT>
     ): ServerCall.Listener<ReqT> {
         val context = Context.current().withValue(RequestLogger.REQUEST_CONTEXT_KEY, RequestInfo(headers))
 
@@ -71,7 +71,7 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
     private class SisyphusGrpcServerCall<ReqT, RespT>(
         call: ServerCall<ReqT, RespT>,
         private val loggers: List<RequestLogger>,
-        private val statusRenderers: List<StatusRenderer>,
+        private val statusRenderers: List<StatusRenderer>
     ) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
         private val requestNanoTime = System.nanoTime()
 

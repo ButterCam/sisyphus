@@ -117,7 +117,8 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
                             for (field in state.descriptor.fields) {
                                 if (field.descriptor.name != field.descriptor.jsonName) {
                                     MessageClearInCurrentFunctionGeneratingState(
-                                        state, field,
+                                        state,
+                                        field,
                                         WhenBranchBuilder(
                                             buildCodeBlock {
                                                 add(
@@ -131,7 +132,8 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
                                     ).advance()
                                 } else {
                                     MessageClearInCurrentFunctionGeneratingState(
-                                        state, field,
+                                        state,
+                                        field,
                                         WhenBranchBuilder(
                                             buildCodeBlock {
                                                 add("%S ->", field.descriptor.name)
@@ -160,7 +162,8 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
                         beginScope("return when(fieldNumber)") {
                             for (field in state.descriptor.fields) {
                                 MessageClearInCurrentFunctionGeneratingState(
-                                    state, field,
+                                    state,
+                                    field,
                                     WhenBranchBuilder(
                                         buildCodeBlock {
                                             add("${field.descriptor.number} ->")
@@ -219,7 +222,8 @@ class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                             for (field in state.descriptor.fields) {
                                 if (field.descriptor.name != field.descriptor.jsonName) {
                                     MessageGetInCurrentFunctionGeneratingState(
-                                        state, field,
+                                        state,
+                                        field,
                                         WhenBranchBuilder(
                                             buildCodeBlock {
                                                 add(
@@ -233,7 +237,8 @@ class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                     ).advance()
                                 } else {
                                     MessageGetInCurrentFunctionGeneratingState(
-                                        state, field,
+                                        state,
+                                        field,
                                         WhenBranchBuilder(
                                             buildCodeBlock {
                                                 add("%S ->", field.descriptor.name)
@@ -263,7 +268,8 @@ class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                         beginScope("return when(fieldNumber)") {
                             for (field in state.descriptor.fields) {
                                 MessageGetInCurrentFunctionGeneratingState(
-                                    state, field,
+                                    state,
+                                    field,
                                     WhenBranchBuilder(
                                         buildCodeBlock {
                                             add("${field.descriptor.number} ->")
@@ -309,7 +315,8 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                             for (field in state.descriptor.fields) {
                                 if (field.descriptor.name != field.descriptor.jsonName) {
                                     MessageSetFieldInCurrentFunctionGeneratingState(
-                                        state, field,
+                                        state,
+                                        field,
                                         WhenBranchBuilder(
                                             buildCodeBlock {
                                                 add(
@@ -323,7 +330,8 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                     ).advance()
                                 } else {
                                     MessageSetFieldInCurrentFunctionGeneratingState(
-                                        state, field,
+                                        state,
+                                        field,
                                         WhenBranchBuilder(
                                             buildCodeBlock {
                                                 add("%S ->", field.descriptor.name)
@@ -353,7 +361,8 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                         beginScope("when(fieldNumber)") {
                             for (field in state.descriptor.fields) {
                                 MessageSetFieldInCurrentFunctionGeneratingState(
-                                    state, field,
+                                    state,
+                                    field,
                                     WhenBranchBuilder(
                                         buildCodeBlock {
                                             add("${field.descriptor.number} ->")
@@ -381,12 +390,14 @@ class MessageFieldSetFieldInCurrentFunctionGenerator :
                     addStatement("this.%N.clear()", state.descriptor.name())
                     if (state.descriptor.mapEntry() == null) {
                         addStatement(
-                            "this.%N.addAll(value.%M())", state.descriptor.name(),
+                            "this.%N.addAll(value.%M())",
+                            state.descriptor.name(),
                             RuntimeMethods.UNCHECK_CAST
                         )
                     } else {
                         addStatement(
-                            "this.%N.putAll(value.%M())", state.descriptor.name(),
+                            "this.%N.putAll(value.%M())",
+                            state.descriptor.name(),
                             RuntimeMethods.UNCHECK_CAST
                         )
                     }
@@ -421,7 +432,8 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                             for (field in state.descriptor.fields) {
                                 if (field.descriptor.name != field.descriptor.jsonName) {
                                     MessageHasFieldInCurrentFunctionGeneratingState(
-                                        state, field,
+                                        state,
+                                        field,
                                         WhenBranchBuilder(
                                             buildCodeBlock {
                                                 add(
@@ -435,7 +447,8 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                     ).advance()
                                 } else {
                                     MessageHasFieldInCurrentFunctionGeneratingState(
-                                        state, field,
+                                        state,
+                                        field,
                                         WhenBranchBuilder(
                                             buildCodeBlock {
                                                 add("%S ->", field.descriptor.name)
@@ -464,7 +477,8 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                         beginScope("return when(fieldNumber)") {
                             for (field in state.descriptor.fields) {
                                 MessageHasFieldInCurrentFunctionGeneratingState(
-                                    state, field,
+                                    state,
+                                    field,
                                     WhenBranchBuilder(
                                         buildCodeBlock {
                                             add("${field.descriptor.number} ->")
@@ -539,8 +553,10 @@ class MessageFieldEqualsFunctionGenerator : GroupedGenerator<MessageEqualsFuncti
                 }
                 DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED -> {
                     addStatement(
-                        "if (!%N.%M(other.%N)) return·false", state.descriptor.name(),
-                        RuntimeMethods.CONTENT_EQUALS, state.descriptor.name()
+                        "if (!%N.%M(other.%N)) return·false",
+                        state.descriptor.name(),
+                        RuntimeMethods.CONTENT_EQUALS,
+                        state.descriptor.name()
                     )
                 }
             }
@@ -819,14 +835,16 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                                 } else {
                                     addStatement(
                                         "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> this.%N[k]·=·v }",
-                                        valueDescriptor.elementType(), state.descriptor.name()
+                                        valueDescriptor.elementType(),
+                                        state.descriptor.name()
                                     )
                                 }
                             }
                             WireFormat.FieldType.ENUM -> {
                                 addStatement(
                                     "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T(it.int32()) }) { k,·v·-> this.%N[k]·=·v }",
-                                    valueDescriptor.elementType(), state.descriptor.name()
+                                    valueDescriptor.elementType(),
+                                    state.descriptor.name()
                                 )
                             }
                             else -> {
@@ -866,7 +884,8 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                     )
                 }
                 enum -> addStatement(
-                    "${state.descriptor.descriptor.number} -> this.%N = %T(reader.int32())", state.descriptor.name(),
+                    "${state.descriptor.descriptor.number} -> this.%N = %T(reader.int32())",
+                    state.descriptor.name(),
                     state.descriptor.elementType()
                 )
                 else -> addStatement(

@@ -7,8 +7,9 @@ plugins {
 description = "Middleware for using Redis cache in Sisyphus Project"
 
 dependencies {
-    api(project(":lib:sisyphus-common"))
-    api(Dependencies.Spring.Boot.redis)
-    api(Dependencies.Kotlin.Coroutines.jdk)
-    api(Dependencies.Kotlin.Coroutines.reactive)
+    api(projects.lib.sisyphusCommon)
+    api(libs.spring.boot)
+    api(libs.spring.boot.redis)
+    api(libs.kotlin.coroutines.jdk)
+    api(libs.kotlin.coroutines.reactive)
 }

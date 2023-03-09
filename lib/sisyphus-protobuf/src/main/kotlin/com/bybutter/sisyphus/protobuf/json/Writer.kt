@@ -74,20 +74,20 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
         FieldDescriptorProto.Type.FLOAT -> value(value as Float)
         FieldDescriptorProto.Type.SFIXED64,
         FieldDescriptorProto.Type.SINT64,
-        FieldDescriptorProto.Type.INT64,
+        FieldDescriptorProto.Type.INT64
         -> safeLong(value as Long)
 
         FieldDescriptorProto.Type.FIXED64,
-        FieldDescriptorProto.Type.UINT64,
+        FieldDescriptorProto.Type.UINT64
         -> safeULong(value as ULong)
 
         FieldDescriptorProto.Type.SFIXED32,
         FieldDescriptorProto.Type.SINT32,
-        FieldDescriptorProto.Type.INT32,
+        FieldDescriptorProto.Type.INT32
         -> value(value as Int)
 
         FieldDescriptorProto.Type.UINT32,
-        FieldDescriptorProto.Type.FIXED32,
+        FieldDescriptorProto.Type.FIXED32
         -> value(value as UInt)
 
         FieldDescriptorProto.Type.BOOL -> value(value as Boolean)

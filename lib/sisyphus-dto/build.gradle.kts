@@ -7,10 +7,10 @@ plugins {
 description = "Easy to create struct in Sisyphus"
 
 dependencies {
-    compileOnly(project(":lib:sisyphus-jackson"))
-    implementation(project(":lib:sisyphus-common"))
+    compileOnly(projects.lib.sisyphusJackson)
 
-    implementation(Dependencies.Kotlin.reflect)
+    implementation(projects.lib.sisyphusCommon)
+    implementation(libs.kotlin.reflect)
 
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(libs.junit.jupiter)
 }

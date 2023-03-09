@@ -8,15 +8,15 @@ plugins {
 description = " Test framework for testing gRPC apis in Sisyphus Framework"
 
 dependencies {
-    api("org.junit.platform:junit-platform-engine")
+    api(libs.junit.jupiter.engine)
 
-    implementation(project(":lib:sisyphus-dsl"))
-    implementation(project(":lib:sisyphus-grpc"))
-    implementation(project(":lib:sisyphus-jackson-protobuf"))
-    implementation("org.junit.platform:junit-platform-launcher")
-    implementation("org.reflections:reflections")
-    implementation("io.grpc:grpc-stub")
+    implementation(projects.lib.sisyphusDsl)
+    implementation(projects.lib.sisyphusGrpc)
+    implementation(projects.lib.sisyphusJacksonProtobuf)
+    implementation(libs.junit.launcher)
+    implementation(libs.grpc.stub)
+    implementation(libs.reflections)
 
-    testImplementation(project(":starter:sisyphus-grpc-server-starter"))
-    testImplementation(project(":starter:sisyphus-spring-boot-test-starter"))
+    testImplementation(projects.starter.sisyphusGrpcServerStarter)
+    testImplementation(projects.starter.sisyphusSpringBootTestStarter)
 }

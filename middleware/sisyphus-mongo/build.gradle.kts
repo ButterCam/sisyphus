@@ -7,6 +7,6 @@ plugins {
 description = "Middleware for using MongoDB in Sisyphus Project"
 
 dependencies {
-    api(Dependencies.mongo)
-    api(Dependencies.Kotlin.Coroutines.reactive)
+    api(libs.spring.boot)
+    api(libs.mongodb)
 }

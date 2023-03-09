@@ -241,8 +241,10 @@ class SwaggerRouterFunction private constructor(
             ) + SwaggerServers.fetchServers(property.servers)
             components = Components().apply {
                 this.schemas = schemas
-                if (property.securitySchemes != null) securitySchemes =
-                    SwaggerSecuritySchemes.fetchSecuritySchemes(property.securitySchemes)
+                if (property.securitySchemes != null) {
+                    securitySchemes =
+                        SwaggerSecuritySchemes.fetchSecuritySchemes(property.securitySchemes)
+                }
             }
         }
         return ServerResponse.ok().bodyValue(Json.mapper().writeValueAsString(openApi))

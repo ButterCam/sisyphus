@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.protobuf.dynamic
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 abstract class AbstractDynamicField<T>(
-    private val descriptor: FieldDescriptorProto,
+    private val descriptor: FieldDescriptorProto
 ) : DynamicField<T> {
     protected abstract var value: T
     protected var hasValue = false
