@@ -86,3 +86,15 @@ val Project.tools: Project
         group = "com.bybutter.sisyphus.tools"
         return this
     }
+
+val Project.plugin: Project
+    get() {
+        apply {
+            plugin("com.gradle.plugin-publish")
+        }
+
+        next
+
+        group = "com.bybutter.sisyphus.tools"
+        return this
+    }

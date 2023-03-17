@@ -14,7 +14,7 @@ import java.time.Duration
  * 'sisyphus_grpc_requests' will statistics all requests,
  * 'sisyphus_incoming_grpc_requests' will count all incoming requests even it not be process over.
  */
-class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogger, IncomingRequestLogger {
+class MicrometerRequestLogger(private val registry: MeterRegistry) : IncomingRequestLogger {
     override val id: String = MicrometerRequestLogger::class.java.typeName
 
     override fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long) {
