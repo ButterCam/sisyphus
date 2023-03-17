@@ -43,7 +43,7 @@ kubernetes = "15.0.1"
 hbase = "2.8.7"
 hikari = "5.0.1"
 h2 = "2.1.214"
-rocketmq = "4.7.1"
+rocketmq = "5.1.0"
 swagger = "2.2.8"
 
 [libraries]
