@@ -1,4 +1,4 @@
-tools
+plugin
 
 plugins {
     `java-library`

@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.starter.grpc.support.metrics
 
 import com.bybutter.sisyphus.starter.grpc.support.IncomingRequestLogger
 import com.bybutter.sisyphus.starter.grpc.support.RequestInfo
-import com.bybutter.sisyphus.starter.grpc.support.RequestLogger
 import io.grpc.Metadata
 import io.grpc.ServerCall
 import io.grpc.Status
@@ -14,7 +13,7 @@ import java.time.Duration
  * 'sisyphus_grpc_requests' will statistics all requests,
  * 'sisyphus_incoming_grpc_requests' will count all incoming requests even it not be process over.
  */
-class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogger, IncomingRequestLogger {
+class MicrometerRequestLogger(private val registry: MeterRegistry) : IncomingRequestLogger {
     override val id: String = MicrometerRequestLogger::class.java.typeName
 
     override fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long) {
@@ -23,10 +22,14 @@ class MicrometerRequestLogger(private val registry: MeterRegistry) : RequestLogg
 
         registry.timer(
             "sisyphus_grpc_requests",
-            "service", call.methodDescriptor.serviceName,
-            "method", call.methodDescriptor.fullMethodName,
-            "status", status.code.name,
-            "exception", status.cause?.javaClass?.name ?: "None"
+            "service",
+            call.methodDescriptor.serviceName,
+            "method",
+            call.methodDescriptor.fullMethodName,
+            "status",
+            status.code.name,
+            "exception",
+            status.cause?.javaClass?.name ?: "None"
         ).record(costDuration)
     }
 

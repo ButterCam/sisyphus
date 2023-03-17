@@ -23,9 +23,6 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
     private var loggers: List<RequestLogger> = listOf()
 
     @Autowired(required = false)
-    private var incomingLogger: List<IncomingRequestLogger> = listOf()
-
-    @Autowired(required = false)
     private var statusRenderers: List<StatusRenderer> = listOf()
 
     private val uniqueLoggers: List<RequestLogger> by lazy {
@@ -39,7 +36,8 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
 
     private val uniqueIncomingLoggers: List<IncomingRequestLogger> by lazy {
         val addedLogger = mutableSetOf<String>()
-        incomingLogger.mapNotNull {
+        loggers.mapNotNull {
+            if (it !is IncomingRequestLogger) return@mapNotNull null
             if (it.id.isNotEmpty() && addedLogger.contains(it.id)) return@mapNotNull null
             addedLogger += it.id
             it
