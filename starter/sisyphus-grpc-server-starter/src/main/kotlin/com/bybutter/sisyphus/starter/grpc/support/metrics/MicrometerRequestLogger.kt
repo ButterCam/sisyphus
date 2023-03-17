@@ -2,7 +2,6 @@ package com.bybutter.sisyphus.starter.grpc.support.metrics
 
 import com.bybutter.sisyphus.starter.grpc.support.IncomingRequestLogger
 import com.bybutter.sisyphus.starter.grpc.support.RequestInfo
-import com.bybutter.sisyphus.starter.grpc.support.RequestLogger
 import io.grpc.Metadata
 import io.grpc.ServerCall
 import io.grpc.Status
@@ -23,10 +22,14 @@ class MicrometerRequestLogger(private val registry: MeterRegistry) : IncomingReq
 
         registry.timer(
             "sisyphus_grpc_requests",
-            "service", call.methodDescriptor.serviceName,
-            "method", call.methodDescriptor.fullMethodName,
-            "status", status.code.name,
-            "exception", status.cause?.javaClass?.name ?: "None"
+            "service",
+            call.methodDescriptor.serviceName,
+            "method",
+            call.methodDescriptor.fullMethodName,
+            "status",
+            status.code.name,
+            "exception",
+            status.cause?.javaClass?.name ?: "None"
         ).record(costDuration)
     }
 
