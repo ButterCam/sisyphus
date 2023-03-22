@@ -1,10 +1,8 @@
-starter
-
 plugins {
-    `java-library`
+    `sisyphus-starter`
 }
 
-description = "Starter for building gRPC server which with HTTP and gRPC Transcoding in Sisyphus Framework"
+description = "Starter for fastly creating OpenAPI v3 document for sisyphus backend service"
 
 dependencies {
     implementation(projects.starter.sisyphusGrpcTranscodingStarter)

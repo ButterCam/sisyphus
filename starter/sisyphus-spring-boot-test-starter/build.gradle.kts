@@ -1,7 +1,5 @@
-starter
-
 plugins {
-    `java-library`
+    `sisyphus-starter`
 }
 
 description = "Starter for configure spring boot environment in Sisyphus Test Framework"

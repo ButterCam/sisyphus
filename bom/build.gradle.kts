@@ -1,12 +1,8 @@
 plugins {
-    `java-platform`
-    id("com.netflix.nebula.maven-publish")
-    sisyphus
+    `sisyphus-bom`
 }
 
-group = "com.bybutter.sisyphus"
 description = "Sisyphus Project (Bill of Materials)"
-
 
 dependencies {
     constraints {

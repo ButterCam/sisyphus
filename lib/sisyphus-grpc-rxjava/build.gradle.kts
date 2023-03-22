@@ -1,8 +1,6 @@
-lib
-
 plugins {
-    `java-library`
-    protobuf
+    `sisyphus-library`
+    `sisyphus-protobuf`
 }
 
 description = "Sisyphus customized gRPC runtime for RxJava2(client only)"

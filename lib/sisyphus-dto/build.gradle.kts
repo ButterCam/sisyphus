@@ -1,7 +1,5 @@
-lib
-
 plugins {
-    `java-library`
+    `sisyphus-library`
 }
 
 description = "Easy to create struct in Sisyphus"

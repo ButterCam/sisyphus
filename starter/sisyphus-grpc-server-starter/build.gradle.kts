@@ -1,8 +1,6 @@
-starter
-
 plugins {
-    `java-library`
-    protobuf
+    `sisyphus-starter`
+    `sisyphus-protobuf`
 }
 
 description = "Starter for building gRPC server in Sisyphus Framework"

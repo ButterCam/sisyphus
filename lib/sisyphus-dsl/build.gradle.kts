@@ -1,9 +1,7 @@
-lib
-
 plugins {
     antlr
-    `java-library`
-    protobuf
+    `sisyphus-library`
+    `sisyphus-protobuf`
 }
 
 description = "Utils and toolkit for building gRPC service easier"
@@ -12,6 +10,7 @@ dependencies {
     api(libs.antlr4.runtime)
     api(projects.lib.sisyphusGrpc)
     implementation(projects.lib.sisyphusCommon)
+    implementation(libs.kotlin.reflect)
 
     antlr(libs.antlr4)
 

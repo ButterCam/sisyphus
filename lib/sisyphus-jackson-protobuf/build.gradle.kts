@@ -1,7 +1,5 @@
-lib
-
 plugins {
-    `java-library`
+    `sisyphus-library`
 }
 
 description = "Jackson support for Sisyphus protobuf runtime customized message"

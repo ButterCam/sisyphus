@@ -15,20 +15,9 @@ import org.springframework.core.type.AnnotationMetadata
 import org.springframework.http.HttpMethod
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsConfigurationSource
-import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.reactive.function.server.RouterFunction
 
-/**
- * Config of gRPC transcoding, it will register webflux router and CORS filter based on the gRPC server.
- *
- * It imported by [EnableHttpToGrpcTranscoding] annotation, and it will found all services registered by
- * [ServiceRegistrar], create [TranscodingRouterFunction] and register into spring context for handling
- * HTTP requests.
- *
- * Also, CORS requests have been supported too, it will analyze service and register [CorsWebFilter] based
- * on [TranscodingCorsConfigurationSource] into spring context.
- */
 @Configuration
 class ApiDocConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
     private lateinit var environment: Environment

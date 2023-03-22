@@ -1,7 +1,5 @@
-middleware
-
 plugins {
-    `java-library`
+    `sisyphus-middleware`
 }
 
 description = "Middleware for manage configuration of Sisyphus Project"

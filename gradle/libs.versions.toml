@@ -146,5 +146,6 @@ swagger = { module = "io.swagger.core.v3:swagger-core", version.ref = "swagger" 
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 
 [plugins]
-nebula-maven = { id = "com.netflix.nebula.maven-publish", version.ref = "nebula-publishing" }
-nebula-contacts = { id = "com.netflix.nebula.contacts", version.ref = "nebula-contacts" }
+nebula-maven = { id = "com.netflix.nebula.maven-publish" }
+nebula-contacts = { id = "com.netflix.nebula.contacts" }
+sisyphus-project = { id = "com.bybutter.sisyphus.project"}

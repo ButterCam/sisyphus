@@ -1,9 +1,5 @@
-plugin
-
 plugins {
-    `java-library`
-    `java-gradle-plugin`
-    id("com.gradle.plugin-publish")
+    `sisyphus-gradle-plugin`
 }
 
 description = "Plugin for easy deploying and debugging docker image on Kubernetes cluster"
