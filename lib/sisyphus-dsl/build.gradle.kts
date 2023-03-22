@@ -1,6 +1,7 @@
 plugins {
     antlr
     `sisyphus-library`
+    `sisyphus-protobuf`
 }
 
 description = "Utils and toolkit for building gRPC service easier"
