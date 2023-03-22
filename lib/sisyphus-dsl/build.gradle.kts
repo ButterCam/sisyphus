@@ -1,9 +1,6 @@
-lib
-
 plugins {
     antlr
-    `java-library`
-    protobuf
+    `sisyphus-library`
 }
 
 description = "Utils and toolkit for building gRPC service easier"

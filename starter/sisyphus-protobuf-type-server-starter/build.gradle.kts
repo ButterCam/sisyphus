@@ -1,7 +1,5 @@
-starter
-
 plugins {
-    `java-library`
+    `sisyphus-starter`
 }
 
 description = "Starter for build application with Protobuf type server in Sisyphus Framework"

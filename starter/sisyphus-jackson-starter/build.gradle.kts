@@ -1,7 +1,5 @@
-starter
-
 plugins {
-    `java-library`
+    `sisyphus-starter`
 }
 
 description = "Starter for configuring HttpMessageEncoder with Jackson in Sisyphus Framework"

@@ -1,7 +1,5 @@
-middleware
-
 plugins {
-    `java-library`
+    `sisyphus-middleware`
 }
 
 description = "Middleware for using gRPC client in Sisyphus Project"

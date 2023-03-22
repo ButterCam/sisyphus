@@ -1,7 +1,5 @@
-tools
-
 plugins {
-    `java-library`
+    `sisyphus-tools`
 }
 
 description = "Proto compiler for Sisyphus customized Protobuf runtime"

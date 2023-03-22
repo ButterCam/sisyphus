@@ -1,7 +1,5 @@
-starter
-
 plugins {
-    `java-library`
+    `sisyphus-starter`
 }
 
 description = "Starter for building gRPC server which with HTTP and gRPC Transcoding in Sisyphus Framework"

@@ -1,7 +1,5 @@
-middleware
-
 plugins {
-    `java-library`
+    `sisyphus-middleware`
 }
 
 description = "Middleware for using Redis cache in Sisyphus Project"

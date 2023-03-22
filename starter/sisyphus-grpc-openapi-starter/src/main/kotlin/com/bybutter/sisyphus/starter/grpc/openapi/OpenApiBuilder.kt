@@ -67,7 +67,7 @@ fun openApi(init: OpenApiBuilder.() -> Unit): OpenAPI {
     return OpenApiBuilder().apply(init).build()
 }
 
-class OpenApiBuilder() {
+class OpenApiBuilder {
     private val openApi = OpenAPI().apply {
         paths = Paths()
         components = Components()

@@ -1,7 +1,5 @@
-lib
-
 plugins {
-    `java-library`
+    `sisyphus-library`
 }
 
 description = "Common lib of Sisyphus Project"
