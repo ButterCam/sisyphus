@@ -1,10 +1,7 @@
 plugins {
-    `java-platform`
-    alias(libs.plugins.nebula.maven)
-    alias(libs.plugins.sisyphus.project)
+    `sisyphus-bom`
 }
 
-group = "com.bybutter.sisyphus"
 description = "Sisyphus Project (Bill of Materials)"
 
 dependencies {

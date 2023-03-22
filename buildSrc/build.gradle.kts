@@ -54,5 +54,9 @@ gradlePlugin {
             id = "sisyphus.plugin"
             implementationClass = "GradlePluginProjectPlugin"
         }
+        create("sisyphus-bom") {
+            id = "sisyphus.bom"
+            implementationClass = "BomProjectPlugin"
+        }
     }
 }

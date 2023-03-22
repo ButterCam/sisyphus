@@ -21,5 +21,8 @@ inline val org.gradle.plugin.use.PluginDependenciesSpec.`sisyphus-tools`: org.gr
 inline val org.gradle.plugin.use.PluginDependenciesSpec.`sisyphus-gradle-plugin`: org.gradle.plugin.use.PluginDependencySpec
     get() = id("sisyphus.plugin")
 
+inline val org.gradle.plugin.use.PluginDependenciesSpec.`sisyphus-bom`: org.gradle.plugin.use.PluginDependencySpec
+    get() = id("sisyphus.bom")
+
 inline val org.gradle.plugin.use.PluginDependenciesSpec.`sisyphus-protobuf`: org.gradle.plugin.use.PluginDependencySpec
     get() = id("com.bybutter.sisyphus.protobuf")
