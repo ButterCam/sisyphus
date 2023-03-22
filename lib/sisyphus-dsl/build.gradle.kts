@@ -9,6 +9,7 @@ dependencies {
     api(libs.antlr4.runtime)
     api(projects.lib.sisyphusGrpc)
     implementation(projects.lib.sisyphusCommon)
+    implementation(libs.kotlin.reflect)
 
     antlr(libs.antlr4)
 

@@ -10,6 +10,7 @@ dependencies {
     api(libs.kotlin.coroutines)
     api(projects.lib.sisyphusDsl)
     implementation(libs.hikari)
+    implementation(libs.kotlin.reflect)
 
     runtimeOnly(libs.mysql.connector)
     runtimeOnly(libs.postgresql.connector)
