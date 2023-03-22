@@ -1,5 +1,6 @@
 package com.bybutter.sisyphus.starter.grpc.transcoding
 
+import com.bybutter.sisyphus.starter.webflux.EmptyRouterFunction
 import io.grpc.Channel
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction

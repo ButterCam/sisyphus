@@ -23,11 +23,6 @@ class ConfigArtifactProvider : EnvironmentPostProcessor, ApplicationListener<App
         val properties = binder.bind("sisyphus", SisyphusProperty::class.java)
             .orElse(null) ?: return
 
-        if (properties.config.artifacts.isEmpty()) {
-            logger.warn("Skip load config artifacts due to empty artifacts list, artifacts list can be set by 'sisyphus.config.artifacts' property.")
-            return
-        }
-
         for (repositoryKey in properties.dependency.repositories) {
             val repository = when (repositoryKey) {
                 "local" -> properties.repositories[repositoryKey] ?: run {

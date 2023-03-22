@@ -10,12 +10,11 @@ dependencies {
     api(libs.spring.boot)
     api(libs.jooq)
     api(libs.kotlin.coroutines)
+    api(projects.lib.sisyphusDsl)
     implementation(libs.hikari)
 
     runtimeOnly(libs.mysql.connector)
     runtimeOnly(libs.postgresql.connector)
-
-    compileOnly(projects.lib.sisyphusDsl)
 
     testImplementation(projects.lib.sisyphusDsl)
     testImplementation(libs.h2)

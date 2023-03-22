@@ -1,4 +1,4 @@
-package com.bybutter.sisyphus.starter.grpc.transcoding
+package com.bybutter.sisyphus.starter.webflux
 
 import org.springframework.web.reactive.function.server.HandlerFunction
 import org.springframework.web.reactive.function.server.RouterFunction
@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono
 /**
  * Empty router just return empty mono.
  */
-internal object EmptyRouterFunction : RouterFunction<ServerResponse> {
+object EmptyRouterFunction : RouterFunction<ServerResponse> {
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
         return Mono.empty()
     }
