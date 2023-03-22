@@ -1,7 +1,7 @@
 plugins {
-    libs.plugins.sisyphus.project
-    libs.plugins.nebula.maven
     `java-platform`
+    alias(libs.plugins.nebula.maven)
+    alias(libs.plugins.sisyphus.project)
 }
 
 group = "com.bybutter.sisyphus"
