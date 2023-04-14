@@ -7,8 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.awaitFirstOrNull
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -101,8 +101,8 @@ private class DistributedLock(private var key: String, private val redis: Statef
     suspend fun lock(leaseTime: Long, timeUnit: TimeUnit): Boolean {
         value = UUID.randomUUID().toString()
         return (
-            redis.reactive().set(key, value, SetArgs().nx().ex(timeUnit.toSeconds(leaseTime)))
-                .awaitFirstOrNull() != null
+            redis.async().set(key, value, SetArgs().nx().ex(timeUnit.toSeconds(leaseTime)))
+                .await() != null
             ).also {
             if (it) {
                 renewExpiration(leaseTime, timeUnit)
@@ -129,12 +129,12 @@ private class DistributedLock(private var key: String, private val redis: Statef
     }
 
     suspend fun unlock() {
-        redis.reactive().eval<Long>(
+        redis.async().eval<Long>(
             "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end",
             ScriptOutputType.INTEGER,
             arrayOf(key),
             value
-        ).awaitFirstOrNull().takeIf { it == 1L }?.let {
+        ).await().takeIf { it == 1L }?.let {
             cancelRenewExpiration()
         }
     }
