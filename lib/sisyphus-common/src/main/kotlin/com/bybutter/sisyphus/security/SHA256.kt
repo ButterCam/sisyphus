@@ -7,7 +7,7 @@ import java.security.MessageDigest
  * Calculate SHA-256 of string, and convert it to hex string.
  */
 fun String.sha256(): String {
-    return this.sha1Data().hex()
+    return this.sha256Data().hex()
 }
 
 /**
