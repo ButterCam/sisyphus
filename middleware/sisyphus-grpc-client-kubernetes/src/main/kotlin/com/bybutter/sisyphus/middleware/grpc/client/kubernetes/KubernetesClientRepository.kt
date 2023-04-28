@@ -80,8 +80,9 @@ class KubernetesClientRepository : ClientRepository {
                 it.name == labelValue || it.port.toString() == labelValue
             }?.port ?: continue
             val host = k8sService.metadata?.name ?: continue
+            val tls = labelValue == "grpcs"
             logger.info("GRPC service '$service' discovered in kubernetes service '$host:$port'.")
-            val channel = createGrpcChannel("$host:$port", channelBuilderInterceptors.values, managedChannelLifecycle)
+            val channel = createGrpcChannel("$host:$port", tls, channelBuilderInterceptors.values, managedChannelLifecycle)
             val client = getClientFromService(service.javaClass.declaringClass)
             val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
                 interceptStub(
