@@ -11,6 +11,10 @@ operator fun <T : Message<T, TM>, TM : MutableMessage<T, TM>> T.times(mask: Fiel
     return FieldMaskTree(mask).applyTo(this)
 }
 
+operator fun <T : Message<T, TM>, TM : MutableMessage<T, TM>> TM.timesAssign(mask: FieldMask) {
+    FieldMaskTree(mask).applyToMutable(this)
+}
+
 infix fun FieldMask.union(other: FieldMask): FieldMask {
     return this + other
 }
@@ -110,21 +114,25 @@ class FieldMaskTree {
 
     fun <T : Message<T, TM>, TM : MutableMessage<T, TM>> applyTo(proto: T): T {
         return proto {
-            for ((field, value) in this) {
-                if (!this.has(field.number)) {
-                    continue
-                }
+            applyToMutable(this)
+        }
+    }
 
-                val tree = children[field.name]
-                when {
-                    tree == null -> {
-                        this.clear(field.number)
-                    }
-                    tree.children.isNotEmpty() -> {
-                        this[field.number] = applyTo(value as T)
-                    }
-                    else -> {
-                    }
+    fun <T : Message<T, TM>, TM : MutableMessage<T, TM>> applyToMutable(proto: TM) {
+        for ((field, value) in proto) {
+            if (!proto.has(field.number)) {
+                continue
+            }
+
+            val tree = children[field.name]
+            when {
+                tree == null -> {
+                    proto.clear(field.number)
+                }
+                tree.children.isNotEmpty() -> {
+                    proto[field.number] = applyTo(value as T)
+                }
+                else -> {
                 }
             }
         }
