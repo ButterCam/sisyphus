@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.bybutter.sisyphus.middleware.kafka.autoconfigure.SisyphusRocketAutoConfiguration,\
+com.bybutter.sisyphus.middleware.kafka.autoconfigure.RocketMqMetricsAutoConfiguration
