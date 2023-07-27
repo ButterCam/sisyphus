@@ -37,6 +37,7 @@ reflections = "0.10.2"
 resilience4j = "1.7.1"
 retrofit = "2.9.0"
 rocketmq = "4.7.1"
+kafka = "2.7.2"
 rxjava = "2.2.21"
 sisyphus-project-plugin = "1.7.1"
 sisyphus-protobuf-plugin = "1.7.0"
@@ -107,6 +108,7 @@ resilience4j-retrofit = { module = "io.github.resilience4j:resilience4j-retrofit
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 rocketmq = { module = "org.apache.rocketmq:rocketmq-client", version.ref = "rocketmq" }
 rocketmq-acl = { module = "org.apache.rocketmq:rocketmq-acl", version.ref = "rocketmq" }
+kafka = { module = "org.apache.kafka:kafka-clients", version.ref = "kafka" }
 rxjava = { module = "io.reactivex.rxjava2:rxjava", version.ref = "rxjava" }
 spring-boot = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
 spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator", version.ref = "spring-boot" }
