@@ -59,10 +59,6 @@ class KafkaConsumerLifecycle(
                             "Consumed by $listener at ${System.currentTimeMillis()}"
                         )
                     }
-
-                    if (records.isEmpty) {
-                        delay(100)
-                    }
                 } catch (e: Exception) {
                     logger.error("Error occurred when polling message.", e)
                 } finally {
