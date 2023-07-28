@@ -95,7 +95,7 @@ class KafkaRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                         .createConsumer(consumer, annotation, listener, loggers)
                         .also {
                             logger.info(
-                                "Kafka listener (${it.groupMetadata().memberId()}) registered on topics '${
+                                "Kafka listener (${it.groupMetadata().groupId()}) registered on topics '${
                                 annotation.topics.joinToString()
                                     .takeIf { it.isNotEmpty() } ?: annotation.topicPattern
                                 }'."
