@@ -89,10 +89,10 @@ class KafkaRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                     addedLogger += it.id
                     it
                 }
-                val listener = beanFactory.getBean(listener) as KafkaListener<*, *>
+                val kafkaListener = beanFactory.getBean(listener) as KafkaListener<*, *>
                 KafkaConsumerLifecycle(
                     beanFactory.getBean(KafkaResourceFactory::class.java)
-                        .createConsumer(consumer, annotation, listener, loggers)
+                        .createConsumer(consumer, annotation, kafkaListener, loggers)
                         .also {
                             logger.info(
                                 "Kafka listener (${it.groupMetadata().groupId()}) registered on topics '${
@@ -101,7 +101,7 @@ class KafkaRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                                 }'."
                             )
                         },
-                    listener.uncheckedCast(),
+                    kafkaListener.uncheckedCast(),
                     loggers
                 )
             }.beanDefinition
