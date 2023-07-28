@@ -1,10 +1,13 @@
 package com.bybutter.sisyphus.middleware.kafka
 
 import com.bybutter.sisyphus.reflect.uncheckedCast
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -29,6 +32,11 @@ class KafkaConsumerLifecycle(
 
     private val logger = LoggerFactory.getLogger(listener.javaClass)
 
+    @OptIn(DelicateCoroutinesApi::class)
+    private val consumerContext by lazy {
+        newSingleThreadContext("kafka-consumer-${consumer.groupMetadata().groupId()}")
+    }
+
     override fun isRunning(): Boolean {
         return running
     }
@@ -36,7 +44,7 @@ class KafkaConsumerLifecycle(
     override fun start() {
         working = true
 
-        worker = GlobalScope.async {
+        worker = CoroutineScope(consumerContext).async {
             running = true
             while (working) {
                 val offsets = mutableMapOf<TopicPartition, OffsetAndMetadata>()
@@ -45,7 +53,11 @@ class KafkaConsumerLifecycle(
 
                     records.forEach {
                         handleRecord(it)
-                        offsets[TopicPartition(it.topic(), it.partition())] = OffsetAndMetadata(it.offset() + 1, it.leaderEpoch(), "Consumed by $listener at ${System.currentTimeMillis()}")
+                        offsets[TopicPartition(it.topic(), it.partition())] = OffsetAndMetadata(
+                            it.offset() + 1,
+                            it.leaderEpoch(),
+                            "Consumed by $listener at ${System.currentTimeMillis()}"
+                        )
                     }
 
                     if (records.isEmpty) {
@@ -85,19 +97,14 @@ class KafkaConsumerLifecycle(
             worker.await()
             listener.shutdown()
             consumer.close()
+            consumerContext.close()
         }
         logger.info("Kafka consumer stopped.")
     }
 
     override fun stop(callback: Runnable) {
-        logger.info("Starting to stop kafka consumer.")
         thread(name = "kafka-consumer-shutdown") {
-            runBlocking {
-                working = false
-                worker.await()
-                listener.shutdown()
-                consumer.close()
-            }
+            stop()
             callback.run()
         }
         logger.info("Kafka consumer stopped.")
