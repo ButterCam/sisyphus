@@ -1,13 +1,7 @@
 package com.bybutter.sisyphus.middleware.kafka.autoconfigure
 
-import com.bybutter.sisyphus.middleware.kafka.KafkaConsumer
-import com.bybutter.sisyphus.middleware.kafka.KafkaConsumerLifecycle
-import com.bybutter.sisyphus.middleware.kafka.KafkaConsumerProperty
-import com.bybutter.sisyphus.middleware.kafka.KafkaListener
-import com.bybutter.sisyphus.middleware.kafka.KafkaLogger
-import com.bybutter.sisyphus.middleware.kafka.KafkaProducerProperty
-import com.bybutter.sisyphus.middleware.kafka.KafkaProperties
-import com.bybutter.sisyphus.middleware.kafka.KafkaResourceFactory
+import com.bybutter.sisyphus.middleware.kafka.*
+import com.bybutter.sisyphus.reflect.instance
 import com.bybutter.sisyphus.reflect.uncheckedCast
 import com.bybutter.sisyphus.spring.BeanUtils
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -102,7 +96,8 @@ class KafkaRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
                             )
                         },
                     kafkaListener.uncheckedCast(),
-                    loggers
+                    loggers,
+                    annotation.errorHandler.instance()
                 )
             }.beanDefinition
             consumerDefinition.addQualifier(AutowireCandidateQualifier(consumer.qualifier))
