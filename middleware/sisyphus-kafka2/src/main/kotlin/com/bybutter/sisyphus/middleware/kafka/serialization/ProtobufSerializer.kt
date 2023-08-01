@@ -3,32 +3,33 @@ package com.bybutter.sisyphus.middleware.kafka.serialization
 import com.bybutter.sisyphus.jackson.toJson
 import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.MessageSupport
-import com.bybutter.sisyphus.protobuf.ProtoTypes
-import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.primitives.toAny
 import org.apache.kafka.common.header.Headers
 import org.apache.kafka.common.serialization.Serializer
 
-class ProtobufSerializer<T : Message<*, *>> : Serializer<T>, ProtobufContextInitializer() {
+class ProtobufSerializer<T : Message<*, *>> : Serializer<T> {
+    private var useJson: Boolean = false
 
     override fun configure(configs: MutableMap<String, *>, isKey: Boolean) {
-        init(configs, isKey)
+        configs[PROTOBUF_USE_JSON]?.let {
+            useJson = when (it) {
+                is Boolean -> it
+                is String -> it.toBoolean()
+                else -> throw IllegalArgumentException("Protobuf deserializer config '$PROTOBUF_USE_JSON'($it[${it.javaClass}]) must be boolean or string.")
+            }
+        }
     }
 
     override fun serialize(topic: String, headers: Headers, data: T): ByteArray {
-        val support = headers.lastHeader(PROTOBUF_TYPE)?.let {
-            ProtoTypes.findMessageSupport(it.value().decodeToString())
-        } ?: messageSupport
         val json = headers.lastHeader(PROTOBUF_USE_JSON)?.let {
             it.value().decodeToString().toBoolean()
         } ?: useJson
-        headers.add(PROTOBUF_USE_JSON, json.toString().encodeToByteArray())
         headers.add(PROTOBUF_TYPE, data.support().name.encodeToByteArray())
-        return doSerialize(topic, data, json, support)
+        return doSerialize(topic, data, json, data.support())
     }
 
     override fun serialize(topic: String, data: T): ByteArray {
-        return doSerialize(topic, data, useJson, messageSupport)
+        return doSerialize(topic, data, useJson, null)
     }
 
     private fun doSerialize(topic: String, data: T, useJson: Boolean, support: MessageSupport<*, *>?): ByteArray {
@@ -39,9 +40,6 @@ class ProtobufSerializer<T : Message<*, *>> : Serializer<T>, ProtobufContextInit
                 data.toAny().toProto()
             }
         } else {
-            if (support != data.support()) {
-                throw IllegalArgumentException("Message type mismatch, accepted message is '${support.name}', but actual message is '${data.support().name}'")
-            }
             if (useJson) {
                 data.toJson().encodeToByteArray()
             } else {
