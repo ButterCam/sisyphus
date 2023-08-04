@@ -1,0 +1,2 @@
+com.bybutter.sisyphus.middleware.rocketmq.autoconfigure.SisyphusRocketAutoConfiguration
+com.bybutter.sisyphus.middleware.rocketmq.autoconfigure.RocketMqMetricsAutoConfiguration

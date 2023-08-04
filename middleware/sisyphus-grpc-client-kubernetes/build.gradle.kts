@@ -9,4 +9,5 @@ dependencies {
     api(projects.lib.sisyphusJackson)
     api(libs.spring.boot)
     implementation(libs.kubernetes)
+    implementation(projects.middleware.sisyphusSpring)
 }

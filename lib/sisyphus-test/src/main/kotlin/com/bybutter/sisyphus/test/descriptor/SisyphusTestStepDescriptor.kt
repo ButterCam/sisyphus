@@ -37,7 +37,7 @@ import org.opentest4j.AssertionFailedError
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.full.memberProperties
 
-class SisyphusTestStepDescriptor(id: UniqueId, val step: TestStep) :
+class SisyphusTestStepDescriptor(id: UniqueId, private val step: TestStep) :
     EngineDescriptor(id, step.name), Node<SisyphusTestEngineContext> {
 
     override fun shouldBeSkipped(context: SisyphusTestEngineContext): Node.SkipResult {

@@ -7,4 +7,5 @@ description = "Starter for build application with String Webflux in Sisyphus Fra
 dependencies {
     api(projects.starter.sisyphusJacksonStarter)
     api(libs.spring.boot.webflux)
+    implementation(projects.middleware.sisyphusSpring)
 }

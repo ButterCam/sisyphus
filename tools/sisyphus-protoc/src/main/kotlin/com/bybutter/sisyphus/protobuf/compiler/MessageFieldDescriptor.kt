@@ -1,6 +1,7 @@
 package com.bybutter.sisyphus.protobuf.compiler
 
 import com.bybutter.sisyphus.collection.contentEquals
+import com.bybutter.sisyphus.collection.firstNotNull
 import com.bybutter.sisyphus.protobuf.compiler.util.escapeDoc
 import com.bybutter.sisyphus.string.toPascalCase
 import com.google.protobuf.DescriptorProtos
@@ -38,6 +39,12 @@ open class MessageFieldDescriptor(
         if (!descriptor.hasOneofIndex()) return null
         return parent.oneofs[descriptor.oneofIndex]
     }
+}
+
+fun MessageFieldDescriptor.hidden(): Boolean {
+    val conflictedField = descriptor.name.substringAfter("is_", "").takeIf { it.isNotBlank() }
+        ?.let { parent.fields.firstNotNull { field -> field.descriptor.name == it } }
+    return conflictedField != null && descriptor.options.deprecated
 }
 
 fun DescriptorNode<DescriptorProtos.FieldDescriptorProto>.name(): String {
@@ -113,6 +120,7 @@ fun DescriptorNode<DescriptorProtos.FieldDescriptorProto>.elementType(): TypeNam
                 fileSet().ensureMessage(descriptor.typeName).className()
             }
         }
+
         DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM -> fileSet().ensureEnum(descriptor.typeName)
             .className()
     }
@@ -129,6 +137,7 @@ fun DescriptorNode<DescriptorProtos.FieldDescriptorProto>.fieldType(): TypeName 
             }
             return LIST.parameterizedBy(elementType())
         }
+
         DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL -> {
             if (descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE) {
                 return elementType().copy(true)
@@ -138,6 +147,7 @@ fun DescriptorNode<DescriptorProtos.FieldDescriptorProto>.fieldType(): TypeName 
             }
             return elementType()
         }
+
         DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED -> {
             return elementType()
         }

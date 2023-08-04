@@ -19,6 +19,7 @@ include("tools:sisyphus-protoc-runner")
 
 include("middleware:sisyphus-configuration-artifact")
 include("middleware:sisyphus-jdbc")
+include("middleware:sisyphus-spring")
 include("middleware:sisyphus-mongo")
 include("middleware:sisyphus-redis")
 include("middleware:sisyphus-amqp")

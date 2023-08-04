@@ -15,7 +15,7 @@ class TranscodingNotSupportExceptionMapper : WebExceptionHandler {
         // org.springframework.web.reactive.DispatcherHandler will throw ResponseStatusException with reason 'No matching handler'
         // org.springframework.web.reactive.resource.ResourceWebHandler will throw ResponseStatusException with no reason
         // We map those ResponseStatusException to TranscodingNotSupportException
-        if (ex is ResponseStatusException && ex.status == HttpStatus.NOT_FOUND &&
+        if (ex is ResponseStatusException && ex.statusCode == HttpStatus.NOT_FOUND &&
             (ex.reason == null || ex.reason == "No matching handler")
         ) {
             return Mono.error(TranscodingNotSupportException())

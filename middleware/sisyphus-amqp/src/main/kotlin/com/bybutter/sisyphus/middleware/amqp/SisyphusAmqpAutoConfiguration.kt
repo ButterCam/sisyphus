@@ -1,11 +1,11 @@
 package com.bybutter.sisyphus.middleware.amqp
 
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Configuration
 
-@Configuration
+@AutoConfiguration
 @ComponentScan(basePackageClasses = [SisyphusAmqpAutoConfiguration::class])
 class SisyphusAmqpAutoConfiguration {
     @Bean

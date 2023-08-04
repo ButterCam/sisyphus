@@ -21,7 +21,7 @@ class KotlinProjectPlugin : Plugin<Project> {
         }
 
         target.tasks.withType<KotlinCompile> {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "17"
             kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
         }
     }

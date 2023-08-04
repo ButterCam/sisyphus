@@ -79,10 +79,10 @@ class DetectBodyInserter<T>(private val value: T) : BodyInserter<T, ReactiveHttp
         // Set the final context mime type.
         outputMessage.headers.contentType = contentType
         return if (request == null) {
-            bodyWriter.write(Mono.just(value), bodyType, contentType, outputMessage, context.hints())
+            bodyWriter.write(Mono.just(value.uncheckedCast()), bodyType, contentType, outputMessage, context.hints())
         } else {
             bodyWriter.write(
-                Mono.just(value),
+                Mono.just(value.uncheckedCast()),
                 bodyType,
                 bodyType,
                 contentType,

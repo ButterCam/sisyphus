@@ -1,0 +1,2 @@
+com.bybutter.sisyphus.middleware.kafka.autoconfigure.SisyphusKafkaAutoConfiguration
+com.bybutter.sisyphus.middleware.kafka.autoconfigure.KafkaMetricsAutoConfiguration

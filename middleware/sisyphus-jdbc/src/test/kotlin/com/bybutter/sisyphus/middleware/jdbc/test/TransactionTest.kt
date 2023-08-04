@@ -105,9 +105,7 @@ class TransactionTest {
     }
 
     private fun createUser(dsl: DSLContext, name: String) {
-        dsl.insertInto(userTable)
-            .set(nameField, name)
-            .execute()
+        dsl.insertInto(userTable).set(nameField, name).execute()
     }
 
     private fun assertUserExist(dsl: DSLContext, name: String) {
@@ -119,9 +117,7 @@ class TransactionTest {
     }
 
     private fun getUser(dsl: DSLContext, name: String): Record? {
-        return dsl.selectFrom(userTable)
-            .where(nameField.eq(name))
-            .fetchOne()
+        return dsl.selectFrom(userTable).where(nameField.eq(name)).fetchOne()
     }
 
     private fun rollbackException() {
@@ -138,10 +134,7 @@ class TransactionTest {
 
     private fun initializeTable(dsl: DSLContext) {
         dsl.dropTableIfExists(userTable).execute()
-        dsl.createTable(userTable)
-            .column(idField)
-            .column(nameField)
-            .execute()
+        dsl.createTable(userTable).column(idField).column(nameField).execute()
     }
 
     private val userTable = table(name("user"))
