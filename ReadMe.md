@@ -4,8 +4,10 @@
 </p>
 <p>
 <a href="https://github.com/grpc-ecosystem/awesome-grpc"><img alt="Awesome gRPC" src="https://raw.githubusercontent.com/sindresorhus/awesome/main/media/badge.svg" /></a>
-<img src="https://img.shields.io/badge/jdk-17-green?logo=java" alt="JDK version"/>
-<img src="https://img.shields.io/badge/gradle-%5E7.5-green?logo=gradle" alt="Gradle version"/>
+<img src="https://img.shields.io/badge/jdk-17-green?logo=openjdk" alt="JDK version"/>
+<img src="https://img.shields.io/badge/SpringBoot-3-green?logo=springboot" alt="SpringBoot version"/>
+<img src="https://img.shields.io/badge/Kotlin-1.9-green?logo=kotlin" alt="Kotlin version">
+<img src="https://img.shields.io/badge/gradle-%5E8-green?logo=gradle" alt="Gradle version"/>
 <a href="https://mvnrepository.com/artifact/com.bybutter.sisyphus/sisyphus-bom"><img src="https://img.shields.io/maven-central/v/com.bybutter.sisyphus/sisyphus-bom" alt="Maven Central"/></a>
 </p>
 </h1>
