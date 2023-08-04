@@ -7,7 +7,7 @@ import com.bybutter.sisyphus.starter.jackson.yaml.Jackson2YamlCodecCustomizer
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
 import com.fasterxml.jackson.dataformat.smile.SmileFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import org.springframework.boot.autoconfigure.AutoConfigureBefore
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.http.codec.CodecsAutoConfiguration
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
@@ -16,7 +16,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Import
 
-@AutoConfigureBefore(JacksonAutoConfiguration::class, CodecsAutoConfiguration::class)
+@AutoConfiguration(
+    before = [
+        JacksonAutoConfiguration::class,
+        CodecsAutoConfiguration::class
+    ]
+)
 @Import(JacksonAutoRegister::class)
 @ComponentScan(basePackageClasses = [SisyphusJacksonAutoConfiguration::class])
 class SisyphusJacksonAutoConfiguration {

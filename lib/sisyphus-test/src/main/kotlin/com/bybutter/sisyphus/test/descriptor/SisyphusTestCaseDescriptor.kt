@@ -7,12 +7,16 @@ import com.bybutter.sisyphus.test.extension.AfterTestCase
 import com.bybutter.sisyphus.test.extension.BeforeTestCase
 import com.bybutter.sisyphus.test.extensions
 import org.junit.platform.engine.TestDescriptor
+import org.junit.platform.engine.TestSource
 import org.junit.platform.engine.UniqueId
 import org.junit.platform.engine.support.descriptor.EngineDescriptor
+import org.junit.platform.engine.support.descriptor.FileSource
 import org.junit.platform.engine.support.hierarchical.Node
 import org.opentest4j.AssertionFailedError
+import java.io.File
+import java.util.Optional
 
-class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase) :
+class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase, val file: File) :
     EngineDescriptor(id, case.name),
     Node<SisyphusTestEngineContext> {
 
@@ -50,6 +54,10 @@ class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase) :
 
     override fun getType(): TestDescriptor.Type {
         return TestDescriptor.Type.CONTAINER_AND_TEST
+    }
+
+    override fun getSource(): Optional<TestSource> {
+        return Optional.of(FileSource.from(file))
     }
 
     companion object {

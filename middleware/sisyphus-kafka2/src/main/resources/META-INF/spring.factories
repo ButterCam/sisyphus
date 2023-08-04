@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bybutter.sisyphus.middleware.kafka.autoconfigure.SisyphusKafkaAutoConfiguration,\
-com.bybutter.sisyphus.middleware.kafka.autoconfigure.KafkaMetricsAutoConfiguration

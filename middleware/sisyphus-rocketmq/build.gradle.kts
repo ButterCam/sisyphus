@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.rocketmq.acl)
     implementation(libs.kotlin.coroutines)
     implementation(projects.lib.sisyphusCommon)
+    implementation(projects.middleware.sisyphusSpring)
 
     compileOnly(libs.spring.boot.actuator)
 }

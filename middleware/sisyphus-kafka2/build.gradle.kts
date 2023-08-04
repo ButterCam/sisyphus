@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.kotlin.coroutines)
     implementation(projects.lib.sisyphusCommon)
     implementation(projects.lib.sisyphusJackson)
+    implementation(projects.middleware.sisyphusSpring)
 
     compileOnly(libs.spring.boot.actuator)
     compileOnly(projects.lib.sisyphusJacksonProtobuf)

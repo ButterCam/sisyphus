@@ -1,4 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.bybutter.sisyphus.starter.webflux.SisyphusWebfluxAutoConfiguration
 org.springframework.boot.env.EnvironmentPostProcessor=\
 com.bybutter.sisyphus.starter.webflux.AutoGracefulShutdownConfigurator

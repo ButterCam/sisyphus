@@ -20,3 +20,19 @@ dependencies {
 configurations {
     api.get().setExtendsFrom(api.get().extendsFrom.filter { it.name != "antlr" })
 }
+
+tasks.runKtlintCheckOverMainSourceSet.configure {
+    dependsOn(tasks.generateGrammarSource)
+}
+
+tasks.runKtlintCheckOverTestSourceSet.configure {
+    dependsOn(tasks.generateTestGrammarSource)
+}
+
+tasks.runKtlintFormatOverMainSourceSet.configure {
+    dependsOn(tasks.generateGrammarSource)
+}
+
+tasks.runKtlintFormatOverTestSourceSet.configure {
+    dependsOn(tasks.generateTestGrammarSource)
+}

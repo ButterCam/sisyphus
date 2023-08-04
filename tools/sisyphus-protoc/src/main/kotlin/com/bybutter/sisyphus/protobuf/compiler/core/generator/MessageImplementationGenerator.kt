@@ -20,6 +20,7 @@ import com.bybutter.sisyphus.protobuf.compiler.elementType
 import com.bybutter.sisyphus.protobuf.compiler.enumType
 import com.bybutter.sisyphus.protobuf.compiler.function
 import com.bybutter.sisyphus.protobuf.compiler.hasFunction
+import com.bybutter.sisyphus.protobuf.compiler.hidden
 import com.bybutter.sisyphus.protobuf.compiler.mapEntry
 import com.bybutter.sisyphus.protobuf.compiler.messageType
 import com.bybutter.sisyphus.protobuf.compiler.name
@@ -521,6 +522,7 @@ class MessageEqualsMessageFunctionGenerator : GroupedGenerator<MessageImplementa
                 addCode(
                     buildCodeBlock {
                         for (field in state.descriptor.fields) {
+                            if (field.hidden()) continue
                             MessageEqualsFunctionGeneratingState(state, field, this).advance()
                         }
                         addStatement("return·true")
@@ -551,6 +553,7 @@ class MessageFieldEqualsFunctionGenerator : GroupedGenerator<MessageEqualsFuncti
                         )
                     }
                 }
+
                 DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED -> {
                     addStatement(
                         "if (!%N.%M(other.%N)) return·false",
@@ -604,10 +607,12 @@ class MessageFieldComputeHashCodeFunctionGenerator : GroupedGenerator<MessageHas
                         }
                     }
                 }
+
                 DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED -> {
                     addStatement("result·=·result·*·37·+·${state.descriptor.descriptor.number}")
                     addStatement("result·=·result·*·31·+·this.%N.hashCode()", state.descriptor.name())
                 }
+
                 DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED -> {
                     if (state.descriptor.descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE) {
                         if (state.descriptor.mapEntry() != null) {
@@ -678,6 +683,7 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                     }).beginLd().apply{ this@${state.descriptor.parent.implementationName()}.%N.forEach { $writeMethod(it) } }.endLd()",
                     state.descriptor.name()
                 )
+
                 repeated && message -> {
                     val typeDescriptor = state.descriptor.messageType()!!
                     if (typeDescriptor.mapEntry()) {
@@ -718,6 +724,7 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                         )
                     }
                 }
+
                 repeated -> addStatement(
                     "this.%N.forEach { writer.tag(${
                     makeTag(
@@ -727,6 +734,7 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                     }).$writeMethod(it) }",
                     state.descriptor.name()
                 )
+
                 message -> addStatement(
                     "writer.tag(${
                     makeTag(
@@ -736,6 +744,7 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                     }).${if (any) "any" else "message"}(this.%N)",
                     state.descriptor.name()
                 )
+
                 proto3Optional -> addStatement(
                     "this.%N?.let{ writer.tag(${
                     makeTag(
@@ -745,6 +754,7 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                     }).$writeMethod(it) }",
                     state.descriptor.name()
                 )
+
                 else -> addStatement(
                     "writer.tag(${
                     makeTag(
@@ -813,10 +823,12 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                     state.descriptor.name(),
                     state.descriptor.enumType()?.className()
                 )
+
                 packed -> addStatement(
                     "${state.descriptor.descriptor.number} -> reader.packed(wire) { this.%N·+=·it.$readMethod() }",
                     state.descriptor.name()
                 )
+
                 repeated && message -> {
                     val typeDescriptor = state.descriptor.messageType()!!
                     if (typeDescriptor.mapEntry()) {
@@ -840,6 +852,7 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                                     )
                                 }
                             }
+
                             WireFormat.FieldType.ENUM -> {
                                 addStatement(
                                     "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T(it.int32()) }) { k,·v·-> this.%N[k]·=·v }",
@@ -847,6 +860,7 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                                     state.descriptor.name()
                                 )
                             }
+
                             else -> {
                                 addStatement(
                                     "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { it.${valueType.name.lowercase()}() }) { k,·v·-> this.%N[k]·=·v }",
@@ -867,10 +881,12 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                         )
                     }
                 }
+
                 repeated -> addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N += reader.$readMethod()",
                     state.descriptor.name()
                 )
+
                 message -> if (any) {
                     addStatement(
                         "${state.descriptor.descriptor.number} -> this.%N = reader.any()",
@@ -883,11 +899,13 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                         state.descriptor.elementType()
                     )
                 }
+
                 enum -> addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N = %T(reader.int32())",
                     state.descriptor.name(),
                     state.descriptor.elementType()
                 )
+
                 else -> addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N = reader.$readMethod()",
                     state.descriptor.name()

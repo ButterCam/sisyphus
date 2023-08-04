@@ -4,12 +4,12 @@ import com.bybutter.sisyphus.middleware.jdbc.hint.HintExecuteListener
 import com.bybutter.sisyphus.middleware.jdbc.transaction.SisyphusTransactionProvider
 import org.jooq.ExecuteListenerProvider
 import org.jooq.TransactionProvider
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Configuration
 
-@Configuration
+@AutoConfiguration
 @ComponentScan(basePackageClasses = [SisyphusJdbcAutoConfiguration::class])
 class SisyphusJdbcAutoConfiguration {
     @Bean

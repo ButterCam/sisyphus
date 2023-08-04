@@ -120,13 +120,15 @@ class SisyphusTestSelectorResolver : SelectorResolver {
     }
 
     private fun createTestCaseDescriptor(parent: TestDescriptor, case: TestCase, name: String): TestDescriptor {
-        val id = File(name).nameWithoutExtension
+        val file = File(name)
+        val id = file.nameWithoutExtension
         val case = case {
-            this.name = this.name.takeIf { it.isNotBlank() } ?: File(name).nameWithoutExtension
+            this.name = this.name.takeIf { it.isNotBlank() } ?: id
         }
         return SisyphusTestCaseDescriptor(
             parent.uniqueId.append(SisyphusTestCaseDescriptor.SEGMENT_TYPE, id),
-            case
+            case,
+            file
         )
     }
 

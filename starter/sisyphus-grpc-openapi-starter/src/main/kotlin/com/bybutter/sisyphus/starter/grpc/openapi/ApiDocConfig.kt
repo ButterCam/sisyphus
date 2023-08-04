@@ -6,9 +6,9 @@ import io.grpc.Server
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionBuilder
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.context.properties.bind.Binder
 import org.springframework.context.EnvironmentAware
-import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar
 import org.springframework.core.env.Environment
 import org.springframework.core.type.AnnotationMetadata
@@ -18,7 +18,7 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.reactive.function.server.RouterFunction
 
-@Configuration
+@AutoConfiguration
 class ApiDocConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
     private lateinit var environment: Environment
 

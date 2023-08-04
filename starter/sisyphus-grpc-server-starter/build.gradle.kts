@@ -9,6 +9,7 @@ dependencies {
     api(projects.middleware.sisyphusGrpcClient)
     api(projects.middleware.sisyphusConfigurationArtifact)
     implementation(libs.grpc.core)
+    implementation(projects.middleware.sisyphusSpring)
 
     compileOnly(libs.spring.boot.actuator)
     runtimeOnly(libs.grpc.netty)

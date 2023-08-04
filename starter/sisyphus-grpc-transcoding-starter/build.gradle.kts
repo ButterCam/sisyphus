@@ -11,5 +11,6 @@ dependencies {
     api(projects.starter.sisyphusGrpcServerStarter)
     api(projects.starter.sisyphusWebfluxStarter)
     implementation(libs.swagger)
+    implementation(projects.middleware.sisyphusSpring)
     compileOnly(libs.spring.boot.actuator)
 }

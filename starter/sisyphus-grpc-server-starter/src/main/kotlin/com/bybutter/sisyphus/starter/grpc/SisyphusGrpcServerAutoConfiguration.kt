@@ -1,15 +1,15 @@
 package com.bybutter.sisyphus.starter.grpc
 
 import com.bybutter.sisyphus.middleware.grpc.SisyphusGrpcClientAutoConfiguration
-import org.springframework.boot.autoconfigure.AutoConfigureBefore
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.context.EnvironmentAware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 
-@Configuration
-@AutoConfigureBefore(SisyphusGrpcClientAutoConfiguration::class)
+@AutoConfiguration(
+    before = [SisyphusGrpcClientAutoConfiguration::class]
+)
 @ComponentScan(basePackageClasses = [SisyphusGrpcServerAutoConfiguration::class])
 class SisyphusGrpcServerAutoConfiguration : EnvironmentAware {
 

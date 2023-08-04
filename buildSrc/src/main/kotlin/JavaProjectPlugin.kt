@@ -16,8 +16,8 @@ class JavaProjectPlugin : Plugin<Project> {
         target.plugins.apply(SisyphusProjectPlugin::class.java)
 
         target.tasks.withType<JavaCompile> {
-            sourceCompatibility = JavaVersion.VERSION_1_8.majorVersion
-            targetCompatibility = JavaVersion.VERSION_1_8.majorVersion
+            sourceCompatibility = JavaVersion.VERSION_17.majorVersion
+            targetCompatibility = JavaVersion.VERSION_17.majorVersion
         }
 
         target.dependencies {
