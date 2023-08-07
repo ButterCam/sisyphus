@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.server.RequestPredicate
 import org.springframework.web.reactive.function.server.RequestPredicates
 import org.springframework.web.reactive.function.server.RouterFunctions
 import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.util.pattern.PathPatternParser
 
 /**
  * [RequestPredicate] that check the request path match with [HttpRule.Pattern].
@@ -21,26 +22,32 @@ class HttpPatternPredicate(private val pattern: HttpRule.Pattern<*>) : RequestPr
                 method = HttpMethod.GET
                 pathTemplate = PathTemplate.create(pattern.value)
             }
+
             is HttpRule.Pattern.Post -> {
                 method = HttpMethod.POST
                 pathTemplate = PathTemplate.create(pattern.value)
             }
+
             is HttpRule.Pattern.Put -> {
                 method = HttpMethod.PUT
                 pathTemplate = PathTemplate.create(pattern.value)
             }
+
             is HttpRule.Pattern.Patch -> {
                 method = HttpMethod.PATCH
                 pathTemplate = PathTemplate.create(pattern.value)
             }
+
             is HttpRule.Pattern.Delete -> {
                 method = HttpMethod.DELETE
                 pathTemplate = PathTemplate.create(pattern.value)
             }
+
             is HttpRule.Pattern.Custom -> {
                 method = HttpMethod.valueOf(pattern.value.kind)
                 pathTemplate = PathTemplate.create(pattern.value.path)
             }
+
             else -> throw UnsupportedOperationException("Unknown http rule pattern")
         }
     }
@@ -67,6 +74,9 @@ class HttpPatternPredicate(private val pattern: HttpRule.Pattern<*>) : RequestPr
         } else {
             pathTemplate.match(path)
         } ?: return false
+
+        request.attributes()[RouterFunctions.MATCHING_PATTERN_ATTRIBUTE] =
+            PathPatternParser.defaultInstance.parse(pathTemplate.withoutVars().toString())
         request.attributes()[RouterFunctions.URI_TEMPLATE_VARIABLES_ATTRIBUTE] = result
         request.attributes()[TranscodingFunctions.MATCHING_PATH_TEMPLATE_ATTRIBUTE] = pathTemplate
         return true
