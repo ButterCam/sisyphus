@@ -616,7 +616,7 @@ class MessageFieldComputeHashCodeFunctionGenerator : GroupedGenerator<MessageHas
                 DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED -> {
                     if (state.descriptor.descriptor.type == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE) {
                         if (state.descriptor.mapEntry() != null) {
-                            beginScope("for ((key, value) in %N)", state.descriptor.name()) {
+                            beginScope("for ((key, value) in this.%N)", state.descriptor.name()) {
                                 addStatement("result·=·result·*·37·+·${state.descriptor.descriptor.number}")
                                 addStatement("result·=·result·*·31·+·key.hashCode()")
                                 addStatement("result·=·result·*·31·+·value.hashCode()")
@@ -624,7 +624,7 @@ class MessageFieldComputeHashCodeFunctionGenerator : GroupedGenerator<MessageHas
                             return true
                         }
                     }
-                    beginScope("for (value in %N)", state.descriptor.name()) {
+                    beginScope("for (value in this.%N)", state.descriptor.name()) {
                         addStatement("result·=·result·*·37·+·${state.descriptor.descriptor.number}")
                         addStatement("result·=·result·*·31·+·value.hashCode()")
                     }
