@@ -193,7 +193,7 @@ internal fun JsonReader.readRepeated(field: FieldDescriptorProto): Any {
 }
 
 internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
-    if (peek() == JsonToken.NULL && field.type != FieldDescriptorProto.Type.ENUM) {
+    if (peek() == JsonToken.NULL && field.type != FieldDescriptorProto.Type.ENUM && field.typeName != Value.name) {
         skipChildren()
         return null
     }
