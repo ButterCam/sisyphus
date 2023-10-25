@@ -7,7 +7,7 @@ import com.bybutter.sisyphus.protobuf.primitives.ServiceDescriptorProto
 
 class DynamicServiceSupport(
     override val parent: ProtoSupport<*>,
-    override val descriptor: ServiceDescriptorProto
+    override val descriptor: ServiceDescriptorProto,
 ) : ServiceSupport() {
     override val name: String by lazy {
         when (parent) {

@@ -5,7 +5,7 @@ import java.sql.Savepoint
 
 class TransactionSavePointContext(
     private val context: CoroutineTransactionContext,
-    private val savePoints: Map<out Connection, Savepoint>
+    private val savePoints: Map<out Connection, Savepoint>,
 ) : TransactionContext {
     override fun nest(): TransactionContext {
         return context.nest()

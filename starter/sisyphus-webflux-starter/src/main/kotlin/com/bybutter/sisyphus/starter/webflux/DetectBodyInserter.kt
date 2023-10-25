@@ -20,7 +20,10 @@ class DetectBodyInserter<T>(private val value: T) : BodyInserter<T, ReactiveHttp
     private var bodyWriter: HttpMessageWriter<*>? = null
     private var contentType: MediaType? = null
 
-    override fun insert(outputMessage: ReactiveHttpOutputMessage, context: BodyInserter.Context): Mono<Void> {
+    override fun insert(
+        outputMessage: ReactiveHttpOutputMessage,
+        context: BodyInserter.Context,
+    ): Mono<Void> {
         // Get all writers from context.
         val writers = context.messageWriters()
         // Get the resolvable type of body.
@@ -31,8 +34,9 @@ class DetectBodyInserter<T>(private val value: T) : BodyInserter<T, ReactiveHttp
         // If `content-type` response header not set, we need choose one from `accept` request header.
         if (contentType == null) {
             // List of accepted types.
-            val acceptTypes = context.serverRequest()
-                .orElse(null)?.headers?.accept ?: listOf()
+            val acceptTypes =
+                context.serverRequest()
+                    .orElse(null)?.headers?.accept ?: listOf()
 
             type@ for (acceptType in acceptTypes) {
                 // Skip for wildcard types.
@@ -65,12 +69,13 @@ class DetectBodyInserter<T>(private val value: T) : BodyInserter<T, ReactiveHttp
         }
 
         // Ensure [bodyWrite] is not null, throw a [UnsupportedMediaTypeException] if we can't resolve it.
-        val bodyWriter = bodyWriter?.uncheckedCast<HttpMessageWriter<T>>()
-            ?: throw UnsupportedMediaTypeException(
-                contentType,
-                context.messageWriters().flatMap { it.writableMediaTypes },
-                bodyType
-            )
+        val bodyWriter =
+            bodyWriter?.uncheckedCast<HttpMessageWriter<T>>()
+                ?: throw UnsupportedMediaTypeException(
+                    contentType,
+                    context.messageWriters().flatMap { it.writableMediaTypes },
+                    bodyType,
+                )
 
         // Get http request or null. Copy from the default body inserter of spring.
         // I don't known why to do it, it seems the [BodyWriter] can write it with more feature when provided http request.
@@ -88,7 +93,7 @@ class DetectBodyInserter<T>(private val value: T) : BodyInserter<T, ReactiveHttp
                 contentType,
                 request,
                 outputMessage as ServerHttpResponse,
-                context.hints()
+                context.hints(),
             )
         }
     }

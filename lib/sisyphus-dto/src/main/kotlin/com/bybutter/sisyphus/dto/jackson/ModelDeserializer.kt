@@ -14,7 +14,10 @@ import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.JsonDeserializer
 
 internal class ModelDeserializer<T : DtoModel>(val targetClass: JavaType) : JsonDeserializer<T>() {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T {
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): T {
         val node = p.readValueAsTree<TreeNode>()
         val targetType = selectType(node, ctxt)
         val beanDescription = ctxt.config.introspect(targetType)
@@ -24,7 +27,11 @@ internal class ModelDeserializer<T : DtoModel>(val targetClass: JavaType) : Json
         }
     }
 
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext, intoValue: T): T {
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+        intoValue: T,
+    ): T {
         val node = Json.deserialize(p)
         val targetType = selectType(node, ctxt)
 
@@ -41,7 +48,7 @@ internal class ModelDeserializer<T : DtoModel>(val targetClass: JavaType) : Json
         node: TreeNode,
         beanDescription: BeanDescription,
         intoValue: T,
-        ctxt: DeserializationContext
+        ctxt: DeserializationContext,
     ): T {
         val properties = beanDescription.findProperties().associateBy { it.name }
 
@@ -59,12 +66,16 @@ internal class ModelDeserializer<T : DtoModel>(val targetClass: JavaType) : Json
         return intoValue
     }
 
-    private fun selectType(node: TreeNode, ctxt: DeserializationContext): JavaType {
-        val targetType = try {
-            ctxt.readValue<JavaType>(node.get("\$type").traverse(), JavaType::class.java.javaType) ?: targetClass
-        } catch (e: Exception) {
-            targetClass
-        }
+    private fun selectType(
+        node: TreeNode,
+        ctxt: DeserializationContext,
+    ): JavaType {
+        val targetType =
+            try {
+                ctxt.readValue<JavaType>(node.get("\$type").traverse(), JavaType::class.java.javaType) ?: targetClass
+            } catch (e: Exception) {
+                targetClass
+            }
 
         if (targetClass.isTypeOrSuperTypeOf(targetType.rawClass)) {
             return targetType

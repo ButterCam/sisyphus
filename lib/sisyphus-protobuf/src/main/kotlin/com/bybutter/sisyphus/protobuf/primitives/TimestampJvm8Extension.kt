@@ -11,10 +11,11 @@ import java.util.concurrent.TimeUnit
 
 private val defaultOffset = OffsetDateTime.now().offset
 
-fun java.sql.Timestamp.toProto(): Timestamp = Timestamp {
-    seconds = TimeUnit.MILLISECONDS.toSeconds(this@toProto.time)
-    nanos = this@toProto.nanos
-}
+fun java.sql.Timestamp.toProto(): Timestamp =
+    Timestamp {
+        seconds = TimeUnit.MILLISECONDS.toSeconds(this@toProto.time)
+        nanos = this@toProto.nanos
+    }
 
 fun Timestamp.toSql(): java.sql.Timestamp {
     val result = java.sql.Timestamp(TimeUnit.SECONDS.toMillis(seconds))
@@ -22,10 +23,11 @@ fun Timestamp.toSql(): java.sql.Timestamp {
     return result
 }
 
-fun LocalDateTime.toProto(offset: ZoneOffset = defaultOffset): Timestamp = Timestamp {
-    seconds = this@toProto.toInstant(offset).epochSecond
-    nanos = this@toProto.nano
-}
+fun LocalDateTime.toProto(offset: ZoneOffset = defaultOffset): Timestamp =
+    Timestamp {
+        seconds = this@toProto.toInstant(offset).epochSecond
+        nanos = this@toProto.nano
+    }
 
 fun Timestamp.toLocalDateTime(offset: ZoneOffset = defaultOffset): LocalDateTime {
     return LocalDateTime.ofEpochSecond(seconds, nanos, offset)
@@ -59,7 +61,7 @@ operator fun Timestamp.Companion.invoke(
     minute: Int = 0,
     second: Int = 0,
     nano: Int = 0,
-    zoneId: ZoneId = ZoneId.systemDefault()
+    zoneId: ZoneId = ZoneId.systemDefault(),
 ): Timestamp {
     val instant = ZonedDateTime.of(year, month.value, day, hour, minute, second, nano, zoneId).toInstant()
     return Timestamp {
@@ -76,7 +78,7 @@ operator fun Timestamp.Companion.invoke(
     minute: Int = 0,
     second: Int = 0,
     nano: Int = 0,
-    zoneId: ZoneId = ZoneId.systemDefault()
+    zoneId: ZoneId = ZoneId.systemDefault(),
 ): Timestamp {
     val instant = ZonedDateTime.of(year, month, day, hour, minute, second, nano, zoneId).toInstant()
     return Timestamp {
@@ -121,6 +123,9 @@ internal fun Timestamp.stringJvm8(): String {
     return this.toInstant().toString()
 }
 
-internal fun Timestamp.Companion.stringJvm8(seconds: Long, nanos: Int): String {
+internal fun Timestamp.Companion.stringJvm8(
+    seconds: Long,
+    nanos: Int,
+): String {
     return Instant.ofEpochSecond(seconds, nanos.toLong()).toString()
 }

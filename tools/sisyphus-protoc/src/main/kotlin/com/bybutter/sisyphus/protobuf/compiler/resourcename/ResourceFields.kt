@@ -21,10 +21,11 @@ object ResourceFields {
                 field.parent.resource?.let { return it }
             }
         }
-        val options = DescriptorProtos.FieldOptions.parseFrom(
-            field.descriptor.options.toByteArray(),
-            extensionRegistry
-        )
+        val options =
+            DescriptorProtos.FieldOptions.parseFrom(
+                field.descriptor.options.toByteArray(),
+                extensionRegistry,
+            )
         val reference = options.getExtension(ResourceProto.resourceReference) ?: return null
 
         if (reference.type.isNotEmpty()) {
@@ -57,9 +58,10 @@ object ResourceFields {
         }
     }
 
-    val extensionRegistry = ExtensionRegistry.newInstance().apply {
-        add(ResourceProto.resource)
-        add(ResourceProto.resourceReference)
-        add(ResourceProto.resourceDefinition)
-    }
+    val extensionRegistry =
+        ExtensionRegistry.newInstance().apply {
+            add(ResourceProto.resource)
+            add(ResourceProto.resourceReference)
+            add(ResourceProto.resourceDefinition)
+        }
 }

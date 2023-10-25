@@ -30,7 +30,7 @@ data class KafkaProducerProperty(
     override val sslEndpointIdentificationAlgorithm: String? = null,
     val properties: Map<String, Any?> = mapOf(),
     val keySerializerConfig: Map<String, Any?> = mapOf(),
-    val valueSerializerConfig: Map<String, Any?> = mapOf()
+    val valueSerializerConfig: Map<String, Any?> = mapOf(),
 ) : KafkaServerProperty
 
 data class KafkaConsumerProperty(
@@ -44,13 +44,12 @@ data class KafkaConsumerProperty(
     override val sslTruststore: String? = null,
     override val sslTruststorePassword: String? = null,
     override val sslEndpointIdentificationAlgorithm: String? = null,
-    val properties: Map<String, Any?> = mapOf()
+    val properties: Map<String, Any?> = mapOf(),
 ) : KafkaServerProperty
 
 data class KafkaProperties(
     @NestedConfigurationProperty
     val producers: Map<String, KafkaProducerProperty>,
-
     @NestedConfigurationProperty
-    val consumers: Map<String, KafkaConsumerProperty>
+    val consumers: Map<String, KafkaConsumerProperty>,
 )

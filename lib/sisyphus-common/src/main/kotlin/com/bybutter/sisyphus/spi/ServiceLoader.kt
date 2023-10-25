@@ -18,19 +18,23 @@ object ServiceLoader {
     /**
      * Load services which provided specified interface with [ClassLoader].
      */
-    fun <T> load(clazz: Class<T>, loader: ClassLoader): List<T> {
-        val result = loader.getResources("META-INF/services/${clazz.name}")
-            .asSequence().flatMap {
-                it.openStream().use {
-                    it.reader().readLines().asSequence()
-                }
-            }.map {
-                it.trim()
-            }.filter {
-                it.isNotBlank()
-            }.distinct().map {
-                Class.forName(it).instance().uncheckedCast<T>()
-            }.toMutableList()
+    fun <T> load(
+        clazz: Class<T>,
+        loader: ClassLoader,
+    ): List<T> {
+        val result =
+            loader.getResources("META-INF/services/${clazz.name}")
+                .asSequence().flatMap {
+                    it.openStream().use {
+                        it.reader().readLines().asSequence()
+                    }
+                }.map {
+                    it.trim()
+                }.filter {
+                    it.isNotBlank()
+                }.distinct().map {
+                    Class.forName(it).instance().uncheckedCast<T>()
+                }.toMutableList()
 
         if (Ordered::class.java.isAssignableFrom(clazz)) {
             result.sortBy {

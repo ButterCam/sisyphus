@@ -19,8 +19,9 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
 
     fun visit(expr: CelParser.ExprContext): Any? {
         return if (expr.op != null) {
-            val condition = visit(expr.e) as? Boolean
-                ?: throw IllegalStateException("Conditional expr '${expr.e.text}' must be bool")
+            val condition =
+                visit(expr.e) as? Boolean
+                    ?: throw IllegalStateException("Conditional expr '${expr.e.text}' must be bool")
             if (condition) {
                 visit(expr.e1)
             } else {
@@ -42,7 +43,10 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
         return result
     }
 
-    private fun or(left: Any?, right: CelParser.ConditionalAndContext): Any? {
+    private fun or(
+        left: Any?,
+        right: CelParser.ConditionalAndContext,
+    ): Any? {
         if (left == true) return left
         if (left == false) return visit(right)
 
@@ -64,7 +68,10 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
         return result
     }
 
-    private fun and(left: Any?, right: CelParser.RelationContext): Any? {
+    private fun and(
+        left: Any?,
+        right: CelParser.RelationContext,
+    ): Any? {
         if (left == false) return left
         if (left == true) return visit(right)
 
@@ -88,9 +95,14 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
         }
     }
 
-    private fun compare(left: CelParser.RelationContext, operator: String, right: CelParser.RelationContext): Boolean {
-        val result = engine.runtime.invoke(null, "compare", visit(left), visit(right)) as? Long
-            ?: throw IllegalStateException("Compare function must return CEL int(java.Long).")
+    private fun compare(
+        left: CelParser.RelationContext,
+        operator: String,
+        right: CelParser.RelationContext,
+    ): Boolean {
+        val result =
+            engine.runtime.invoke(null, "compare", visit(left), visit(right)) as? Long
+                ?: throw IllegalStateException("Compare function must return CEL int(java.Long).")
         return when (operator) {
             "<" -> result < 0
             "<=" -> result <= 0
@@ -100,9 +112,14 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
         }
     }
 
-    private fun equals(left: CelParser.RelationContext, operator: String, right: CelParser.RelationContext): Boolean {
-        val result = engine.runtime.invoke(null, "equals", visit(left), visit(right)) as? Boolean
-            ?: throw IllegalStateException("Equals function must return CEL bool(java.Boolean).")
+    private fun equals(
+        left: CelParser.RelationContext,
+        operator: String,
+        right: CelParser.RelationContext,
+    ): Boolean {
+        val result =
+            engine.runtime.invoke(null, "equals", visit(left), visit(right)) as? Boolean
+                ?: throw IllegalStateException("Equals function must return CEL bool(java.Boolean).")
         return when (operator) {
             "==" -> result
             "!=" -> !result
@@ -152,13 +169,13 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
                         visit(member.member()),
                         member.IDENTIFIER().text,
                         member.args?.e
-                            ?: listOf()
+                            ?: listOf(),
                     ) { return it }
                     engine.runtime.invoke(
                         visit(member.member()),
                         member.IDENTIFIER().text,
                         member.args?.e?.map { visit(it) }
-                            ?: listOf()
+                            ?: listOf(),
                     )
                 } else {
                     if (member.text.startsWith(".")) {
@@ -177,9 +194,9 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
                     (
                         member.fieldInitializerList()?.fields
                             ?: listOf()
-                        ).asSequence().mapIndexed { index, token ->
+                    ).asSequence().mapIndexed { index, token ->
                         token.text to visit(member.fieldInitializerList().values[index])
-                    }.associate { it }
+                    }.associate { it },
                 )
             }
             else -> throw UnsupportedOperationException("Unsupported member expression '${member.text}'.")
@@ -195,13 +212,13 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
                         null,
                         primary.IDENTIFIER().text,
                         primary.args?.e
-                            ?: listOf()
+                            ?: listOf(),
                     ) { return it }
                     engine.runtime.invoke(
                         null,
                         primary.IDENTIFIER().text,
                         primary.args?.e?.map { visit(it) }
-                            ?: listOf()
+                            ?: listOf(),
                     )
                 } else {
                     engine.runtime.getGlobalField(primary.text, global)
@@ -243,20 +260,22 @@ class CelContext internal constructor(private val engine: CelEngine, global: Map
 
     private fun celString(data: String): String {
         val rawMode: Boolean
-        val string = if (data.startsWith("r") || data.startsWith("R")) {
-            rawMode = true
-            data.subSequence(1, data.length)
-        } else {
-            rawMode = false
-            data
-        }
+        val string =
+            if (data.startsWith("r") || data.startsWith("R")) {
+                rawMode = true
+                data.subSequence(1, data.length)
+            } else {
+                rawMode = false
+                data
+            }
 
-        val rawString = when {
-            string.startsWith("\"\"\"") -> string.substring(3, string.length - 3)
-            string.startsWith("\"") -> string.substring(1, string.length - 1)
-            string.startsWith("'") -> string.substring(1, string.length - 1)
-            else -> throw IllegalStateException("Wrong string token '$data'.")
-        }
+        val rawString =
+            when {
+                string.startsWith("\"\"\"") -> string.substring(3, string.length - 3)
+                string.startsWith("\"") -> string.substring(1, string.length - 1)
+                string.startsWith("'") -> string.substring(1, string.length - 1)
+                else -> throw IllegalStateException("Wrong string token '$data'.")
+            }
 
         return if (rawMode) {
             rawString

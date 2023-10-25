@@ -52,7 +52,7 @@ class SisyphusTestRootContext(extensions: List<Extension>) : SisyphusTestEngineC
 }
 
 class SisyphusTestCaseContext(val parent: SisyphusTestRootContext) : SisyphusTestEngineContext {
-    private val _results: MutableMap<String, TestResult> = mutableMapOf()
+    private val results: MutableMap<String, TestResult> = mutableMapOf()
 
     override fun cel(): CelEngine {
         return parent.cel()
@@ -63,7 +63,7 @@ class SisyphusTestCaseContext(val parent: SisyphusTestRootContext) : SisyphusTes
     }
 
     override fun results(): Map<String, TestResult> {
-        return _results
+        return results
     }
 
     override fun extensions(): List<Extension> {
@@ -72,7 +72,7 @@ class SisyphusTestCaseContext(val parent: SisyphusTestRootContext) : SisyphusTes
 
     fun record(result: TestResult) {
         val id = result.step?.id?.takeIf { it.isNotEmpty() } ?: return
-        _results[id] = result
+        results[id] = result
     }
 
     fun forStep(callContext: CallContext): SisyphusTestStepContext {
@@ -82,7 +82,7 @@ class SisyphusTestCaseContext(val parent: SisyphusTestRootContext) : SisyphusTes
 
 class SisyphusTestStepContext(
     val parent: SisyphusTestCaseContext,
-    val callContext: CallContext
+    val callContext: CallContext,
 ) : SisyphusTestEngineContext {
     override fun cel(): CelEngine {
         return parent.cel()

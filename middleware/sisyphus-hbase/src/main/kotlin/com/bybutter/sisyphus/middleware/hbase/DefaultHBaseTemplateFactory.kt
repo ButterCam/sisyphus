@@ -13,19 +13,27 @@ open class DefaultHBaseTemplateFactory : HBaseTemplateFactory {
         return createTemplate(property.template, connection)
     }
 
-    protected open fun createConnection(urls: List<String>, property: HBaseTableProperty): Connection {
+    protected open fun createConnection(
+        urls: List<String>,
+        property: HBaseTableProperty,
+    ): Connection {
         return connections.getOrPut(urls.sorted().joinToString()) {
-            val config = HBaseConfiguration.create().apply {
-                this[HConstants.ZOOKEEPER_QUORUM] = urls.joinToString(",")
-            }
+            val config =
+                HBaseConfiguration.create().apply {
+                    this[HConstants.ZOOKEEPER_QUORUM] = urls.joinToString(",")
+                }
             ConnectionFactory.createConnection(config)
         }
     }
 
-    protected open fun createTemplate(clazz: Class<*>, connection: Connection): HTableTemplate<*, *> {
-        val template = clazz.constructors.first {
-            it.canAccess(null) && it.parameters.isEmpty()
-        }.newInstance() as HTableTemplate<*, *>
+    protected open fun createTemplate(
+        clazz: Class<*>,
+        connection: Connection,
+    ): HTableTemplate<*, *> {
+        val template =
+            clazz.constructors.first {
+                it.canAccess(null) && it.parameters.isEmpty()
+            }.newInstance() as HTableTemplate<*, *>
         template.connection = connection
         return template
     }

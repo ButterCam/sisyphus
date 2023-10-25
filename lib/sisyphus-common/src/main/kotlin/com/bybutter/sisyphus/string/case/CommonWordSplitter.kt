@@ -11,7 +11,7 @@ object CommonWordSplitter : WordSplitter {
         string: CharSequence,
         pos: Int = 0,
         stack: StringBuilder = StringBuilder(),
-        result: MutableList<String> = mutableListOf()
+        result: MutableList<String> = mutableListOf(),
     ): List<String> {
         result.append(stack)
 
@@ -42,7 +42,7 @@ object CommonWordSplitter : WordSplitter {
         string: CharSequence,
         pos: Int,
         stack: StringBuilder,
-        result: MutableList<String>
+        result: MutableList<String>,
     ): List<String> {
         var index = pos
         val digital = StringBuilder()
@@ -85,7 +85,7 @@ object CommonWordSplitter : WordSplitter {
         string: CharSequence,
         pos: Int,
         stack: StringBuilder,
-        result: MutableList<String>
+        result: MutableList<String>,
     ): List<String> {
         var index = pos
 
@@ -110,7 +110,7 @@ object CommonWordSplitter : WordSplitter {
         string: CharSequence,
         pos: Int,
         stack: StringBuilder,
-        result: MutableList<String>
+        result: MutableList<String>,
     ): List<String> {
         var index = pos
 
@@ -143,7 +143,7 @@ object CommonWordSplitter : WordSplitter {
         pos: Int,
         stack: StringBuilder,
         digital: StringBuilder,
-        result: MutableList<String>
+        result: MutableList<String>,
     ): List<String> {
         var index = pos
 
@@ -184,7 +184,7 @@ object CommonWordSplitter : WordSplitter {
         string: CharSequence,
         pos: Int,
         stack: StringBuilder,
-        result: MutableList<String>
+        result: MutableList<String>,
     ): List<String> {
         var index = pos
 
@@ -206,7 +206,7 @@ object CommonWordSplitter : WordSplitter {
         string: CharSequence,
         pos: Int,
         stack: StringBuilder,
-        result: MutableList<String>
+        result: MutableList<String>,
     ): List<String> {
         var index = pos + 1
 

@@ -21,102 +21,126 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootApplication
 class TransactionTest {
     @Test
-    fun `test sisyphus transaction`(@Jdbc.Test dsl: DSLContext): Unit = runBlocking {
-        initializeTable(dsl)
+    fun `test sisyphus transaction`(
+        @Jdbc.Test dsl: DSLContext,
+    ): Unit =
+        runBlocking {
+            initializeTable(dsl)
 
-        assertRollback {
+            assertRollback {
+                transaction {
+                    createUser(dsl, "foo")
+                    noTransaction {
+                        assertUserNotExist(dsl, "foo")
+                    }
+                    assertUserExist(dsl, "foo")
+                    rollbackException()
+                }
+            }
+            assertUserNotExist(dsl, "foo")
+        }
+
+    @Test
+    fun `test sisyphus nest transaction`(
+        @Jdbc.Test dsl: DSLContext,
+    ): Unit =
+        runBlocking {
+            initializeTable(dsl)
+
             transaction {
                 createUser(dsl, "foo")
-                noTransaction {
-                    assertUserNotExist(dsl, "foo")
-                }
                 assertUserExist(dsl, "foo")
-                rollbackException()
+
+                assertRollback {
+                    nestTransaction {
+                        createUser(dsl, "bar")
+                        assertUserExist(dsl, "foo")
+                        assertUserExist(dsl, "bar")
+                        rollbackException()
+                    }
+                }
+
+                assertUserExist(dsl, "foo")
+                assertUserNotExist(dsl, "bar")
             }
         }
-        assertUserNotExist(dsl, "foo")
-    }
 
     @Test
-    fun `test sisyphus nest transaction`(@Jdbc.Test dsl: DSLContext): Unit = runBlocking {
-        initializeTable(dsl)
+    fun `test sisyphus new transaction`(
+        @Jdbc.Test dsl: DSLContext,
+    ): Unit =
+        runBlocking {
+            initializeTable(dsl)
 
-        transaction {
-            createUser(dsl, "foo")
-            assertUserExist(dsl, "foo")
+            transaction {
+                createUser(dsl, "foo")
+                assertUserExist(dsl, "foo")
 
-            assertRollback {
-                nestTransaction {
-                    createUser(dsl, "bar")
-                    assertUserExist(dsl, "foo")
-                    assertUserExist(dsl, "bar")
-                    rollbackException()
+                assertRollback {
+                    newTransaction {
+                        createUser(dsl, "bar")
+                        assertUserNotExist(dsl, "foo")
+                        assertUserExist(dsl, "bar")
+                        rollbackException()
+                    }
                 }
-            }
 
-            assertUserExist(dsl, "foo")
-            assertUserNotExist(dsl, "bar")
+                assertUserExist(dsl, "foo")
+                assertUserNotExist(dsl, "bar")
+            }
         }
-    }
 
     @Test
-    fun `test sisyphus new transaction`(@Jdbc.Test dsl: DSLContext): Unit = runBlocking {
-        initializeTable(dsl)
+    fun `test sisyphus nest jooq transaction`(
+        @Jdbc.Test dsl: DSLContext,
+    ): Unit =
+        runBlocking {
+            initializeTable(dsl)
 
-        transaction {
-            createUser(dsl, "foo")
-            assertUserExist(dsl, "foo")
+            transaction {
+                createUser(dsl, "foo")
+                assertUserExist(dsl, "foo")
 
-            assertRollback {
-                newTransaction {
-                    createUser(dsl, "bar")
-                    assertUserNotExist(dsl, "foo")
-                    assertUserExist(dsl, "bar")
-                    rollbackException()
+                assertRollback {
+                    dsl.transaction { config ->
+                        val dsl = config.dsl()
+                        createUser(dsl, "bar")
+                        assertUserExist(dsl, "foo")
+                        assertUserExist(dsl, "bar")
+                        rollbackException()
+                    }
                 }
+
+                assertUserExist(dsl, "foo")
+                assertUserNotExist(dsl, "bar")
             }
-
-            assertUserExist(dsl, "foo")
-            assertUserNotExist(dsl, "bar")
         }
-    }
 
-    @Test
-    fun `test sisyphus nest jooq transaction`(@Jdbc.Test dsl: DSLContext): Unit = runBlocking {
-        initializeTable(dsl)
-
-        transaction {
-            createUser(dsl, "foo")
-            assertUserExist(dsl, "foo")
-
-            assertRollback {
-                dsl.transaction { config ->
-                    val dsl = config.dsl()
-                    createUser(dsl, "bar")
-                    assertUserExist(dsl, "foo")
-                    assertUserExist(dsl, "bar")
-                    rollbackException()
-                }
-            }
-
-            assertUserExist(dsl, "foo")
-            assertUserNotExist(dsl, "bar")
-        }
-    }
-
-    private fun createUser(dsl: DSLContext, name: String) {
+    private fun createUser(
+        dsl: DSLContext,
+        name: String,
+    ) {
         dsl.insertInto(userTable).set(nameField, name).execute()
     }
 
-    private fun assertUserExist(dsl: DSLContext, name: String) {
+    private fun assertUserExist(
+        dsl: DSLContext,
+        name: String,
+    ) {
         Assertions.assertNotNull(getUser(dsl, name))
     }
 
-    private fun assertUserNotExist(dsl: DSLContext, name: String) {
+    private fun assertUserNotExist(
+        dsl: DSLContext,
+        name: String,
+    ) {
         Assertions.assertNull(getUser(dsl, name))
     }
 
-    private fun getUser(dsl: DSLContext, name: String): Record? {
+    private fun getUser(
+        dsl: DSLContext,
+        name: String,
+    ): Record? {
         return dsl.selectFrom(userTable).where(nameField.eq(name)).fetchOne()
     }
 

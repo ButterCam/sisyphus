@@ -4,7 +4,10 @@ import com.bybutter.sisyphus.dsl.cel.grammar.CelParser
 import com.bybutter.sisyphus.protobuf.Message
 
 open class CelMacro {
-    open fun has(context: CelContext, expr: CelParser.ExprContext): Boolean {
+    open fun has(
+        context: CelContext,
+        expr: CelParser.ExprContext,
+    ): Boolean {
         if (!expr.text.matches(CelRuntime.memberRegex)) {
             throw IllegalArgumentException("Argument of 'has' macro '${expr.text}' must be a field selection.")
         }
@@ -29,7 +32,11 @@ open class CelMacro {
         return true
     }
 
-    open fun List<*>.all(context: CelContext, name: CelParser.ExprContext, expr: CelParser.ExprContext): Boolean {
+    open fun List<*>.all(
+        context: CelContext,
+        name: CelParser.ExprContext,
+        expr: CelParser.ExprContext,
+    ): Boolean {
         if (!name.text.matches(CelRuntime.idRegex)) {
             throw IllegalArgumentException("Argument1 of 'all' macro '${name.text}' must be a identifier.")
         }
@@ -42,11 +49,19 @@ open class CelMacro {
         }
     }
 
-    open fun Map<*, *>.all(context: CelContext, name: CelParser.ExprContext, expr: CelParser.ExprContext): Boolean {
+    open fun Map<*, *>.all(
+        context: CelContext,
+        name: CelParser.ExprContext,
+        expr: CelParser.ExprContext,
+    ): Boolean {
         return this.keys.toList().all(context, name, expr)
     }
 
-    open fun List<*>.exists(context: CelContext, name: CelParser.ExprContext, expr: CelParser.ExprContext): Boolean {
+    open fun List<*>.exists(
+        context: CelContext,
+        name: CelParser.ExprContext,
+        expr: CelParser.ExprContext,
+    ): Boolean {
         if (!name.text.matches(CelRuntime.idRegex)) {
             throw IllegalArgumentException("Argument1 of 'exists' macro '${name.text}' must be a identifier.")
         }
@@ -59,14 +74,19 @@ open class CelMacro {
         }
     }
 
-    open fun Map<*, *>.exists(context: CelContext, name: CelParser.ExprContext, expr: CelParser.ExprContext): Boolean {
+    open fun Map<*, *>.exists(
+        context: CelContext,
+        name: CelParser.ExprContext,
+        expr: CelParser.ExprContext,
+    ): Boolean {
         return this.keys.toList().exists(context, name, expr)
     }
 
+    @Suppress("ktlint:standard:function-naming")
     open fun List<*>.exists_one(
         context: CelContext,
         name: CelParser.ExprContext,
-        expr: CelParser.ExprContext
+        expr: CelParser.ExprContext,
     ): Boolean {
         if (!name.text.matches(CelRuntime.idRegex)) {
             throw IllegalArgumentException("Argument1 of 'exists_one' macro '${name.text}' must be a identifier.")
@@ -77,8 +97,9 @@ open class CelMacro {
 
         for (value in this) {
             newContext.global[name.text] = value
-            val result = newContext.visit(expr) as? Boolean
-                ?: throw IllegalArgumentException("Argument2 of 'exists_one' macro '${expr.text}' must return a bool.")
+            val result =
+                newContext.visit(expr) as? Boolean
+                    ?: throw IllegalArgumentException("Argument2 of 'exists_one' macro '${expr.text}' must return a bool.")
             if (result) {
                 counter++
                 if (counter > 1) return false
@@ -88,15 +109,20 @@ open class CelMacro {
         return counter == 1
     }
 
+    @Suppress("ktlint:standard:function-naming")
     open fun Map<*, *>.exists_one(
         context: CelContext,
         name: CelParser.ExprContext,
-        expr: CelParser.ExprContext
+        expr: CelParser.ExprContext,
     ): Boolean {
         return this.keys.toList().exists_one(context, name, expr)
     }
 
-    open fun List<*>.map(context: CelContext, name: CelParser.ExprContext, expr: CelParser.ExprContext): List<*> {
+    open fun List<*>.map(
+        context: CelContext,
+        name: CelParser.ExprContext,
+        expr: CelParser.ExprContext,
+    ): List<*> {
         if (!name.text.matches(CelRuntime.idRegex)) {
             throw IllegalArgumentException("Argument1 of 'map' macro '${name.text}' must be a identifier.")
         }
@@ -108,7 +134,11 @@ open class CelMacro {
         }
     }
 
-    open fun List<*>.filter(context: CelContext, name: CelParser.ExprContext, expr: CelParser.ExprContext): List<*> {
+    open fun List<*>.filter(
+        context: CelContext,
+        name: CelParser.ExprContext,
+        expr: CelParser.ExprContext,
+    ): List<*> {
         if (!name.text.matches(CelRuntime.idRegex)) {
             throw IllegalArgumentException("Argument1 of 'filter' macro '${name.text}' must be a identifier.")
         }

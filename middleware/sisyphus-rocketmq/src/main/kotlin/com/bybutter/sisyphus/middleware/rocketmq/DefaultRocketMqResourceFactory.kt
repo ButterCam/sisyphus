@@ -22,11 +22,12 @@ import org.slf4j.LoggerFactory
 
 open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
     override fun createProducer(producerProperty: RocketMqProducerProperty): MQProducer {
-        val hook = if (producerProperty.aclAccessKey != null && producerProperty.aclSecretKey != null) {
-            AclClientRPCHook(SessionCredentials(producerProperty.aclAccessKey, producerProperty.aclSecretKey))
-        } else {
-            null
-        }
+        val hook =
+            if (producerProperty.aclAccessKey != null && producerProperty.aclSecretKey != null) {
+                AclClientRPCHook(SessionCredentials(producerProperty.aclAccessKey, producerProperty.aclSecretKey))
+            } else {
+                null
+            }
         return if (producerProperty.enableTrace) {
             DefaultMQProducer(MixAll.DEFAULT_PRODUCER_GROUP, hook, true, producerProperty.traceTopic)
         } else {
@@ -46,14 +47,15 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
         consumerProperty: RocketMqConsumerProperty,
         metadata: MessageConsumer,
         listener: MessageListener<*>,
-        loggers: List<RocketMqLogger>
+        loggers: List<RocketMqLogger>,
     ): MQConsumer {
         val listener = listener as MessageListener<Any?>
-        val hook = if (consumerProperty.aclAccessKey != null && consumerProperty.aclSecretKey != null) {
-            AclClientRPCHook(SessionCredentials(consumerProperty.aclAccessKey, consumerProperty.aclSecretKey))
-        } else {
-            null
-        }
+        val hook =
+            if (consumerProperty.aclAccessKey != null && consumerProperty.aclSecretKey != null) {
+                AclClientRPCHook(SessionCredentials(consumerProperty.aclAccessKey, consumerProperty.aclSecretKey))
+            } else {
+                null
+            }
 
         return if (consumerProperty.enableTrace) {
             DefaultMQPushConsumer(
@@ -62,14 +64,14 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
                 hook,
                 AllocateMessageQueueAveragely(),
                 true,
-                consumerProperty.traceTopic
+                consumerProperty.traceTopic,
             )
         } else {
             DefaultMQPushConsumer(
                 metadata.groupId.takeIf { metadata.groupId.isNotEmpty() }
                     ?: MixAll.DEFAULT_CONSUMER_GROUP,
                 hook,
-                AllocateMessageQueueAveragely()
+                AllocateMessageQueueAveragely(),
             )
         }.apply {
             this.namesrvAddr = chooseNameServerAddr(consumerProperty)
@@ -82,9 +84,9 @@ open class DefaultRocketMqResourceFactory : RocketMqResourceFactory {
                     MessageSelector.byTag(metadata.filter)
                 } else {
                     MessageSelector.bySql(
-                        metadata.filter
+                        metadata.filter,
                     )
-                }
+                },
             )
             val converter = metadata.converter.instance()
             when (metadata.type) {

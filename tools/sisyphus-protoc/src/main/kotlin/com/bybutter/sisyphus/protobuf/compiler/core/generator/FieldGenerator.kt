@@ -92,7 +92,7 @@ class MutableMessageInterfaceBasicFieldGenerator : GroupedGenerator<FieldMutable
                 this += KModifier.ABSTRACT
                 returns(
                     state.descriptor.fieldType()
-                        .copy(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)
+                        .copy(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL),
                 )
             }
         }
@@ -111,13 +111,14 @@ class MessageImplementationFieldGenerator : GroupedGenerator<MessageImplementati
 
 class MessageImplementationFieldBasicGenerator : GroupedGenerator<FieldImplementationGeneratingState> {
     override fun generate(state: FieldImplementationGeneratingState): Boolean {
-        val isPrimitive = when (state.descriptor.descriptor.type) {
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES -> false
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING -> false
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE -> false
-            DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM -> false
-            else -> true
-        }
+        val isPrimitive =
+            when (state.descriptor.descriptor.type) {
+                DescriptorProtos.FieldDescriptorProto.Type.TYPE_BYTES -> false
+                DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING -> false
+                DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE -> false
+                DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM -> false
+                else -> true
+            }
         val hiddenField = state.descriptor.hidden()
 
         when (state.descriptor.descriptor.label) {
@@ -198,7 +199,7 @@ class MessageImplementationFieldBasicGenerator : GroupedGenerator<FieldImplement
                         getter {
                             addStatement(
                                 "return if(_${state.descriptor.hasFunction()}) field else %L",
-                                state.descriptor.defaultValue()
+                                state.descriptor.defaultValue(),
                             )
                         }
                         setter {

@@ -16,20 +16,25 @@ import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.superclasses
 
-private fun KType.getTypeArgument(target: KClass<*>, index: Int, map: MutableMap<KTypeParameter, KType>): KType? {
-    val raw = when (val kClass = this.classifier) {
-        is KClass<*> -> {
-            if (!kClass.isSubclassOf(target) && kClass != target) {
-                return null
-            }
+private fun KType.getTypeArgument(
+    target: KClass<*>,
+    index: Int,
+    map: MutableMap<KTypeParameter, KType>,
+): KType? {
+    val raw =
+        when (val kClass = this.classifier) {
+            is KClass<*> -> {
+                if (!kClass.isSubclassOf(target) && kClass != target) {
+                    return null
+                }
 
-            for ((i, parameter) in kClass.typeParameters.withIndex()) {
-                map[parameter] = this.arguments[i].type!!
+                for ((i, parameter) in kClass.typeParameters.withIndex()) {
+                    map[parameter] = this.arguments[i].type!!
+                }
+                kClass
             }
-            kClass
+            else -> throw UnsupportedOperationException("Unsupported '$this'.")
         }
-        else -> throw UnsupportedOperationException("Unsupported '$this'.")
-    }
 
     if (raw == target) {
         var result = map[target.typeParameters[index]]!!
@@ -46,25 +51,33 @@ private fun KType.getTypeArgument(target: KClass<*>, index: Int, map: MutableMap
     }.firstOrNull { it != null }
 }
 
-fun KType.getTypeArgument(target: KClass<*>, index: Int): KType {
+fun KType.getTypeArgument(
+    target: KClass<*>,
+    index: Int,
+): KType {
     return this.getTypeArgument(target, index, mutableMapOf()) ?: throw IllegalArgumentException()
 }
 
-private fun <T> Type.getTypeArgument(target: Class<T>, index: Int, map: MutableMap<Type, Type>): Type? {
-    val raw = when (this) {
-        is ParameterizedType -> {
-            for ((i, parameter) in (this.rawType as Class<*>).typeParameters.withIndex()) {
-                map[parameter] = this.actualTypeArguments[i]
+private fun <T> Type.getTypeArgument(
+    target: Class<T>,
+    index: Int,
+    map: MutableMap<Type, Type>,
+): Type? {
+    val raw =
+        when (this) {
+            is ParameterizedType -> {
+                for ((i, parameter) in (this.rawType as Class<*>).typeParameters.withIndex()) {
+                    map[parameter] = this.actualTypeArguments[i]
+                }
+                this.rawType as Class<*>
             }
-            this.rawType as Class<*>
+            is Class<*> -> {
+                this
+            }
+            else -> {
+                throw IllegalArgumentException()
+            }
         }
-        is Class<*> -> {
-            this
-        }
-        else -> {
-            throw IllegalArgumentException()
-        }
-    }
 
     if (raw == target) {
         var result = map[target.typeParameters[index]]
@@ -83,7 +96,10 @@ private fun <T> Type.getTypeArgument(target: Class<T>, index: Int, map: MutableM
     }
 }
 
-fun Type.getTypeArgument(target: Class<*>, index: Int): Type {
+fun Type.getTypeArgument(
+    target: Class<*>,
+    index: Int,
+): Type {
     return this.getTypeArgument(target, index, mutableMapOf()) ?: throw IllegalArgumentException()
 }
 
@@ -97,7 +113,7 @@ val Type.kotlinType: KType
                 (this.rawType as Class<*>).kotlin.createType(
                     this.actualTypeArguments.map {
                         it.toKTypeProjection()
-                    }
+                    },
                 )
             }
             else -> throw UnsupportedOperationException("Unsupported '$this'.")
@@ -155,7 +171,9 @@ fun <T : Any> KClass<T>.instance(): T {
     this.java.methods.first {
         it.name == "provider" && Modifier.isStatic(it.modifiers) && Modifier.isPublic(it.modifiers) && it.parameterCount == 0
     }.invoke(null)?.let { return it.uncheckedCast() }
-    throw IllegalArgumentException("Class should have a single no-arg constructor, or be a 'object', or has static no-arg 'provider' function: $this")
+    throw IllegalArgumentException(
+        "Class should have a single no-arg constructor, or be a 'object', or has static no-arg 'provider' function: $this",
+    )
 }
 
 fun <T : Any> Class<T>.instance(): T {
@@ -180,11 +198,18 @@ object Reflect {
         return tryGetClass(name) != null
     }
 
-    fun <T> getPrivateField(any: Any, name: String): T? {
+    fun <T> getPrivateField(
+        any: Any,
+        name: String,
+    ): T? {
         return getPrivateField(any.javaClass, any, name)
     }
 
-    fun <T> getPrivateField(clazz: Class<*>, any: Any, name: String): T? {
+    fun <T> getPrivateField(
+        clazz: Class<*>,
+        any: Any,
+        name: String,
+    ): T? {
         return try {
             clazz.getDeclaredField(name).apply { isAccessible = true }.get(any).uncheckedCast()
         } catch (e: NoSuchFieldException) {
@@ -195,11 +220,20 @@ object Reflect {
         }
     }
 
-    fun <T> setPrivateField(any: Any, name: String, value: T?) {
+    fun <T> setPrivateField(
+        any: Any,
+        name: String,
+        value: T?,
+    ) {
         setPrivateField(any.javaClass, any, name, value)
     }
 
-    fun <T> setPrivateField(clazz: Class<*>, any: Any, name: String, value: T?) {
+    fun <T> setPrivateField(
+        clazz: Class<*>,
+        any: Any,
+        name: String,
+        value: T?,
+    ) {
         try {
             clazz.getDeclaredField(name).apply { isAccessible = true }.set(any, value).uncheckedCast<T?>()
         } catch (e: NoSuchFieldException) {

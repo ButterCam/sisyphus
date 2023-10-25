@@ -28,7 +28,10 @@ class TranscodingUnaryCallListener(private val body: String) : TranscodingCallLi
     private var headers: Metadata? = null
     private var message: Message<*, *>? = null
 
-    override fun onClose(status: Status, trailers: Metadata) {
+    override fun onClose(
+        status: Status,
+        trailers: Metadata,
+    ) {
         try {
             val builder = ServerResponse.status(status.code.toHttpStatus())
 
@@ -48,28 +51,31 @@ class TranscodingUnaryCallListener(private val body: String) : TranscodingCallLi
             }
 
             val message = message
-            val response = when {
-                // Empty message.
-                message is Empty -> builder.build()
-                // Return the body.
-                message != null -> when (body) {
-                    "", "*" -> {
-                        builder.body(DetectBodyInserter(message))
-                    }
-                    else -> {
-                        builder.body(DetectBodyInserter<Any>(message[body]))
-                    }
-                }
-                // No message returned by gRPC, maybe some unknown error happened.
-                else -> builder.body(
-                    DetectBodyInserter(
-                        com.bybutter.sisyphus.rpc.Status {
-                            this.code = status.code.value()
-                            this.message = status.description ?: status.cause?.message ?: "Unknown"
+            val response =
+                when {
+                    // Empty message.
+                    message is Empty -> builder.build()
+                    // Return the body.
+                    message != null ->
+                        when (body) {
+                            "", "*" -> {
+                                builder.body(DetectBodyInserter(message))
+                            }
+                            else -> {
+                                builder.body(DetectBodyInserter<Any>(message[body]))
+                            }
                         }
-                    )
-                )
-            }
+                    // No message returned by gRPC, maybe some unknown error happened.
+                    else ->
+                        builder.body(
+                            DetectBodyInserter(
+                                com.bybutter.sisyphus.rpc.Status {
+                                    this.code = status.code.value()
+                                    this.message = status.description ?: status.cause?.message ?: "Unknown"
+                                },
+                            ),
+                        )
+                }
             this.response.tryEmitValue(response)
         } catch (e: Exception) {
             this.response.tryEmitValue(
@@ -79,9 +85,9 @@ class TranscodingUnaryCallListener(private val body: String) : TranscodingCallLi
                             com.bybutter.sisyphus.rpc.Status {
                                 this.code = Status.Code.INTERNAL.value()
                                 this.message = e.message ?: "Unknown"
-                            }
-                        )
-                    )
+                            },
+                        ),
+                    ),
             )
         }
     }

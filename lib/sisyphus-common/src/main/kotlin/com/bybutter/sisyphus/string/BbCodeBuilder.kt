@@ -3,7 +3,11 @@ package com.bybutter.sisyphus.string
 class BbCodeBuilder {
     private val builder: StringBuilder = StringBuilder()
 
-    fun tag(value: String, parameter: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
+    fun tag(
+        value: String,
+        parameter: String,
+        block: BbCodeBuilder.() -> Unit,
+    ): BbCodeBuilder {
         builder.append('[')
         builder.append(value)
         builder.append('=')
@@ -16,7 +20,10 @@ class BbCodeBuilder {
         return this
     }
 
-    fun tag(value: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
+    fun tag(
+        value: String,
+        block: BbCodeBuilder.() -> Unit,
+    ): BbCodeBuilder {
         builder.append('[')
         builder.append(value)
         builder.append(']')
@@ -100,7 +107,10 @@ class BbCodeBuilder {
         return tag("u", block)
     }
 
-    fun url(url: String, value: String? = null): BbCodeBuilder {
+    fun url(
+        url: String,
+        value: String? = null,
+    ): BbCodeBuilder {
         return if (value == null) {
             tag("url") {
                 text(url)
@@ -112,7 +122,10 @@ class BbCodeBuilder {
         }
     }
 
-    fun url(url: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
+    fun url(
+        url: String,
+        block: BbCodeBuilder.() -> Unit,
+    ): BbCodeBuilder {
         return tag("url", url, block)
     }
 
@@ -126,23 +139,35 @@ class BbCodeBuilder {
         }
     }
 
-    fun size(size: Int, value: String): BbCodeBuilder {
+    fun size(
+        size: Int,
+        value: String,
+    ): BbCodeBuilder {
         return tag("size", size.toString()) {
             text(value)
         }
     }
 
-    fun size(size: Int, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
+    fun size(
+        size: Int,
+        block: BbCodeBuilder.() -> Unit,
+    ): BbCodeBuilder {
         return tag("size", size.toString(), block)
     }
 
-    fun color(color: String, value: String): BbCodeBuilder {
+    fun color(
+        color: String,
+        value: String,
+    ): BbCodeBuilder {
         return tag("color", color) {
             text(value)
         }
     }
 
-    fun color(color: String, block: BbCodeBuilder.() -> Unit): BbCodeBuilder {
+    fun color(
+        color: String,
+        block: BbCodeBuilder.() -> Unit,
+    ): BbCodeBuilder {
         return tag("color", color, block)
     }
 

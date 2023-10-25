@@ -77,11 +77,14 @@ class Reader(private val inputStream: InputStream) {
         }
     }
 
-    inline fun packed(wireType: Int, block: (Reader) -> Unit) {
+    inline fun packed(
+        wireType: Int,
+        block: (Reader) -> Unit,
+    ) {
         when (wireType) {
             WireType.VARINT.ordinal,
             WireType.FIXED32.ordinal,
-            WireType.FIXED64.ordinal
+            WireType.FIXED64.ordinal,
             -> block(this)
 
             WireType.LENGTH_DELIMITED.ordinal -> nested(block)
@@ -89,7 +92,10 @@ class Reader(private val inputStream: InputStream) {
         }
     }
 
-    inline fun packed(wireType: WireType, block: (Reader) -> Unit) {
+    inline fun packed(
+        wireType: WireType,
+        block: (Reader) -> Unit,
+    ) {
         when (wireType) {
             WireType.VARINT -> block(this)
             WireType.LENGTH_DELIMITED -> nested(block)
@@ -196,10 +202,11 @@ class Reader(private val inputStream: InputStream) {
             it.tag()
             val typeUrl = it.string()
             it.tag()
-            val support = ProtoReflection.findSupport(typeUrl) as? MessageSupport<*, *> ?: return Any {
-                this.typeUrl = typeUrl
-                this.value = it.bytes()
-            }
+            val support =
+                ProtoReflection.findSupport(typeUrl) as? MessageSupport<*, *> ?: return Any {
+                    this.typeUrl = typeUrl
+                    this.value = it.bytes()
+                }
             return support.parse(it, it.int32())
         }
 
@@ -217,7 +224,11 @@ class Reader(private val inputStream: InputStream) {
         }
     }
 
-    inline fun <TK, TV> mapEntry(kBlock: (Reader) -> TK, vBlock: (Reader) -> TV, block: (TK, TV) -> Unit) {
+    inline fun <TK, TV> mapEntry(
+        kBlock: (Reader) -> TK,
+        vBlock: (Reader) -> TV,
+        block: (TK, TV) -> Unit,
+    ) {
         var key: TK? = null
         var value: TV? = null
 
@@ -232,7 +243,7 @@ class Reader(private val inputStream: InputStream) {
 
         block(
             key ?: throw IllegalStateException("Wrong protobuf map data(key missed)."),
-            value ?: throw IllegalStateException("Wrong protobuf map data(value missed).")
+            value ?: throw IllegalStateException("Wrong protobuf map data(value missed)."),
         )
     }
 }

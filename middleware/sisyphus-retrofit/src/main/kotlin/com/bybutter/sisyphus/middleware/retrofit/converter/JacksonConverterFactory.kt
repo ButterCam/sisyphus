@@ -13,7 +13,7 @@ class JacksonConverterFactory : Converter.Factory() {
     override fun responseBodyConverter(
         type: Type,
         annotations: Array<Annotation>,
-        retrofit: Retrofit
+        retrofit: Retrofit,
     ): Converter<ResponseBody, *> {
         return JacksonResponseBodyConverter<Any>(type)
     }
@@ -22,7 +22,7 @@ class JacksonConverterFactory : Converter.Factory() {
         type: Type,
         parameterAnnotations: Array<Annotation>,
         methodAnnotations: Array<Annotation>,
-        retrofit: Retrofit
+        retrofit: Retrofit,
     ): Converter<*, RequestBody> {
         return JacksonRequestBodyConverter
     }

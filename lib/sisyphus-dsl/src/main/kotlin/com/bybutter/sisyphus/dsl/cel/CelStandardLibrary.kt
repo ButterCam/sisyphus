@@ -32,7 +32,6 @@ import java.util.Arrays
 import java.util.concurrent.TimeUnit
 
 open class CelStandardLibrary {
-
     // !_
     open fun logicalNot(value: Boolean): Boolean {
         return !value
@@ -49,187 +48,299 @@ open class CelStandardLibrary {
     }
 
     // _==_ _!=_
-    open fun equals(left: Any?, right: Any?): Boolean {
+    open fun equals(
+        left: Any?,
+        right: Any?,
+    ): Boolean {
         return left == right
     }
 
     // _%_
-    open fun rem(left: Long, right: Long): Long {
+    open fun rem(
+        left: Long,
+        right: Long,
+    ): Long {
         return left % right
     }
 
     // _%_
-    open fun rem(left: ULong, right: ULong): ULong {
+    open fun rem(
+        left: ULong,
+        right: ULong,
+    ): ULong {
         return left % right
     }
 
     // _&&_
-    open fun logicalAnd(left: Boolean, right: Boolean): Boolean {
+    open fun logicalAnd(
+        left: Boolean,
+        right: Boolean,
+    ): Boolean {
         return left && right
     }
 
     // _*_
-    open fun times(left: Long, right: Long): Long {
+    open fun times(
+        left: Long,
+        right: Long,
+    ): Long {
         return left * right
     }
 
     // _*_
-    open fun times(left: ULong, right: ULong): ULong {
+    open fun times(
+        left: ULong,
+        right: ULong,
+    ): ULong {
         return left * right
     }
 
     // _*_
-    open fun times(left: Double, right: Double): Double {
+    open fun times(
+        left: Double,
+        right: Double,
+    ): Double {
         return left * right
     }
 
     // _+_
-    open fun plus(left: Long, right: Long): Long {
+    open fun plus(
+        left: Long,
+        right: Long,
+    ): Long {
         return left + right
     }
 
     // _+_
-    open fun plus(left: ULong, right: ULong): ULong {
+    open fun plus(
+        left: ULong,
+        right: ULong,
+    ): ULong {
         return left + right
     }
 
     // _+_
-    open fun plus(left: Double, right: Double): Double {
+    open fun plus(
+        left: Double,
+        right: Double,
+    ): Double {
         return left + right
     }
 
     // _+_
-    open fun plus(left: String, right: String): String {
+    open fun plus(
+        left: String,
+        right: String,
+    ): String {
         return left + right
     }
 
     // _+_
-    open fun plus(left: ByteArray, right: ByteArray): ByteArray {
+    open fun plus(
+        left: ByteArray,
+        right: ByteArray,
+    ): ByteArray {
         return left + right
     }
 
     // _+_
-    open fun plus(left: List<*>, right: List<*>): List<*> {
+    open fun plus(
+        left: List<*>,
+        right: List<*>,
+    ): List<*> {
         return left + right
     }
 
     // _+_
-    open fun plus(left: Timestamp, right: Duration): Timestamp {
+    open fun plus(
+        left: Timestamp,
+        right: Duration,
+    ): Timestamp {
         return left + right
     }
 
     // _+_
-    open fun plus(left: Duration, right: Timestamp): Timestamp {
+    open fun plus(
+        left: Duration,
+        right: Timestamp,
+    ): Timestamp {
         return right + left
     }
 
     // _+_
-    open fun plus(left: Duration, right: Duration): Duration {
+    open fun plus(
+        left: Duration,
+        right: Duration,
+    ): Duration {
         return left + right
     }
 
     // _-_
-    open fun minus(left: Long, right: Long): Long {
+    open fun minus(
+        left: Long,
+        right: Long,
+    ): Long {
         return left - right
     }
 
     // _-_
-    open fun minus(left: ULong, right: ULong): ULong {
+    open fun minus(
+        left: ULong,
+        right: ULong,
+    ): ULong {
         return left - right
     }
 
     // _-_
-    open fun minus(left: Double, right: Double): Double {
+    open fun minus(
+        left: Double,
+        right: Double,
+    ): Double {
         return left - right
     }
 
     // _-_
-    open fun minus(left: Timestamp, right: Duration): Timestamp {
+    open fun minus(
+        left: Timestamp,
+        right: Duration,
+    ): Timestamp {
         return left - right
     }
 
     // _-_
-    open fun minus(left: Timestamp, right: Timestamp): Duration {
+    open fun minus(
+        left: Timestamp,
+        right: Timestamp,
+    ): Duration {
         return left - right
     }
 
     // _-_
-    open fun minus(left: Duration, right: Duration): Duration {
+    open fun minus(
+        left: Duration,
+        right: Duration,
+    ): Duration {
         return left - right
     }
 
     // _/_
-    open fun div(left: Long, right: Long): Long {
+    open fun div(
+        left: Long,
+        right: Long,
+    ): Long {
         return left / right
     }
 
     // _/_
-    open fun div(left: ULong, right: ULong): ULong {
+    open fun div(
+        left: ULong,
+        right: ULong,
+    ): ULong {
         return left / right
     }
 
     // _/_
-    open fun div(left: Double, right: Double): Double {
+    open fun div(
+        left: Double,
+        right: Double,
+    ): Double {
         return left / right
     }
 
     // _<_ _<=_ _>_ _>=_
-    open fun compare(left: Long, right: Long): Long {
+    open fun compare(
+        left: Long,
+        right: Long,
+    ): Long {
         return left.compareTo(right).toLong()
     }
 
     // _<_ _<=_ _>_ _>=_
-    open fun compare(left: ULong, right: ULong): Long {
+    open fun compare(
+        left: ULong,
+        right: ULong,
+    ): Long {
         return left.compareTo(right).toLong()
     }
 
     // _<_ _<=_ _>_ _>=_
-    open fun compare(left: Double, right: Double): Long {
+    open fun compare(
+        left: Double,
+        right: Double,
+    ): Long {
         return left.compareTo(right).toLong()
     }
 
     // _<_ _<=_ _>_ _>=_
-    open fun compare(left: String, right: String): Long {
+    open fun compare(
+        left: String,
+        right: String,
+    ): Long {
         return left.compareTo(right).toLong()
     }
 
     // _<_ _<=_ _>_ _>=_
-    open fun compare(left: ByteArray, right: ByteArray): Long {
+    open fun compare(
+        left: ByteArray,
+        right: ByteArray,
+    ): Long {
         return Arrays.compare(left, right).toLong()
     }
 
     // _<_ _<=_ _>_ _>=_
-    open fun compare(left: Timestamp, right: Timestamp): Long {
+    open fun compare(
+        left: Timestamp,
+        right: Timestamp,
+    ): Long {
         return left.compareTo(right).toLong()
     }
 
     // _<_ _<=_ _>_ _>=_
-    open fun compare(left: Duration, right: Duration): Long {
+    open fun compare(
+        left: Duration,
+        right: Duration,
+    ): Long {
         return left.compareTo(right).toLong()
     }
 
     // _?_:_
-    open fun conditional(condition: Boolean, value1: Any?, value2: Any?): Any? {
+    open fun conditional(
+        condition: Boolean,
+        value1: Any?,
+        value2: Any?,
+    ): Any? {
         return if (condition) value1 else value2
     }
 
     // _[_]
-    open fun index(list: List<*>, index: Long): Any? {
+    open fun index(
+        list: List<*>,
+        index: Long,
+    ): Any? {
         return list[index.toInt()]
     }
 
     // _[_]
-    open fun index(map: Map<*, *>, index: Any?): Any? {
+    open fun index(
+        map: Map<*, *>,
+        index: Any?,
+    ): Any? {
         return map[index]
     }
 
     // _._
-    open fun access(map: Map<*, *>, index: Any?): Any? {
+    open fun access(
+        map: Map<*, *>,
+        index: Any?,
+    ): Any? {
         return map[index]
     }
 
     // _._
-    open fun access(message: Message<*, *>, index: String): Any? {
+    open fun access(
+        message: Message<*, *>,
+        index: String,
+    ): Any? {
         return message.get<Any?>(index).protobufConversion()
     }
 
@@ -250,16 +361,17 @@ open class CelStandardLibrary {
             is BytesValue -> this.value
             is NullValue -> null
             is Struct -> this.fields.mapValues { it.value.protobufConversion() }
-            is Value -> when (val kind = this.kind) {
-                is Value.Kind.BoolValue -> kind.value
-                is Value.Kind.ListValue -> kind.value.protobufConversion()
-                is Value.Kind.NullValue -> null
-                is Value.Kind.NumberValue -> kind.value
-                is Value.Kind.StringValue -> kind.value
-                is Value.Kind.StructValue -> kind.value
-                null -> null
-                else -> throw IllegalStateException("Illegal proto value type '${kind.javaClass}'.")
-            }
+            is Value ->
+                when (val kind = this.kind) {
+                    is Value.Kind.BoolValue -> kind.value
+                    is Value.Kind.ListValue -> kind.value.protobufConversion()
+                    is Value.Kind.NullValue -> null
+                    is Value.Kind.NumberValue -> kind.value
+                    is Value.Kind.StringValue -> kind.value
+                    is Value.Kind.StructValue -> kind.value
+                    null -> null
+                    else -> throw IllegalStateException("Illegal proto value type '${kind.javaClass}'.")
+                }
             is ProtoEnum<*> -> this.number.toLong()
             is List<*> -> this.map { it.protobufConversion() }
             is Map<*, *> -> this.mapValues { it.value.protobufConversion() }
@@ -271,12 +383,18 @@ open class CelStandardLibrary {
     }
 
     // _in_
-    open fun contains(map: Map<*, *>, key: Any?): Boolean {
+    open fun contains(
+        map: Map<*, *>,
+        key: Any?,
+    ): Boolean {
         return key in map
     }
 
     // _in_
-    open fun contains(map: List<*>, key: Any?): Boolean {
+    open fun contains(
+        map: List<*>,
+        key: Any?,
+    ): Boolean {
         return key in map
     }
 
@@ -286,7 +404,10 @@ open class CelStandardLibrary {
     }
 
     // _||_
-    open fun logicalOr(left: Boolean, right: Boolean): Boolean {
+    open fun logicalOr(
+        left: Boolean,
+        right: Boolean,
+    ): Boolean {
         return left || right
     }
 

@@ -36,7 +36,7 @@ class CoroutineServiceGenerator : GroupedGenerator<ApiFileGeneratingState> {
             state.target.addType(
                 kClass(service.name()) {
                     ServiceGeneratingState(state, service, this).advance()
-                }
+                },
             )
         }
         return true
@@ -51,8 +51,9 @@ class CoroutineServiceBasicGenerator : GroupedGenerator<ServiceGeneratingState> 
             addKdoc(state.descriptor.document())
 
             addAnnotation(
-                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION).addMember("%S", state.descriptor.fullProtoName())
-                    .build()
+                AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION)
+                    .addMember("%S", state.descriptor.fullProtoName())
+                    .build(),
             )
 
             constructor {
@@ -75,39 +76,50 @@ class CoroutineServiceBasicGenerator : GroupedGenerator<ServiceGeneratingState> 
                             when {
                                 !method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                                     add(
-                                        ".addMethod(%T.unaryServerMethodDefinition(context, ${method.descriptor.name.toCamelCase()}, ::${method.descriptor.name.toCamelCase()}))",
-                                        RuntimeTypes.SERVER_CALLS
+                                        ".addMethod(%T.unaryServerMethodDefinition(context, ${
+                                            method.descriptor.name.toCamelCase()
+                                        }, ::${method.descriptor.name.toCamelCase()}))",
+                                        RuntimeTypes.SERVER_CALLS,
                                     )
                                 }
+
                                 method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                                     add(
-                                        ".addMethod(%T.clientStreamingServerMethodDefinition(context, ${method.descriptor.name.toCamelCase()}, ::${method.descriptor.name.toCamelCase()}))",
-                                        RuntimeTypes.SERVER_CALLS
+                                        ".addMethod(%T.clientStreamingServerMethodDefinition(context, ${
+                                            method.descriptor.name.toCamelCase()
+                                        }, ::${method.descriptor.name.toCamelCase()}))",
+                                        RuntimeTypes.SERVER_CALLS,
                                     )
                                 }
+
                                 !method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                                     add(
-                                        ".addMethod(%T.serverStreamingServerMethodDefinition(context, ${method.descriptor.name.toCamelCase()}, ::${method.descriptor.name.toCamelCase()}))",
-                                        RuntimeTypes.SERVER_CALLS
+                                        ".addMethod(%T.serverStreamingServerMethodDefinition(context, ${
+                                            method.descriptor.name.toCamelCase()
+                                        }, ::${method.descriptor.name.toCamelCase()}))",
+                                        RuntimeTypes.SERVER_CALLS,
                                     )
                                 }
+
                                 method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                                     add(
-                                        ".addMethod(%T.bidiStreamingServerMethodDefinition(context, ${method.descriptor.name.toCamelCase()}, ::${method.descriptor.name.toCamelCase()}))",
-                                        RuntimeTypes.SERVER_CALLS
+                                        ".addMethod(%T.bidiStreamingServerMethodDefinition(context, ${
+                                            method.descriptor.name.toCamelCase()
+                                        }, ::${method.descriptor.name.toCamelCase()}))",
+                                        RuntimeTypes.SERVER_CALLS,
                                     )
                                 }
                             }
                         }
                         add(".build()\n")
-                    }
+                    },
                 )
             }
 
             addType(
                 kClass("Client") {
                     ClientGeneratingState(state, state.descriptor, this).advance()
-                }
+                },
             )
 
             function("support") {
@@ -129,14 +141,15 @@ class CoroutineServiceBasicGenerator : GroupedGenerator<ServiceGeneratingState> 
 class CoroutineClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
     override fun generate(state: ClientGeneratingState): Boolean {
         state.target.apply {
-            this extends RuntimeTypes.ABSTRACT_COROUTINE_STUB.parameterizedBy(
-                state.descriptor.className().nestedClass("Client")
-            )
+            this extends
+                RuntimeTypes.ABSTRACT_COROUTINE_STUB.parameterizedBy(
+                    state.descriptor.className().nestedClass("Client"),
+                )
             constructor {
                 parameter("channel", RuntimeTypes.CHANNEL)
                 parameter(
                     "optionsInterceptors",
-                    Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR)
+                    Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR),
                 ) {
                     defaultValue("listOf()")
                 }
@@ -154,7 +167,7 @@ class CoroutineClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
                 parameter("channel", RuntimeTypes.CHANNEL)
                 parameter(
                     "optionsInterceptors",
-                    Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR)
+                    Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR),
                 )
                 parameter("callOptions", RuntimeTypes.CALL_OPTIONS)
 
@@ -162,7 +175,7 @@ class CoroutineClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
 
                 addStatement(
                     "return %T(channel, optionsInterceptors, callOptions)",
-                    state.descriptor.className().nestedClass("Client")
+                    state.descriptor.className().nestedClass("Client"),
                 )
             }
 
@@ -190,7 +203,7 @@ class CoroutineClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                 if (method.descriptor.clientStreaming) {
                     addParameter(
                         "input",
-                        Flow::class.asClassName().parameterizedBy(method.inputMessage().className())
+                        Flow::class.asClassName().parameterizedBy(method.inputMessage().className()),
                     )
                 } else {
                     addParameter("input", method.inputMessage().className())
@@ -201,28 +214,31 @@ class CoroutineClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                         addStatement(
                             "return unaryCall(%T.${method.name()}, input, %T())",
                             method.parent.className(),
-                            RuntimeTypes.METADATA
+                            RuntimeTypes.METADATA,
                         )
                     }
+
                     method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                         addStatement(
                             "return clientStreaming(%T.${method.name()}, input, %T())",
                             method.parent.className(),
-                            RuntimeTypes.METADATA
+                            RuntimeTypes.METADATA,
                         )
                     }
+
                     !method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                         addStatement(
                             "return serverStreaming(%T.${method.name()}, input, %T())",
                             method.parent.className(),
-                            RuntimeTypes.METADATA
+                            RuntimeTypes.METADATA,
                         )
                     }
+
                     method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                         addStatement(
                             "return bidiStreaming(%T.${method.name()}, input, %T())",
                             method.parent.className(),
-                            RuntimeTypes.METADATA
+                            RuntimeTypes.METADATA,
                         )
                     }
                 }
@@ -277,7 +293,7 @@ class CoroutineServiceSupportGenerator : GroupedGenerator<InternalFileGenerating
             state.target.addType(
                 kClass(service.supportName()) {
                     ServiceSupportGeneratingState(state, service, this).advance()
-                }
+                },
             )
         }
         return true
@@ -312,10 +328,10 @@ class CoroutineServiceSupportBasicGenerator : GroupedGenerator<ServiceSupportGen
                         addStatement(
                             "%T.descriptor.service.first{ it.name == %S }",
                             state.descriptor.parent.fileMetadataClassName(),
-                            state.descriptor.descriptor.name
+                            state.descriptor.descriptor.name,
                         )
                         endControlFlow()
-                    }
+                    },
                 )
             }
 
@@ -326,7 +342,7 @@ class CoroutineServiceSupportBasicGenerator : GroupedGenerator<ServiceSupportGen
                             add(
                                 "%T.newBuilder(%S)\n",
                                 RuntimeTypes.SERVICE_DESCRIPTOR,
-                                state.descriptor.fullProtoName().trim('.')
+                                state.descriptor.fullProtoName().trim('.'),
                             )
                             for (method in state.descriptor.methods) {
                                 add(".addMethod(%L)\n", method.name())
@@ -334,7 +350,7 @@ class CoroutineServiceSupportBasicGenerator : GroupedGenerator<ServiceSupportGen
                             add(".setSchemaDescriptor(%T)\n", state.descriptor.className())
                             add(".build()\n")
                         }
-                    }
+                    },
                 )
             }
         }
@@ -349,8 +365,8 @@ class CoroutineServiceSupportMethodGenerator : GroupedGenerator<ServiceSupportGe
                 method.name(),
                 RuntimeTypes.METHOD_DESCRIPTOR.parameterizedBy(
                     method.inputMessage().className(),
-                    method.outputMessage().className()
-                )
+                    method.outputMessage().className(),
+                ),
             ) {
                 initializer(
                     buildCodeBlock {
@@ -358,18 +374,21 @@ class CoroutineServiceSupportMethodGenerator : GroupedGenerator<ServiceSupportGe
                             "%T.newBuilder<%T,·%T>()\n",
                             RuntimeTypes.METHOD_DESCRIPTOR,
                             method.inputMessage().className(),
-                            method.outputMessage().className()
+                            method.outputMessage().className(),
                         )
                         when {
                             !method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                                 add(".setType(MethodDescriptor.MethodType.%L)\n", "UNARY")
                             }
+
                             method.descriptor.clientStreaming && !method.descriptor.serverStreaming -> {
                                 add(".setType(MethodDescriptor.MethodType.%L)\n", "CLIENT_STREAMING")
                             }
+
                             !method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                                 add(".setType(MethodDescriptor.MethodType.%L)\n", "SERVER_STREAMING")
                             }
+
                             method.descriptor.clientStreaming && method.descriptor.serverStreaming -> {
                                 add(".setType(MethodDescriptor.MethodType.%L)\n", "BIDI_STREAMING")
                             }
@@ -378,16 +397,16 @@ class CoroutineServiceSupportMethodGenerator : GroupedGenerator<ServiceSupportGe
                         add(
                             ".setRequestMarshaller(%T.%M())\n",
                             method.inputMessage().className(),
-                            RuntimeMethods.MARSHALLER
+                            RuntimeMethods.MARSHALLER,
                         )
                         add(
                             ".setResponseMarshaller(%T.%M())\n",
                             method.outputMessage().className(),
-                            RuntimeMethods.MARSHALLER
+                            RuntimeMethods.MARSHALLER,
                         )
                         add(".setSchemaDescriptor(%T)\n", method.parent.className())
                         add(".build()\n")
-                    }
+                    },
                 )
             }
         }

@@ -14,21 +14,28 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 
 object MessageTypeAdapterFactory : TypeAdapterFactory {
-    override fun <T : Any?> create(p0: Gson, p1: TypeToken<T>): TypeAdapter<T>? {
+    override fun <T : Any?> create(
+        p0: Gson,
+        p1: TypeToken<T>,
+    ): TypeAdapter<T>? {
         return when (val raw = p1.rawType) {
             Message::class.java -> UnboxedAnyMessageTypeAdapter()
             com.bybutter.sisyphus.protobuf.primitives.Any::class.java -> BoxedAnyMessageTypeAdapter()
-            else -> if (Message::class.java.isAssignableFrom(raw)) {
-                MessageTypeAdapter(raw)
-            } else {
-                null
-            }
+            else ->
+                if (Message::class.java.isAssignableFrom(raw)) {
+                    MessageTypeAdapter(raw)
+                } else {
+                    null
+                }
         } as? TypeAdapter<T>
     }
 }
 
 class UnboxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
-    override fun write(writer: JsonWriter, message: Message<*, *>) {
+    override fun write(
+        writer: JsonWriter,
+        message: Message<*, *>,
+    ) {
         message.writeTo(GsonWriter(writer))
     }
 
@@ -38,7 +45,10 @@ class UnboxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
 }
 
 class BoxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
-    override fun write(writer: JsonWriter, message: Message<*, *>) {
+    override fun write(
+        writer: JsonWriter,
+        message: Message<*, *>,
+    ) {
         message.writeTo(GsonWriter(writer))
     }
 
@@ -53,7 +63,10 @@ class BoxedAnyMessageTypeAdapter : TypeAdapter<Message<*, *>>() {
 }
 
 class MessageTypeAdapter(private val clazz: Class<*>) : TypeAdapter<Message<*, *>>() {
-    override fun write(writer: JsonWriter, message: Message<*, *>) {
+    override fun write(
+        writer: JsonWriter,
+        message: Message<*, *>,
+    ) {
         message.writeTo(GsonWriter(writer))
     }
 

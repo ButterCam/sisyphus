@@ -11,7 +11,7 @@ import com.squareup.kotlinpoet.KModifier
 class ProtobufCompiler(
     files: DescriptorProtos.FileDescriptorSet,
     packageShading: Map<String, String> = mapOf(),
-    val generators: CodeGenerators = CodeGenerators()
+    val generators: CodeGenerators = CodeGenerators(),
 ) {
     private var context = ProtobufBoosterContext()
 
@@ -19,43 +19,46 @@ class ProtobufCompiler(
         return context
     }
 
-    private val descriptorSet = FileDescriptorSet(files, packageShading).apply {
-        resolve()
-    }
+    private val descriptorSet =
+        FileDescriptorSet(files, packageShading).apply {
+            resolve()
+        }
 
     fun generate(files: Collection<String>): ProtoCompileResults {
         val generatingHash = (descriptorSet.descriptor.toByteArray().md5() + generators.md5()).md5().hex()
         context = ProtobufBoosterContext(name = "Booster_$generatingHash")
         val results = files.map { generate(it) }
         val boostFunc = context.builder.build()
-        val booster = if (boostFunc.body.isNotEmpty()) {
-            kFile("com.bybutter.sisyphus.protobuf.booster", "Booster") {
-                addType(
-                    kObject(context.name) {
-                        implements(RuntimeTypes.PROTOBUF_BOOSTER)
+        val booster =
+            if (boostFunc.body.isNotEmpty()) {
+                kFile("com.bybutter.sisyphus.protobuf.booster", "Booster") {
+                    addType(
+                        kObject(context.name) {
+                            implements(RuntimeTypes.PROTOBUF_BOOSTER)
 
-                        if (context.order != 0) {
-                            property("order", Int::class) {
-                                this += KModifier.OVERRIDE
-                                getter {
-                                    addStatement("return ${context.order}")
+                            if (context.order != 0) {
+                                property("order", Int::class) {
+                                    this += KModifier.OVERRIDE
+                                    getter {
+                                        addStatement("return ${context.order}")
+                                    }
                                 }
                             }
-                        }
 
-                        addFunction(boostFunc)
-                    }
-                )
+                            addFunction(boostFunc)
+                        },
+                    )
+                }
+            } else {
+                null
             }
-        } else {
-            null
-        }
         return ProtoCompileResults(booster, results)
     }
 
     private fun generate(file: String): ProtoCompileResult {
-        val fileDescriptor = descriptorSet.files.firstOrNull { it.descriptor.name == file }
-            ?: throw IllegalArgumentException("Proto file '$file' not imported.")
+        val fileDescriptor =
+            descriptorSet.files.firstOrNull { it.descriptor.name == file }
+                ?: throw IllegalArgumentException("Proto file '$file' not imported.")
         val result = mutableListOf<GeneratedFile>()
         FileGeneratingState(this, fileDescriptor, result).advance()
         return ProtoCompileResult(fileDescriptor, result)

@@ -11,7 +11,7 @@ object FilterSyntaxErrorListener : BaseErrorListener() {
         line: Int,
         charPositionInLine: Int,
         msg: String?,
-        e: RecognitionException?
+        e: RecognitionException?,
     ) {
         throw FilterSyntaxException(line, charPositionInLine, msg, e)
     }

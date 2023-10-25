@@ -15,7 +15,7 @@ import org.springframework.web.server.ServerWebExchange
  */
 class TranscodingCorsConfigurationSource(
     private val rules: Collection<TranscodingRouterRule>,
-    private val interceptors: Iterable<TranscodingCorsConfigurationInterceptor>
+    private val interceptors: Iterable<TranscodingCorsConfigurationInterceptor>,
 ) : CorsConfigurationSource {
     private val corsConfigurations = mutableMapOf<String, CorsConfiguration>()
 
@@ -29,9 +29,10 @@ class TranscodingCorsConfigurationSource(
         val lookupPath = exchange.request.path.pathWithinApplication()
 
         // Find a supported request path.
-        val pattern = corsConfigurations.keys.firstOrNull {
-            PathMatcher.match(it, lookupPath.value().substring(1), setOf('/', ':'))
-        } ?: return null
+        val pattern =
+            corsConfigurations.keys.firstOrNull {
+                PathMatcher.match(it, lookupPath.value().substring(1), setOf('/', ':'))
+            } ?: return null
 
         return corsConfigurations[pattern]
     }
@@ -40,7 +41,10 @@ class TranscodingCorsConfigurationSource(
         registerHttp(rule.http, rule.method)
     }
 
-    private fun registerHttp(http: HttpRule, method: ServerMethodDefinition<*, *>) {
+    private fun registerHttp(
+        http: HttpRule,
+        method: ServerMethodDefinition<*, *>,
+    ) {
         http.pattern?.let {
             registerPattern(it, method)
         }
@@ -50,7 +54,10 @@ class TranscodingCorsConfigurationSource(
         }
     }
 
-    private fun registerPattern(pattern: HttpRule.Pattern<*>, method: ServerMethodDefinition<*, *>) {
+    private fun registerPattern(
+        pattern: HttpRule.Pattern<*>,
+        method: ServerMethodDefinition<*, *>,
+    ) {
         val httpMethod: HttpMethod
         val pathTemplate: PathTemplate
 
@@ -84,18 +91,19 @@ class TranscodingCorsConfigurationSource(
 
         val normalizedPattern = pathTemplate.withoutVars().toString()
 
-        val config = corsConfigurations.getOrPut(normalizedPattern) {
-            interceptors.fold(
-                CorsConfiguration().apply {
-                    addAllowedHeader(CorsConfiguration.ALL)
-                    addAllowedOrigin(CorsConfiguration.ALL)
-                    addAllowedMethod(HttpMethod.OPTIONS)
-                    addAllowedMethod(HttpMethod.HEAD)
+        val config =
+            corsConfigurations.getOrPut(normalizedPattern) {
+                interceptors.fold(
+                    CorsConfiguration().apply {
+                        addAllowedHeader(CorsConfiguration.ALL)
+                        addAllowedOrigin(CorsConfiguration.ALL)
+                        addAllowedMethod(HttpMethod.OPTIONS)
+                        addAllowedMethod(HttpMethod.HEAD)
+                    },
+                ) { config, interceptor ->
+                    interceptor.intercept(config, method, pattern, normalizedPattern)
                 }
-            ) { config, interceptor ->
-                interceptor.intercept(config, method, pattern, normalizedPattern)
             }
-        }
 
         config.addAllowedMethod(httpMethod)
     }

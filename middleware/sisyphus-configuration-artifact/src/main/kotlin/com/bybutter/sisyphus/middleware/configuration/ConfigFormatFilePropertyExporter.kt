@@ -32,7 +32,9 @@ abstract class ConfigFormatFilePropertyExporter : FileConfigPropertyExporter() {
     override fun read(url: URL): PropertySource<*>? {
         when (val connection = url.openConnection()) {
             is JarURLConnection -> {
-                ConfigArtifactProvider.logger.info("Load config '${connection.entryName}' from artifact '${Path(connection.jarFile.name).fileName}'")
+                ConfigArtifactProvider.logger.info(
+                    "Load config '${connection.entryName}' from artifact '${Path(connection.jarFile.name).fileName}'",
+                )
             }
             else -> {
                 ConfigArtifactProvider.logger.info("Load config from $url")

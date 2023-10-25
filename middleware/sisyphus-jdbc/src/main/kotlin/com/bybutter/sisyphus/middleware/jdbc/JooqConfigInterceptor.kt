@@ -15,5 +15,9 @@ interface JooqConfigInterceptor {
 
     val qualifier: Class<*>?
 
-    fun intercept(datasource: DataSource, dialect: SQLDialect, configuration: Configuration): Configuration
+    fun intercept(
+        datasource: DataSource,
+        dialect: SQLDialect,
+        configuration: Configuration,
+    ): Configuration
 }

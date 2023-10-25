@@ -24,7 +24,10 @@ class BitInputStream(private val source: InputStream) : InputStream() {
         }
     }
 
-    fun readBits(data: BitSet, bits: Int): Int {
+    fun readBits(
+        data: BitSet,
+        bits: Int,
+    ): Int {
         if (bits > data.size()) {
             throw IllegalArgumentException()
         }
@@ -41,7 +44,10 @@ class BitInputStream(private val source: InputStream) : InputStream() {
         return read
     }
 
-    fun readInt(value: IntArray, bits: Int): Int {
+    fun readInt(
+        value: IntArray,
+        bits: Int,
+    ): Int {
         if (bits > 32) throw IllegalArgumentException("'bits' must less than or equal to 32.")
         if (value.isEmpty()) throw IllegalArgumentException("'value' must not be empty.")
         var int = 0
@@ -107,7 +113,10 @@ class BitOutputStream(private val target: OutputStream) : OutputStream() {
         }
     }
 
-    fun writeBits(data: BitSet, bits: Int) {
+    fun writeBits(
+        data: BitSet,
+        bits: Int,
+    ) {
         if (bits > data.size()) {
             throw IllegalArgumentException()
         }
@@ -121,7 +130,10 @@ class BitOutputStream(private val target: OutputStream) : OutputStream() {
         }
     }
 
-    fun writeInt(value: Int, bits: Int) {
+    fun writeInt(
+        value: Int,
+        bits: Int,
+    ) {
         for (i in 0 until bits) {
             if (value and (1 shl (bits - i - 1)) > 0) {
                 write(1)

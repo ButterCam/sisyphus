@@ -19,45 +19,47 @@ import kotlinx.coroutines.flow.flow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReflectionServiceAlpha : ServerReflection() {
-    override fun serverReflectionInfo(input: Flow<ServerReflectionRequest>): Flow<ServerReflectionResponse> = flow {
-        input.collect { request ->
-            val response = ServerReflectionResponse {
-                validHost = request.host
-                originalRequest = request
+    override fun serverReflectionInfo(input: Flow<ServerReflectionRequest>): Flow<ServerReflectionResponse> =
+        flow {
+            input.collect { request ->
+                val response =
+                    ServerReflectionResponse {
+                        validHost = request.host
+                        originalRequest = request
 
-                when (val messageRequest = request.messageRequest) {
-                    is ServerReflectionRequest.MessageRequest.FileByFilename -> {
-                        messageResponse = getFileByFileName(messageRequest.value)
-                    }
-                    is ServerReflectionRequest.MessageRequest.FileContainingSymbol -> {
-                        messageResponse = getFileContainingSymbol(messageRequest.value)
+                        when (val messageRequest = request.messageRequest) {
+                            is ServerReflectionRequest.MessageRequest.FileByFilename -> {
+                                messageResponse = getFileByFileName(messageRequest.value)
+                            }
+                            is ServerReflectionRequest.MessageRequest.FileContainingSymbol -> {
+                                messageResponse = getFileContainingSymbol(messageRequest.value)
+                            }
+
+                            is ServerReflectionRequest.MessageRequest.FileContainingExtension -> {
+                                messageResponse = getFileContainingExtension(messageRequest.value)
+                            }
+
+                            is ServerReflectionRequest.MessageRequest.AllExtensionNumbersOfType -> {
+                                messageResponse = getAllExtensionNumbersOfType(messageRequest.value)
+                            }
+
+                            is ServerReflectionRequest.MessageRequest.ListServices -> {
+                                messageResponse = listService(messageRequest.value)
+                            }
+
+                            null -> {}
+                        }
                     }
 
-                    is ServerReflectionRequest.MessageRequest.FileContainingExtension -> {
-                        messageResponse = getFileContainingExtension(messageRequest.value)
-                    }
-
-                    is ServerReflectionRequest.MessageRequest.AllExtensionNumbersOfType -> {
-                        messageResponse = getAllExtensionNumbersOfType(messageRequest.value)
-                    }
-
-                    is ServerReflectionRequest.MessageRequest.ListServices -> {
-                        messageResponse = listService(messageRequest.value)
-                    }
-
-                    null -> {}
-                }
+                emit(response)
             }
-
-            emit(response)
         }
-    }
 
     private fun getFileByFileName(name: String): ServerReflectionResponse.MessageResponse.FileDescriptorResponse {
         return ServerReflectionResponse.MessageResponse.FileDescriptorResponse(
             FileDescriptorResponse {
                 this.fileDescriptorProto += ProtoTypes.findFileSupport(name).descriptor.toProto()
-            }
+            },
         )
     }
 
@@ -67,7 +69,7 @@ class ReflectionServiceAlpha : ServerReflection() {
                 ProtoTypes.findSupport(".$name")?.file()?.let {
                     this.fileDescriptorProto += it.descriptor.toProto()
                 }
-            }
+            },
         )
     }
 
@@ -75,14 +77,15 @@ class ReflectionServiceAlpha : ServerReflection() {
         return ServerReflectionResponse.MessageResponse.FileDescriptorResponse(
             FileDescriptorResponse {
                 val message = ProtoTypes.findMessageSupport(".${request.containingType}")
-                val extension = message.extensions.firstOrNull {
-                    it.descriptor.number == request.extensionNumber
-                }
+                val extension =
+                    message.extensions.firstOrNull {
+                        it.descriptor.number == request.extensionNumber
+                    }
 
                 extension?.file()?.let {
                     this.fileDescriptorProto += it.descriptor.toProto()
                 }
-            }
+            },
         )
     }
 
@@ -92,19 +95,20 @@ class ReflectionServiceAlpha : ServerReflection() {
                 this.baseTypeName = name
                 val message = ProtoTypes.findMessageSupport(".$name")
                 this.extensionNumber += message.extensions.map { it.descriptor.number }
-            }
+            },
         )
     }
 
     private fun listService(name: String): ServerReflectionResponse.MessageResponse.ListServicesResponse {
         return ServerReflectionResponse.MessageResponse.ListServicesResponse(
             ListServiceResponse {
-                this.service += InternalServer.SERVER_CONTEXT_KEY.get().services.map {
-                    ServiceResponse {
-                        this.name = it.serviceDescriptor.name
+                this.service +=
+                    InternalServer.SERVER_CONTEXT_KEY.get().services.map {
+                        ServiceResponse {
+                            this.name = it.serviceDescriptor.name
+                        }
                     }
-                }
-            }
+            },
         )
     }
 }

@@ -12,5 +12,5 @@ annotation class PropertyHook(
     /**
      * Parameters for [PropertyHookHandler]
      */
-    vararg val params: String = []
+    vararg val params: String = [],
 )

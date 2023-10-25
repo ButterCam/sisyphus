@@ -3,7 +3,7 @@ package com.bybutter.sisyphus.protobuf.dynamic
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 abstract class AbstractDynamicField<T>(
-    private val descriptor: FieldDescriptorProto
+    private val descriptor: FieldDescriptorProto,
 ) : DynamicField<T> {
     protected abstract var value: T
     protected var hasValue = false
@@ -51,7 +51,11 @@ abstract class AbstractDynamicField<T>(
         if (get() == other) {
             return true
         }
-        if (other is AbstractDynamicField<*> && javaClass == other.javaClass && get() == other.get() && descriptor().number == other.descriptor().number) {
+        if (other is AbstractDynamicField<*> &&
+            javaClass == other.javaClass &&
+            get() == other.get() &&
+            descriptor().number == other.descriptor().number
+        ) {
             return true
         }
         return false

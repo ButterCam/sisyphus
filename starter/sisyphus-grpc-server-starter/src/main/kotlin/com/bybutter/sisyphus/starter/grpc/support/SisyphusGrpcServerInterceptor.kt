@@ -47,7 +47,7 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
     override fun <ReqT : Any, RespT : Any> interceptCall(
         call: ServerCall<ReqT, RespT>,
         headers: Metadata,
-        next: ServerCallHandler<ReqT, RespT>
+        next: ServerCallHandler<ReqT, RespT>,
     ): ServerCall.Listener<ReqT> {
         val context = Context.current().withValue(RequestLogger.REQUEST_CONTEXT_KEY, RequestInfo(headers))
 
@@ -57,7 +57,7 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
             Contexts.interceptCall(
                 context,
                 SisyphusGrpcServerCall(call, uniqueLoggers, statusRenderers),
-                headers
+                headers,
             ) { call, headers ->
                 SisyphusGrpcServerCallListener(next.startCall(call, headers))
             }
@@ -69,11 +69,14 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
     private class SisyphusGrpcServerCall<ReqT, RespT>(
         call: ServerCall<ReqT, RespT>,
         private val loggers: List<RequestLogger>,
-        private val statusRenderers: List<StatusRenderer>
+        private val statusRenderers: List<StatusRenderer>,
     ) : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
         private val requestNanoTime = System.nanoTime()
 
-        private fun renderStatus(status: Status, trailers: Metadata): Status {
+        private fun renderStatus(
+            status: Status,
+            trailers: Metadata,
+        ): Status {
             statusRenderers.forEach {
                 if (it.canRender(status)) {
                     it.render(status, trailers)?.let {
@@ -84,7 +87,10 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
             return status
         }
 
-        override fun close(status: Status, trailers: Metadata) {
+        override fun close(
+            status: Status,
+            trailers: Metadata,
+        ) {
             val status = renderStatus(status, trailers)
 
             RequestLogger.REQUEST_CONTEXT_KEY.get().apply {
@@ -102,7 +108,10 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
             super.sendMessage(message)
         }
 
-        private fun logRequest(status: Status, requestInfo: RequestInfo) {
+        private fun logRequest(
+            status: Status,
+            requestInfo: RequestInfo,
+        ) {
             val cost = System.nanoTime() - requestNanoTime
 
             try {
@@ -115,7 +124,10 @@ class SisyphusGrpcServerInterceptor : ServerInterceptor {
         }
     }
 
-    private fun logIncomingRequest(call: ServerCall<*, *>, headers: Metadata) {
+    private fun logIncomingRequest(
+        call: ServerCall<*, *>,
+        headers: Metadata,
+    ) {
         try {
             for (logger in uniqueIncomingLoggers) {
                 logger.log(call, headers)

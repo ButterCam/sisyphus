@@ -10,7 +10,7 @@ class JsonDefaultValueProvider : DefaultValueProvider<Any?> {
     override fun getValue(
         proxy: ModelProxy,
         param: String,
-        property: KProperty<Any?>
+        property: KProperty<Any?>,
     ): Any? {
         return Json.deserialize(param, property.returnType.javaType)
     }

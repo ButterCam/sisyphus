@@ -5,9 +5,8 @@ import java.util.Objects
 
 class FixedByteArrayOutputStream(
     private val buf: ByteArray,
-    private var pos: Int = 0
+    private var pos: Int = 0,
 ) : OutputStream() {
-
     constructor(size: Int) : this(ByteArray(size))
 
     @Synchronized
@@ -17,7 +16,11 @@ class FixedByteArrayOutputStream(
     }
 
     @Synchronized
-    override fun write(b: ByteArray, off: Int, len: Int) {
+    override fun write(
+        b: ByteArray,
+        off: Int,
+        len: Int,
+    ) {
         Objects.checkFromIndexSize(off, len, b.size)
         System.arraycopy(b, off, buf, pos, len)
         pos += len

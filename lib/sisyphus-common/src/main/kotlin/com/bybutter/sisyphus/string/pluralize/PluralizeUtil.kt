@@ -5,6 +5,7 @@ import com.bybutter.sisyphus.string.toPascalCase
 /**
  * Translate from JavaScript module 'https://github.com/blakeembrey/pluralize'
  */
+@Suppress("ktlint:standard:max-line-length")
 object PluralizeUtil {
     private val uncountableWords = hashSetOf<String>()
     private val uncountableRules = mutableListOf<Regex>()
@@ -13,16 +14,25 @@ object PluralizeUtil {
     private val pluralizationRules = mutableListOf<Rule>()
     private val singularizationRules = mutableListOf<Rule>()
 
-    fun addIrregularRule(single: String, plural: String) {
+    fun addIrregularRule(
+        single: String,
+        plural: String,
+    ) {
         irregularSingles[single] = plural
         irregularPlurals[plural] = single
     }
 
-    fun addPluralRule(rule: Regex, replace: String) {
+    fun addPluralRule(
+        rule: Regex,
+        replace: String,
+    ) {
         pluralizationRules.add(Rule(rule, replace))
     }
 
-    fun addSingularRule(rule: Regex, replace: String) {
+    fun addSingularRule(
+        rule: Regex,
+        replace: String,
+    ) {
         singularizationRules.add(Rule(rule, replace))
     }
 
@@ -50,7 +60,10 @@ object PluralizeUtil {
         return checkWord(word, irregularSingles, irregularPlurals, pluralizationRules)
     }
 
-    private fun restoreCase(word: String, token: String): String {
+    private fun restoreCase(
+        word: String,
+        token: String,
+    ): String {
         if (word == token) return token
         if (word.all { it.isLowerCase() }) return token.lowercase()
         if (word.all { it.isUpperCase() }) return token.uppercase()
@@ -62,7 +75,7 @@ object PluralizeUtil {
         word: String,
         replaceMap: Map<String, String>,
         keepMap: Map<String, String>,
-        rules: List<Rule>
+        rules: List<Rule>,
     ): String {
         if (word.isBlank()) return word
 
@@ -90,7 +103,10 @@ object PluralizeUtil {
         return restoreCase(word, sanitizedToken)
     }
 
-    private fun sanitizeWord(token: String, rules: List<Rule>): String {
+    private fun sanitizeWord(
+        token: String,
+        rules: List<Rule>,
+    ): String {
         for (rule in rules.asReversed()) {
             if (rule.regex.containsMatchIn(token)) {
                 return rule.regex.replace(token, rule.replace)
@@ -103,7 +119,7 @@ object PluralizeUtil {
         word: String,
         replaceMap: Map<String, String>,
         keepMap: Map<String, String>,
-        rules: List<Rule>
+        rules: List<Rule>,
     ): Boolean {
         if (word.isBlank()) return false
 
@@ -191,18 +207,18 @@ object PluralizeUtil {
         addPluralRule("""([^l]ias|[aeiou]las|[ejzr]as|[iu]am)$""".toRegex(), "$1")
         addPluralRule(
             """(alumn|syllab|vir|radi|nucle|fung|cact|stimul|termin|bacill|foc|uter|loc|strat)(?:us|i)$""".toRegex(),
-            "$1i"
+            "$1i",
         )
         addPluralRule("""(alumn|alg|vertebr)(?:a|ae)$""".toRegex(), "$1ae")
         addPluralRule("""(seraph|cherub)(?:im)?$""".toRegex(), "$1im")
         addPluralRule("""(her|at|gr)o$""".toRegex(), "$1oes")
         addPluralRule(
             """(agend|addend|millenni|dat|extrem|bacteri|desiderat|strat|candelabr|errat|ov|symposi|curricul|automat|quor)(?:a|um)$""".toRegex(),
-            "$1a"
+            "$1a",
         )
         addPluralRule(
             """(apheli|hyperbat|periheli|asyndet|noumen|phenomen|criteri|organ|prolegomen|hedr|automat)(?:a|on)$""".toRegex(),
-            "$1a"
+            "$1a",
         )
         addPluralRule("""sis$""".toRegex(), "ses")
         addPluralRule("""(?:(kni|wi|li)fe|(ar|l|ea|eo|oa|hoo)f)$""".toRegex(), "$1$2ves")
@@ -228,29 +244,29 @@ object PluralizeUtil {
         addSingularRule("""(dg|ss|ois|lk|ok|wn|mb|th|ch|ec|oal|is|ec|ck|ix|sser|ts|wb)ies$""".toRegex(), "$1ie")
         addSingularRule(
             """\b(l|(?:neck|cross|hog|aun)?t|coll|faer|food|gen|goon|group|hipp|junk|vegg|(?:pork)?p|charl|calor|cut)ies$""".toRegex(),
-            "$1ie"
+            "$1ie",
         )
         addSingularRule("""\b(mon|smil)ies$""".toRegex(), "$1ey")
         addSingularRule("""\b((?:tit)?m|l)ice$""".toRegex(), "$1ouse")
         addSingularRule("""(seraph|cherub)im$""".toRegex(), "$1")
         addSingularRule(
             """(x|ch|ss|sh|zz|tto|go|cho|alias|[^aou]us|t[lm]as|gas|(?:her|at|gr)o|[aeiou]ris)(?:es)?$""".toRegex(),
-            "$1"
+            "$1",
         )
         addSingularRule("""(analy|diagno|parenthe|progno|synop|the|empha|cri|ne)(?:sis|ses)$""".toRegex(), "$1sis")
         addSingularRule("""(movie|twelve|abuse|e[mn]u)s$""".toRegex(), "$1")
         addSingularRule("""(test)(?:is|es)$""".toRegex(), "$1is")
         addSingularRule(
             """(alumn|syllab|vir|radi|nucle|fung|cact|stimul|termin|bacill|foc|uter|loc|strat)(?:us|i)$""".toRegex(),
-            "$1us"
+            "$1us",
         )
         addSingularRule(
             """(agend|addend|millenni|dat|extrem|bacteri|desiderat|strat|candelabr|errat|ov|symposi|curricul|quor)a$""".toRegex(),
-            "$1um"
+            "$1um",
         )
         addSingularRule(
             """(apheli|hyperbat|periheli|asyndet|noumen|phenomen|criteri|organ|prolegomen|hedr|automat)a$""".toRegex(),
-            "$1on"
+            "$1on",
         )
         addSingularRule("""(alumn|alg|vertebr)ae$""".toRegex(), "$1a")
         addSingularRule("""(cod|mur|sil|vert|ind)ices$""".toRegex(), "$1ex")

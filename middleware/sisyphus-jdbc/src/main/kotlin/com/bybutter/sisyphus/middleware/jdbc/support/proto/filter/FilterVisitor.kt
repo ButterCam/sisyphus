@@ -8,17 +8,26 @@ import com.bybutter.sisyphus.protobuf.primitives.invoke
 import com.bybutter.sisyphus.string.unescape
 
 open class FilterVisitor {
-    fun build(builder: SqlBuilder<*>, filter: String): List<Any?> {
+    fun build(
+        builder: SqlBuilder<*>,
+        filter: String,
+    ): List<Any?> {
         return visit(builder, FilterDsl.parse(filter))
     }
 
-    fun visit(builder: SqlBuilder<*>, filter: FilterParser.FilterContext): List<Any?> {
+    fun visit(
+        builder: SqlBuilder<*>,
+        filter: FilterParser.FilterContext,
+    ): List<Any?> {
         return filter.expression().map {
             visit(builder, it)
         }
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, expr: FilterParser.ExpressionContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        expr: FilterParser.ExpressionContext,
+    ): Any? {
         return expr.factor().fold<FilterParser.FactorContext, Any?>(null) { a, b ->
             val right = visit(builder, b)
             a?.let {
@@ -27,7 +36,10 @@ open class FilterVisitor {
         }
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, factor: FilterParser.FactorContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        factor: FilterParser.FactorContext,
+    ): Any? {
         return factor.term().fold<FilterParser.TermContext, Any?>(null) { a, b ->
             val right = visit(builder, b)
             a?.let {
@@ -36,7 +48,10 @@ open class FilterVisitor {
         }
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, term: FilterParser.TermContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        term: FilterParser.TermContext,
+    ): Any? {
         val result = visit(builder, term.simple())
 
         if (term.NOT() != null) {
@@ -50,7 +65,10 @@ open class FilterVisitor {
         return result
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, condition: FilterParser.SimpleContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        condition: FilterParser.SimpleContext,
+    ): Any? {
         condition.restriction()?.let {
             return visit(builder, it)
         }
@@ -58,7 +76,10 @@ open class FilterVisitor {
         return visit(builder, condition.composite())
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, restriction: FilterParser.RestrictionContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        restriction: FilterParser.RestrictionContext,
+    ): Any? {
         val field = visit(builder, restriction.comparable())
 
         restriction.comparator()?.let {
@@ -78,7 +99,10 @@ open class FilterVisitor {
         return field
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, comparable: FilterParser.ComparableContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        comparable: FilterParser.ComparableContext,
+    ): Any? {
         comparable.function()?.let {
             return visit(builder, it)
         }
@@ -86,19 +110,31 @@ open class FilterVisitor {
         return visit(builder, comparable.member())
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, member: FilterParser.MemberContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        member: FilterParser.MemberContext,
+    ): Any? {
         return builder.member(member)
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, composite: FilterParser.CompositeContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        composite: FilterParser.CompositeContext,
+    ): Any? {
         return visit(builder, composite.expression())
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, args: FilterParser.ArgListContext): List<Any?> {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        args: FilterParser.ArgListContext,
+    ): List<Any?> {
         return args.arg().map { visit(builder, it) }
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, arg: FilterParser.ArgContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        arg: FilterParser.ArgContext,
+    ): Any? {
         arg.comparable()?.let {
             return visit(builder, it)
         }
@@ -110,7 +146,10 @@ open class FilterVisitor {
         return visit(builder, arg.value())
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, value: FilterParser.ValueContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        value: FilterParser.ValueContext,
+    ): Any? {
         return when (value) {
             is FilterParser.IntContext -> value.text.toLong()
             is FilterParser.UintContext -> value.text.substring(0, value.text.length - 1).toULong()
@@ -125,16 +164,22 @@ open class FilterVisitor {
         }
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, function: FilterParser.FunctionContext): Any? {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        function: FilterParser.FunctionContext,
+    ): Any? {
         return builder.runtime.invoke(
             function.name().joinToString(".") { it.text },
             function.argList()?.let {
                 visit(builder, it)
-            } ?: listOf()
+            } ?: listOf(),
         )
     }
 
-    protected open fun visit(builder: SqlBuilder<*>, value: FilterParser.StringContext): String {
+    protected open fun visit(
+        builder: SqlBuilder<*>,
+        value: FilterParser.StringContext,
+    ): String {
         val string = value.text
         return when {
             string.startsWith("\"") -> string.substring(1, string.length - 1)

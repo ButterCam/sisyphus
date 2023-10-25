@@ -14,7 +14,6 @@ import org.springframework.core.annotation.AnnotationUtils
  * BeanUtils for spring framework.
  */
 object BeanUtils {
-
     inline fun <reified T> getBeans(beanFactory: ListableBeanFactory): Map<String, T> {
         return getBeans(beanFactory, T::class.java)
     }
@@ -22,11 +21,15 @@ object BeanUtils {
     /**
      * Get beans of specified type, if [beanFactory] is [ConfigurableBeanFactory] or [ApplicationContext] this function will return sorted beans.
      */
-    fun <T> getBeans(beanFactory: ListableBeanFactory, type: Class<T>): Map<String, T> {
-        val factory = when (beanFactory) {
-            is ApplicationContext -> beanFactory.autowireCapableBeanFactory
-            else -> beanFactory
-        }
+    fun <T> getBeans(
+        beanFactory: ListableBeanFactory,
+        type: Class<T>,
+    ): Map<String, T> {
+        val factory =
+            when (beanFactory) {
+                is ApplicationContext -> beanFactory.autowireCapableBeanFactory
+                else -> beanFactory
+            }
 
         if (factory is ConfigurableListableBeanFactory) {
             return getSortedBeans(factory, type)
@@ -37,7 +40,10 @@ object BeanUtils {
         }
     }
 
-    fun <T> getSortedBeans(beanFactory: ConfigurableListableBeanFactory, type: Class<T>): Map<String, T> {
+    fun <T> getSortedBeans(
+        beanFactory: ConfigurableListableBeanFactory,
+        type: Class<T>,
+    ): Map<String, T> {
         return getSortedBeansWithCondition(beanFactory, type) { _, _, _ ->
             true
         }
@@ -45,7 +51,7 @@ object BeanUtils {
 
     inline fun <reified T> getBeansWithAnnotation(
         beanFactory: ListableBeanFactory,
-        annotation: Class<out Annotation>
+        annotation: Class<out Annotation>,
     ): Map<String, T> {
         return getBeansWithAnnotation(beanFactory, T::class.java, annotation)
     }
@@ -56,12 +62,13 @@ object BeanUtils {
     fun <T> getBeansWithAnnotation(
         beanFactory: ListableBeanFactory,
         type: Class<T>,
-        annotation: Class<out Annotation>
+        annotation: Class<out Annotation>,
     ): Map<String, T> {
-        val factory = when (beanFactory) {
-            is ApplicationContext -> beanFactory.autowireCapableBeanFactory
-            else -> beanFactory
-        }
+        val factory =
+            when (beanFactory) {
+                is ApplicationContext -> beanFactory.autowireCapableBeanFactory
+                else -> beanFactory
+            }
 
         if (factory is ConfigurableListableBeanFactory) {
             return getSortedBeansWithAnnotation(factory, type, annotation)
@@ -76,7 +83,7 @@ object BeanUtils {
     fun <T> getSortedBeansWithAnnotation(
         beanFactory: ConfigurableListableBeanFactory,
         type: Class<T>,
-        annotation: Class<out Annotation>
+        annotation: Class<out Annotation>,
     ): Map<String, T> {
         return getSortedBeansWithCondition(beanFactory, type) { _, _, definition ->
             val beanType = Class.forName(definition.beanClassName)
@@ -90,12 +97,13 @@ object BeanUtils {
     fun <T> getBeansWithCondition(
         beanFactory: ListableBeanFactory,
         type: Class<T>,
-        condition: (String, ListableBeanFactory) -> Boolean
+        condition: (String, ListableBeanFactory) -> Boolean,
     ): Map<String, T> {
-        val factory = when (beanFactory) {
-            is ApplicationContext -> beanFactory.autowireCapableBeanFactory
-            else -> beanFactory
-        }
+        val factory =
+            when (beanFactory) {
+                is ApplicationContext -> beanFactory.autowireCapableBeanFactory
+                else -> beanFactory
+            }
 
         if (factory is ConfigurableListableBeanFactory) {
             return getSortedBeansWithCondition(factory, type) { name, _, _ ->
@@ -118,7 +126,7 @@ object BeanUtils {
     fun <T> getSortedBeansWithCondition(
         beanFactory: ConfigurableListableBeanFactory,
         type: Class<T>,
-        condition: (String, ConfigurableBeanFactory, BeanDefinition) -> Boolean
+        condition: (String, ConfigurableBeanFactory, BeanDefinition) -> Boolean,
     ): Map<String, T> {
         val names = beanFactory.getBeanNamesForType(type)
         val beans = mutableMapOf<String, BeanDefinition>()
@@ -143,7 +151,10 @@ private class BeanDefinitionOrderComparer(private val map: Map<String, BeanDefin
             Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor::class.java, "order")
     }
 
-    override fun compare(o1: String, o2: String): Int {
+    override fun compare(
+        o1: String,
+        o2: String,
+    ): Int {
         val order = getOrder(o1).compareTo(getOrder(o2))
         if (order != 0) return order
         return o1.compareTo(o2)

@@ -10,11 +10,17 @@ import org.jooq.Field
 import java.util.concurrent.TimeUnit
 
 open class FilterStandardLibrary {
-    fun and(left: SqlFilterPart, right: SqlFilterPart): SqlFilterPart {
+    fun and(
+        left: SqlFilterPart,
+        right: SqlFilterPart,
+    ): SqlFilterPart {
         return left.and(right)
     }
 
-    fun or(left: SqlFilterPart, right: SqlFilterPart): SqlFilterPart {
+    fun or(
+        left: SqlFilterPart,
+        right: SqlFilterPart,
+    ): SqlFilterPart {
         return left.or(right)
     }
 
@@ -22,27 +28,45 @@ open class FilterStandardLibrary {
         return value.not()
     }
 
-    fun and(left: SqlFilterPart, right: Condition): SqlFilterPart {
+    fun and(
+        left: SqlFilterPart,
+        right: Condition,
+    ): SqlFilterPart {
         return left.and(right.filterPart())
     }
 
-    fun or(left: SqlFilterPart, right: Condition): SqlFilterPart {
+    fun or(
+        left: SqlFilterPart,
+        right: Condition,
+    ): SqlFilterPart {
         return left.or(right.filterPart())
     }
 
-    fun and(left: Condition, right: SqlFilterPart): SqlFilterPart {
+    fun and(
+        left: Condition,
+        right: SqlFilterPart,
+    ): SqlFilterPart {
         return left.filterPart().and(right)
     }
 
-    fun or(left: Condition, right: SqlFilterPart): SqlFilterPart {
+    fun or(
+        left: Condition,
+        right: SqlFilterPart,
+    ): SqlFilterPart {
         return left.filterPart().or(right)
     }
 
-    fun and(left: Condition, right: Condition): Condition {
+    fun and(
+        left: Condition,
+        right: Condition,
+    ): Condition {
         return left.and(right)
     }
 
-    fun or(left: Condition, right: Condition): Condition {
+    fun or(
+        left: Condition,
+        right: Condition,
+    ): Condition {
         return left.or(right)
     }
 
@@ -50,57 +74,96 @@ open class FilterStandardLibrary {
         return value.not()
     }
 
-    fun lessOrEquals(left: Field<*>, right: Any?): Condition {
+    fun lessOrEquals(
+        left: Field<*>,
+        right: Any?,
+    ): Condition {
         return (left as Field<Any>).le(databaseValueMapping(right))
     }
 
-    fun lessOrEquals(left: FieldHandle, right: Any?): Condition {
+    fun lessOrEquals(
+        left: FieldHandle,
+        right: Any?,
+    ): Condition {
         return lessOrEquals(left.field(), left.valueConverter().invoke(right) ?: right)
     }
 
-    fun lessThan(left: Field<*>, right: Any?): Condition {
+    fun lessThan(
+        left: Field<*>,
+        right: Any?,
+    ): Condition {
         return (left as Field<Any>).lt(databaseValueMapping(right))
     }
 
-    fun lessThan(left: FieldHandle, right: Any?): Condition {
+    fun lessThan(
+        left: FieldHandle,
+        right: Any?,
+    ): Condition {
         return lessThan(left.field(), left.valueConverter().invoke(right) ?: right)
     }
 
-    fun greaterOrEqual(left: Field<*>, right: Any?): Condition {
+    fun greaterOrEqual(
+        left: Field<*>,
+        right: Any?,
+    ): Condition {
         return (left as Field<Any>).ge(databaseValueMapping(right))
     }
 
-    fun greaterOrEqual(left: FieldHandle, right: Any?): Condition {
+    fun greaterOrEqual(
+        left: FieldHandle,
+        right: Any?,
+    ): Condition {
         return greaterOrEqual(left.field(), left.valueConverter().invoke(right) ?: right)
     }
 
-    fun greaterThan(left: Field<*>, right: Any?): Condition {
+    fun greaterThan(
+        left: Field<*>,
+        right: Any?,
+    ): Condition {
         return (left as Field<Any>).gt(databaseValueMapping(right))
     }
 
-    fun greaterThan(left: FieldHandle, right: Any?): Condition {
+    fun greaterThan(
+        left: FieldHandle,
+        right: Any?,
+    ): Condition {
         return greaterThan(left.field(), left.valueConverter().invoke(right) ?: right)
     }
 
-    fun equals(left: Field<*>, right: Any?): Condition {
+    fun equals(
+        left: Field<*>,
+        right: Any?,
+    ): Condition {
         right ?: return left.isNull
         return (left as Field<Any>).eq(databaseValueMapping(right))
     }
 
-    fun equals(left: FieldHandle, right: Any?): Condition {
+    fun equals(
+        left: FieldHandle,
+        right: Any?,
+    ): Condition {
         return equals(left.field(), left.valueConverter().invoke(right) ?: right)
     }
 
-    fun notEquals(left: Field<*>, right: Any?): Condition {
+    fun notEquals(
+        left: Field<*>,
+        right: Any?,
+    ): Condition {
         right ?: return left.isNotNull
         return (left as Field<Any>).notEqual(databaseValueMapping(right))
     }
 
-    fun notEquals(left: FieldHandle, right: Any?): Condition {
+    fun notEquals(
+        left: FieldHandle,
+        right: Any?,
+    ): Condition {
         return notEquals(left.field(), left.valueConverter().invoke(right) ?: right)
     }
 
-    fun has(left: Field<*>, right: Any?): Condition {
+    fun has(
+        left: Field<*>,
+        right: Any?,
+    ): Condition {
         val mapped = databaseValueMapping(right)
         if (mapped == "*") return left.isNotNull
         return when (mapped) {
@@ -118,7 +181,10 @@ open class FilterStandardLibrary {
         }
     }
 
-    fun has(left: FieldHandle, right: Any): Condition {
+    fun has(
+        left: FieldHandle,
+        right: Any,
+    ): Condition {
         return has(left.field(), left.valueConverter().invoke(right) ?: right)
     }
 

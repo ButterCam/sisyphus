@@ -23,5 +23,5 @@ annotation class RetrofitClient(
     val converterFactory: Array<KClass<out Converter.Factory>> = [JacksonConverterFactory::class],
     val builderInterceptors: Array<KClass<out RetrofitBuilderInterceptor>> = [],
     val clientBuilderInterceptors: Array<KClass<out OkHttpClientBuilderInterceptor>> = [],
-    val enableCircuitBreaker: Boolean = true
+    val enableCircuitBreaker: Boolean = true,
 )

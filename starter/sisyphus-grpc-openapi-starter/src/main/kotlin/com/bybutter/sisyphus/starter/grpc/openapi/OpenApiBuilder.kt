@@ -68,10 +68,11 @@ fun openApi(init: OpenApiBuilder.() -> Unit): OpenAPI {
 }
 
 class OpenApiBuilder {
-    private val openApi = OpenAPI().apply {
-        paths = Paths()
-        components = Components()
-    }
+    private val openApi =
+        OpenAPI().apply {
+            paths = Paths()
+            components = Components()
+        }
     private val handledFiles = mutableSetOf<String>()
 
     fun addService(service: ServerServiceDefinition): OpenApiBuilder {
@@ -84,140 +85,159 @@ class OpenApiBuilder {
         return this
     }
 
-    private fun addMethod(method: MethodDescriptorProto, service: ServiceSupport) {
+    private fun addMethod(
+        method: MethodDescriptorProto,
+        service: ServiceSupport,
+    ) {
         val http = method.options?.http ?: return
-        val elementPath = service.path() + listOf(
-            ServiceDescriptorProto.METHOD_FIELD_NUMBER,
-            service.descriptor.method.indexOf(method)
-        )
-        val (kind, path) = when (val pattern = http.pattern) {
-            is HttpRule.Pattern.Custom -> pattern.value.kind.lowercase() to pattern.value.path
-            is HttpRule.Pattern.Delete -> "delete" to pattern.value
-            is HttpRule.Pattern.Get -> "get" to pattern.value
-            is HttpRule.Pattern.Patch -> "patch" to pattern.value
-            is HttpRule.Pattern.Post -> "post" to pattern.value
-            is HttpRule.Pattern.Put -> "put" to pattern.value
-            else -> return
-        }
+        val elementPath =
+            service.path() +
+                listOf(
+                    ServiceDescriptorProto.METHOD_FIELD_NUMBER,
+                    service.descriptor.method.indexOf(method),
+                )
+        val (kind, path) =
+            when (val pattern = http.pattern) {
+                is HttpRule.Pattern.Custom -> pattern.value.kind.lowercase() to pattern.value.path
+                is HttpRule.Pattern.Delete -> "delete" to pattern.value
+                is HttpRule.Pattern.Get -> "get" to pattern.value
+                is HttpRule.Pattern.Patch -> "patch" to pattern.value
+                is HttpRule.Pattern.Post -> "post" to pattern.value
+                is HttpRule.Pattern.Put -> "put" to pattern.value
+                else -> return
+            }
         val (url, action) = path.substringBefore(':') to path.substringAfter(':', "")
         val template = PathTemplate.create(url)
         val inputType = ProtoTypes.findMessageSupport(method.inputType)
         val outputType = ProtoTypes.findMessageSupport(method.outputType)
         val parameters = mutableListOf<Parameter>()
-        val normalized = buildString {
-            template.withoutVars().toString().split('/').forEach {
-                when (it) {
-                    "" -> return@forEach
-                    "*", "**" -> {
-                        val varName = "var${parameters.size + 1}"
-                        val part = "/{$varName}"
-                        append(part)
-                        parameters.add(
-                            Parameter().apply {
-                                this.name = varName
-                                this.`in` = "path"
-                                this.description = "Path variable `$varName`"
-                                this.required = true
-                                this.allowReserved = it == "**"
-                            }
-                        )
-                    }
+        val normalized =
+            buildString {
+                template.withoutVars().toString().split('/').forEach {
+                    when (it) {
+                        "" -> return@forEach
+                        "*", "**" -> {
+                            val varName = "var${parameters.size + 1}"
+                            val part = "/{$varName}"
+                            append(part)
+                            parameters.add(
+                                Parameter().apply {
+                                    this.name = varName
+                                    this.`in` = "path"
+                                    this.description = "Path variable `$varName`"
+                                    this.required = true
+                                    this.allowReserved = it == "**"
+                                },
+                            )
+                        }
 
-                    else -> {
-                        append("/$it")
+                        else -> {
+                            append("/$it")
+                        }
                     }
                 }
+                if (this.isBlank()) {
+                    append("/")
+                }
+                if (action.isNotBlank()) {
+                    append(":$action")
+                }
             }
-            if (this.isBlank()) {
-                append("/")
-            }
-            if (action.isNotBlank()) {
-                append(":$action")
-            }
-        }
         val comment = getComment(elementPath, service.file()) ?: ""
         val (summary, description) = extractSummary(comment)
 
-        val pathItem = openApi.paths[normalized] ?: PathItem().also {
-            openApi.paths.addPathItem(normalized, it)
-        }
+        val pathItem =
+            openApi.paths[normalized] ?: PathItem().also {
+                openApi.paths.addPathItem(normalized, it)
+            }
         val serviceName = service.name.trim('.')
-        val operation = Operation().apply {
-            this.tags = listOf(serviceName)
-            this.summary = summary ?: method.name
-            this.description = description
-            this.operationId = "$serviceName/${method.name}"
-            this.deprecated = method.options?.deprecated
-            val bodyMediaType = when (http.body) {
-                "" -> {
-                    parameters += queryParameters(template, null, inputType)
-                    null
-                }
+        val operation =
+            Operation().apply {
+                this.tags = listOf(serviceName)
+                this.summary = summary ?: method.name
+                this.description = description
+                this.operationId = "$serviceName/${method.name}"
+                this.deprecated = method.options?.deprecated
+                val bodyMediaType =
+                    when (http.body) {
+                        "" -> {
+                            parameters += queryParameters(template, null, inputType)
+                            null
+                        }
 
-                "*" -> MediaType().apply {
-                    this.schema = ObjectSchema().apply {
-                        this.`$ref` = ref(inputType.name)
-                    }
-                }
+                        "*" ->
+                            MediaType().apply {
+                                this.schema =
+                                    ObjectSchema().apply {
+                                        this.`$ref` = ref(inputType.name)
+                                    }
+                            }
 
-                else -> {
-                    val field = inputType.fieldInfo(http.body) ?: return
-                    parameters += queryParameters(template, field, inputType)
-                    MediaType().apply {
-                        this.schema = field.toSchema()
-                    }
-                }
-            }
-            this.requestBody = bodyMediaType?.let {
-                RequestBody().apply {
-                    this.required = true
-                    this.content = Content().apply {
-                        addMediaType("application/json", it)
-                        addMediaType("multipart/form-data", it)
-                        addMediaType("application/x-www-form-urlencoded", it)
-                    }
-                }
-            }
-            val responseBodyMediaType = when (http.responseBody) {
-                "", "*" -> MediaType().apply {
-                    this.schema = ObjectSchema().apply {
-                        this.`$ref` = ref(outputType.name)
-                    }
-                }
-
-                else -> {
-                    val field = outputType.fieldInfo(http.responseBody) ?: return
-                    MediaType().apply {
-                        this.schema = field.toSchema()
-                    }
-                }
-            }
-            this.responses = ApiResponses().apply {
-                this.addApiResponse(
-                    "2XX",
-                    ApiResponse().apply {
-                        this.content = Content().apply {
-                            addMediaType("application/json", responseBodyMediaType)
+                        else -> {
+                            val field = inputType.fieldInfo(http.body) ?: return
+                            parameters += queryParameters(template, field, inputType)
+                            MediaType().apply {
+                                this.schema = field.toSchema()
+                            }
                         }
                     }
-                )
-                this.addApiResponse(
-                    "4XX",
-                    ApiResponse().apply {
-                        this.`$ref` = "#/components/responses/ClientError"
+                this.requestBody =
+                    bodyMediaType?.let {
+                        RequestBody().apply {
+                            this.required = true
+                            this.content =
+                                Content().apply {
+                                    addMediaType("application/json", it)
+                                    addMediaType("multipart/form-data", it)
+                                    addMediaType("application/x-www-form-urlencoded", it)
+                                }
+                        }
                     }
-                )
-                this.addApiResponse(
-                    "5XX",
-                    ApiResponse().apply {
-                        this.`$ref` = "#/components/responses/ServerError"
+                val responseBodyMediaType =
+                    when (http.responseBody) {
+                        "", "*" ->
+                            MediaType().apply {
+                                this.schema =
+                                    ObjectSchema().apply {
+                                        this.`$ref` = ref(outputType.name)
+                                    }
+                            }
+
+                        else -> {
+                            val field = outputType.fieldInfo(http.responseBody) ?: return
+                            MediaType().apply {
+                                this.schema = field.toSchema()
+                            }
+                        }
                     }
-                )
+                this.responses =
+                    ApiResponses().apply {
+                        this.addApiResponse(
+                            "2XX",
+                            ApiResponse().apply {
+                                this.content =
+                                    Content().apply {
+                                        addMediaType("application/json", responseBodyMediaType)
+                                    }
+                            },
+                        )
+                        this.addApiResponse(
+                            "4XX",
+                            ApiResponse().apply {
+                                this.`$ref` = "#/components/responses/ClientError"
+                            },
+                        )
+                        this.addApiResponse(
+                            "5XX",
+                            ApiResponse().apply {
+                                this.`$ref` = "#/components/responses/ServerError"
+                            },
+                        )
+                    }
+                parameters.forEach {
+                    this.addParametersItem(it)
+                }
             }
-            parameters.forEach {
-                this.addParametersItem(it)
-            }
-        }
         when (kind) {
             "get" -> pathItem.get = operation
             "put" -> pathItem.put = operation
@@ -233,11 +253,11 @@ class OpenApiBuilder {
     private fun queryParameters(
         path: PathTemplate,
         body: FieldDescriptorProto?,
-        inputType: MessageSupport<*, *>
+        inputType: MessageSupport<*, *>,
     ): List<Parameter> {
         val pathParameters = path.vars()
         val inputTypePath = inputType.path()
-        return inputType.descriptor.field.mapIndexedNotNull() { index, it ->
+        return inputType.descriptor.field.mapIndexedNotNull { index, it ->
             if (it == body) return@mapIndexedNotNull null
             if (it.name in pathParameters || it.jsonName in pathParameters) return@mapIndexedNotNull null
             val fieldPath = inputTypePath + listOf(DescriptorProto.FIELD_FIELD_NUMBER, index)
@@ -256,18 +276,20 @@ class OpenApiBuilder {
         file.children().forEach {
             when (it) {
                 is MessageSupport<*, *> -> {
-                    val path = listOf(
-                        FileDescriptorProto.MESSAGE_TYPE_FIELD_NUMBER,
-                        file.descriptor.messageType.indexOf(it.descriptor)
-                    )
+                    val path =
+                        listOf(
+                            FileDescriptorProto.MESSAGE_TYPE_FIELD_NUMBER,
+                            file.descriptor.messageType.indexOf(it.descriptor),
+                        )
                     addMessage(path, it)
                 }
 
                 is EnumSupport<*> -> {
-                    val path = listOf(
-                        FileDescriptorProto.ENUM_TYPE_FIELD_NUMBER,
-                        file.descriptor.enumType.indexOf(it.descriptor)
-                    )
+                    val path =
+                        listOf(
+                            FileDescriptorProto.ENUM_TYPE_FIELD_NUMBER,
+                            file.descriptor.enumType.indexOf(it.descriptor),
+                        )
                     addEnum(path, it)
                 }
             }
@@ -278,46 +300,57 @@ class OpenApiBuilder {
         }
     }
 
-    private fun addMessage(path: List<Int>, message: MessageSupport<*, *>) {
+    private fun addMessage(
+        path: List<Int>,
+        message: MessageSupport<*, *>,
+    ) {
         val comment = getComment(path, message.file())
-        val schema = when (message.name) {
-            com.bybutter.sisyphus.protobuf.primitives.Any.name -> ObjectSchema().apply {
-                this.addProperty("@type", StringSchema().example("types.googleapis.com/${message.name.trim('.')}"))
-            }
+        val schema =
+            when (message.name) {
+                com.bybutter.sisyphus.protobuf.primitives.Any.name ->
+                    ObjectSchema().apply {
+                        this.addProperty(
+                            "@type",
+                            StringSchema().example("types.googleapis.com/${message.name.trim('.')}"),
+                        )
+                    }
 
-            FieldMask.name -> StringSchema().example("*")
-            Timestamp.name -> DateTimeSchema().example(Timestamp.now().string())
-            Duration.name -> StringSchema().example(Duration.invoke(100).string())
-            Struct.name -> ObjectSchema()
-            Value.name -> JsonSchema()
-            ListValue.name -> ArraySchema()
-            DoubleValue.name -> NumberSchema().format("double").example(1.0)
-            FloatValue.name -> NumberSchema().format("float").example(1.0)
-            Int64Value.name, UInt64Value.name -> NumberSchema().format("int64").example(0)
+                FieldMask.name -> StringSchema().example("*")
+                Timestamp.name -> DateTimeSchema().example(Timestamp.now().string())
+                Duration.name -> StringSchema().example(Duration.invoke(100).string())
+                Struct.name -> ObjectSchema()
+                Value.name -> JsonSchema()
+                ListValue.name -> ArraySchema()
+                DoubleValue.name -> NumberSchema().format("double").example(1.0)
+                FloatValue.name -> NumberSchema().format("float").example(1.0)
+                Int64Value.name, UInt64Value.name -> NumberSchema().format("int64").example(0)
 
-            Int32Value.name, UInt32Value.name -> NumberSchema().format("int32").example(0)
+                Int32Value.name, UInt32Value.name -> NumberSchema().format("int32").example(0)
 
-            BoolValue.name -> BooleanSchema()
-            StringValue.name -> StringSchema()
-            BytesValue.name -> BinarySchema().format("base64")
-            ListValue.name -> ArraySchema()
-            else -> ObjectSchema().apply {
-                message.descriptor.field.forEach {
-                    val fieldPath = path + listOf(
-                        DescriptorProto.FIELD_FIELD_NUMBER,
-                        message.descriptor.field.indexOf(it)
-                    )
-                    this.addProperty(
-                        it.jsonName,
-                        Schema<Any>().apply {
-                            this.description = getComment(fieldPath, message.file())
-                            this.deprecated = it.options?.deprecated
-                            this.addAllOfItem(it.toSchema())
+                BoolValue.name -> BooleanSchema()
+                StringValue.name -> StringSchema()
+                BytesValue.name -> BinarySchema().format("base64")
+                ListValue.name -> ArraySchema()
+                else ->
+                    ObjectSchema().apply {
+                        message.descriptor.field.forEach {
+                            val fieldPath =
+                                path +
+                                    listOf(
+                                        DescriptorProto.FIELD_FIELD_NUMBER,
+                                        message.descriptor.field.indexOf(it),
+                                    )
+                            this.addProperty(
+                                it.jsonName,
+                                Schema<Any>().apply {
+                                    this.description = getComment(fieldPath, message.file())
+                                    this.deprecated = it.options?.deprecated
+                                    this.addAllOfItem(it.toSchema())
+                                },
+                            )
                         }
-                    )
-                }
+                    }
             }
-        }
 
         openApi.components.addSchemas(
             message.name.trim('.'),
@@ -325,24 +358,28 @@ class OpenApiBuilder {
                 this.name = message.descriptor.name
                 this.description = comment
                 this.deprecated = message.descriptor.options?.deprecated
-            }
+            },
         )
 
         message.children().forEach {
             when (it) {
                 is MessageSupport<*, *> -> {
-                    val childPath = path + listOf(
-                        DescriptorProto.NESTED_TYPE_FIELD_NUMBER,
-                        message.descriptor.nestedType.indexOf(it.descriptor)
-                    )
+                    val childPath =
+                        path +
+                            listOf(
+                                DescriptorProto.NESTED_TYPE_FIELD_NUMBER,
+                                message.descriptor.nestedType.indexOf(it.descriptor),
+                            )
                     addMessage(childPath, it)
                 }
 
                 is EnumSupport<*> -> {
-                    val childPath = path + listOf(
-                        DescriptorProto.ENUM_TYPE_FIELD_NUMBER,
-                        message.descriptor.enumType.indexOf(it.descriptor)
-                    )
+                    val childPath =
+                        path +
+                            listOf(
+                                DescriptorProto.ENUM_TYPE_FIELD_NUMBER,
+                                message.descriptor.enumType.indexOf(it.descriptor),
+                            )
                     addEnum(childPath, it)
                 }
             }
@@ -354,17 +391,23 @@ class OpenApiBuilder {
         }
     }
 
-    private fun addMap(message: MessageSupport<*, *>, entry: DescriptorProto) {
+    private fun addMap(
+        message: MessageSupport<*, *>,
+        entry: DescriptorProto,
+    ) {
         openApi.components.addSchemas(
             "${message.name.trim('.')}.${entry.name}-MAP",
             ObjectSchema().apply {
                 this.name = entry.name.plural()
                 this.additionalProperties = entry.field[1].toSchema()
-            }
+            },
         )
     }
 
-    private fun addEnum(path: List<Int>, enum: EnumSupport<*>) {
+    private fun addEnum(
+        path: List<Int>,
+        enum: EnumSupport<*>,
+    ) {
         val comment = getComment(path, enum.file())
         openApi.components.addSchemas(
             enum.name.trim('.'),
@@ -374,7 +417,7 @@ class OpenApiBuilder {
                 enum.descriptor.value.forEach {
                     this.addEnumItem(it.name)
                 }
-            }
+            },
         )
     }
 
@@ -388,7 +431,7 @@ class OpenApiBuilder {
     private fun ServiceSupport.path(): List<Int> {
         return listOf(
             FileDescriptorProto.SERVICE_FIELD_NUMBER,
-            this.file().descriptor.service.indexOf(this.descriptor)
+            this.file().descriptor.service.indexOf(this.descriptor),
         )
     }
 
@@ -397,15 +440,16 @@ class OpenApiBuilder {
             is FileSupport -> {
                 return listOf(
                     FileDescriptorProto.MESSAGE_TYPE_FIELD_NUMBER,
-                    parent.descriptor.messageType.indexOf(this.descriptor)
+                    parent.descriptor.messageType.indexOf(this.descriptor),
                 )
             }
 
             is MessageSupport<*, *> -> {
-                return parent.path() + listOf(
-                    DescriptorProto.NESTED_TYPE_FIELD_NUMBER,
-                    parent.descriptor.nestedType.indexOf(this.descriptor)
-                )
+                return parent.path() +
+                    listOf(
+                        DescriptorProto.NESTED_TYPE_FIELD_NUMBER,
+                        parent.descriptor.nestedType.indexOf(this.descriptor),
+                    )
             }
 
             else -> throw IllegalStateException()
@@ -414,11 +458,12 @@ class OpenApiBuilder {
 
     private fun MessageSupport<*, *>.resolveField(field: String): Pair<MessageSupport<*, *>, FieldDescriptorProto>? {
         val fields = field.split('.', limit = 2)
-        val fieldInfo = if (this.descriptor.options?.mapEntry == true) {
-            this.fieldInfo("value")
-        } else {
-            this.fieldInfo(fields[0])
-        } ?: return null
+        val fieldInfo =
+            if (this.descriptor.options?.mapEntry == true) {
+                this.fieldInfo("value")
+            } else {
+                this.fieldInfo(fields[0])
+            } ?: return null
 
         if (fields.size == 1) {
             return this to fieldInfo
@@ -429,10 +474,14 @@ class OpenApiBuilder {
         return target.resolveField(fields[1])
     }
 
-    private fun getComment(path: List<Int>, file: FileSupport): String? {
-        val location = file.descriptor.sourceCodeInfo?.location?.firstOrNull { location ->
-            location.path.contentEquals(path)
-        }
+    private fun getComment(
+        path: List<Int>,
+        file: FileSupport,
+    ): String? {
+        val location =
+            file.descriptor.sourceCodeInfo?.location?.firstOrNull { location ->
+                location.path.contentEquals(path)
+            }
         location ?: return null
         return listOf(location.leadingComments, location.trailingComments).filter { it.isNotBlank() }
             .joinToString("\n\n").replace(regex, "").trim()
@@ -461,34 +510,47 @@ class OpenApiBuilder {
     }
 
     private fun FieldDescriptorProto.toSchema(): Schema<*> {
-        val schema = when (type) {
-            FieldDescriptorProto.Type.INT32, FieldDescriptorProto.Type.SINT32, FieldDescriptorProto.Type.UINT32, FieldDescriptorProto.Type.FIXED32, FieldDescriptorProto.Type.SFIXED32 -> IntegerSchema().format(
-                "int32"
-            )
+        val schema =
+            when (type) {
+                FieldDescriptorProto.Type.INT32,
+                FieldDescriptorProto.Type.SINT32,
+                FieldDescriptorProto.Type.UINT32,
+                FieldDescriptorProto.Type.FIXED32,
+                FieldDescriptorProto.Type.SFIXED32,
+                ->
+                    IntegerSchema().format(
+                        "int32",
+                    )
 
-            FieldDescriptorProto.Type.INT64, FieldDescriptorProto.Type.SINT64, FieldDescriptorProto.Type.UINT64, FieldDescriptorProto.Type.FIXED64, FieldDescriptorProto.Type.SFIXED64 -> IntegerSchema().format(
-                "int64"
-            )
+                FieldDescriptorProto.Type.INT64,
+                FieldDescriptorProto.Type.SINT64,
+                FieldDescriptorProto.Type.UINT64,
+                FieldDescriptorProto.Type.FIXED64,
+                FieldDescriptorProto.Type.SFIXED64,
+                ->
+                    IntegerSchema().format(
+                        "int64",
+                    )
 
-            FieldDescriptorProto.Type.STRING -> StringSchema()
-            FieldDescriptorProto.Type.BYTES -> BinarySchema().contentEncoding("base64")
-            FieldDescriptorProto.Type.DOUBLE -> NumberSchema().format("double")
-            FieldDescriptorProto.Type.FLOAT -> NumberSchema().format("float")
-            FieldDescriptorProto.Type.BOOL -> BooleanSchema()
-            FieldDescriptorProto.Type.ENUM -> {
-                Schema<Any>().apply {
-                    this.`$ref` = ref(typeName)
+                FieldDescriptorProto.Type.STRING -> StringSchema()
+                FieldDescriptorProto.Type.BYTES -> BinarySchema().contentEncoding("base64")
+                FieldDescriptorProto.Type.DOUBLE -> NumberSchema().format("double")
+                FieldDescriptorProto.Type.FLOAT -> NumberSchema().format("float")
+                FieldDescriptorProto.Type.BOOL -> BooleanSchema()
+                FieldDescriptorProto.Type.ENUM -> {
+                    Schema<Any>().apply {
+                        this.`$ref` = ref(typeName)
+                    }
                 }
-            }
 
-            FieldDescriptorProto.Type.MESSAGE -> {
-                Schema<Any>().apply {
-                    this.`$ref` = ref(typeName)
+                FieldDescriptorProto.Type.MESSAGE -> {
+                    Schema<Any>().apply {
+                        this.`$ref` = ref(typeName)
+                    }
                 }
-            }
 
-            FieldDescriptorProto.Type.GROUP -> TODO()
-        }
+                FieldDescriptorProto.Type.GROUP -> TODO()
+            }
 
         return when (this.label) {
             FieldDescriptorProto.Label.REPEATED -> {
@@ -515,32 +577,36 @@ class OpenApiBuilder {
         openApi.components.addResponses(
             "ClientError",
             ApiResponse().apply {
-                this.content = Content().apply {
-                    addMediaType(
-                        "application/json",
-                        MediaType().apply {
-                            this.schema = ObjectSchema().apply {
-                                this.`$ref` = ref(Status.name)
-                            }
-                        }
-                    )
-                }
-            }
+                this.content =
+                    Content().apply {
+                        addMediaType(
+                            "application/json",
+                            MediaType().apply {
+                                this.schema =
+                                    ObjectSchema().apply {
+                                        this.`$ref` = ref(Status.name)
+                                    }
+                            },
+                        )
+                    }
+            },
         )
         openApi.components.addResponses(
             "ServerError",
             ApiResponse().apply {
-                this.content = Content().apply {
-                    addMediaType(
-                        "application/json",
-                        MediaType().apply {
-                            this.schema = ObjectSchema().apply {
-                                this.`$ref` = ref(Status.name)
-                            }
-                        }
-                    )
-                }
-            }
+                this.content =
+                    Content().apply {
+                        addMediaType(
+                            "application/json",
+                            MediaType().apply {
+                                this.schema =
+                                    ObjectSchema().apply {
+                                        this.`$ref` = ref(Status.name)
+                                    }
+                            },
+                        )
+                    }
+            },
         )
         return openApi
     }

@@ -9,24 +9,25 @@ data class SisyphusProperty(
     @NestedConfigurationProperty
     val dependency: TargetRepositorySetting = TargetRepositorySetting(),
     @NestedConfigurationProperty
-    val config: SisyphusConfigArtifacts = SisyphusConfigArtifacts()
+    val config: SisyphusConfigArtifacts = SisyphusConfigArtifacts(),
 )
 
 data class TargetRepositorySetting(
-    val repositories: List<String> = listOf(
-        "local",
-        "central",
-        "portal",
-        "google"
-    )
+    val repositories: List<String> =
+        listOf(
+            "local",
+            "central",
+            "portal",
+            "google",
+        ),
 )
 
 data class Repository(
     val url: String,
     val username: String? = null,
-    val password: String? = null
+    val password: String? = null,
 )
 
 data class SisyphusConfigArtifacts(
-    val artifacts: List<String> = listOf()
+    val artifacts: List<String> = listOf(),
 )

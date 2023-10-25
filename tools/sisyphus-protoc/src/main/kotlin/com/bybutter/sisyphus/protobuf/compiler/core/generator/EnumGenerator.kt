@@ -38,7 +38,7 @@ class EnumApiGenerator : GroupedGenerator<ApiFileGeneratingState> {
             state.target.addType(
                 kEnum(enum.name()) {
                     EnumGeneratingState(state, enum, this).advance()
-                }
+                },
             )
         }
 
@@ -52,7 +52,7 @@ class NestedEnumGenerator : GroupedGenerator<MessageInterfaceGeneratingState> {
             state.target.addType(
                 kEnum(enum.name()) {
                     EnumGeneratingState(state, enum, this).advance()
-                }
+                },
             )
         }
 
@@ -66,7 +66,7 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
             addAnnotation(
                 AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION)
                     .addMember("%S", state.descriptor.fullProtoName())
-                    .build()
+                    .build(),
             )
 
             this implements RuntimeTypes.PROTO_ENUM.parameterizedBy(state.descriptor.className())
@@ -104,7 +104,7 @@ class EnumBasicGenerator : GroupedGenerator<EnumGeneratingState> {
                         .addKdoc(value.document())
                         .addSuperclassConstructorParameter("%L", value.descriptor.number)
                         .addSuperclassConstructorParameter("%S", value.descriptor.name)
-                        .build()
+                        .build(),
                 )
             }
         }
@@ -118,7 +118,7 @@ class EnumSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
             state.target.addType(
                 kClass(enum.supportName()) {
                     EnumSupportGeneratingState(state, enum, this).advance()
-                }
+                },
             )
         }
         return true
@@ -131,7 +131,7 @@ class NestedEnumSupportGenerator : GroupedGenerator<MessageSupportGeneratingStat
             state.target.addType(
                 kClass(enum.supportName()) {
                     EnumSupportGeneratingState(state, enum, this).advance()
-                }
+                },
             )
         }
         return true
@@ -189,19 +189,19 @@ class EnumSupportBasicGenerator : GroupedGenerator<EnumSupportGeneratingState> {
                                 addStatement(
                                     "%T.descriptor.enumType.first{ it.name == %S }",
                                     parent.fileMetadataClassName(),
-                                    state.descriptor.descriptor.name
+                                    state.descriptor.descriptor.name,
                                 )
                             }
                             is MessageDescriptor -> {
                                 addStatement(
                                     "%T.descriptor.enumType.first{ it.name == %S }",
                                     parent.className(),
-                                    state.descriptor.descriptor.name
+                                    state.descriptor.descriptor.name,
                                 )
                             }
                         }
                         endControlFlow()
-                    }
+                    },
                 )
             }
         }

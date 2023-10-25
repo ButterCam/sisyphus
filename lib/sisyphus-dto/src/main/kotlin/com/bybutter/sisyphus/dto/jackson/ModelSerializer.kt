@@ -18,23 +18,23 @@ internal class ModelSerializer : BeanSerializerBase {
     constructor(source: ModelSerializer, objectIdWriter: ObjectIdWriter, filterId: Any?) : super(
         source,
         objectIdWriter,
-        filterId
+        filterId,
     )
 
     constructor(
         source: ModelSerializer,
         properties: Array<out BeanPropertyWriter>?,
-        filteredProperties: Array<out BeanPropertyWriter>?
+        filteredProperties: Array<out BeanPropertyWriter>?,
     ) : super(
         source,
         properties,
-        filteredProperties
+        filteredProperties,
     )
 
     constructor(source: ModelSerializer, toIgnore: MutableSet<String>?, toInclude: MutableSet<String>?) : super(
         source,
         toIgnore,
-        toInclude
+        toInclude,
     )
 
     override fun withObjectIdWriter(objectIdWriter: ObjectIdWriter): BeanSerializerBase {
@@ -47,7 +47,7 @@ internal class ModelSerializer : BeanSerializerBase {
 
     override fun withByNameInclusion(
         toIgnore: MutableSet<String>?,
-        toInclude: MutableSet<String>?
+        toInclude: MutableSet<String>?,
     ): BeanSerializerBase {
         return ModelSerializer(this, toIgnore, toInclude)
     }
@@ -58,7 +58,7 @@ internal class ModelSerializer : BeanSerializerBase {
 
     override fun withProperties(
         properties: Array<out BeanPropertyWriter>?,
-        filteredProperties: Array<out BeanPropertyWriter>?
+        filteredProperties: Array<out BeanPropertyWriter>?,
     ): BeanSerializerBase {
         return ModelSerializer(this, properties, filteredProperties)
     }
@@ -67,7 +67,11 @@ internal class ModelSerializer : BeanSerializerBase {
         return ModelSerializer(this, _objectIdWriter, filterId)
     }
 
-    override fun serialize(bean: Any, gen: JsonGenerator, provider: SerializerProvider) {
+    override fun serialize(
+        bean: Any,
+        gen: JsonGenerator,
+        provider: SerializerProvider,
+    ) {
         gen.currentValue = bean
 
         gen.writeStartObject()
@@ -75,17 +79,29 @@ internal class ModelSerializer : BeanSerializerBase {
         gen.writeEndObject()
     }
 
-    override fun serializeFields(bean: Any, gen: JsonGenerator, provider: SerializerProvider?) {
+    override fun serializeFields(
+        bean: Any,
+        gen: JsonGenerator,
+        provider: SerializerProvider?,
+    ) {
         serializeTypeInfo(bean, gen, provider)
         super.serializeFields(bean, gen, provider)
     }
 
-    override fun serializeFieldsFiltered(bean: Any, gen: JsonGenerator, provider: SerializerProvider?) {
+    override fun serializeFieldsFiltered(
+        bean: Any,
+        gen: JsonGenerator,
+        provider: SerializerProvider?,
+    ) {
         serializeTypeInfo(bean, gen, provider)
         super.serializeFieldsFiltered(bean, gen, provider)
     }
 
-    private fun serializeTypeInfo(bean: Any, gen: JsonGenerator, provider: SerializerProvider?) {
+    private fun serializeTypeInfo(
+        bean: Any,
+        gen: JsonGenerator,
+        provider: SerializerProvider?,
+    ) {
         gen.currentValue = bean as DtoMeta
         val context = getParentContext(gen.outputContext)
 

@@ -7,5 +7,5 @@ import com.bybutter.sisyphus.protobuf.compiler.core.state.GeneratingState
 class ProtobufBoosterGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: FileDescriptor,
-    override val target: ProtobufBoosterContext
+    override val target: ProtobufBoosterContext,
 ) : ChildGeneratingState<FileDescriptor, ProtobufBoosterContext>

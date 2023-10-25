@@ -101,7 +101,10 @@ class URIBuilder {
         }
     }
 
-    fun setUserInfo(user: String, password: String): URIBuilder {
+    fun setUserInfo(
+        user: String,
+        password: String,
+    ): URIBuilder {
         return setUserInfo("${user.urlEncode()}:${password.urlEncode()}")
     }
 
@@ -132,11 +135,17 @@ class URIBuilder {
         return this
     }
 
-    fun appendQueryPart(key: String, vararg value: String): URIBuilder {
+    fun appendQueryPart(
+        key: String,
+        vararg value: String,
+    ): URIBuilder {
         return appendQueryPart(key, value.asSequence().asIterable())
     }
 
-    fun appendQueryPart(key: String, value: Iterable<String>): URIBuilder {
+    fun appendQueryPart(
+        key: String,
+        value: Iterable<String>,
+    ): URIBuilder {
         if (isOpaque) throw IllegalStateException("Opaque URI has no query.")
         queryMap.getOrPut(key) { mutableListOf() } += value.map { it.urlEncode() }
         return this
@@ -159,18 +168,19 @@ class URIBuilder {
     }
 
     private fun buildQuery(): String? {
-        val result = buildString {
-            for ((key, values) in queryMap) {
-                for (value in values) {
-                    if (this.isNotEmpty()) {
-                        append("&")
+        val result =
+            buildString {
+                for ((key, values) in queryMap) {
+                    for (value in values) {
+                        if (this.isNotEmpty()) {
+                            append("&")
+                        }
+                        append(key)
+                        append("=")
+                        append(value)
                     }
-                    append(key)
-                    append("=")
-                    append(value)
                 }
             }
-        }
         return if (result.isEmpty()) null else result
     }
 
@@ -189,7 +199,7 @@ class URIBuilder {
                         append("#")
                         append(it)
                     }
-                }
+                },
             )
         } else {
             URI(
@@ -213,7 +223,7 @@ class URIBuilder {
                         append("#")
                         append(it)
                     }
-                }
+                },
             )
         }
     }

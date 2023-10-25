@@ -9,10 +9,10 @@ data class GrpcChannelProperty(
     val services: Set<Class<*>>,
     val tls: Boolean = false,
     val options: CallOptions = CallOptions.DEFAULT,
-    val extensions: Map<String, Any> = mapOf()
+    val extensions: Map<String, Any> = mapOf(),
 )
 
 data class GrpcChannelProperties(
     @NestedConfigurationProperty
-    val grpc: Map<String, GrpcChannelProperty>
+    val grpc: Map<String, GrpcChannelProperty>,
 )

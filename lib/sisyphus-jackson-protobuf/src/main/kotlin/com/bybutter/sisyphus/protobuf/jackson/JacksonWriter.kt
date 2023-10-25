@@ -63,7 +63,7 @@ class JacksonWriter(private val gen: JsonGenerator) : JsonWriter {
             when (gen) {
                 is YAMLGenerator -> field.name
                 else -> field.jsonName
-            }
+            },
         )
     }
 

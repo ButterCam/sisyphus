@@ -63,7 +63,7 @@ class ExtensionSupportGenerator : GroupedGenerator<InternalFileGeneratingState> 
             state.target.addType(
                 kObject(extension.supportName()) {
                     ExtensionSupportGeneratingState(state, extension, this).advance()
-                }
+                },
             )
         }
         return true
@@ -76,7 +76,7 @@ class NestedExtensionSupportGenerator : GroupedGenerator<MessageSupportGeneratin
             state.target.addType(
                 kObject(extension.supportName()) {
                     ExtensionSupportGeneratingState(state, extension, this).advance()
-                }
+                },
             )
         }
         return true
@@ -85,51 +85,55 @@ class NestedExtensionSupportGenerator : GroupedGenerator<MessageSupportGeneratin
 
 class ExtensionDefinitionGenerator : GroupedGenerator<ExtensionGeneratingState> {
     override fun generate(state: ExtensionGeneratingState): Boolean {
-        val property = kProperty(state.descriptor.descriptor.jsonName, state.descriptor.fieldType()) {
-            receiver(state.descriptor.extendee().className())
-            addKdoc(state.descriptor.document())
-            if (state.descriptor.descriptor.options?.deprecated == true) {
-                annotation(Deprecated::class.asClassName()) {
-                    addMember("message = %S", "${state.descriptor.name()} has been marked as deprecated")
+        val property =
+            kProperty(state.descriptor.descriptor.jsonName, state.descriptor.fieldType()) {
+                receiver(state.descriptor.extendee().className())
+                addKdoc(state.descriptor.document())
+                if (state.descriptor.descriptor.options?.deprecated == true) {
+                    annotation(Deprecated::class.asClassName()) {
+                        addMember("message = %S", "${state.descriptor.name()} has been marked as deprecated")
+                    }
+                }
+                getter {
+                    addStatement("return this[${state.descriptor.descriptor.number}]")
                 }
             }
-            getter {
-                addStatement("return this[${state.descriptor.descriptor.number}]")
+
+        val hasFunc =
+            kFun(state.descriptor.hasFunction()) {
+                receiver(state.descriptor.extendee().className())
+                returns(Boolean::class)
+                addStatement("return this.has(${state.descriptor.descriptor.number})")
             }
-        }
 
-        val hasFunc = kFun(state.descriptor.hasFunction()) {
-            receiver(state.descriptor.extendee().className())
-            returns(Boolean::class)
-            addStatement("return this.has(${state.descriptor.descriptor.number})")
-        }
-
-        val mutableProperty = kProperty(state.descriptor.descriptor.jsonName, state.descriptor.fieldType()) {
-            receiver(state.descriptor.extendee().mutableClassName())
-            mutable(true)
-            addKdoc(state.descriptor.document())
-            if (state.descriptor.descriptor.options?.deprecated == true) {
-                annotation(Deprecated::class.asClassName()) {
-                    addMember("message = %S", "${state.descriptor.name()} has been marked as deprecated")
+        val mutableProperty =
+            kProperty(state.descriptor.descriptor.jsonName, state.descriptor.fieldType()) {
+                receiver(state.descriptor.extendee().mutableClassName())
+                mutable(true)
+                addKdoc(state.descriptor.document())
+                if (state.descriptor.descriptor.options?.deprecated == true) {
+                    annotation(Deprecated::class.asClassName()) {
+                        addMember("message = %S", "${state.descriptor.name()} has been marked as deprecated")
+                    }
+                }
+                getter {
+                    addStatement("return this[${state.descriptor.descriptor.number}]")
+                }
+                setter {
+                    addParameter("value", state.descriptor.fieldType())
+                    addStatement("this[${state.descriptor.descriptor.number}] = value")
                 }
             }
-            getter {
-                addStatement("return this[${state.descriptor.descriptor.number}]")
-            }
-            setter {
-                addParameter("value", state.descriptor.fieldType())
-                addStatement("this[${state.descriptor.descriptor.number}] = value")
-            }
-        }
 
-        val clearFunc = kFun(state.descriptor.clearFunction()) {
-            receiver(state.descriptor.extendee().mutableClassName())
-            returns(state.descriptor.fieldType().copy(true))
-            addStatement(
-                "return this.clear(${state.descriptor.descriptor.number}) as %T",
-                state.descriptor.fieldType().copy(true)
-            )
-        }
+        val clearFunc =
+            kFun(state.descriptor.clearFunction()) {
+                receiver(state.descriptor.extendee().mutableClassName())
+                returns(state.descriptor.fieldType().copy(true))
+                addStatement(
+                    "return this.clear(${state.descriptor.descriptor.number}) as %T",
+                    state.descriptor.fieldType().copy(true),
+                )
+            }
 
         when (val target = state.target) {
             is FileSpec.Builder -> {
@@ -138,6 +142,7 @@ class ExtensionDefinitionGenerator : GroupedGenerator<ExtensionGeneratingState> 
                 target.addFunction(hasFunc)
                 target.addFunction(clearFunc)
             }
+
             is TypeSpec.Builder -> {
                 target.addProperty(property)
                 target.addProperty(mutableProperty)
@@ -168,16 +173,17 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                             addStatement(
                                 "return %S",
                                 "${
-                                state.descriptor.extendee().fullProtoName()
-                                }.${state.descriptor.descriptor.name}@${parent.fullProtoName()}"
+                                    state.descriptor.extendee().fullProtoName()
+                                }.${state.descriptor.descriptor.name}@${parent.fullProtoName()}",
                             )
                         }
+
                         is FileDescriptor -> {
                             addStatement(
                                 "return %S",
                                 "${
-                                state.descriptor.extendee().fullProtoName()
-                                }.${state.descriptor.descriptor.name}@${parent.descriptor.`package`}"
+                                    state.descriptor.extendee().fullProtoName()
+                                }.${state.descriptor.descriptor.name}@${parent.descriptor.`package`}",
                             )
                         }
                     }
@@ -193,6 +199,7 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                         }
                     }
                 }
+
                 is FileDescriptor -> {
                     property("parent", parent.fileMetadataClassName()) {
                         this += KModifier.OVERRIDE
@@ -210,13 +217,14 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                         is MessageDescriptor -> {
                             addStatement(
                                 "return %T.descriptor.extension.first { it.number == ${state.descriptor.descriptor.number} }",
-                                parent.className()
+                                parent.className(),
                             )
                         }
+
                         is FileDescriptor -> {
                             addStatement(
                                 "return %T.descriptor.extension.first { it.number == ${state.descriptor.descriptor.number} }",
-                                parent.fileMetadataClassName()
+                                parent.fileMetadataClassName(),
                             )
                         }
                     }
@@ -225,7 +233,7 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
 
             property(
                 "extendee",
-                state.descriptor.extendee().className().nestedClass("Companion")
+                state.descriptor.extendee().className().nestedClass("Companion"),
             ) {
                 this += KModifier.OVERRIDE
                 getter {
@@ -257,22 +265,26 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                 addParameter("value", fieldType)
 
                 when {
-                    packed && enum -> addStatement(
-                        "writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            WireFormat.WIRETYPE_LENGTH_DELIMITED
+                    packed && enum ->
+                        addStatement(
+                            "writer.tag(${
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                                )
+                            }).beginLd().apply{ value.forEach { int32(it.number) } }.endLd()",
                         )
-                        }).beginLd().apply{ value.forEach { int32(it.number) } }.endLd()"
-                    )
-                    packed -> addStatement(
-                        "writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            WireFormat.WIRETYPE_LENGTH_DELIMITED
+
+                    packed ->
+                        addStatement(
+                            "writer.tag(${
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                                )
+                            }).beginLd().apply{ value.forEach { $method(it) } }.endLd()",
                         )
-                        }).beginLd().apply{ value.forEach { $method(it) } }.endLd()"
-                    )
+
                     repeated && message -> {
                         if (mapEntry != null) {
                             val keyType =
@@ -282,65 +294,73 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
 
                             addStatement(
                                 "value.forEach { k, v -> writer.tag(${
-                                makeTag(
-                                    state.descriptor.descriptor.number,
-                                    WireFormat.WIRETYPE_LENGTH_DELIMITED
-                                )
+                                    makeTag(
+                                        state.descriptor.descriptor.number,
+                                        WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                                    )
                                 }).beginLd().tag(${
-                                makeTag(
-                                    1,
-                                    keyType.wireType
-                                )
+                                    makeTag(
+                                        1,
+                                        keyType.wireType,
+                                    )
                                 }).${keyType.name.lowercase()}(k).tag(${
-                                makeTag(
-                                    2,
-                                    valueType.wireType
-                                )
-                                }).${valueType.name.lowercase()}(v).endLd() }"
+                                    makeTag(
+                                        2,
+                                        valueType.wireType,
+                                    )
+                                }).${valueType.name.lowercase()}(v).endLd() }",
                             )
                         } else {
                             addStatement(
                                 "value.forEach { writer.tag(${
-                                makeTag(
-                                    state.descriptor.descriptor.number,
-                                    WireFormat.WIRETYPE_LENGTH_DELIMITED
-                                )
-                                }).${if (any) "any" else "message"}(it) }"
+                                    makeTag(
+                                        state.descriptor.descriptor.number,
+                                        WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                                    )
+                                }).${if (any) "any" else "message"}(it) }",
                             )
                         }
                     }
-                    repeated -> addStatement(
-                        "value.forEach { writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            type.wireType
+
+                    repeated ->
+                        addStatement(
+                            "value.forEach { writer.tag(${
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    type.wireType,
+                                )
+                            }).$method(it) }",
                         )
-                        }).$method(it) }"
-                    )
-                    enum -> addStatement(
-                        "writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            type.wireType
+
+                    enum ->
+                        addStatement(
+                            "writer.tag(${
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    type.wireType,
+                                )
+                            }).int32(value.number)",
                         )
-                        }).int32(value.number)"
-                    )
-                    message -> addStatement(
-                        "writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            WireFormat.WIRETYPE_LENGTH_DELIMITED
+
+                    message ->
+                        addStatement(
+                            "writer.tag(${
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                                )
+                            }).${if (any) "any" else "message"}(value)",
                         )
-                        }).${if (any) "any" else "message"}(value)"
-                    )
-                    else -> addStatement(
-                        "writer.tag(${
-                        makeTag(
-                            state.descriptor.descriptor.number,
-                            type.wireType
+
+                    else ->
+                        addStatement(
+                            "writer.tag(${
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    type.wireType,
+                                )
+                            }).$method(value)",
                         )
-                        }).$method(value)"
-                    )
                 }
             }
 
@@ -361,10 +381,12 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                 }
 
                 when {
-                    packed && enum -> addStatement(
-                        "reader.packed(wire) { value·+=·%T(it.int32()) }",
-                        state.descriptor.enumType()!!.className()
-                    )
+                    packed && enum ->
+                        addStatement(
+                            "reader.packed(wire) { value·+=·%T(it.int32()) }",
+                            state.descriptor.enumType()!!.className(),
+                        )
+
                     packed -> addStatement("reader.packed(wire) { value·+=·it.$method() }")
                     repeated && message -> {
                         if (mapEntry != null) {
@@ -376,18 +398,28 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                             when (valueType) {
                                 WireFormat.FieldType.MESSAGE -> {
                                     addStatement(
-                                        "reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> value[k]·=·v }",
-                                        valueDescriptor.elementType()
+                                        "reader.mapEntry({ it.${
+                                            keyType.name.lowercase()
+                                        }() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> value[k]·=·v }",
+                                        valueDescriptor.elementType(),
                                     )
                                 }
+
                                 WireFormat.FieldType.ENUM -> {
                                     addStatement(
-                                        "reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T(it.int32()) }) { k,·v·-> value[k]·=·v }",
-                                        valueDescriptor.elementType()
+                                        "reader.mapEntry({ it.${
+                                            keyType.name.lowercase()
+                                        }() }, { %T(it.int32()) }) { k,·v·-> value[k]·=·v }",
+                                        valueDescriptor.elementType(),
                                     )
                                 }
+
                                 else -> {
-                                    addStatement("reader.mapEntry({ it.${keyType.name.lowercase()}() }, { it.${valueType.name.lowercase()}() }) { k,·v·-> value[k]·=·v }")
+                                    addStatement(
+                                        "reader.mapEntry({ it.${
+                                            keyType.name.lowercase()
+                                        }() }, { it.${valueType.name.lowercase()}() }) { k,·v·-> value[k]·=·v }",
+                                    )
                                 }
                             }
                         } else if (any) {
@@ -395,23 +427,28 @@ class ExtensionSupportBasicGenerator : GroupedGenerator<ExtensionSupportGenerati
                         } else {
                             addStatement(
                                 "value += %T.newMutable().apply { readFrom(reader) }",
-                                state.descriptor.elementType()
+                                state.descriptor.elementType(),
                             )
                         }
                     }
+
                     repeated -> addStatement("value += reader.$method()")
-                    message -> if (any) {
-                        addStatement("return wrap(reader.any())")
-                    } else {
+                    message ->
+                        if (any) {
+                            addStatement("return wrap(reader.any())")
+                        } else {
+                            addStatement(
+                                "return wrap(%T.newMutable().apply { readFrom(reader) })",
+                                state.descriptor.elementType(),
+                            )
+                        }
+
+                    enum ->
                         addStatement(
-                            "return wrap(%T.newMutable().apply { readFrom(reader) })",
-                            state.descriptor.elementType()
+                            "return wrap(%T(reader.int32()))",
+                            state.descriptor.elementType(),
                         )
-                    }
-                    enum -> addStatement(
-                        "return wrap(%T(reader.int32()))",
-                        state.descriptor.elementType()
-                    )
+
                     else -> addStatement("return wrap(reader.$method())")
                 }
 

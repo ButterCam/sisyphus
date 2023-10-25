@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 fun CodeBlock.Builder.beginScope(
     controlFlow: String,
     vararg args: Any?,
-    block: CodeBlock.Builder.() -> Unit = {}
+    block: CodeBlock.Builder.() -> Unit = {},
 ): CodeBlock.Builder {
     beginControlFlow(controlFlow, *args)
     block()
@@ -32,15 +32,24 @@ operator fun PropertySpec.Builder.plusAssign(modifier: KModifier) {
     this.addModifiers(modifier)
 }
 
-fun FunSpec.Builder.annotation(annotation: ClassName, block: AnnotationSpec.Builder.() -> Unit = {}) {
+fun FunSpec.Builder.annotation(
+    annotation: ClassName,
+    block: AnnotationSpec.Builder.() -> Unit = {},
+) {
     this.addAnnotation(AnnotationSpec.builder(annotation).apply(block).build())
 }
 
-fun TypeSpec.Builder.annotation(annotation: ClassName, block: AnnotationSpec.Builder.() -> Unit = {}) {
+fun TypeSpec.Builder.annotation(
+    annotation: ClassName,
+    block: AnnotationSpec.Builder.() -> Unit = {},
+) {
     this.addAnnotation(AnnotationSpec.builder(annotation).apply(block).build())
 }
 
-fun PropertySpec.Builder.annotation(annotation: ClassName, block: AnnotationSpec.Builder.() -> Unit = {}) {
+fun PropertySpec.Builder.annotation(
+    annotation: ClassName,
+    block: AnnotationSpec.Builder.() -> Unit = {},
+) {
     this.addAnnotation(AnnotationSpec.builder(annotation).apply(block).build())
 }
 
@@ -56,35 +65,62 @@ operator fun FunSpec.Builder.plusAssign(modifier: KModifier) {
     this.addModifiers(modifier)
 }
 
-fun kFile(packageName: String, name: String, block: FileSpec.Builder.() -> Unit = {}): FileSpec {
+fun kFile(
+    packageName: String,
+    name: String,
+    block: FileSpec.Builder.() -> Unit = {},
+): FileSpec {
     return FileSpec.builder(packageName, name).apply(block).build()
 }
 
-fun kClass(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
+fun kClass(
+    name: String,
+    block: TypeSpec.Builder.() -> Unit = {},
+): TypeSpec {
     return TypeSpec.classBuilder(name).apply(block).build()
 }
 
-fun kEnum(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
+fun kEnum(
+    name: String,
+    block: TypeSpec.Builder.() -> Unit = {},
+): TypeSpec {
     return TypeSpec.enumBuilder(name).apply(block).build()
 }
 
-fun kObject(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
+fun kObject(
+    name: String,
+    block: TypeSpec.Builder.() -> Unit = {},
+): TypeSpec {
     return TypeSpec.objectBuilder(name).apply(block).build()
 }
 
-fun kInterface(name: String, block: TypeSpec.Builder.() -> Unit = {}): TypeSpec {
+fun kInterface(
+    name: String,
+    block: TypeSpec.Builder.() -> Unit = {},
+): TypeSpec {
     return TypeSpec.interfaceBuilder(name).apply(block).build()
 }
 
-fun kProperty(name: String, type: TypeName, block: PropertySpec.Builder.() -> Unit = {}): PropertySpec {
+fun kProperty(
+    name: String,
+    type: TypeName,
+    block: PropertySpec.Builder.() -> Unit = {},
+): PropertySpec {
     return PropertySpec.builder(name, type).apply(block).build()
 }
 
-fun kProperty(name: String, type: KClass<*>, block: PropertySpec.Builder.() -> Unit = {}): PropertySpec {
+fun kProperty(
+    name: String,
+    type: KClass<*>,
+    block: PropertySpec.Builder.() -> Unit = {},
+): PropertySpec {
     return PropertySpec.builder(name, type).apply(block).build()
 }
 
-fun kFun(name: String, block: FunSpec.Builder.() -> Unit = {}): FunSpec {
+fun kFun(
+    name: String,
+    block: FunSpec.Builder.() -> Unit = {},
+): FunSpec {
     return FunSpec.builder(name).apply(block).build()
 }
 
@@ -128,27 +164,49 @@ fun TypeSpec.Builder.constructor(block: FunSpec.Builder.() -> Unit = {}) {
     primaryConstructor(FunSpec.constructorBuilder().apply(block).build())
 }
 
-fun TypeSpec.Builder.property(name: String, type: TypeName, block: PropertySpec.Builder.() -> Unit = {}) {
+fun TypeSpec.Builder.property(
+    name: String,
+    type: TypeName,
+    block: PropertySpec.Builder.() -> Unit = {},
+) {
     addProperty(PropertySpec.builder(name, type).apply(block).build())
 }
 
-fun TypeSpec.Builder.property(name: String, type: KClass<*>, block: PropertySpec.Builder.() -> Unit = {}) {
+fun TypeSpec.Builder.property(
+    name: String,
+    type: KClass<*>,
+    block: PropertySpec.Builder.() -> Unit = {},
+) {
     addProperty(PropertySpec.builder(name, type).apply(block).build())
 }
 
-fun TypeSpec.Builder.type(name: String, block: TypeSpec.Builder.() -> Unit = {}) {
+fun TypeSpec.Builder.type(
+    name: String,
+    block: TypeSpec.Builder.() -> Unit = {},
+) {
     addType(TypeSpec.classBuilder(name).apply(block).build())
 }
 
-fun TypeSpec.Builder.function(name: String, block: FunSpec.Builder.() -> Unit = {}) {
+fun TypeSpec.Builder.function(
+    name: String,
+    block: FunSpec.Builder.() -> Unit = {},
+) {
     addFunction(FunSpec.builder(name).apply(block).build())
 }
 
-fun FunSpec.Builder.parameter(name: String, type: KClass<*>, block: ParameterSpec.Builder.() -> Unit = {}) {
+fun FunSpec.Builder.parameter(
+    name: String,
+    type: KClass<*>,
+    block: ParameterSpec.Builder.() -> Unit = {},
+) {
     addParameter(ParameterSpec.builder(name, type).apply(block).build())
 }
 
-fun FunSpec.Builder.parameter(name: String, type: TypeName, block: ParameterSpec.Builder.() -> Unit = {}) {
+fun FunSpec.Builder.parameter(
+    name: String,
+    type: TypeName,
+    block: ParameterSpec.Builder.() -> Unit = {},
+) {
     addParameter(ParameterSpec.builder(name, type).apply(block).build())
 }
 

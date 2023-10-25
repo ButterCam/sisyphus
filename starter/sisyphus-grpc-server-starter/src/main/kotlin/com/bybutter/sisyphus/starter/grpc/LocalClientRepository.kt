@@ -25,7 +25,7 @@ class LocalClientRepository : ClientRepository {
 
     private fun createInProcessChannel(
         builderInterceptors: Iterable<ChannelBuilderInterceptor>,
-        lifecycle: ManagedChannelLifecycle
+        lifecycle: ManagedChannelLifecycle,
     ): Channel {
         var builder: ManagedChannelBuilder<*> =
             InProcessChannelBuilder.forName(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER)
@@ -42,7 +42,7 @@ class LocalClientRepository : ClientRepository {
 
     override fun listClientBeanDefinition(
         beanFactory: ConfigurableListableBeanFactory,
-        environment: Environment
+        environment: Environment,
     ): List<AbstractBeanDefinition> {
         (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL,
@@ -53,26 +53,27 @@ class LocalClientRepository : ClientRepository {
                     BeanUtils.getSortedBeans(beanFactory, ChannelBuilderInterceptor::class.java)
                 createInProcessChannel(
                     channelBuilderInterceptors.values,
-                    managedChannelLifecycle
+                    managedChannelLifecycle,
                 )
-            }.beanDefinition
+            }.beanDefinition,
         )
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
         for (serviceName in beanFactory.getBeanNamesForAnnotation(RpcServiceImpl::class.java)) {
             val serviceBeanDefinition = beanFactory.getBeanDefinition(serviceName)
             val serviceClass = Class.forName(serviceBeanDefinition.beanClassName)
             val stub = getClientFromService(serviceClass.superclass)
-            val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(stub as Class<Any>) {
-                val builderInterceptors = BeanUtils.getSortedBeans(beanFactory, ClientBuilderInterceptor::class.java)
-                val clientInterceptors = BeanUtils.getSortedBeans(beanFactory, ClientInterceptor::class.java)
-                val optionsInterceptors = BeanUtils.getSortedBeans(beanFactory, CallOptionsInterceptor::class.java)
-                val localChannel = beanFactory.getBean<Channel>(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL)
-                interceptStub(
-                    createGrpcClient(stub, localChannel, optionsInterceptors.values, CallOptions.DEFAULT),
-                    builderInterceptors.values,
-                    clientInterceptors.values
-                )
-            }
+            val clientBeanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(stub as Class<Any>) {
+                    val builderInterceptors = BeanUtils.getSortedBeans(beanFactory, ClientBuilderInterceptor::class.java)
+                    val clientInterceptors = BeanUtils.getSortedBeans(beanFactory, ClientInterceptor::class.java)
+                    val optionsInterceptors = BeanUtils.getSortedBeans(beanFactory, CallOptionsInterceptor::class.java)
+                    val localChannel = beanFactory.getBean<Channel>(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL)
+                    interceptStub(
+                        createGrpcClient(stub, localChannel, optionsInterceptors.values, CallOptions.DEFAULT),
+                        builderInterceptors.values,
+                        clientInterceptors.values,
+                    )
+                }
             beanDefinitionList.add(clientBeanDefinition.beanDefinition)
         }
         return beanDefinitionList

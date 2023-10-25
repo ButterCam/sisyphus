@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
-
     private lateinit var environment: Environment
 
     override fun setEnvironment(environment: Environment) {
@@ -25,12 +24,13 @@ class ClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
         val registry = beanFactory as BeanDefinitionRegistry
 
-        val lifecycleBuilder = BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
-            ManagedChannelLifecycle()
-        }
+        val lifecycleBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
+                ManagedChannelLifecycle()
+            }
         registry.registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE,
-            lifecycleBuilder.beanDefinition
+            lifecycleBuilder.beanDefinition,
         )
         for (clientRepository in clientRepositories) {
             val clientBeanList = clientRepository.listClientBeanDefinition(beanFactory, environment)

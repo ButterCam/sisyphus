@@ -91,7 +91,7 @@ class ResourceNameMutableInterfaceFieldGenerator :
                 this += KModifier.ABSTRACT
                 returns(
                     ResourceFields.fieldType(state.descriptor)
-                        .copy(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL)
+                        .copy(state.descriptor.descriptor.label == DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL),
                 )
             }
         }
@@ -181,7 +181,7 @@ class ResourceNameOneofImplementationFieldGenerator :
                 addStatement(
                     "return (%N as? %T)?.value",
                     oneOf.fieldName(),
-                    oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                    oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
                 )
             }
             setter {
@@ -191,9 +191,9 @@ class ResourceNameOneofImplementationFieldGenerator :
                         addStatement(
                             "%N = value?.let { %T(it) }",
                             oneOf.fieldName(),
-                            oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                            oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
                         )
-                    }
+                    },
                 )
             }
         }
@@ -204,7 +204,7 @@ class ResourceNameOneofImplementationFieldGenerator :
             addStatement(
                 "return %N is %T",
                 oneOf.fieldName(),
-                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
             )
         }
 
@@ -214,7 +214,7 @@ class ResourceNameOneofImplementationFieldGenerator :
             beginControlFlow(
                 "return (%N as? %T)?.value?.also",
                 oneOf.fieldName(),
-                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
             )
             addStatement("%N = null", oneOf.fieldName())
             endControlFlow()
@@ -265,8 +265,8 @@ class ResourceNameMessageFieldWriteFunctionGenerator :
                     "writer.tag(%L).string(value.value())",
                     makeTag(
                         state.descriptor.descriptor.number,
-                        WireFormat.WIRETYPE_LENGTH_DELIMITED
-                    )
+                        WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                    ),
                 )
             }
         } else {
@@ -276,8 +276,8 @@ class ResourceNameMessageFieldWriteFunctionGenerator :
                     state.descriptor.name(),
                     makeTag(
                         state.descriptor.descriptor.number,
-                        WireFormat.WIRETYPE_LENGTH_DELIMITED
-                    )
+                        WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                    ),
                 )
             }
         }
@@ -300,7 +300,7 @@ class ResourceNameMessageFieldReadFunctionGenerator :
                 addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N += %T(reader.string())",
                     state.descriptor.name(),
-                    resource.className()
+                    resource.className(),
                 )
             }
         } else {
@@ -308,7 +308,7 @@ class ResourceNameMessageFieldReadFunctionGenerator :
                 addStatement(
                     "${state.descriptor.descriptor.number} -> this.%N = %T(reader.string())",
                     state.descriptor.name(),
-                    resource.className()
+                    resource.className(),
                 )
             }
         }
@@ -333,7 +333,7 @@ class ResourceNameMessageFieldSetFieldInCurrentFunctionGenerator :
                         "this.%N.addAll((value as List<Any>).map{ if(it·is·%T)·it·else·%T(it·as·String) })",
                         state.descriptor.name(),
                         resource.className(),
-                        resource.className()
+                        resource.className(),
                     )
                 }
             } else {
@@ -342,7 +342,7 @@ class ResourceNameMessageFieldSetFieldInCurrentFunctionGenerator :
                     state.target.branch,
                     state.descriptor.name(),
                     resource.className(),
-                    resource.className()
+                    resource.className(),
                 )
             }
         }

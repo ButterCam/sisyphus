@@ -10,6 +10,6 @@ interface RocketMqResourceFactory {
         consumerProperty: RocketMqConsumerProperty,
         metadata: MessageConsumer,
         listener: MessageListener<*>,
-        loggers: List<RocketMqLogger>
+        loggers: List<RocketMqLogger>,
     ): MQConsumer
 }

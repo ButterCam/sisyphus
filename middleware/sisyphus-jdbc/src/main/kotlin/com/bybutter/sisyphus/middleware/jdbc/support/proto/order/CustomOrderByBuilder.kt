@@ -16,7 +16,10 @@ class CustomOrderByBuilder : OrderByBuilder() {
         return defaultOrder
     }
 
-    fun field(member: String, field: Field<*>) {
+    fun field(
+        member: String,
+        field: Field<*>,
+    ) {
         fieldMapping[member] = field
         fieldMapping[member.toCamelCase()] = field
     }

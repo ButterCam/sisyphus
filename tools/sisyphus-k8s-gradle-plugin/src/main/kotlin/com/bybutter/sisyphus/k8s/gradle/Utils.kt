@@ -2,7 +2,10 @@ package com.bybutter.sisyphus.k8s.gradle
 
 import org.gradle.api.Project
 
-internal fun Project.ensurePlugin(vararg ids: String, block: (Project) -> Unit): Boolean {
+internal fun Project.ensurePlugin(
+    vararg ids: String,
+    block: (Project) -> Unit,
+): Boolean {
     for (id in ids) {
         if (!pluginManager.hasPlugin(id)) {
             pluginManager.withPlugin(id) {
@@ -15,7 +18,11 @@ internal fun Project.ensurePlugin(vararg ids: String, block: (Project) -> Unit):
     return true
 }
 
-internal inline fun Project.ensurePlugin(id: String, noinline block: (Project) -> Unit, returnBlock: () -> Unit) {
+internal inline fun Project.ensurePlugin(
+    id: String,
+    noinline block: (Project) -> Unit,
+    returnBlock: () -> Unit,
+) {
     if (!pluginManager.hasPlugin(id)) {
         pluginManager.withPlugin(id) {
             block(this)
@@ -24,7 +31,10 @@ internal inline fun Project.ensurePlugin(id: String, noinline block: (Project) -
     }
 }
 
-internal fun Project.tryApplyPluginClass(className: String, action: () -> Unit = {}): Boolean {
+internal fun Project.tryApplyPluginClass(
+    className: String,
+    action: () -> Unit = {},
+): Boolean {
     return try {
         val plugin = Class.forName(className)
         action()

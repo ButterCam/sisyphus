@@ -10,7 +10,7 @@ import com.squareup.kotlinpoet.MemberName.Companion.member
 
 class ExtensionDescriptor(
     override val parent: DescriptorNode<*>,
-    override val descriptor: DescriptorProtos.FieldDescriptorProto
+    override val descriptor: DescriptorProtos.FieldDescriptorProto,
 ) : DescriptorNode<DescriptorProtos.FieldDescriptorProto>() {
     fun supportName(): String {
         return "${this.descriptor.jsonName.toPascalCase()}ExtensionSupportFor${extendee().descriptor.name}"
@@ -40,18 +40,22 @@ class ExtensionDescriptor(
         return escapeDoc(
             file().descriptor.sourceCodeInfo?.locationList?.firstOrNull {
                 it.pathList.contentEquals(path())
-            }?.leadingComments ?: ""
+            }?.leadingComments ?: "",
         )
     }
 
     fun path(): List<Int> {
         return when (val parent = parent) {
-            is FileDescriptor -> listOf<Int>() + DescriptorProtos.FileDescriptorProto.EXTENSION_FIELD_NUMBER + parent.descriptor.extensionList.indexOf(
-                descriptor
-            )
-            is MessageDescriptor -> parent.path() + DescriptorProtos.DescriptorProto.EXTENSION_FIELD_NUMBER + parent.descriptor.extensionList.indexOf(
-                descriptor
-            )
+            is FileDescriptor ->
+                listOf<Int>() + DescriptorProtos.FileDescriptorProto.EXTENSION_FIELD_NUMBER +
+                    parent.descriptor.extensionList.indexOf(
+                        descriptor,
+                    )
+            is MessageDescriptor ->
+                parent.path() + DescriptorProtos.DescriptorProto.EXTENSION_FIELD_NUMBER +
+                    parent.descriptor.extensionList.indexOf(
+                        descriptor,
+                    )
             else -> TODO()
         }
     }

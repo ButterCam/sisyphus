@@ -134,11 +134,12 @@ internal fun MutableMessage<*, *>.readFields(reader: JsonReader) {
             reader.skipChildren()
             continue
         }
-        val value = if (field.label == FieldDescriptorProto.Label.REPEATED) {
-            reader.readRepeated(field)
-        } else {
-            reader.readField(field) ?: continue
-        }
+        val value =
+            if (field.label == FieldDescriptorProto.Label.REPEATED) {
+                reader.readRepeated(field)
+            } else {
+                reader.readField(field) ?: continue
+            }
         set(field.number, value)
     }
 }
@@ -155,29 +156,30 @@ internal fun JsonReader.readRepeated(field: FieldDescriptorProto): Any {
                 val keyName = nameAndNext()
                 val value = readField(valueField) ?: continue
 
-                val key = when (keyField.type) {
-                    FieldDescriptorProto.Type.SINT64,
-                    FieldDescriptorProto.Type.SFIXED64,
-                    FieldDescriptorProto.Type.INT64
-                    -> keyName.toLong()
+                val key =
+                    when (keyField.type) {
+                        FieldDescriptorProto.Type.SINT64,
+                        FieldDescriptorProto.Type.SFIXED64,
+                        FieldDescriptorProto.Type.INT64,
+                        -> keyName.toLong()
 
-                    FieldDescriptorProto.Type.FIXED64,
-                    FieldDescriptorProto.Type.UINT64
-                    -> keyName.toULong()
+                        FieldDescriptorProto.Type.FIXED64,
+                        FieldDescriptorProto.Type.UINT64,
+                        -> keyName.toULong()
 
-                    FieldDescriptorProto.Type.SINT32,
-                    FieldDescriptorProto.Type.SFIXED32,
-                    FieldDescriptorProto.Type.INT32
-                    -> keyName.toInt()
+                        FieldDescriptorProto.Type.SINT32,
+                        FieldDescriptorProto.Type.SFIXED32,
+                        FieldDescriptorProto.Type.INT32,
+                        -> keyName.toInt()
 
-                    FieldDescriptorProto.Type.UINT32,
-                    FieldDescriptorProto.Type.FIXED32
-                    -> keyName.toUInt()
+                        FieldDescriptorProto.Type.UINT32,
+                        FieldDescriptorProto.Type.FIXED32,
+                        -> keyName.toUInt()
 
-                    FieldDescriptorProto.Type.BOOL -> keyName == "true"
-                    FieldDescriptorProto.Type.STRING -> keyName
-                    else -> throw IllegalStateException()
-                }
+                        FieldDescriptorProto.Type.BOOL -> keyName == "true"
+                        FieldDescriptorProto.Type.STRING -> keyName
+                        else -> throw IllegalStateException()
+                    }
                 result[key] = value
             }
             return result
@@ -203,20 +205,20 @@ internal fun JsonReader.readField(field: FieldDescriptorProto): Any? {
         FieldDescriptorProto.Type.FLOAT -> float()
         FieldDescriptorProto.Type.SFIXED64,
         FieldDescriptorProto.Type.SINT64,
-        FieldDescriptorProto.Type.INT64
+        FieldDescriptorProto.Type.INT64,
         -> long()
 
         FieldDescriptorProto.Type.FIXED64,
-        FieldDescriptorProto.Type.UINT64
+        FieldDescriptorProto.Type.UINT64,
         -> ulong()
 
         FieldDescriptorProto.Type.SFIXED32,
         FieldDescriptorProto.Type.SINT32,
-        FieldDescriptorProto.Type.INT32
+        FieldDescriptorProto.Type.INT32,
         -> int()
 
         FieldDescriptorProto.Type.UINT32,
-        FieldDescriptorProto.Type.FIXED32
+        FieldDescriptorProto.Type.FIXED32,
         -> uint()
 
         FieldDescriptorProto.Type.BOOL -> bool()
@@ -293,7 +295,7 @@ fun JsonReader.readAny(): Message<*, *>? {
         Timestamp.name,
         UInt32Value.name,
         UInt64Value.name,
-        Value.name
+        Value.name,
         -> {
             while (next() != JsonToken.END_OBJECT) {
                 if (nameAndNext() == "value") {

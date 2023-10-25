@@ -33,8 +33,7 @@ inline fun <reified T> String?.parseJsonOrDefault(value: T): T {
     return this.parseJsonOrNull<T>() ?: value
 }
 
-inline fun <reified T> String.parseJson(): T =
-    Json.deserialize(this, object : TypeReference<T>() {})
+inline fun <reified T> String.parseJson(): T = Json.deserialize(this, object : TypeReference<T>() {})
 
 inline fun <reified T> Reader?.parseJsonOrNull(): T? {
     this ?: return null
@@ -50,8 +49,7 @@ inline fun <reified T> Reader?.parseJsonOrDefault(value: T): T {
     return this.parseJsonOrNull<T>() ?: value
 }
 
-inline fun <reified T> Reader.parseJson(): T =
-    Json.deserialize(this, object : TypeReference<T>() {})
+inline fun <reified T> Reader.parseJson(): T = Json.deserialize(this, object : TypeReference<T>() {})
 
 inline fun <reified T> InputStream?.parseJsonOrNull(): T? {
     this ?: return null
@@ -67,7 +65,6 @@ inline fun <reified T> InputStream?.parseJsonOrDefault(value: T): T {
     return this.parseJsonOrNull<T>() ?: value
 }
 
-inline fun <reified T> InputStream.parseJson(): T =
-    Json.deserialize(this, object : TypeReference<T>() {})
+inline fun <reified T> InputStream.parseJson(): T = Json.deserialize(this, object : TypeReference<T>() {})
 
 fun Any.toJson(): String = Json.serialize(this)

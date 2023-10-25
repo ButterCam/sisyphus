@@ -30,18 +30,23 @@ class SisyphusTestEngine : HierarchicalTestEngine<SisyphusTestEngineContext>() {
 
     private val extensions = ServiceLoader.load(Extension::class.java)
 
-    override fun discover(discoveryRequest: EngineDiscoveryRequest, uniqueId: UniqueId): TestDescriptor {
-        val resolver = EngineDiscoveryRequestResolver.builder<SisyphusTestDescriptor>()
-            .addSelectorResolver(SisyphusTestSelectorResolver())
-            .apply {
-                extensions.filterIsInstance<SelectorResolver>().forEach {
-                    addSelectorResolver(it)
+    override fun discover(
+        discoveryRequest: EngineDiscoveryRequest,
+        uniqueId: UniqueId,
+    ): TestDescriptor {
+        val resolver =
+            EngineDiscoveryRequestResolver.builder<SisyphusTestDescriptor>()
+                .addSelectorResolver(SisyphusTestSelectorResolver())
+                .apply {
+                    extensions.filterIsInstance<SelectorResolver>().forEach {
+                        addSelectorResolver(it)
+                    }
                 }
-            }
-            .build()
-        val defaultRequest = LauncherDiscoveryRequestBuilder.request()
-            .selectors(DiscoverySelectors.selectPackage("META-INF.sisyphus"))
-            .build()
+                .build()
+        val defaultRequest =
+            LauncherDiscoveryRequestBuilder.request()
+                .selectors(DiscoverySelectors.selectPackage("META-INF.sisyphus"))
+                .build()
 
         return SisyphusTestDescriptor(uniqueId).apply {
             resolver.resolve(defaultRequest, this)

@@ -8,9 +8,10 @@ import kotlin.math.truncate
 open class BaseEncoding(val table: CharArray) {
     val bits: Int
     val base = table.size
-    private val reverseMap: Map<Char, Int> = table.mapIndexed { index, char ->
-        char to index
-    }.associate { it }
+    private val reverseMap: Map<Char, Int> =
+        table.mapIndexed { index, char ->
+            char to index
+        }.associate { it }
 
     init {
         val bits = log2(base.toDouble())
@@ -24,16 +25,17 @@ open class BaseEncoding(val table: CharArray) {
         return encode(input.inputStream())
     }
 
-    open fun encode(input: InputStream): String = buildString {
-        val stream = BitInputStream(input)
-        val data = IntArray(1)
+    open fun encode(input: InputStream): String =
+        buildString {
+            val stream = BitInputStream(input)
+            val data = IntArray(1)
 
-        do {
-            data[0] = 0
-            val read = stream.readInt(data, bits)
-            if (read > 0) append(table[data[0]])
-        } while (read == bits)
-    }
+            do {
+                data[0] = 0
+                val read = stream.readInt(data, bits)
+                if (read > 0) append(table[data[0]])
+            } while (read == bits)
+        }
 
     open fun decode(input: String): ByteArray {
         val output = ByteArrayOutputStream()
@@ -43,7 +45,7 @@ open class BaseEncoding(val table: CharArray) {
             stream.writeInt(
                 reverseMap[char]
                     ?: throw IllegalArgumentException("Wrong base$bits input '$char'."),
-                bits
+                bits,
             )
         }
         return output.toByteArray()

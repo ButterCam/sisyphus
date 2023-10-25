@@ -32,11 +32,12 @@ fun String.parseHex(): ByteArray {
         if (!hexChars.contains(this[index])) {
             throw IllegalArgumentException("Wrong hex format char '${this[index]}'.")
         }
-        val value = when {
-            this[index] >= 'a' -> 10 + (this[index] - 'a')
-            this[index] >= 'A' -> 10 + (this[index] - 'A')
-            else -> this[index] - '0'
-        } shl ((1 - offset % 2) * 4)
+        val value =
+            when {
+                this[index] >= 'a' -> 10 + (this[index] - 'a')
+                this[index] >= 'A' -> 10 + (this[index] - 'A')
+                else -> this[index] - '0'
+            } shl ((1 - offset % 2) * 4)
         result[offset / 2] = result[offset / 2] or value.toByte()
     }
 

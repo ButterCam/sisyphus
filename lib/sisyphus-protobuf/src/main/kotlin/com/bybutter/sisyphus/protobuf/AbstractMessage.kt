@@ -105,11 +105,12 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
         for (field in fieldName.split('.')) {
             val current = target ?: return null as T
 
-            target = when (current) {
-                is AbstractMessage<*, *> -> current.getFieldInCurrent(field)
-                is Map<*, *> -> current[field]
-                else -> throw IllegalStateException("Nested property must be message")
-            }
+            target =
+                when (current) {
+                    is AbstractMessage<*, *> -> current.getFieldInCurrent(field)
+                    is Map<*, *> -> current[field]
+                    else -> throw IllegalStateException("Nested property must be message")
+                }
         }
         return target as T
     }
@@ -129,21 +130,22 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
         for (field in fieldPart) {
             val current = target ?: return false
 
-            target = when (current) {
-                is AbstractMessage<*, *> -> {
-                    if (!current.hasFieldInCurrent(field)) {
-                        return false
+            target =
+                when (current) {
+                    is AbstractMessage<*, *> -> {
+                        if (!current.hasFieldInCurrent(field)) {
+                            return false
+                        }
+                        current.getFieldInCurrent(field)
                     }
-                    current.getFieldInCurrent(field)
-                }
-                is Map<*, *> -> {
-                    if (!current.contains(field)) {
-                        return false
+                    is Map<*, *> -> {
+                        if (!current.contains(field)) {
+                            return false
+                        }
+                        current[field]
                     }
-                    current[field]
+                    else -> throw IllegalStateException("Nested property must be message")
                 }
-                else -> throw IllegalStateException("Nested property must be message")
-            }
         }
         return true
     }
@@ -186,14 +188,16 @@ abstract class AbstractMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     }
 
     protected fun <T> getFieldInExtensions(name: String): T {
-        val number = support().fieldInfo(name)?.number
-            ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
+        val number =
+            support().fieldInfo(name)?.number
+                ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
         return getFieldInExtensions(number)
     }
 
     protected fun <T> getFieldInExtensions(number: Int): T {
-        val extension = support().extensions.firstOrNull { it.descriptor.number == number }
-            ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
+        val extension =
+            support().extensions.firstOrNull { it.descriptor.number == number }
+                ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
         return (extensions()[number]?.value ?: extension.default()).uncheckedCast()
     }
 

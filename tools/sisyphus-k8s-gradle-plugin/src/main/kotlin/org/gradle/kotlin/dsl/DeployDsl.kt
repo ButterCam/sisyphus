@@ -5,7 +5,10 @@ import com.bybutter.sisyphus.k8s.gradle.resource.KubernetesResourceSupport
 import io.kubernetes.client.openapi.models.V1Deployment
 import org.gradle.util.internal.GUtil
 
-fun KubernetesResource<V1Deployment>.deploying(name: String = "", block: V1Deployment.() -> Unit) {
+fun KubernetesResource<V1Deployment>.deploying(
+    name: String = "",
+    block: V1Deployment.() -> Unit,
+) {
     val project = this.cluster.extension.project
     val support = KubernetesResourceSupport.fromKind(this.kind) as KubernetesResourceSupport<V1Deployment>
     project.tasks.create(name.ifBlank { deployTaskName() }) {

@@ -24,7 +24,10 @@ class MeasureWriter : Writer {
         return this
     }
 
-    override fun tag(filedNumber: Int, wireType: WireType): MeasureWriter {
+    override fun tag(
+        filedNumber: Int,
+        wireType: WireType,
+    ): MeasureWriter {
         return tag(WireType.tagOf(filedNumber, wireType))
     }
 
@@ -127,7 +130,7 @@ class MeasureWriter : Writer {
 
     class LdMark private constructor(
         private val parent: LdMark? = null,
-        private val list: MutableList<LdMark> = parent?.list ?: mutableListOf()
+        private val list: MutableList<LdMark> = parent?.list ?: mutableListOf(),
     ) {
         constructor() : this(null)
 

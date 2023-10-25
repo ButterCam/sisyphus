@@ -149,9 +149,10 @@ class CodeGenerators {
 
     private fun resolveDependencies(generators: Iterable<CodeGenerator<*>>): List<CodeGenerator<*>> {
         val result = mutableListOf<CodeGenerator<*>>()
-        val resolving = Stack<CodeGenerator<*>>().apply {
-            this.addAll(generators.reversed())
-        }
+        val resolving =
+            Stack<CodeGenerator<*>>().apply {
+                this.addAll(generators.reversed())
+            }
 
         while (resolving.isNotEmpty()) {
             val current = resolving.pop()
@@ -322,18 +323,20 @@ class CodeGenerators {
         val handledGroup = mutableSetOf<String>()
 
         loop@ for (generator in generators) {
-            val targetState = targetType.getOrPut(generator) {
-                when (
-                    val type = generator.javaClass.getTypeArgument(
-                        CodeGenerator::class.java,
-                        0
-                    )
-                ) {
-                    is Class<*> -> type
-                    is ParameterizedType -> type.rawType as Class<*>
-                    else -> TODO()
+            val targetState =
+                targetType.getOrPut(generator) {
+                    when (
+                        val type =
+                            generator.javaClass.getTypeArgument(
+                                CodeGenerator::class.java,
+                                0,
+                            )
+                    ) {
+                        is Class<*> -> type
+                        is ParameterizedType -> type.rawType as Class<*>
+                        else -> TODO()
+                    }
                 }
-            }
 
             if (!targetState.isInstance(state)) continue
             when (generator) {

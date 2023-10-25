@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component
 interface StatusRenderer {
     fun canRender(status: Status): Boolean
 
-    fun render(status: Status, trailers: Metadata): Status?
+    fun render(
+        status: Status,
+        trailers: Metadata,
+    ): Status?
 }
 
 @Component
@@ -21,7 +24,10 @@ class SisyphusStatusRenderer : StatusRenderer {
         return status.cause is StatusException
     }
 
-    override fun render(status: Status, trailers: Metadata): Status? {
+    override fun render(
+        status: Status,
+        trailers: Metadata,
+    ): Status? {
         val cause = status.cause as? StatusException ?: return null
         trailers.merge(cause.trailers)
         trailers.put(STATUS_META_KEY, cause.asStatusDetail())

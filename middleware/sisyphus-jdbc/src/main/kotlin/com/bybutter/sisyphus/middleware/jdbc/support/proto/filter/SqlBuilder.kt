@@ -11,34 +11,45 @@ import org.jooq.impl.DSL
 abstract class SqlBuilder<T : Record> {
     abstract val runtime: FilterRuntime
 
-    open fun select(dsl: DSLContext, filter: String): SelectConditionStep<T> {
+    open fun select(
+        dsl: DSLContext,
+        filter: String,
+    ): SelectConditionStep<T> {
         return selectFields(dsl, filter)
     }
 
-    open fun selectFields(dsl: DSLContext, filter: String, vararg fields: Field<*>): SelectConditionStep<T> {
+    open fun selectFields(
+        dsl: DSLContext,
+        filter: String,
+        vararg fields: Field<*>,
+    ): SelectConditionStep<T> {
         return buildSelect(dsl, expressions(filter), *fields)
     }
 
-    open fun select(dsl: DSLContext, filter: FilterParser.FilterContext): SelectConditionStep<T> {
+    open fun select(
+        dsl: DSLContext,
+        filter: FilterParser.FilterContext,
+    ): SelectConditionStep<T> {
         return selectFields(dsl, filter)
     }
 
     open fun selectFields(
         dsl: DSLContext,
         filter: FilterParser.FilterContext,
-        vararg fields: Field<*>
+        vararg fields: Field<*>,
     ): SelectConditionStep<T> {
         return buildSelect(dsl, expressions(filter), *fields)
     }
 
     open fun condition(filter: String): Condition {
-        val conditions = expressions(filter).flatMap {
-            when (it) {
-                is Condition -> listOf(it)
-                is ConditionProvider -> it.provideConditions()
-                else -> listOf()
+        val conditions =
+            expressions(filter).flatMap {
+                when (it) {
+                    is Condition -> listOf(it)
+                    is ConditionProvider -> it.provideConditions()
+                    else -> listOf()
+                }
             }
-        }
         return DSL.and(conditions)
     }
 
@@ -53,7 +64,7 @@ abstract class SqlBuilder<T : Record> {
     protected abstract fun buildSelect(
         dsl: DSLContext,
         expressions: List<Any?>,
-        vararg fields: Field<*>
+        vararg fields: Field<*>,
     ): SelectConditionStep<T>
 
     abstract fun member(member: FilterParser.MemberContext): Any?

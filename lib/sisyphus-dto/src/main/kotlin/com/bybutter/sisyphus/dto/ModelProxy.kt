@@ -8,12 +8,14 @@ import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
 open class ModelProxy constructor(
-    override val `$type`: SimpleType
+    override val `$type`: SimpleType,
 ) : InvocationHandler, DtoMeta, DtoModel, CachedReflection by ReflectionCache.get(`$type`) {
     private var target: SoftReference<Any>? = null
 
+    @Suppress("ktlint:standard:property-naming")
     override var `$modelMap`: MutableMap<String, Any?> = mutableMapOf()
 
+    @Suppress("ktlint:standard:property-naming")
     override var `$outputType`: Boolean = jsonTypeOutputHandler()
 
     override fun <T> get(name: String): T? {
@@ -22,25 +24,30 @@ open class ModelProxy constructor(
         if (property == null) {
             return `$modelMap`[name].uncheckedCast()
         } else {
-            var value: Any? = `$modelMap`.getOrElse(property.name) {
-                val default = defaultValue[name] ?: return@getOrElse null
-                val defaultValue = default.instance.getValue(this, default.raw.value, property)
-                if (default.raw.assign) {
-                    `$modelMap`[property.name] = defaultValue
+            var value: Any? =
+                `$modelMap`.getOrElse(property.name) {
+                    val default = defaultValue[name] ?: return@getOrElse null
+                    val defaultValue = default.instance.getValue(this, default.raw.value, property)
+                    if (default.raw.assign) {
+                        `$modelMap`[property.name] = defaultValue
+                    }
+                    defaultValue
                 }
-                defaultValue
-            }
 
             val hooks = getterHooks[name] ?: emptyList()
 
-            value = hooks.fold(value) { v, it ->
-                it.instance.invoke(this, v, it.raw.params, property)
-            }
+            value =
+                hooks.fold(value) { v, it ->
+                    it.instance.invoke(this, v, it.raw.params, property)
+                }
             return value.uncheckedCast()
         }
     }
 
-    override fun <T> set(name: String, value: T?) {
+    override fun <T> set(
+        name: String,
+        value: T?,
+    ) {
         val property = properties[name]
 
         if (property == null) {
@@ -48,9 +55,10 @@ open class ModelProxy constructor(
         } else {
             val hooks = setterHooks[name] ?: emptyList()
 
-            val value = hooks.fold(value) { v, it ->
-                it.instance.invoke(this, v, it.raw.params, property).uncheckedCast()
-            }
+            val value =
+                hooks.fold(value) { v, it ->
+                    it.instance.invoke(this, v, it.raw.params, property).uncheckedCast()
+                }
             propertyValidators[name]?.forEach {
                 it.instance.verify(this, value, it.raw.params, property)
             }
@@ -59,7 +67,11 @@ open class ModelProxy constructor(
         }
     }
 
-    override fun invoke(proxy: Any, method: Method, args: Array<Any>?): Any? {
+    override fun invoke(
+        proxy: Any,
+        method: Method,
+        args: Array<Any>?,
+    ): Any? {
         if (target == null) {
             target = SoftReference(proxy)
         }
@@ -108,9 +120,10 @@ open class ModelProxy constructor(
     }
 
     private fun verifyInternal() {
-        val property = notNullProperties.firstOrNull {
-            `$modelMap`[it.name] == null
-        }
+        val property =
+            notNullProperties.firstOrNull {
+                `$modelMap`[it.name] == null
+            }
 
         if (property != null) {
             exception = NullPointerException("Property '$property' is null, but it be declared as not null.")
@@ -128,12 +141,13 @@ open class ModelProxy constructor(
         for ((name, validators) in propertyValidators) {
             val property = properties.getValue(name)
             for (validator in validators) {
-                val ex = validator.instance.verify(
-                    this,
-                    get(name),
-                    validator.raw.params,
-                    property
-                )
+                val ex =
+                    validator.instance.verify(
+                        this,
+                        get(name),
+                        validator.raw.params,
+                        property,
+                    )
                 if (ex != null) {
                     exception = ex
                     return

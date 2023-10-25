@@ -20,15 +20,22 @@ class DefaultRocketMqLogger : RocketMqLogger {
         consumer: MessageListener<*>,
         messages: List<MessageExt>,
         costNanoTime: Long,
-        exception: Exception?
+        exception: Exception?,
     ) {
         if (messages.isEmpty()) return
         val firstMessage = messages.first()
 
         if (exception == null) {
-            logger.info("[COMPLETED] $groupId <- $topic/${messages.joinToString { it.msgId }}(${firstMessage.tags}) +${getCostString(costNanoTime)}")
+            logger.info(
+                "[COMPLETED] $groupId <- $topic/${messages.joinToString { it.msgId }}(${firstMessage.tags}) +${getCostString(
+                    costNanoTime,
+                )}",
+            )
         } else {
-            logger.error("[ERROR] $groupId <- $topic/${messages.joinToString { it.msgId }}(${firstMessage.tags}) +${getCostString(costNanoTime)}", exception)
+            logger.error(
+                "[ERROR] $groupId <- $topic/${messages.joinToString { it.msgId }}(${firstMessage.tags}) +${getCostString(costNanoTime)}",
+                exception,
+            )
         }
     }
 

@@ -22,7 +22,7 @@ class SeparatedCoroutineServiceBoosterGenerator : GroupedGenerator<ProtobufBoost
         state.descriptor.services.forEach {
             state.target.builder.addStatement(
                 "reflection.register(%T)",
-                it.className()
+                it.className(),
             )
         }
         return true
@@ -32,11 +32,12 @@ class SeparatedCoroutineServiceBoosterGenerator : GroupedGenerator<ProtobufBoost
 class SeparatedCoroutineServiceApiFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
         if (state.descriptor.services.isNotEmpty()) {
-            state.target += GeneratedKotlinFile(
-                kFile(state.descriptor.packageName(), state.descriptor.rpcKotlinFileName()) {
-                    RpcApiFileGeneratingState(state, state.descriptor, this).advance()
-                }
-            )
+            state.target +=
+                GeneratedKotlinFile(
+                    kFile(state.descriptor.packageName(), state.descriptor.rpcKotlinFileName()) {
+                        RpcApiFileGeneratingState(state, state.descriptor, this).advance()
+                    },
+                )
         }
         return true
     }
@@ -45,11 +46,12 @@ class SeparatedCoroutineServiceApiFileGenerator : GroupedGenerator<FileGeneratin
 class SeparatedCoroutineServiceInternalFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
         if (state.descriptor.services.isNotEmpty()) {
-            state.target += GeneratedKotlinFile(
-                kFile(state.descriptor.internalPackageName(), state.descriptor.rpcKotlinFileName()) {
-                    RpcInternalFileGeneratingState(state, state.descriptor, this).advance()
-                }
-            )
+            state.target +=
+                GeneratedKotlinFile(
+                    kFile(state.descriptor.internalPackageName(), state.descriptor.rpcKotlinFileName()) {
+                        RpcInternalFileGeneratingState(state, state.descriptor, this).advance()
+                    },
+                )
         }
         return true
     }
@@ -66,7 +68,7 @@ class SeparatedCoroutineServiceGenerator :
             state.target.addType(
                 kClass(service.name()) {
                     ServiceGeneratingState(state, service, this).advance()
-                }
+                },
             )
         }
         return true
@@ -84,7 +86,7 @@ class SeparatedCoroutineServiceSupportGenerator :
             state.target.addType(
                 kClass(service.supportName()) {
                     ServiceSupportGeneratingState(state, service, this).advance()
-                }
+                },
             )
         }
         return true

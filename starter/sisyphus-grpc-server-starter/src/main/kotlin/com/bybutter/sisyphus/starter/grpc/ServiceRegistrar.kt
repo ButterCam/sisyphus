@@ -35,39 +35,49 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     }
 
     override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
-        val serverBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
-            val config = beanFactory.getBean<ServiceConfig>()
-            buildServer(ServerBuilder.forPort(config.serverPort), beanFactory)
-        }
+        val serverBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
+                val config = beanFactory.getBean<ServiceConfig>()
+                buildServer(ServerBuilder.forPort(config.serverPort), beanFactory)
+            }
         (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER,
-            serverBuilder.beanDefinition
+            serverBuilder.beanDefinition,
         )
 
-        val inProcessServerBuilder = BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
-            buildServer(InProcessServerBuilder.forName(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER), beanFactory)
-        }
+        val inProcessServerBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(Server::class.java) {
+                buildServer(
+                    InProcessServerBuilder.forName(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER),
+                    beanFactory,
+                )
+            }
         (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER,
-            inProcessServerBuilder.beanDefinition
+            inProcessServerBuilder.beanDefinition,
         )
 
-        val lifecycleBuilder = BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
-            val server = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER, Server::class.java)
-            val inProcessServer = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER, Server::class.java)
-            val shutdown = environment.getProperty("server.shutdown", Shutdown::class.java)
-            ServerLifecycle(shutdown ?: Shutdown.IMMEDIATE, server, inProcessServer)
-        }
+        val lifecycleBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(Lifecycle::class.java) {
+                val server = beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER, Server::class.java)
+                val inProcessServer =
+                    beanFactory.getBean(QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_SERVER, Server::class.java)
+                val shutdown = environment.getProperty("server.shutdown", Shutdown::class.java)
+                ServerLifecycle(shutdown ?: Shutdown.IMMEDIATE, server, inProcessServer)
+            }
         (beanFactory as BeanDefinitionRegistry).registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER_LIFECYCLE,
-            lifecycleBuilder.beanDefinition
+            lifecycleBuilder.beanDefinition,
         )
     }
 
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
     }
 
-    private fun buildServer(serverBuilder: ServerBuilder<*>, beanFactory: ConfigurableListableBeanFactory): Server {
+    private fun buildServer(
+        serverBuilder: ServerBuilder<*>,
+        beanFactory: ConfigurableListableBeanFactory,
+    ): Server {
         var builder = serverBuilder
 
         val builderInterceptors = beanFactory.getBeansOfType(ServerBuilderInterceptor::class.java)
@@ -78,17 +88,22 @@ class ServiceRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
         val services = beanFactory.getBeansWithAnnotation(RpcServiceImpl::class.java)
         logger.info("${services.size} gRPC services registered: ${services.keys.joinToString(", ")}")
         for ((_, service) in services) {
-            builder = when (service) {
-                is BindableService -> {
-                    builder.addService(service)
+            builder =
+                when (service) {
+                    is BindableService -> {
+                        builder.addService(service)
+                    }
+
+                    is ServerServiceDefinition -> {
+                        builder.addService(service)
+                    }
+
+                    else -> {
+                        throw IllegalArgumentException(
+                            "Grpc service implement must inherit from 'BindableService' or 'ServerServiceDefinition'.",
+                        )
+                    }
                 }
-                is ServerServiceDefinition -> {
-                    builder.addService(service)
-                }
-                else -> {
-                    throw IllegalArgumentException("Grpc service implement must inherit from 'BindableService' or 'ServerServiceDefinition'.")
-                }
-            }
         }
 
         val interceptors = BeanUtils.getBeans<ServerInterceptor>(beanFactory)

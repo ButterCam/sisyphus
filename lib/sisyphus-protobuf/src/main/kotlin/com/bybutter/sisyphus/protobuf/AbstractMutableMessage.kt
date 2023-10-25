@@ -18,7 +18,6 @@ import com.bybutter.sisyphus.protobuf.primitives.UInt64Value
 abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> :
     AbstractMessage<T, TM>(),
     MutableMessage<T, TM> {
-
     private var unknownFields: UnknownFields? = null
 
     private var extensions: MutableMap<Int, MessageExtension<*>>? = null
@@ -59,16 +58,20 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
     }
 
     @OptIn(InternalProtoApi::class)
-    override fun readFrom(reader: Reader, size: Int) {
+    override fun readFrom(
+        reader: Reader,
+        size: Int,
+    ) {
         val current = reader.readBytes
         while (!reader.isAtEnd && reader.readBytes - current < size) {
             val tag = reader.tag()
             val number = WireType.getFieldNumber(tag)
             val wireType = WireType.getWireType(tag).ordinal
             if (!readField(reader, number, wireType)) {
-                val extension = support().extensions.firstOrNull {
-                    it.number == number
-                } as? ExtensionSupport<Any>
+                val extension =
+                    support().extensions.firstOrNull {
+                        it.number == number
+                    } as? ExtensionSupport<Any>
 
                 if (extension == null) {
                     unknownFields {
@@ -103,14 +106,20 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
         copyFrom(message, true)
     }
 
-    override fun <T> set(fieldName: String, value: T) {
+    override fun <T> set(
+        fieldName: String,
+        value: T,
+    ) {
         if (!fieldName.contains('.')) {
             return setFieldInCurrent(fieldName, value)
         }
         throw UnsupportedOperationException("Set field not support nested field.")
     }
 
-    override fun <T> set(fieldNumber: Int, value: T) {
+    override fun <T> set(
+        fieldNumber: Int,
+        value: T,
+    ) {
         return setFieldInCurrent(fieldNumber, value)
     }
 
@@ -125,23 +134,24 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
         for ((index, field) in fieldPart.withIndex()) {
             val current = target ?: return null
 
-            target = when (current) {
-                is AbstractMutableMessage<*, *> -> {
-                    if (index == fieldPart.size - 1) {
-                        return current.clearFieldInCurrent(field)
+            target =
+                when (current) {
+                    is AbstractMutableMessage<*, *> -> {
+                        if (index == fieldPart.size - 1) {
+                            return current.clearFieldInCurrent(field)
+                        }
+                        current.getFieldInCurrent(field)
                     }
-                    current.getFieldInCurrent(field)
-                }
 
-                is MutableMap<*, *> -> {
-                    if (index == fieldPart.size - 1) {
-                        return current.remove(field)
+                    is MutableMap<*, *> -> {
+                        if (index == fieldPart.size - 1) {
+                            return current.remove(field)
+                        }
+                        current[field]
                     }
-                    current[field]
-                }
 
-                else -> throw IllegalStateException("Nested property must be message")
-            }
+                    else -> throw IllegalStateException("Nested property must be message")
+                }
         }
 
         return null
@@ -151,19 +161,27 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
         return clearFieldInCurrent(fieldNumber)
     }
 
-    protected fun <T> setFieldInExtensions(name: String, value: T) {
-        val fieldNumber = support().fieldInfo(name)?.number
-            ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
+    protected fun <T> setFieldInExtensions(
+        name: String,
+        value: T,
+    ) {
+        val fieldNumber =
+            support().fieldInfo(name)?.number
+                ?: throw IllegalArgumentException("Message not contains field definition of '$name'.")
         setFieldInExtensions(fieldNumber, value)
     }
 
-    protected fun <T> setFieldInExtensions(number: Int, value: T) {
+    protected fun <T> setFieldInExtensions(
+        number: Int,
+        value: T,
+    ) {
         if (value == null) {
             clearFieldInCurrent(number)
             return
         }
-        val extension = support().extensions.firstOrNull { it.descriptor.number == number } as? ExtensionSupport<T>
-            ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
+        val extension =
+            support().extensions.firstOrNull { it.descriptor.number == number } as? ExtensionSupport<T>
+                ?: throw IllegalArgumentException("Message not contains field definition of '$number'.")
         extensions {
             this[number] = extension.wrap(value)
         }
@@ -192,7 +210,10 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
         }
     }
 
-    private fun copyFrom(message: Message<*, *>, keepOriginalValues: Boolean = false) {
+    private fun copyFrom(
+        message: Message<*, *>,
+        keepOriginalValues: Boolean = false,
+    ) {
         for (source in message.support().fieldDescriptors) {
             val target = this.fieldDescriptorOrNull(source.name) ?: continue
 
@@ -211,13 +232,14 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
 
             if (target.type == FieldDescriptorProto.Type.MESSAGE && target.typeName == WellKnownTypes.ANY_TYPENAME) {
                 if (target.label == FieldDescriptorProto.Label.REPEATED) {
-                    this[target.name] = if (source.label == FieldDescriptorProto.Label.REPEATED) {
-                        message.get<List<Any>>(source.name).mapNotNull {
-                            buildTypeMessage(source.type, it)
+                    this[target.name] =
+                        if (source.label == FieldDescriptorProto.Label.REPEATED) {
+                            message.get<List<Any>>(source.name).mapNotNull {
+                                buildTypeMessage(source.type, it)
+                            }
+                        } else {
+                            listOf(buildTypeMessage(source.type, message[source.name]) ?: continue)
                         }
-                    } else {
-                        listOf(buildTypeMessage(source.type, message[source.name]) ?: continue)
-                    }
                     continue
                 }
                 if (source.label != FieldDescriptorProto.Label.REPEATED) {
@@ -227,7 +249,10 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
         }
     }
 
-    private fun buildTypeMessage(type: FieldDescriptorProto.Type, value: Any): Message<*, *>? {
+    private fun buildTypeMessage(
+        type: FieldDescriptorProto.Type,
+        value: Any,
+    ): Message<*, *>? {
         return when (type) {
             FieldDescriptorProto.Type.DOUBLE -> DoubleValue { this.value = value as Double }
             FieldDescriptorProto.Type.FLOAT -> FloatValue { this.value = value as Float }
@@ -243,11 +268,21 @@ abstract class AbstractMutableMessage<T : Message<T, TM>, TM : MutableMessage<T,
     }
 
     @InternalProtoApi
-    protected abstract fun readField(reader: Reader, field: Int, wire: Int): Boolean
+    protected abstract fun readField(
+        reader: Reader,
+        field: Int,
+        wire: Int,
+    ): Boolean
 
-    protected abstract fun <T> setFieldInCurrent(fieldName: String, value: T)
+    protected abstract fun <T> setFieldInCurrent(
+        fieldName: String,
+        value: T,
+    )
 
-    protected abstract fun <T> setFieldInCurrent(fieldNumber: Int, value: T)
+    protected abstract fun <T> setFieldInCurrent(
+        fieldNumber: Int,
+        value: T,
+    )
 
     protected abstract fun clearFieldInCurrent(fieldName: String): Any?
 

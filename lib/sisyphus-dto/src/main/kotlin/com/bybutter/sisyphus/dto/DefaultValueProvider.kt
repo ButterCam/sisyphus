@@ -13,13 +13,17 @@ import kotlin.reflect.jvm.jvmErasure
  * The provider which can convert string value to real type value.
  */
 interface DefaultValueProvider<T> {
-    fun getValue(proxy: ModelProxy, param: String, property: KProperty<T?>): T?
+    fun getValue(
+        proxy: ModelProxy,
+        param: String,
+        property: KProperty<T?>,
+    ): T?
 
     object Default : DefaultValueProvider<Any?> {
         override fun getValue(
             proxy: ModelProxy,
             param: String,
-            property: KProperty<Any?>
+            property: KProperty<Any?>,
         ): Any? {
             return when (property.returnType.classifier) {
                 Long::class -> {
@@ -150,7 +154,7 @@ interface DefaultValueProvider<T> {
                             if (param.toIntOrNull() != null) {
                                 IntEnum.valueOf(
                                     param.toInt(),
-                                    property.returnType.jvmErasure.java.uncheckedCast<Class<IntEnum>>()
+                                    property.returnType.jvmErasure.java.uncheckedCast<Class<IntEnum>>(),
                                 )
                             } else {
                                 property.returnType.jvmErasure.java.enumConstants.firstOrNull {
@@ -161,13 +165,15 @@ interface DefaultValueProvider<T> {
                         StringEnum::class.isSuperclassOf(property.returnType.classifier.uncheckedCast()) -> {
                             StringEnum.valueOf(
                                 param,
-                                property.returnType.jvmErasure.java.uncheckedCast<Class<StringEnum>>()
+                                property.returnType.jvmErasure.java.uncheckedCast<Class<StringEnum>>(),
                             )
                                 ?: property.returnType.jvmErasure.java.enumConstants.firstOrNull {
                                     (it as Enum<*>).name == param
                                 }
                         }
-                        else -> throw UnsupportedOperationException("Unsupported default value type(${property.returnType})(${proxy.`$type`}).")
+                        else -> throw UnsupportedOperationException(
+                            "Unsupported default value type(${property.returnType})(${proxy.`$type`}).",
+                        )
                     }
                 }
             }

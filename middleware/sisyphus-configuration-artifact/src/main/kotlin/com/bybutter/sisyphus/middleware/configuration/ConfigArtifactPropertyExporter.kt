@@ -4,5 +4,8 @@ import org.springframework.core.Ordered
 import org.springframework.core.env.PropertySource
 
 interface ConfigArtifactPropertyExporter : Ordered {
-    fun export(environment: String, classLoader: ClassLoader): List<PropertySource<*>>
+    fun export(
+        environment: String,
+        classLoader: ClassLoader,
+    ): List<PropertySource<*>>
 }

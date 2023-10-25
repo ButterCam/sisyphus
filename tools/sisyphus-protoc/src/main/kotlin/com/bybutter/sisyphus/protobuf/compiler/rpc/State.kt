@@ -10,35 +10,35 @@ import com.squareup.kotlinpoet.TypeSpec
 class RpcApiFileGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: FileDescriptor,
-    override val target: FileSpec.Builder
+    override val target: FileSpec.Builder,
 ) : ChildGeneratingState<FileDescriptor, FileSpec.Builder>
 
 class RpcInternalFileGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: FileDescriptor,
-    override val target: FileSpec.Builder
+    override val target: FileSpec.Builder,
 ) : ChildGeneratingState<FileDescriptor, FileSpec.Builder>
 
 class ServiceGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: ServiceDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<ServiceDescriptor, TypeSpec.Builder>
 
 class ClientGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: ServiceDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<ServiceDescriptor, TypeSpec.Builder>
 
 class ServiceSupportGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: ServiceDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<ServiceDescriptor, TypeSpec.Builder>
 
 class ServiceCompanionGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: ServiceDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<ServiceDescriptor, TypeSpec.Builder>

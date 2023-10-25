@@ -43,8 +43,8 @@ class MessageSupportFunctionGenerator : GroupedGenerator<MessageImplementationGe
                 returns(
                     RuntimeTypes.MESSAGE_SUPPORT.parameterizedBy(
                         state.descriptor.className(),
-                        state.descriptor.mutableClassName()
-                    )
+                        state.descriptor.mutableClassName(),
+                    ),
                 )
                 addStatement("return %T", state.descriptor.className())
             }
@@ -125,11 +125,11 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
                                                 add(
                                                     "%S, %S ->",
                                                     field.descriptor.name,
-                                                    field.descriptor.jsonName
+                                                    field.descriptor.jsonName,
                                                 )
                                             },
-                                            this
-                                        )
+                                            this,
+                                        ),
                                     ).advance()
                                 } else {
                                     MessageClearInCurrentFunctionGeneratingState(
@@ -139,14 +139,14 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
                                             buildCodeBlock {
                                                 add("%S ->", field.descriptor.name)
                                             },
-                                            this
-                                        )
+                                            this,
+                                        ),
                                     ).advance()
                                 }
                             }
                             addStatement("else -> clearFieldInExtensions(fieldName)")
                         }
-                    }
+                    },
                 )
             }
 
@@ -169,13 +169,13 @@ class MessageClearFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImpl
                                         buildCodeBlock {
                                             add("${field.descriptor.number} ->")
                                         },
-                                        this
-                                    )
+                                        this,
+                                    ),
                                 ).advance()
                             }
                             addStatement("else -> clearFieldInExtensions(fieldNumber)")
                         }
-                    }
+                    },
                 )
             }
         }
@@ -190,14 +190,14 @@ class MessageFieldClearFieldInCurrentFunctionGenerator :
             if (state.descriptor.descriptor.label != DescriptorProtos.FieldDescriptorProto.Label.LABEL_REQUIRED) {
                 addStatement(
                     "%L this.clear${state.descriptor.name().toPascalCase()}()",
-                    state.target.branch
+                    state.target.branch,
                 )
             } else {
                 addStatement(
                     "%L throw %T(%S)",
                     state.target.branch,
                     IllegalArgumentException::class,
-                    "Field '${state.descriptor.descriptor.name}' is required field can't be clear."
+                    "Field '${state.descriptor.descriptor.name}' is required field can't be clear.",
                 )
             }
         }
@@ -230,11 +230,11 @@ class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                                 add(
                                                     "%S, %S ->",
                                                     field.descriptor.name,
-                                                    field.descriptor.jsonName
+                                                    field.descriptor.jsonName,
                                                 )
                                             },
-                                            this
-                                        )
+                                            this,
+                                        ),
                                     ).advance()
                                 } else {
                                     MessageGetInCurrentFunctionGeneratingState(
@@ -244,14 +244,14 @@ class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                             buildCodeBlock {
                                                 add("%S ->", field.descriptor.name)
                                             },
-                                            this
-                                        )
+                                            this,
+                                        ),
                                     ).advance()
                                 }
                             }
                             addStatement("else -> getFieldInExtensions(fieldName)")
                         }
-                    }
+                    },
                 )
             }
 
@@ -275,13 +275,13 @@ class MessageGetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                         buildCodeBlock {
                                             add("${field.descriptor.number} ->")
                                         },
-                                        this
-                                    )
+                                        this,
+                                    ),
                                 ).advance()
                             }
                             addStatement("else -> getFieldInExtensions(fieldNumber)")
                         }
-                    }
+                    },
                 )
             }
         }
@@ -323,11 +323,11 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                                 add(
                                                     "%S, %S ->",
                                                     field.descriptor.name,
-                                                    field.descriptor.jsonName
+                                                    field.descriptor.jsonName,
                                                 )
                                             },
-                                            this
-                                        )
+                                            this,
+                                        ),
                                     ).advance()
                                 } else {
                                     MessageSetFieldInCurrentFunctionGeneratingState(
@@ -337,14 +337,14 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                             buildCodeBlock {
                                                 add("%S ->", field.descriptor.name)
                                             },
-                                            this
-                                        )
+                                            this,
+                                        ),
                                     ).advance()
                                 }
                             }
                             addStatement("else -> setFieldInExtensions(fieldName, value)")
                         }
-                    }
+                    },
                 )
             }
 
@@ -368,13 +368,13 @@ class MessageSetFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                         buildCodeBlock {
                                             add("${field.descriptor.number} ->")
                                         },
-                                        this
-                                    )
+                                        this,
+                                    ),
                                 ).advance()
                             }
                             addStatement("else -> setFieldInExtensions(fieldNumber, value)")
                         }
-                    }
+                    },
                 )
             }
         }
@@ -393,13 +393,13 @@ class MessageFieldSetFieldInCurrentFunctionGenerator :
                         addStatement(
                             "this.%N.addAll(value.%M())",
                             state.descriptor.name(),
-                            RuntimeMethods.UNCHECK_CAST
+                            RuntimeMethods.UNCHECK_CAST,
                         )
                     } else {
                         addStatement(
                             "this.%N.putAll(value.%M())",
                             state.descriptor.name(),
-                            RuntimeMethods.UNCHECK_CAST
+                            RuntimeMethods.UNCHECK_CAST,
                         )
                     }
                 }
@@ -408,7 +408,7 @@ class MessageFieldSetFieldInCurrentFunctionGenerator :
                     "%L this.%N·=·value.%M()",
                     state.target.branch,
                     state.descriptor.name(),
-                    RuntimeMethods.UNCHECK_CAST
+                    RuntimeMethods.UNCHECK_CAST,
                 )
             }
         }
@@ -440,11 +440,11 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                                 add(
                                                     "%S, %S ->",
                                                     field.descriptor.name,
-                                                    field.descriptor.jsonName
+                                                    field.descriptor.jsonName,
                                                 )
                                             },
-                                            this
-                                        )
+                                            this,
+                                        ),
                                     ).advance()
                                 } else {
                                     MessageHasFieldInCurrentFunctionGeneratingState(
@@ -454,14 +454,14 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                             buildCodeBlock {
                                                 add("%S ->", field.descriptor.name)
                                             },
-                                            this
-                                        )
+                                            this,
+                                        ),
                                     ).advance()
                                 }
                             }
                             addStatement("else -> hasFieldInExtensions(fieldName)")
                         }
-                    }
+                    },
                 )
             }
 
@@ -484,13 +484,13 @@ class MessageHasFieldInCurrentFunctionGenerator : GroupedGenerator<MessageImplem
                                         buildCodeBlock {
                                             add("${field.descriptor.number} ->")
                                         },
-                                        this
-                                    )
+                                        this,
+                                    ),
                                 ).advance()
                             }
                             addStatement("else -> hasFieldInExtensions(fieldNumber)")
                         }
-                    }
+                    },
                 )
             }
         }
@@ -526,7 +526,7 @@ class MessageEqualsMessageFunctionGenerator : GroupedGenerator<MessageImplementa
                             MessageEqualsFunctionGeneratingState(state, field, this).advance()
                         }
                         addStatement("return·true")
-                    }
+                    },
                 )
             }
         }
@@ -543,13 +543,13 @@ class MessageFieldEqualsFunctionGenerator : GroupedGenerator<MessageEqualsFuncti
                         addStatement(
                             "if (!%N.contentEquals(other.%N)) return·false",
                             state.descriptor.name(),
-                            state.descriptor.name()
+                            state.descriptor.name(),
                         )
                     } else {
                         addStatement(
                             "if (%N != other.%N) return·false",
                             state.descriptor.name(),
-                            state.descriptor.name()
+                            state.descriptor.name(),
                         )
                     }
                 }
@@ -559,7 +559,7 @@ class MessageFieldEqualsFunctionGenerator : GroupedGenerator<MessageEqualsFuncti
                         "if (!%N.%M(other.%N)) return·false",
                         state.descriptor.name(),
                         RuntimeMethods.CONTENT_EQUALS,
-                        state.descriptor.name()
+                        state.descriptor.name(),
                     )
                 }
             }
@@ -585,7 +585,7 @@ class MessageComputeHashCodeFunctionGenerator : GroupedGenerator<MessageImplemen
                             MessageHashCodeFunctionGeneratingState(state, field, this).advance()
                         }
                         addStatement("return result")
-                    }
+                    },
                 )
             }
         }
@@ -647,7 +647,7 @@ class MessageWriteFieldsFunctionGenerator : GroupedGenerator<MessageImplementati
                         for (field in state.descriptor.fields) {
                             MessageWriteFieldsFunctionGeneratingState(state, field, this).advance()
                         }
-                    }
+                    },
                 )
             }
         }
@@ -674,15 +674,16 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
                 beginControlFlow("if (${state.descriptor.hasFunction()}())")
             }
             when {
-                packed -> addStatement(
-                    "writer.tag(${
-                    makeTag(
-                        state.descriptor.descriptor.number,
-                        WireFormat.WIRETYPE_LENGTH_DELIMITED
+                packed ->
+                    addStatement(
+                        "writer.tag(${
+                            makeTag(
+                                state.descriptor.descriptor.number,
+                                WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                            )
+                        }).beginLd().apply{ this@${state.descriptor.parent.implementationName()}.%N.forEach { $writeMethod(it) } }.endLd()",
+                        state.descriptor.name(),
                     )
-                    }).beginLd().apply{ this@${state.descriptor.parent.implementationName()}.%N.forEach { $writeMethod(it) } }.endLd()",
-                    state.descriptor.name()
-                )
 
                 repeated && message -> {
                     val typeDescriptor = state.descriptor.messageType()!!
@@ -695,75 +696,79 @@ class MessageFieldWriteFunctionGenerator : GroupedGenerator<MessageWriteFieldsFu
 
                         addStatement(
                             "this.%N.forEach { (k, v) -> writer.tag(${
-                            makeTag(
-                                state.descriptor.descriptor.number,
-                                WireFormat.WIRETYPE_LENGTH_DELIMITED
-                            )
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                                )
                             }).beginLd().tag(${
-                            makeTag(
-                                1,
-                                keyType.wireType
-                            )
+                                makeTag(
+                                    1,
+                                    keyType.wireType,
+                                )
                             }).${keyType.name.lowercase()}(k).tag(${
-                            makeTag(
-                                2,
-                                valueType.wireType
-                            )
+                                makeTag(
+                                    2,
+                                    valueType.wireType,
+                                )
                             }).${if (anyValue) "any" else valueType.name.lowercase()}(v).endLd() }",
-                            state.descriptor.name()
+                            state.descriptor.name(),
                         )
                     } else {
                         addStatement(
                             "this.%N.forEach { writer.tag(${
-                            makeTag(
-                                state.descriptor.descriptor.number,
-                                WireFormat.WIRETYPE_LENGTH_DELIMITED
-                            )
+                                makeTag(
+                                    state.descriptor.descriptor.number,
+                                    WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                                )
                             }).${if (any) "any" else "message"}(it) }",
-                            state.descriptor.name()
+                            state.descriptor.name(),
                         )
                     }
                 }
 
-                repeated -> addStatement(
-                    "this.%N.forEach { writer.tag(${
-                    makeTag(
-                        state.descriptor.descriptor.number,
-                        type.wireType
+                repeated ->
+                    addStatement(
+                        "this.%N.forEach { writer.tag(${
+                            makeTag(
+                                state.descriptor.descriptor.number,
+                                type.wireType,
+                            )
+                        }).$writeMethod(it) }",
+                        state.descriptor.name(),
                     )
-                    }).$writeMethod(it) }",
-                    state.descriptor.name()
-                )
 
-                message -> addStatement(
-                    "writer.tag(${
-                    makeTag(
-                        state.descriptor.descriptor.number,
-                        WireFormat.WIRETYPE_LENGTH_DELIMITED
+                message ->
+                    addStatement(
+                        "writer.tag(${
+                            makeTag(
+                                state.descriptor.descriptor.number,
+                                WireFormat.WIRETYPE_LENGTH_DELIMITED,
+                            )
+                        }).${if (any) "any" else "message"}(this.%N)",
+                        state.descriptor.name(),
                     )
-                    }).${if (any) "any" else "message"}(this.%N)",
-                    state.descriptor.name()
-                )
 
-                proto3Optional -> addStatement(
-                    "this.%N?.let{ writer.tag(${
-                    makeTag(
-                        state.descriptor.descriptor.number,
-                        type.wireType
+                proto3Optional ->
+                    addStatement(
+                        "this.%N?.let{ writer.tag(${
+                            makeTag(
+                                state.descriptor.descriptor.number,
+                                type.wireType,
+                            )
+                        }).$writeMethod(it) }",
+                        state.descriptor.name(),
                     )
-                    }).$writeMethod(it) }",
-                    state.descriptor.name()
-                )
 
-                else -> addStatement(
-                    "writer.tag(${
-                    makeTag(
-                        state.descriptor.descriptor.number,
-                        type.wireType
+                else ->
+                    addStatement(
+                        "writer.tag(${
+                            makeTag(
+                                state.descriptor.descriptor.number,
+                                type.wireType,
+                            )
+                        }).$writeMethod(this.%N)",
+                        state.descriptor.name(),
                     )
-                    }).$writeMethod(this.%N)",
-                    state.descriptor.name()
-                )
             }
             if (optional) {
                 endControlFlow()
@@ -797,7 +802,7 @@ class MessageReadFieldFunctionGenerator : GroupedGenerator<MessageImplementation
                             addStatement("else -> return false")
                         }
                         addStatement("return true")
-                    }
+                    },
                 )
             }
         }
@@ -818,16 +823,18 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
             val any = state.descriptor.descriptor.typeName == ".google.protobuf.Any"
 
             when {
-                packed && enum -> addStatement(
-                    "${state.descriptor.descriptor.number} -> reader.packed(wire) { this.%N·+=·%T(it.int32()) }",
-                    state.descriptor.name(),
-                    state.descriptor.enumType()?.className()
-                )
+                packed && enum ->
+                    addStatement(
+                        "${state.descriptor.descriptor.number} -> reader.packed(wire) { this.%N·+=·%T(it.int32()) }",
+                        state.descriptor.name(),
+                        state.descriptor.enumType()?.className(),
+                    )
 
-                packed -> addStatement(
-                    "${state.descriptor.descriptor.number} -> reader.packed(wire) { this.%N·+=·it.$readMethod() }",
-                    state.descriptor.name()
-                )
+                packed ->
+                    addStatement(
+                        "${state.descriptor.descriptor.number} -> reader.packed(wire) { this.%N·+=·it.$readMethod() }",
+                        state.descriptor.name(),
+                    )
 
                 repeated && message -> {
                     val typeDescriptor = state.descriptor.messageType()!!
@@ -841,75 +848,87 @@ class MessageFieldReadFunctionGenerator : GroupedGenerator<MessageReadFieldFunct
                             WireFormat.FieldType.MESSAGE -> {
                                 if (valueDescriptor.messageType()?.fullProtoName() == ".google.protobuf.Any") {
                                     addStatement(
-                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { reader.any() }) { k,·v·-> this.%N[k]·=·v }",
-                                        state.descriptor.name()
+                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${
+                                            keyType.name.lowercase()
+                                        }() }, { reader.any() }) { k,·v·-> this.%N[k]·=·v }",
+                                        state.descriptor.name(),
                                     )
                                 } else {
                                     addStatement(
-                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> this.%N[k]·=·v }",
+                                        "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${
+                                            keyType.name.lowercase()
+                                        }() }, { %T.newMutable().apply { readFrom(reader) } }) { k,·v·-> this.%N[k]·=·v }",
                                         valueDescriptor.elementType(),
-                                        state.descriptor.name()
+                                        state.descriptor.name(),
                                     )
                                 }
                             }
 
                             WireFormat.FieldType.ENUM -> {
                                 addStatement(
-                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { %T(it.int32()) }) { k,·v·-> this.%N[k]·=·v }",
+                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${
+                                        keyType.name.lowercase()
+                                    }() }, { %T(it.int32()) }) { k,·v·-> this.%N[k]·=·v }",
                                     valueDescriptor.elementType(),
-                                    state.descriptor.name()
+                                    state.descriptor.name(),
                                 )
                             }
 
                             else -> {
                                 addStatement(
-                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${keyType.name.lowercase()}() }, { it.${valueType.name.lowercase()}() }) { k,·v·-> this.%N[k]·=·v }",
-                                    state.descriptor.name()
+                                    "${state.descriptor.descriptor.number} -> reader.mapEntry({ it.${
+                                        keyType.name.lowercase()
+                                    }() }, { it.${valueType.name.lowercase()}() }) { k,·v·-> this.%N[k]·=·v }",
+                                    state.descriptor.name(),
                                 )
                             }
                         }
                     } else if (any) {
                         addStatement(
                             "${state.descriptor.descriptor.number} -> this.%N += reader.any()",
-                            state.descriptor.name()
+                            state.descriptor.name(),
                         )
                     } else {
                         addStatement(
                             "${state.descriptor.descriptor.number} -> this.%N += %T.newMutable().apply { readFrom(reader) }",
                             state.descriptor.name(),
-                            state.descriptor.elementType()
+                            state.descriptor.elementType(),
                         )
                     }
                 }
 
-                repeated -> addStatement(
-                    "${state.descriptor.descriptor.number} -> this.%N += reader.$readMethod()",
-                    state.descriptor.name()
-                )
-
-                message -> if (any) {
+                repeated ->
                     addStatement(
-                        "${state.descriptor.descriptor.number} -> this.%N = reader.any()",
-                        state.descriptor.name()
-                    )
-                } else {
-                    addStatement(
-                        "${state.descriptor.descriptor.number} -> this.%N = %T.newMutable().apply { readFrom(reader) }",
+                        "${state.descriptor.descriptor.number} -> this.%N += reader.$readMethod()",
                         state.descriptor.name(),
-                        state.descriptor.elementType()
                     )
-                }
 
-                enum -> addStatement(
-                    "${state.descriptor.descriptor.number} -> this.%N = %T(reader.int32())",
-                    state.descriptor.name(),
-                    state.descriptor.elementType()
-                )
+                message ->
+                    if (any) {
+                        addStatement(
+                            "${state.descriptor.descriptor.number} -> this.%N = reader.any()",
+                            state.descriptor.name(),
+                        )
+                    } else {
+                        addStatement(
+                            "${state.descriptor.descriptor.number} -> this.%N = %T.newMutable().apply { readFrom(reader) }",
+                            state.descriptor.name(),
+                            state.descriptor.elementType(),
+                        )
+                    }
 
-                else -> addStatement(
-                    "${state.descriptor.descriptor.number} -> this.%N = reader.$readMethod()",
-                    state.descriptor.name()
-                )
+                enum ->
+                    addStatement(
+                        "${state.descriptor.descriptor.number} -> this.%N = %T(reader.int32())",
+                        state.descriptor.name(),
+                        state.descriptor.elementType(),
+                    )
+
+                else ->
+                    addStatement(
+                        "${state.descriptor.descriptor.number} -> this.%N = reader.$readMethod()",
+                        state.descriptor.name(),
+                    )
             }
         }
         return true

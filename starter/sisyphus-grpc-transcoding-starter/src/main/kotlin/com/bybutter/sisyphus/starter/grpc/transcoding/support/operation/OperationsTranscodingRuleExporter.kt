@@ -20,33 +20,41 @@ class OperationsTranscodingRuleExporter : TranscodingRouterRuleExporter {
     @Autowired(required = false)
     private var operationSupports: List<OperationSupport> = listOf()
 
-    override fun export(server: Server, enableServices: Set<String>, rules: MutableList<TranscodingRouterRule>) {
-        val operations = server.services.firstOrNull {
-            it.serviceDescriptor.name == Operations.serviceDescriptor.name
-        } ?: return
+    override fun export(
+        server: Server,
+        enableServices: Set<String>,
+        rules: MutableList<TranscodingRouterRule>,
+    ) {
+        val operations =
+            server.services.firstOrNull {
+                it.serviceDescriptor.name == Operations.serviceDescriptor.name
+            } ?: return
 
         val serviceProto = Operations.descriptor
         for (method in operations.methods) {
             when (method.methodDescriptor.fullMethodName) {
-                Operations.listOperations.fullMethodName -> exportListOperations(
-                    operations,
-                    method,
-                    serviceProto,
-                    rules
-                )
+                Operations.listOperations.fullMethodName ->
+                    exportListOperations(
+                        operations,
+                        method,
+                        serviceProto,
+                        rules,
+                    )
                 Operations.getOperation.fullMethodName -> exportGetOperation(operations, method, serviceProto, rules)
-                Operations.deleteOperation.fullMethodName -> exportDeleteOperation(
-                    operations,
-                    method,
-                    serviceProto,
-                    rules
-                )
-                Operations.cancelOperation.fullMethodName -> exportCancelOperation(
-                    operations,
-                    method,
-                    serviceProto,
-                    rules
-                )
+                Operations.deleteOperation.fullMethodName ->
+                    exportDeleteOperation(
+                        operations,
+                        method,
+                        serviceProto,
+                        rules,
+                    )
+                Operations.cancelOperation.fullMethodName ->
+                    exportCancelOperation(
+                        operations,
+                        method,
+                        serviceProto,
+                        rules,
+                    )
             }
         }
     }
@@ -55,7 +63,7 @@ class OperationsTranscodingRuleExporter : TranscodingRouterRuleExporter {
         service: ServerServiceDefinition,
         method: ServerMethodDefinition<*, *>,
         serviceProto: ServiceDescriptorProto,
-        rules: MutableList<TranscodingRouterRule>
+        rules: MutableList<TranscodingRouterRule>,
     ) {
         val methodName = method.methodDescriptor.bareMethodName
         val methodProto = serviceProto.method.firstOrNull { it.name == methodName } ?: return
@@ -70,7 +78,7 @@ class OperationsTranscodingRuleExporter : TranscodingRouterRuleExporter {
         service: ServerServiceDefinition,
         method: ServerMethodDefinition<*, *>,
         serviceProto: ServiceDescriptorProto,
-        rules: MutableList<TranscodingRouterRule>
+        rules: MutableList<TranscodingRouterRule>,
     ) {
         val methodName = method.methodDescriptor.bareMethodName
         val methodProto = serviceProto.method.firstOrNull { it.name == methodName } ?: return
@@ -85,7 +93,7 @@ class OperationsTranscodingRuleExporter : TranscodingRouterRuleExporter {
         service: ServerServiceDefinition,
         method: ServerMethodDefinition<*, *>,
         serviceProto: ServiceDescriptorProto,
-        rules: MutableList<TranscodingRouterRule>
+        rules: MutableList<TranscodingRouterRule>,
     ) {
         val methodName = method.methodDescriptor.bareMethodName
         val methodProto = serviceProto.method.firstOrNull { it.name == methodName } ?: return
@@ -100,7 +108,7 @@ class OperationsTranscodingRuleExporter : TranscodingRouterRuleExporter {
         service: ServerServiceDefinition,
         method: ServerMethodDefinition<*, *>,
         serviceProto: ServiceDescriptorProto,
-        rules: MutableList<TranscodingRouterRule>
+        rules: MutableList<TranscodingRouterRule>,
     ) {
         val methodName = method.methodDescriptor.bareMethodName
         val methodProto = serviceProto.method.firstOrNull { it.name == methodName } ?: return

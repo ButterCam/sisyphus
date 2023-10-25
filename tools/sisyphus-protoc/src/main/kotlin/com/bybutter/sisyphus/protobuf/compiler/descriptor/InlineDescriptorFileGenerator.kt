@@ -31,19 +31,20 @@ class InlineFileSupportDescriptorGenerator :
     override val group: String get() = FileSupportDescriptorGenerator::class.java.canonicalName
 
     override fun generate(state: FileDescriptorGeneratingState): Boolean {
-        val descriptor = state.descriptor.descriptor.toBuilder().apply {
-            DescriptorGeneratingState(state, state.descriptor, this).advance()
-        }.build()
+        val descriptor =
+            state.descriptor.descriptor.toBuilder().apply {
+                DescriptorGeneratingState(state, state.descriptor, this).advance()
+            }.build()
         state.target.apply {
             delegate(
                 buildCodeBlock {
                     beginScope("%M", RuntimeMethods.LAZY) {
                         addStatement(
                             "%T.parse(byteArrayOf(${descriptor.toByteArray().joinToString(", ")}))",
-                            RuntimeTypes.FILE_DESCRIPTOR_PROTO
+                            RuntimeTypes.FILE_DESCRIPTOR_PROTO,
                         )
                     }
-                }
+                },
             )
         }
         return true

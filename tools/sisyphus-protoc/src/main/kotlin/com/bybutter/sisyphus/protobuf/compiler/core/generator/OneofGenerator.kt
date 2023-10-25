@@ -39,13 +39,13 @@ class OneofInterfaceGenerator : GroupedGenerator<MessageInterfaceGeneratingState
 
             state.target.property(
                 oneof.fieldName(),
-                oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true)
+                oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true),
             )
 
             state.target.addType(
                 kInterface(oneof.oneOfName()) {
                     OneofValueTypeGeneratingState(state, oneof, this).advance()
-                }
+                },
             )
         }
         return true
@@ -99,7 +99,7 @@ class OneofMutableInterfaceGenerator : GroupedGenerator<MutableMessageInterfaceG
 
             state.target.property(
                 oneof.fieldName(),
-                oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true)
+                oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true),
             ) {
                 this += KModifier.OVERRIDE
                 mutable()
@@ -116,7 +116,7 @@ class OneofImplementationGenerator : GroupedGenerator<MessageImplementationGener
 
             state.target.property(
                 oneof.fieldName(),
-                oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true)
+                oneof.oneOfClassName().parameterizedBy(TypeVariableName("*")).copy(true),
             ) {
                 this += KModifier.OVERRIDE
                 mutable()
@@ -145,14 +145,14 @@ class OneofFieldImplementationInterceptorGenerator :
                     addStatement(
                         "return (%N as? %T)?.value",
                         oneOf.fieldName(),
-                        oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                        oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
                     )
                 } else {
                     addStatement(
                         "return (%N as? %T)?.value ?: %L",
                         oneOf.fieldName(),
                         oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
-                        state.descriptor.defaultValue()
+                        state.descriptor.defaultValue(),
                     )
                 }
             }
@@ -164,16 +164,16 @@ class OneofFieldImplementationInterceptorGenerator :
                             addStatement(
                                 "%N = value?.let { %T(it) }",
                                 oneOf.fieldName(),
-                                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
                             )
                         } else {
                             addStatement(
                                 "%N = %T(value)",
                                 oneOf.fieldName(),
-                                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
                             )
                         }
-                    }
+                    },
                 )
             }
         }
@@ -184,7 +184,7 @@ class OneofFieldImplementationInterceptorGenerator :
             addStatement(
                 "return %N is %T",
                 oneOf.fieldName(),
-                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
             )
         }
 
@@ -194,7 +194,7 @@ class OneofFieldImplementationInterceptorGenerator :
             beginControlFlow(
                 "return (%N as? %T)?.value?.also",
                 oneOf.fieldName(),
-                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase())
+                oneOf.oneOfClassName().nestedClass(state.descriptor.descriptor.name.toPascalCase()),
             )
             addStatement("%N = null", oneOf.fieldName())
             endControlFlow()

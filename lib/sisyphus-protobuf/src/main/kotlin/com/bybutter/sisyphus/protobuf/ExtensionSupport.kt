@@ -9,9 +9,17 @@ abstract class ExtensionSupport<T> : ProtoSupport<FieldDescriptorProto> {
 
     abstract val extendee: MessageSupport<*, *>
 
-    abstract fun write(writer: Writer, value: T)
+    abstract fun write(
+        writer: Writer,
+        value: T,
+    )
 
-    abstract fun read(reader: Reader, number: Int, wire: Int, extension: MessageExtension<T>?): MessageExtension<T>
+    abstract fun read(
+        reader: Reader,
+        number: Int,
+        wire: Int,
+        extension: MessageExtension<T>?,
+    ): MessageExtension<T>
 
     abstract fun default(): T?
 

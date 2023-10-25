@@ -19,28 +19,31 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
     override fun buildSelect(
         dsl: DSLContext,
         expressions: List<Any?>,
-        vararg fields: Field<*>
+        vararg fields: Field<*>,
     ): SelectConditionStep<T> {
-        val selectedFields = if (fields.isEmpty()) {
-            table.fields()
-        } else {
-            fields
-        }
+        val selectedFields =
+            if (fields.isEmpty()) {
+                table.fields()
+            } else {
+                fields
+            }
 
-        val conditions = expressions.flatMap {
-            when (it) {
-                is Condition -> listOf(it)
-                is ConditionProvider -> it.provideConditions()
-                else -> listOf()
+        val conditions =
+            expressions.flatMap {
+                when (it) {
+                    is Condition -> listOf(it)
+                    is ConditionProvider -> it.provideConditions()
+                    else -> listOf()
+                }
             }
-        }
-        val joins = expressions.flatMap {
-            when (it) {
-                is JoinProvider -> it.provideJoins()
-                is Join -> listOf(it)
-                else -> listOf()
-            }
-        }.distinctBy { it.javaClass }
+        val joins =
+            expressions.flatMap {
+                when (it) {
+                    is JoinProvider -> it.provideJoins()
+                    is Join -> listOf(it)
+                    else -> listOf()
+                }
+            }.distinctBy { it.javaClass }
 
         return dsl.select(*selectedFields).from(table).run {
             joins.fold(this as SelectJoinStep<*>) { step, join ->
@@ -53,7 +56,11 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
         return fieldMapping[member.text]
     }
 
-    fun field(member: String, field: Field<*>, converter: ((Any?) -> Any?)? = null) {
+    fun field(
+        member: String,
+        field: Field<*>,
+        converter: ((Any?) -> Any?)? = null,
+    ) {
         val camelCaseMember = toCamelCase(member)
         val fieldOrHandle = FieldHandle.wrap(field, converter)
         fieldMapping[member] = fieldOrHandle
@@ -73,7 +80,10 @@ open class TableSqlBuilder<T : Record>(private val table: Table<T>) : SqlBuilder
     }
 }
 
-fun <T : Record> sqlBuilder(table: Table<T>, block: TableSqlBuilder<T>.() -> Unit): TableSqlBuilder<T> {
+fun <T : Record> sqlBuilder(
+    table: Table<T>,
+    block: TableSqlBuilder<T>.() -> Unit,
+): TableSqlBuilder<T> {
     return TableSqlBuilder(table).apply(block)
 }
 

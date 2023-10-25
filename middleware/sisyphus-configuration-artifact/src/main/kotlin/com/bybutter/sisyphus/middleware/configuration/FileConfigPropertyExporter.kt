@@ -13,7 +13,10 @@ abstract class FileConfigPropertyExporter : ConfigArtifactPropertyExporter {
 
     protected abstract fun read(url: URL): PropertySource<*>?
 
-    override fun export(environment: String, classLoader: ClassLoader): List<PropertySource<*>> {
+    override fun export(
+        environment: String,
+        classLoader: ClassLoader,
+    ): List<PropertySource<*>> {
         return getFiles(environment).asSequence().flatMap {
             classLoader.getResources(it).asSequence()
         }.mapNotNull { read(it) }.toList()

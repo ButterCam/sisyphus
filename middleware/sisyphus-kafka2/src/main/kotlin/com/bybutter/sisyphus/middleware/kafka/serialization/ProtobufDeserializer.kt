@@ -18,36 +18,58 @@ import kotlin.reflect.full.companionObjectInstance
 class ProtobufDeserializer<T : Message<*, *>> : Deserializer<T> {
     private var messageSupport: MessageSupport<*, *>? = null
 
-    override fun configure(configs: MutableMap<String, *>, isKey: Boolean) {
+    override fun configure(
+        configs: MutableMap<String, *>,
+        isKey: Boolean,
+    ) {
         val typeConfig = if (isKey) LISTENER_KEY_TYPE else LISTENER_VALUE_TYPE
         configs[typeConfig]?.let {
-            messageSupport = when (it) {
-                is MessageSupport<*, *> -> it
-                Message::class.java -> null
-                is ParameterizedType -> null
-                is Class<*> -> it.kotlin.companionObjectInstance as? MessageSupport<*, *>
-                is String -> ProtoTypes.findMessageSupport(it)
-                else -> throw IllegalArgumentException("Protobuf deserializer config '$typeConfig'($it[${it.javaClass}]) must be MessageSupport or message type string.")
-            }
+            messageSupport =
+                when (it) {
+                    is MessageSupport<*, *> -> it
+                    Message::class.java -> null
+                    is ParameterizedType -> null
+                    is Class<*> -> it.kotlin.companionObjectInstance as? MessageSupport<*, *>
+                    is String -> ProtoTypes.findMessageSupport(it)
+                    else -> throw IllegalArgumentException(
+                        "Protobuf deserializer config '$typeConfig'($it[${
+                            it.javaClass
+                        }]) must be MessageSupport or message type string.",
+                    )
+                }
         }
     }
 
-    override fun deserialize(topic: String, headers: Headers, data: ByteArray): T {
-        val localSupport = headers.lastHeader(PROTOBUF_TYPE)?.let {
-            ProtoTypes.findMessageSupport(it.value().decodeToString())
-        } ?: messageSupport
-        val useJson = headers.lastHeader(PROTOBUF_USE_JSON)?.let {
-            it.value().decodeToString().toBoolean()
-        } ?: isJson(data)
+    override fun deserialize(
+        topic: String,
+        headers: Headers,
+        data: ByteArray,
+    ): T {
+        val localSupport =
+            headers.lastHeader(PROTOBUF_TYPE)?.let {
+                ProtoTypes.findMessageSupport(it.value().decodeToString())
+            } ?: messageSupport
+        val useJson =
+            headers.lastHeader(PROTOBUF_USE_JSON)?.let {
+                it.value().decodeToString().toBoolean()
+            } ?: isJson(data)
 
         return doDeserialize(topic, data, useJson, localSupport)
     }
 
-    override fun deserialize(topic: String, data: ByteArray): T {
+    override fun deserialize(
+        topic: String,
+        data: ByteArray,
+    ): T {
         return doDeserialize(topic, data, isJson(data), messageSupport)
     }
 
-    private fun doDeserialize(topic: String, data: ByteArray, useJson: Boolean, support: MessageSupport<*, *>?): T {
+    private fun doDeserialize(
+        topic: String,
+        data: ByteArray,
+        useJson: Boolean,
+        support: MessageSupport<*, *>?,
+    ): T {
         return if (support == null) {
             if (useJson) {
                 Json.deserialize(data.toString(Charset.defaultCharset()), Message::class.java)

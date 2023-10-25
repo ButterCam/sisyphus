@@ -8,5 +8,8 @@ import java.util.UUID
 data class ProtobufBoosterContext(
     var order: Int = 0,
     var name: String = "Booster_${UUID.randomUUID().toString().replace("-", "")}",
-    val builder: FunSpec.Builder = FunSpec.builder("invoke").addParameter("reflection", RuntimeTypes.PROTO_REFLECTION).addModifiers(KModifier.OVERRIDE)
+    val builder: FunSpec.Builder =
+        FunSpec.builder(
+            "invoke",
+        ).addParameter("reflection", RuntimeTypes.PROTO_REFLECTION).addModifiers(KModifier.OVERRIDE),
 )

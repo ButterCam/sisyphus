@@ -30,36 +30,39 @@ import com.squareup.kotlinpoet.buildCodeBlock
 
 class ApiFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
-        state.target += GeneratedKotlinFile(
-            kFile(state.descriptor.packageName(), state.descriptor.kotlinFileName()) {
-                ApiFileGeneratingState(state, state.descriptor, this).advance()
-            }
-        )
+        state.target +=
+            GeneratedKotlinFile(
+                kFile(state.descriptor.packageName(), state.descriptor.kotlinFileName()) {
+                    ApiFileGeneratingState(state, state.descriptor, this).advance()
+                },
+            )
         return true
     }
 }
 
 class InternalFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
-        state.target += GeneratedKotlinFile(
-            kFile(
-                state.descriptor.internalPackageName(),
-                state.descriptor.kotlinFileName()
-            ) {
-                InternalFileGeneratingState(state, state.descriptor, this).advance()
-            }
-        )
+        state.target +=
+            GeneratedKotlinFile(
+                kFile(
+                    state.descriptor.internalPackageName(),
+                    state.descriptor.kotlinFileName(),
+                ) {
+                    InternalFileGeneratingState(state, state.descriptor, this).advance()
+                },
+            )
         return true
     }
 }
 
 class DescriptorFileGenerator : GroupedGenerator<FileGeneratingState> {
     override fun generate(state: FileGeneratingState): Boolean {
-        state.target += GeneratedDescriptorFile(
-            state.descriptor.descriptor.toBuilder().apply {
-                DescriptorGeneratingState(state, state.descriptor, this).advance()
-            }.build()
-        )
+        state.target +=
+            GeneratedDescriptorFile(
+                state.descriptor.descriptor.toBuilder().apply {
+                    DescriptorGeneratingState(state, state.descriptor, this).advance()
+                }.build(),
+            )
         return true
     }
 }
@@ -86,14 +89,14 @@ class FileSupportGenerator : GroupedGenerator<InternalFileGeneratingState> {
                     function("children") {
                         this += KModifier.OVERRIDE
                         returns(
-                            Array::class.asTypeName().parameterizedBy(RuntimeTypes.PROTO_SUPPORT.parameterizedBy(STAR))
+                            Array::class.asTypeName().parameterizedBy(RuntimeTypes.PROTO_SUPPORT.parameterizedBy(STAR)),
                         )
                         addStatement("return arrayOf(${result.joinToString(", ") { "%T" }})", *result.toTypedArray())
                     }
                 }
 
                 FileSupportGeneratingState(state, state.descriptor, this).advance()
-            }
+            },
         )
         return true
     }
@@ -107,10 +110,10 @@ class FileSupportDescriptorGenerator : GroupedGenerator<FileDescriptorGenerating
                     beginScope("%M", RuntimeMethods.LAZY) {
                         addStatement(
                             "readDescriptor(%S)",
-                            state.descriptor.descriptor.name.replaceExtensionName("proto", "pb")
+                            state.descriptor.descriptor.name.replaceExtensionName("proto", "pb"),
                         )
                     }
-                }
+                },
             )
         }
         return true

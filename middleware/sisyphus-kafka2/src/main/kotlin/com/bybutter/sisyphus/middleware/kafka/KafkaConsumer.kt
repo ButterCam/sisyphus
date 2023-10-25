@@ -14,5 +14,5 @@ annotation class KafkaConsumer(
     val groupId: String = "",
     val keyDeserializer: KClass<out Deserializer<*>> = StringDeserializer::class,
     val valueDeserializer: KClass<out Deserializer<*>> = JsonDeserializer::class,
-    val errorHandler: KClass<out KafkaExceptionHandler> = DefaultExceptionHandler::class
+    val errorHandler: KClass<out KafkaExceptionHandler> = DefaultExceptionHandler::class,
 )

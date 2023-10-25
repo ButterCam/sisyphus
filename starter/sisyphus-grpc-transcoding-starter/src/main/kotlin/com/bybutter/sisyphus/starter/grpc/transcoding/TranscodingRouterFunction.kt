@@ -15,9 +15,8 @@ import reactor.core.publisher.Mono
  */
 class TranscodingRouterFunction constructor(
     private val serviceRouters: List<RouterFunction<ServerResponse>>,
-    private val transcodingChannel: Channel
+    private val transcodingChannel: Channel,
 ) : RouterFunction<ServerResponse> {
-
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
         val oldAttributes = request.attributes().toMap()
 
@@ -34,21 +33,21 @@ class TranscodingRouterFunction constructor(
                 request.attributes().clear()
                 request.attributes() += oldAttributes
                 it.success()
-            }
+            },
         )
     }
 
     companion object {
         operator fun invoke(
             rules: Collection<TranscodingRouterRule>,
-            transcodingChannel: Channel
+            transcodingChannel: Channel,
         ): RouterFunction<ServerResponse> {
             // Return empty router if no service routers created.
             if (rules.isEmpty()) return EmptyRouterFunction
 
             return TranscodingRouterFunction(
                 rules.map { TranscodingHttpRouterFunction(it) },
-                transcodingChannel
+                transcodingChannel,
             )
         }
     }

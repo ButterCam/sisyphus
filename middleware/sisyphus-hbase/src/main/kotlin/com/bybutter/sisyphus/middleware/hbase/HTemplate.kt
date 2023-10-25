@@ -8,7 +8,10 @@ interface HTemplate<TKey, TValue> {
 
     fun get(key: TKey): TValue?
 
-    fun set(key: TKey, value: TValue)
+    fun set(
+        key: TKey,
+        value: TValue,
+    )
 
     fun getMap(keys: Collection<TKey>): Map<TKey, TValue>
 

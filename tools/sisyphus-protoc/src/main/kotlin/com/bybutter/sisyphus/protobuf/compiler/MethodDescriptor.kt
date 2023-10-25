@@ -7,7 +7,7 @@ import com.google.protobuf.DescriptorProtos
 
 class MethodDescriptor(
     override val parent: ServiceDescriptor,
-    override val descriptor: DescriptorProtos.MethodDescriptorProto
+    override val descriptor: DescriptorProtos.MethodDescriptorProto,
 ) : DescriptorNode<DescriptorProtos.MethodDescriptorProto>() {
     fun name(): String {
         return descriptor.name.toCamelCase()
@@ -18,17 +18,18 @@ class MethodDescriptor(
     }
 
     fun path(): List<Int> {
-        return parent.path() + listOf(
-            DescriptorProtos.ServiceDescriptorProto.METHOD_FIELD_NUMBER,
-            parent.descriptor.methodList.indexOf(descriptor)
-        )
+        return parent.path() +
+            listOf(
+                DescriptorProtos.ServiceDescriptorProto.METHOD_FIELD_NUMBER,
+                parent.descriptor.methodList.indexOf(descriptor),
+            )
     }
 
     fun document(): String {
         return escapeDoc(
             file().descriptor.sourceCodeInfo?.locationList?.firstOrNull {
                 it.pathList.contentEquals(path())
-            }?.leadingComments ?: ""
+            }?.leadingComments ?: "",
         )
     }
 

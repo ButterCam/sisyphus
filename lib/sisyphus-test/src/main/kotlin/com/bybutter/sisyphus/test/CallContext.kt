@@ -15,7 +15,7 @@ data class CallContext(
     val input: Message<*, *>,
     var status: Status? = null,
     var trailers: Metadata? = null,
-    var output: Message<*, *>? = null
+    var output: Message<*, *>? = null,
 ) {
     fun toCelContext(): Map<String, Any?> {
         return mutableMapOf<String, Any?>().apply {

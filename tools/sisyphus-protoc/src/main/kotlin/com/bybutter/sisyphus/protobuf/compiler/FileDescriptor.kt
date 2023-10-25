@@ -7,21 +7,25 @@ import java.nio.file.Paths
 
 class FileDescriptor(
     override val parent: FileDescriptorSet,
-    override val descriptor: DescriptorProtos.FileDescriptorProto
+    override val descriptor: DescriptorProtos.FileDescriptorProto,
 ) : DescriptorNode<DescriptorProtos.FileDescriptorProto>() {
     override fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
-        children += descriptor.messageTypeList.map {
-            MessageDescriptor(this, it)
-        }
-        children += descriptor.enumTypeList.map {
-            EnumDescriptor(this, it)
-        }
-        children += descriptor.extensionList.map {
-            ExtensionDescriptor(this, it)
-        }
-        children += descriptor.serviceList.map {
-            ServiceDescriptor(this, it)
-        }
+        children +=
+            descriptor.messageTypeList.map {
+                MessageDescriptor(this, it)
+            }
+        children +=
+            descriptor.enumTypeList.map {
+                EnumDescriptor(this, it)
+            }
+        children +=
+            descriptor.extensionList.map {
+                ExtensionDescriptor(this, it)
+            }
+        children +=
+            descriptor.serviceList.map {
+                ServiceDescriptor(this, it)
+            }
         super.resolveChildren(children)
     }
 
@@ -34,11 +38,12 @@ class FileDescriptor(
     val services: List<ServiceDescriptor> get() = children().filterIsInstance<ServiceDescriptor>()
 
     fun packageName(): String {
-        val packageName = if (descriptor.options.hasJavaPackage()) {
-            descriptor.options.javaPackage
-        } else {
-            descriptor.`package`
-        }
+        val packageName =
+            if (descriptor.options.hasJavaPackage()) {
+                descriptor.options.javaPackage
+            } else {
+                descriptor.`package`
+            }
 
         return parent.shadePackage(packageName)
     }

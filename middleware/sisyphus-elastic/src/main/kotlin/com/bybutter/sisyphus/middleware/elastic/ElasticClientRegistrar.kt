@@ -27,9 +27,10 @@ class ElasticClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentA
         val beanFactory = registry as ConfigurableListableBeanFactory
 
         val properties = beanFactory.getBeansOfType<ElasticProperty>().toMutableMap()
-        val elasticProperties = Binder.get(environment)
-            .bind("sisyphus", ElasticProperties::class.java)
-            .orElse(null)?.elastic ?: mapOf()
+        val elasticProperties =
+            Binder.get(environment)
+                .bind("sisyphus", ElasticProperties::class.java)
+                .orElse(null)?.elastic ?: mapOf()
 
         properties += elasticProperties
 
@@ -37,10 +38,11 @@ class ElasticClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentA
 
         for ((name, property) in properties) {
             val beanName = "$BEAN_NAME_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RestClient::class.java) {
-                val factory = beanFactory.getBean(ElasticClientFactory::class.java)
-                factory.createClient(property)
-            }.beanDefinition
+            val beanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(RestClient::class.java) {
+                    val factory = beanFactory.getBean(ElasticClientFactory::class.java)
+                    factory.createClient(property)
+                }.beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
         }

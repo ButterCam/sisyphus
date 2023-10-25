@@ -19,13 +19,12 @@ import org.springframework.context.annotation.Import
 @AutoConfiguration(
     before = [
         JacksonAutoConfiguration::class,
-        CodecsAutoConfiguration::class
-    ]
+        CodecsAutoConfiguration::class,
+    ],
 )
 @Import(JacksonAutoRegister::class)
 @ComponentScan(basePackageClasses = [SisyphusJacksonAutoConfiguration::class])
 class SisyphusJacksonAutoConfiguration {
-
     @Bean
     @ConditionalOnClass(CBORFactory::class)
     fun jackson2CborCodecCustomizer(): CodecCustomizer {

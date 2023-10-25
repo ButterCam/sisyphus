@@ -28,24 +28,26 @@ abstract class DescriptorNode<T> {
 fun DescriptorNode<*>.file(): FileDescriptor {
     var state: DescriptorNode<*> = this
     while (true) {
-        state = when (state) {
-            is FileDescriptor -> return state
-            is ServiceDescriptor -> return state.parent
-            is MethodDescriptor -> return state.parent.parent
-            else -> state.parent
-        }
+        state =
+            when (state) {
+                is FileDescriptor -> return state
+                is ServiceDescriptor -> return state.parent
+                is MethodDescriptor -> return state.parent.parent
+                else -> state.parent
+            }
     }
 }
 
 fun DescriptorNode<*>.fileSet(): FileDescriptorSet {
     var state: DescriptorNode<*> = this
     while (true) {
-        state = when (state) {
-            is FileDescriptorSet -> return state
-            is FileDescriptor -> return state.parent
-            is ServiceDescriptor -> return state.parent.parent
-            is MethodDescriptor -> return state.parent.parent.parent
-            else -> state.parent
-        }
+        state =
+            when (state) {
+                is FileDescriptorSet -> return state
+                is FileDescriptor -> return state.parent
+                is ServiceDescriptor -> return state.parent.parent
+                is MethodDescriptor -> return state.parent.parent.parent
+                else -> state.parent
+            }
     }
 }

@@ -19,9 +19,14 @@ import java.util.Optional
 class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase, val file: File) :
     EngineDescriptor(id, case.name),
     Node<SisyphusTestEngineContext> {
-
     override fun shouldBeSkipped(context: SisyphusTestEngineContext): Node.SkipResult {
-        return if (case.steps.isEmpty() && case.asserts.isEmpty()) Node.SkipResult.skip("No test steps found.") else Node.SkipResult.doNotSkip()
+        return if (case.steps.isEmpty() && case.asserts.isEmpty()) {
+            Node.SkipResult.skip(
+                "No test steps found.",
+            )
+        } else {
+            Node.SkipResult.doNotSkip()
+        }
     }
 
     override fun prepare(context: SisyphusTestEngineContext): SisyphusTestEngineContext {
@@ -33,7 +38,10 @@ class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase, val file: Fil
         return context
     }
 
-    override fun around(context: SisyphusTestEngineContext, invocation: Node.Invocation<SisyphusTestEngineContext>) {
+    override fun around(
+        context: SisyphusTestEngineContext,
+        invocation: Node.Invocation<SisyphusTestEngineContext>,
+    ) {
         invocation.invoke(context)
         val engine = context.cel().fork(context.results())
         for (assert in case.asserts) {
@@ -42,7 +50,7 @@ class SisyphusTestCaseDescriptor(id: UniqueId, val case: TestCase, val file: Fil
                 throw AssertionFailedError(
                     "Assertion '$assert' failed in test '$displayName'.",
                     true,
-                    result
+                    result,
                 )
             }
         }

@@ -13,17 +13,17 @@ import org.springframework.boot.context.properties.bind.Binder
 import org.springframework.core.env.Environment
 
 class RemoteClientRepository : ClientRepository {
-
     override var order: Int = Int.MAX_VALUE - 1000
 
     override fun listClientBeanDefinition(
         beanFactory: ConfigurableListableBeanFactory,
-        environment: Environment
+        environment: Environment,
     ): List<AbstractBeanDefinition> {
         val properties = beanFactory.getBeansOfType<GrpcChannelProperty>().toMutableMap()
-        val grpcProperties = Binder.get(environment)
-            .bind("sisyphus", GrpcChannelProperties::class.java)
-            .orElse(null)?.grpc ?: mapOf()
+        val grpcProperties =
+            Binder.get(environment)
+                .bind("sisyphus", GrpcChannelProperties::class.java)
+                .orElse(null)?.grpc ?: mapOf()
         properties += grpcProperties
 
         if (properties.isEmpty()) return arrayListOf()
@@ -37,22 +37,24 @@ class RemoteClientRepository : ClientRepository {
             beanFactory.getBean<ManagedChannelLifecycle>(ClientRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE)
 
         for (property in properties.values) {
-            val channel = createGrpcChannel(
-                property.target,
-                property.tls,
-                channelBuilderInterceptors.values,
-                managedChannelLifecycle
-            )
+            val channel =
+                createGrpcChannel(
+                    property.target,
+                    property.tls,
+                    channelBuilderInterceptors.values,
+                    managedChannelLifecycle,
+                )
             beanFactory.registerSingleton(property.name, channel)
             for (service in property.services) {
                 val client = getClientFromService(service)
-                val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
-                    interceptStub(
-                        createGrpcClient(client, channel, optionsInterceptors.values, CallOptions.DEFAULT),
-                        builderInterceptors.values,
-                        clientInterceptors.values
-                    )
-                }
+                val clientBeanDefinition =
+                    BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
+                        interceptStub(
+                            createGrpcClient(client, channel, optionsInterceptors.values, CallOptions.DEFAULT),
+                            builderInterceptors.values,
+                            clientInterceptors.values,
+                        )
+                    }
                 beanDefinitionList.add(clientBeanDefinition.beanDefinition)
             }
         }

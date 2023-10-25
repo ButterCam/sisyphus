@@ -20,22 +20,22 @@ interface CachedReflection {
 
 data class DtoValidating(
     val raw: DtoValidation,
-    val instance: DtoValidator<DtoModel> = raw.validator.instance().uncheckedCast()
+    val instance: DtoValidator<DtoModel> = raw.validator.instance().uncheckedCast(),
 )
 
 data class PropertyValidating(
     val raw: PropertyValidation,
-    val instance: PropertyValidator<in Any?> = raw.validator.instance().uncheckedCast()
+    val instance: PropertyValidator<in Any?> = raw.validator.instance().uncheckedCast(),
 )
 
 data class PropertyHooking(
     val raw: PropertyHook,
-    val instance: PropertyHookHandler<Any?> = raw.value.instance().uncheckedCast()
+    val instance: PropertyHookHandler<Any?> = raw.value.instance().uncheckedCast(),
 )
 
 data class DefaultValueAssigning(
     val raw: DefaultValue,
-    val instance: DefaultValueProvider<Any?> = raw.valueProvider.instance().uncheckedCast()
+    val instance: DefaultValueProvider<Any?> = raw.valueProvider.instance().uncheckedCast(),
 )
 
 internal fun DtoValidation.resolve(): DtoValidating {

@@ -15,7 +15,7 @@ class MicrometerRocketMqLogger(private val registry: MeterRegistry) : RocketMqLo
         consumer: MessageListener<*>,
         messages: List<MessageExt>,
         costNanoTime: Long,
-        exception: Exception?
+        exception: Exception?,
     ) {
         registry.timer(
             "sisyphus_rocketmq_consumer",
@@ -23,7 +23,7 @@ class MicrometerRocketMqLogger(private val registry: MeterRegistry) : RocketMqLo
             "groupId", groupId,
             "consumer", consumer.javaClass.canonicalName,
             "tags", messages.firstOrNull()?.tags,
-            "exception", exception?.javaClass?.canonicalName ?: "None"
+            "exception", exception?.javaClass?.canonicalName ?: "None",
         ).record(Duration.ofNanos(costNanoTime))
     }
 }

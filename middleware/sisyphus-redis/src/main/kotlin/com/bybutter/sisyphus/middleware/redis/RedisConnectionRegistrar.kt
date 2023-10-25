@@ -28,9 +28,10 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
         val beanFactory = registry as ConfigurableListableBeanFactory
 
         val properties = beanFactory.getBeansOfType<RedisProperty>().toMutableMap()
-        val elasticProperties = Binder.get(environment)
-            .bind("sisyphus", RedisProperties::class.java)
-            .orElse(null)?.redis ?: mapOf()
+        val elasticProperties =
+            Binder.get(environment)
+                .bind("sisyphus", RedisProperties::class.java)
+                .orElse(null)?.redis ?: mapOf()
 
         properties += elasticProperties
 
@@ -38,17 +39,19 @@ class RedisConnectionRegistrar : BeanDefinitionRegistryPostProcessor, Environmen
 
         for ((name, property) in properties) {
             val beanName = "$CONNECTION_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(StatefulRedisConnection::class.java) {
-                val redisClient = beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
-                redisClient.connect()
-            }.setDestroyMethodName("close").beanDefinition
+            val beanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(StatefulRedisConnection::class.java) {
+                    val redisClient = beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
+                    redisClient.connect()
+                }.setDestroyMethodName("close").beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
 
             val clientBeanName = "$CLIENT_PREFIX:$name"
-            val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RedisClient::class.java) {
-                beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
-            }.beanDefinition
+            val clientBeanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(RedisClient::class.java) {
+                    beanFactory.getBean(RedisClientFactory::class.java).createClient(property)
+                }.beanDefinition
             clientBeanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(clientBeanName, clientBeanDefinition)
         }

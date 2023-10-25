@@ -7,5 +7,5 @@ import org.springframework.util.MimeType
 class Jackson2YamlDecoder(objectMapper: ObjectMapper, vararg mimeTypes: MimeType) :
     AbstractJackson2Decoder(
         objectMapper,
-        *(if (mimeTypes.isEmpty()) Jackson2YamlCodecCustomizer.DEFAULT_YAML_MIME_TYPES else mimeTypes)
+        *(if (mimeTypes.isEmpty()) Jackson2YamlCodecCustomizer.DEFAULT_YAML_MIME_TYPES else mimeTypes),
     )

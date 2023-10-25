@@ -27,7 +27,7 @@ class RxClientGenerator : GroupedGenerator<ApiFileGeneratingState> {
             state.target.addType(
                 kClass(service.name()) {
                     ClientGeneratingState(state, service, this).advance()
-                }
+                },
             )
         }
         return true
@@ -39,17 +39,18 @@ class RxClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
         state.target.apply {
             addAnnotation(
                 AnnotationSpec.builder(RuntimeAnnotations.PROTOBUF_DEFINITION).addMember("%S", state.descriptor.fullProtoName())
-                    .build()
+                    .build(),
             )
 
-            this extends RuntimeTypes.ABSTRACT_REACTIVE_STUB.parameterizedBy(
-                state.descriptor.className()
-            )
+            this extends
+                RuntimeTypes.ABSTRACT_REACTIVE_STUB.parameterizedBy(
+                    state.descriptor.className(),
+                )
             constructor {
                 parameter("channel", RuntimeTypes.CHANNEL)
                 parameter(
                     "optionsInterceptors",
-                    Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR)
+                    Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR),
                 ) {
                     defaultValue("listOf()")
                 }
@@ -67,7 +68,7 @@ class RxClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
                 parameter("channel", RuntimeTypes.CHANNEL)
                 parameter(
                     "optionsInterceptors",
-                    Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR)
+                    Iterable::class.asClassName().parameterizedBy(RuntimeTypes.CALL_OPTIONS_INTERCEPTOR),
                 )
                 parameter("options", RuntimeTypes.CALL_OPTIONS)
 
@@ -75,7 +76,7 @@ class RxClientBasicGenerator : GroupedGenerator<ClientGeneratingState> {
 
                 addStatement(
                     "return %T(channel, optionsInterceptors, options)",
-                    state.descriptor.className()
+                    state.descriptor.className(),
                 )
             }
         }
@@ -105,7 +106,7 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                 if (method.descriptor.clientStreaming) {
                     addParameter(
                         "input",
-                        RuntimeTypes.FLOWABLE.parameterizedBy(method.inputMessage().className())
+                        RuntimeTypes.FLOWABLE.parameterizedBy(method.inputMessage().className()),
                     )
                 } else {
                     addParameter("input", method.inputMessage().className())
@@ -154,8 +155,8 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                 method.name(),
                 RuntimeTypes.METHOD_DESCRIPTOR.parameterizedBy(
                     method.inputMessage().className(),
-                    method.outputMessage().className()
-                )
+                    method.outputMessage().className(),
+                ),
             ) {
                 initializer(
                     buildCodeBlock {
@@ -163,23 +164,23 @@ class RxClientMethodGenerator : GroupedGenerator<ClientGeneratingState> {
                             "%T.newBuilder<%T,·%T>()\n",
                             RuntimeTypes.METHOD_DESCRIPTOR,
                             method.inputMessage().className(),
-                            method.outputMessage().className()
+                            method.outputMessage().className(),
                         )
                         add(".setType(MethodDescriptor.MethodType.%L)\n", "UNARY")
                         add(".setFullMethodName(%S)\n", method.fullProtoName().substring(1))
                         add(
                             ".setRequestMarshaller(%T.%M())\n",
                             method.inputMessage().className(),
-                            RuntimeMethods.MARSHALLER
+                            RuntimeMethods.MARSHALLER,
                         )
                         add(
                             ".setResponseMarshaller(%T.%M())\n",
                             method.outputMessage().className(),
-                            RuntimeMethods.MARSHALLER
+                            RuntimeMethods.MARSHALLER,
                         )
                         add(".setSchemaDescriptor(this)\n")
                         add(".build()\n")
-                    }
+                    },
                 )
             }
         }

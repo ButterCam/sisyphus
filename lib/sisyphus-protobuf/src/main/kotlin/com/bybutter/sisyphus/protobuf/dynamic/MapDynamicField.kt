@@ -9,7 +9,7 @@ import com.bybutter.sisyphus.protobuf.findMapEntryDescriptor
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 class MapDynamicField<TKey, TValue>(
-    private val descriptor: FieldDescriptorProto
+    private val descriptor: FieldDescriptorProto,
 ) : DynamicField<MutableMap<TKey, TValue>> {
     private val map = mutableMapOf<TKey, TValue>()
 
@@ -45,14 +45,18 @@ class MapDynamicField<TKey, TValue>(
         }
     }
 
-    override fun read(reader: Reader, field: Int, wire: Int) {
+    override fun read(
+        reader: Reader,
+        field: Int,
+        wire: Int,
+    ) {
         reader.mapEntry(
             {
                 it.read<Any?>(keyField.type, keyField.typeName)
             },
             {
                 it.read<Any?>(valueField.type, valueField.typeName)
-            }
+            },
         ) { k, v ->
             get()[k as TKey] = v as TValue
         }

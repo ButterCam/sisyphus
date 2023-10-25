@@ -37,7 +37,10 @@ open class DtoDsl<T : DtoModel> {
     /**
      * Create DTO instance with shallow copy and init body.
      */
-    inline operator fun invoke(model: DtoModel, block: T.() -> Unit): T {
+    inline operator fun invoke(
+        model: DtoModel,
+        block: T.() -> Unit,
+    ): T {
         return DtoModel(type) {
             val map = HashMap((model as DtoMeta).`$modelMap`)
             (this as DtoMeta).`$modelMap` = map

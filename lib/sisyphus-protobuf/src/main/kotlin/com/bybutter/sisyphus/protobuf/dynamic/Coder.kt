@@ -9,7 +9,10 @@ import com.bybutter.sisyphus.protobuf.findEnumSupport
 import com.bybutter.sisyphus.protobuf.findMessageSupport
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
-fun <T> Reader.read(type: FieldDescriptorProto.Type, typename: String): T {
+fun <T> Reader.read(
+    type: FieldDescriptorProto.Type,
+    typename: String,
+): T {
     return when (type) {
         FieldDescriptorProto.Type.DOUBLE -> double()
         FieldDescriptorProto.Type.FLOAT -> float()
@@ -32,7 +35,10 @@ fun <T> Reader.read(type: FieldDescriptorProto.Type, typename: String): T {
     } as T
 }
 
-fun Writer.write(type: FieldDescriptorProto.Type, value: Any?): Writer {
+fun Writer.write(
+    type: FieldDescriptorProto.Type,
+    value: Any?,
+): Writer {
     value ?: return this
     return when (type) {
         FieldDescriptorProto.Type.DOUBLE -> double(value as Double)

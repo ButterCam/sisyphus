@@ -8,7 +8,6 @@ import org.springframework.http.server.reactive.observation.DefaultServerRequest
 import org.springframework.http.server.reactive.observation.ServerRequestObservationContext
 
 class GrpcTranscodingRequestObservationConvention : DefaultServerRequestObservationConvention() {
-
     override fun getLowCardinalityKeyValues(context: ServerRequestObservationContext): KeyValues {
         val rule = context.attributes[TranscodingFunctions.TRANSCODING_RULE_ATTRIBUTE] as? TranscodingRouterRule
         val pathTemplate = context.attributes[TranscodingFunctions.MATCHING_PATH_TEMPLATE_ATTRIBUTE] as? PathTemplate
@@ -18,7 +17,7 @@ class GrpcTranscodingRequestObservationConvention : DefaultServerRequestObservat
                 "grpc_method",
                 "None",
                 "grpc_service",
-                "None"
+                "None",
             )
         }
 
@@ -27,8 +26,8 @@ class GrpcTranscodingRequestObservationConvention : DefaultServerRequestObservat
                 "grpc_method",
                 rule.method.methodDescriptor.fullMethodName,
                 "grpc_service",
-                rule.service.serviceDescriptor.name
-            )
+                rule.service.serviceDescriptor.name,
+            ),
         )
     }
 }

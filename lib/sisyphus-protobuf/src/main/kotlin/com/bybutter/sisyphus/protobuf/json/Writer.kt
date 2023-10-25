@@ -55,7 +55,10 @@ internal fun JsonWriter.safeULong(value: ULong) {
     }
 }
 
-internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
+internal fun JsonWriter.field(
+    value: Any?,
+    field: FieldDescriptorProto,
+) {
     if (value == null) return nullValue()
     if (value is CustomProtoType<*>) return field(value.value(), field)
     if (value is Map<*, *>) {
@@ -74,20 +77,20 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
         FieldDescriptorProto.Type.FLOAT -> value(value as Float)
         FieldDescriptorProto.Type.SFIXED64,
         FieldDescriptorProto.Type.SINT64,
-        FieldDescriptorProto.Type.INT64
+        FieldDescriptorProto.Type.INT64,
         -> safeLong(value as Long)
 
         FieldDescriptorProto.Type.FIXED64,
-        FieldDescriptorProto.Type.UINT64
+        FieldDescriptorProto.Type.UINT64,
         -> safeULong(value as ULong)
 
         FieldDescriptorProto.Type.SFIXED32,
         FieldDescriptorProto.Type.SINT32,
-        FieldDescriptorProto.Type.INT32
+        FieldDescriptorProto.Type.INT32,
         -> value(value as Int)
 
         FieldDescriptorProto.Type.UINT32,
-        FieldDescriptorProto.Type.FIXED32
+        FieldDescriptorProto.Type.FIXED32,
         -> value(value as UInt)
 
         FieldDescriptorProto.Type.BOOL -> value(value as Boolean)
@@ -120,26 +123,34 @@ internal fun JsonWriter.field(value: Any?, field: FieldDescriptorProto) {
     }
 }
 
-internal fun JsonWriter.map(value: Map<*, *>, field: FieldDescriptorProto) {
+internal fun JsonWriter.map(
+    value: Map<*, *>,
+    field: FieldDescriptorProto,
+) {
     if (field.typeName.isEmpty()) throw IllegalStateException()
     val entry = ProtoReflection.findMapEntryDescriptor(field.typeName) ?: throw IllegalStateException()
-    val valueDescriptor = entry.field.firstOrNull {
-        it.number == 2
-    } ?: throw IllegalStateException()
+    val valueDescriptor =
+        entry.field.firstOrNull {
+            it.number == 2
+        } ?: throw IllegalStateException()
 
     beginObject()
     value.forEach { (k, v) ->
-        val key = when (k) {
-            is CustomProtoType<*> -> k.value().toString()
-            else -> k.toString()
-        }
+        val key =
+            when (k) {
+                is CustomProtoType<*> -> k.value().toString()
+                else -> k.toString()
+            }
         fieldName(key)
         field(v, valueDescriptor)
     }
     endObject()
 }
 
-internal fun JsonWriter.wellknown(type: String, value: Message<*, *>): Boolean {
+internal fun JsonWriter.wellknown(
+    type: String,
+    value: Message<*, *>,
+): Boolean {
     when (type) {
         Timestamp.name -> value(value.timestampString())
 
@@ -177,7 +188,10 @@ internal fun JsonWriter.wellknown(type: String, value: Message<*, *>): Boolean {
     return true
 }
 
-internal fun JsonWriter.any(value: Message<*, *>, recursion: Boolean = true) {
+internal fun JsonWriter.any(
+    value: Message<*, *>,
+    recursion: Boolean = true,
+) {
     // If we already unwrapped the value, just encode it to json.
     if (value.type() != com.bybutter.sisyphus.protobuf.primitives.Any.name) {
         return unwrappedAny(value)

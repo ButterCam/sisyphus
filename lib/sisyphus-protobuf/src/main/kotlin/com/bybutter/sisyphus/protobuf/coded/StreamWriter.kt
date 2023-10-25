@@ -11,7 +11,10 @@ class StreamWriter(private val stream: OutputStream, mark: MeasureWriter.LdMark)
     private val marks = mark.children()
     private var index = 0
 
-    override fun tag(filedNumber: Int, wireType: WireType): StreamWriter {
+    override fun tag(
+        filedNumber: Int,
+        wireType: WireType,
+    ): StreamWriter {
         return tag(WireType.tagOf(filedNumber, wireType))
     }
 
@@ -48,8 +51,8 @@ class StreamWriter(private val stream: OutputStream, mark: MeasureWriter.LdMark)
                 (value and 0xFF).toByte(),
                 ((value ushr 8) and 0xFF).toByte(),
                 ((value ushr 16) and 0xFF).toByte(),
-                ((value ushr 24) and 0xFF).toByte()
-            )
+                ((value ushr 24) and 0xFF).toByte(),
+            ),
         )
         return this
     }
@@ -87,8 +90,8 @@ class StreamWriter(private val stream: OutputStream, mark: MeasureWriter.LdMark)
                 ((value ushr 32) and 0xFF).toByte(),
                 ((value ushr 40) and 0xFF).toByte(),
                 ((value ushr 48) and 0xFF).toByte(),
-                ((value ushr 56) and 0xFF).toByte()
-            )
+                ((value ushr 56) and 0xFF).toByte(),
+            ),
         )
         return this
     }

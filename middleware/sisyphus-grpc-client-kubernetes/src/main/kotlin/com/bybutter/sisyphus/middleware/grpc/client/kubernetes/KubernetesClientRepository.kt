@@ -24,12 +24,11 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class KubernetesClientRepository : ClientRepository {
-
     override var order: Int = Int.MIN_VALUE + 2000
 
     override fun listClientBeanDefinition(
         beanFactory: ConfigurableListableBeanFactory,
-        environment: Environment
+        environment: Environment,
     ): List<AbstractBeanDefinition> {
         val path = Paths.get(Config.SERVICEACCOUNT_ROOT, "namespace")
         if (!Files.exists(path)) {
@@ -37,12 +36,17 @@ class KubernetesClientRepository : ClientRepository {
             return emptyList()
         }
         val namespace = String(Files.readAllBytes(path), Charset.defaultCharset())
-        val api = try {
-            CoreV1Api(Config.fromCluster())
-        } catch (e: Exception) {
-            logger.warn("Skip discovering services on kubernetes cluster, an ${e.javaClass.name}('${e.message}') occurred when creating kubernetes client.")
-            return emptyList()
-        }
+        val api =
+            try {
+                CoreV1Api(Config.fromCluster())
+            } catch (e: Exception) {
+                logger.warn(
+                    "Skip discovering services on kubernetes cluster, an ${
+                        e.javaClass.name
+                    }('${e.message}') occurred when creating kubernetes client.",
+                )
+                return emptyList()
+            }
         logger.debug("Detect application is running in kubernetes namespace $namespace.")
         val beanDefinitionList = arrayListOf<AbstractBeanDefinition>()
         val services = ProtoTypes.services()
@@ -55,42 +59,58 @@ class KubernetesClientRepository : ClientRepository {
             beanFactory.getBean<ManagedChannelLifecycle>(ClientRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_CHANNEL_LIFECYCLE)
 
         for (service in services) {
-            val list = try {
-                api.listNamespacedService(
-                    namespace,
-                    null,
-                    null,
-                    null,
-                    null,
-                    "sisyphus/${service.name.trimStart('.')}",
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                )
-            } catch (e: ApiException) {
-                logger.error("An exception('${e.responseBody}') occurred when listing kubernetes services in namespace '$namespace'.")
-                continue
-            }
+            val list =
+                try {
+                    api.listNamespacedService(
+                        // namespace =
+                        namespace,
+                        // pretty =
+                        null,
+                        // allowWatchBookmarks =
+                        null,
+                        // _continue =
+                        null,
+                        // fieldSelector =
+                        null,
+                        // labelSelector =
+                        "sisyphus/${service.name.trimStart('.')}",
+                        // limit =
+                        null,
+                        // resourceVersion =
+                        null,
+                        // resourceVersionMatch =
+                        null,
+                        // sendInitialEvents =
+                        null,
+                        // timeoutSeconds =
+                        null,
+                        // watch =
+                        null,
+                    )
+                } catch (e: ApiException) {
+                    logger.error("An exception('${e.responseBody}') occurred when listing kubernetes services in namespace '$namespace'.")
+                    continue
+                }
             if (list.items.isEmpty()) continue
             val k8sService = list.items[0]
             val labelValue = k8sService.metadata?.labels?.get("sisyphus/${service.name.trimStart('.')}") ?: continue
-            val port = k8sService.spec?.ports?.first {
-                it.name == labelValue || it.port.toString() == labelValue
-            }?.port ?: continue
+            val port =
+                k8sService.spec?.ports?.first {
+                    it.name == labelValue || it.port.toString() == labelValue
+                }?.port ?: continue
             val host = k8sService.metadata?.name ?: continue
             val tls = labelValue == "grpcs"
             logger.info("GRPC service '$service' discovered in kubernetes service '$host:$port'.")
             val channel = createGrpcChannel("$host:$port", tls, channelBuilderInterceptors.values, managedChannelLifecycle)
             val client = getClientFromService(service.javaClass.declaringClass)
-            val clientBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
-                interceptStub(
-                    createGrpcClient(client, channel, optionsInterceptors.values, CallOptions.DEFAULT),
-                    builderInterceptors.values,
-                    clientInterceptors.values
-                )
-            }
+            val clientBeanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(client as Class<Any>) {
+                    interceptStub(
+                        createGrpcClient(client, channel, optionsInterceptors.values, CallOptions.DEFAULT),
+                        builderInterceptors.values,
+                        clientInterceptors.values,
+                    )
+                }
             beanDefinitionList.add(clientBeanDefinition.beanDefinition)
         }
         return beanDefinitionList

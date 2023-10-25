@@ -12,7 +12,10 @@ class TranscodingAttributeInterceptor : WebFilter {
     @Autowired(required = false)
     private val headerExporters: List<TranscodingHeaderExporter> = listOf()
 
-    override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
+    override fun filter(
+        exchange: ServerWebExchange,
+        chain: WebFilterChain,
+    ): Mono<Void> {
         exchange.attributes[TranscodingFunctions.HEADER_EXPORTER_ATTRIBUTE] = headerExporters
         return chain.filter(exchange)
     }

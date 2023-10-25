@@ -25,9 +25,8 @@ class TranscodingErrorWebExceptionHandler(
     errorAttributes: ErrorAttributes,
     properties: WebProperties,
     applicationContext: ApplicationContext,
-    serverCodecConfigurer: ServerCodecConfigurer
+    serverCodecConfigurer: ServerCodecConfigurer,
 ) : AbstractErrorWebExceptionHandler(errorAttributes, properties.resources, applicationContext) {
-
     init {
         // Safe for use `this` in init function, because the handler is a [Component] and just spring need it be open.
         setMessageReaders(serverCodecConfigurer.readers)
@@ -37,12 +36,14 @@ class TranscodingErrorWebExceptionHandler(
     override fun getRoutingFunction(errorAttributes: ErrorAttributes): RouterFunction<ServerResponse> {
         return router {
             RequestPredicates.all().invoke {
-                val error = errorAttributes.getErrorAttributes(
-                    it,
-                    ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE)
-                )
-                val status = error[TranscodingErrorAttributes.GRPC_STATUS_ATTRIBUTE] as? Status
-                    ?: throw IllegalStateException("Missing gRPC status in error attributes.")
+                val error =
+                    errorAttributes.getErrorAttributes(
+                        it,
+                        ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE),
+                    )
+                val status =
+                    error[TranscodingErrorAttributes.GRPC_STATUS_ATTRIBUTE] as? Status
+                        ?: throw IllegalStateException("Missing gRPC status in error attributes.")
 
                 ServerResponse.status(status.toHttpStatus())
                     .body(DetectBodyInserter(status))

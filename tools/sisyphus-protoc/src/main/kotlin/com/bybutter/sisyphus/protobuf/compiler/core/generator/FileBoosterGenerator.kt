@@ -7,7 +7,7 @@ class FileBoosterGenerator : GroupedGenerator<ProtobufBoosterGeneratingState> {
     override fun generate(state: ProtobufBoosterGeneratingState): Boolean {
         state.target.builder.addStatement(
             "reflection.register(%T)",
-            state.descriptor.fileMetadataClassName()
+            state.descriptor.fileMetadataClassName(),
         )
         return true
     }

@@ -1,15 +1,28 @@
 package com.bybutter.sisyphus.string
 
 object PathMatcher {
-    fun CharSequence.matches(pattern: CharSequence, pathDelimiters: Set<Char> = setOf('/')): Boolean {
+    fun CharSequence.matches(
+        pattern: CharSequence,
+        pathDelimiters: Set<Char> = setOf('/'),
+    ): Boolean {
         return match(pattern, this, pathDelimiters)
     }
 
-    fun match(pattern: CharSequence, path: CharSequence, pathDelimiters: Set<Char> = setOf('/')): Boolean {
+    fun match(
+        pattern: CharSequence,
+        path: CharSequence,
+        pathDelimiters: Set<Char> = setOf('/'),
+    ): Boolean {
         return normalMatch(pattern, 0, path, 0, pathDelimiters)
     }
 
-    private fun normalMatch(pat: CharSequence, p: Int, str: CharSequence, s: Int, pathDelimiters: Set<Char>): Boolean {
+    private fun normalMatch(
+        pat: CharSequence,
+        p: Int,
+        str: CharSequence,
+        s: Int,
+        pathDelimiters: Set<Char>,
+    ): Boolean {
         var pi = p
         var si = s
         while (pi < pat.length) {
@@ -68,7 +81,7 @@ object PathMatcher {
         p: Int,
         str: CharSequence,
         s: Int,
-        pathDelimiters: Set<Char>
+        pathDelimiters: Set<Char>,
     ): Boolean {
         var si = s
         val pc = pat.getOrZero(p)
@@ -109,7 +122,7 @@ object PathMatcher {
         p: Int,
         str: CharSequence,
         s: Int,
-        pathDelimiters: Set<Char>
+        pathDelimiters: Set<Char>,
     ): Boolean {
         // End of pattern, just check the end of string is '/' quickly.
         var si = s

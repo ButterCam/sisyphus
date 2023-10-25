@@ -39,12 +39,13 @@ fun OperationSupport.listOperationsRules(): List<HttpRule> {
     return this@listOperationsRules.operationName.patterns.mapNotNull {
         val basePath = it.listPath() ?: return@mapNotNull null
         HttpRule {
-            get = buildString {
-                this@listOperationsRules.pathPrefix?.let {
-                    append(it)
+            get =
+                buildString {
+                    this@listOperationsRules.pathPrefix?.let {
+                        append(it)
+                    }
+                    append(basePath)
                 }
-                append(basePath)
-            }
         }
     }
 }
@@ -52,12 +53,13 @@ fun OperationSupport.listOperationsRules(): List<HttpRule> {
 fun OperationSupport.getOperationRules(): List<HttpRule> {
     return this@getOperationRules.operationName.patterns.mapNotNull {
         HttpRule {
-            get = buildString {
-                this@getOperationRules.pathPrefix?.let {
-                    append(it)
+            get =
+                buildString {
+                    this@getOperationRules.pathPrefix?.let {
+                        append(it)
+                    }
+                    append(it.operationPath())
                 }
-                append(it.operationPath())
-            }
         }
     }
 }
@@ -65,12 +67,13 @@ fun OperationSupport.getOperationRules(): List<HttpRule> {
 fun OperationSupport.deleteOperationRules(): List<HttpRule> {
     return this@deleteOperationRules.operationName.patterns.mapNotNull {
         HttpRule {
-            delete = buildString {
-                this@deleteOperationRules.pathPrefix?.let {
-                    append(it)
+            delete =
+                buildString {
+                    this@deleteOperationRules.pathPrefix?.let {
+                        append(it)
+                    }
+                    append(it.operationPath())
                 }
-                append(it.operationPath())
-            }
         }
     }
 }
@@ -78,13 +81,14 @@ fun OperationSupport.deleteOperationRules(): List<HttpRule> {
 fun OperationSupport.cancelOperationRules(): List<HttpRule> {
     return this@cancelOperationRules.operationName.patterns.mapNotNull {
         HttpRule {
-            post = buildString {
-                this@cancelOperationRules.pathPrefix?.let {
-                    append(it)
+            post =
+                buildString {
+                    this@cancelOperationRules.pathPrefix?.let {
+                        append(it)
+                    }
+                    append(it.operationPath())
+                    append(":cancel")
                 }
-                append(it.operationPath())
-                append(":cancel")
-            }
             body = "*"
         }
     }

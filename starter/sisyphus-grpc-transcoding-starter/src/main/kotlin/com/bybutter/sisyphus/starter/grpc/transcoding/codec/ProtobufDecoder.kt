@@ -14,7 +14,7 @@ class ProtobufDecoder(vararg mimeTypes: MimeType) : AbstractDataBufferDecoder<Me
         buffer: DataBuffer,
         targetType: ResolvableType,
         mimeType: MimeType?,
-        hints: Map<String, Any>?
+        hints: Map<String, Any>?,
     ): Message<*, *> {
         val fullName = targetType.rawClass.getAnnotation(ProtobufDefinition::class.java).name
         return ProtoTypes.findMessageSupport(fullName).parse(buffer.asInputStream(), Int.MAX_VALUE)

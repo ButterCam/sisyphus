@@ -11,6 +11,6 @@ interface RocketMqLogger {
         consumer: MessageListener<*>,
         messages: List<MessageExt>,
         costNanoTime: Long,
-        exception: Exception?
+        exception: Exception?,
     )
 }

@@ -29,12 +29,15 @@ open class StatusException : RuntimeException {
 
     constructor(code: Status.Code, message: String? = null, cause: Throwable? = null) : super(
         message ?: code.name,
-        cause
+        cause,
     ) {
         this._code = code.value()
     }
 
-    fun withLocalizedMessage(locale: String, message: String): StatusException {
+    fun withLocalizedMessage(
+        locale: String,
+        message: String,
+    ): StatusException {
         withDetails(LocalizedMessage(locale, message))
         return this
     }
@@ -53,13 +56,16 @@ open class StatusException : RuntimeException {
         resourceType: String,
         resourceName: String,
         description: String,
-        owner: String = ""
+        owner: String = "",
     ): StatusException {
         withDetails(ResourceInfo(resourceType, resourceName, description, owner))
         return this
     }
 
-    fun withRequestInfo(requestId: String, servingData: String = ""): StatusException {
+    fun withRequestInfo(
+        requestId: String,
+        servingData: String = "",
+    ): StatusException {
         withDetails(RequestInfo(requestId, servingData))
         return this
     }
@@ -84,7 +90,10 @@ open class StatusException : RuntimeException {
         return this
     }
 
-    fun withRetryInfo(number: Long, unit: TimeUnit = TimeUnit.SECONDS): StatusException {
+    fun withRetryInfo(
+        number: Long,
+        unit: TimeUnit = TimeUnit.SECONDS,
+    ): StatusException {
         withDetails(RetryInfo(number, unit))
         return this
     }
@@ -104,7 +113,10 @@ open class StatusException : RuntimeException {
         return this
     }
 
-    fun <T> withTrailer(key: Metadata.Key<T>, value: T): StatusException {
+    fun <T> withTrailer(
+        key: Metadata.Key<T>,
+        value: T,
+    ): StatusException {
         trailers.put(key, value)
         return this
     }

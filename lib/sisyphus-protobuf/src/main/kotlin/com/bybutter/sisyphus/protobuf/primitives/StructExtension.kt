@@ -48,19 +48,21 @@ operator fun Value.Companion.invoke(value: Boolean): Value {
 
 operator fun Value.Companion.invoke(value: List<*>): Value {
     return Value {
-        listValue = ListValue {
-            values += value.map { wrapValue(it) }
-        }
+        listValue =
+            ListValue {
+                values += value.map { wrapValue(it) }
+            }
     }
 }
 
 operator fun Value.Companion.invoke(value: Map<*, *>): Value {
     return Value {
-        structValue = Struct {
-            value.forEach { (k, v) ->
-                field(k.toString(), wrapValue(v))
+        structValue =
+            Struct {
+                value.forEach { (k, v) ->
+                    field(k.toString(), wrapValue(v))
+                }
             }
-        }
     }
 }
 
@@ -82,62 +84,94 @@ operator fun Struct.Companion.invoke(data: Collection<Pair<String, kotlin.Any?>>
     }
 }
 
-fun MutableStruct.field(field: String, value: Number) {
-    this.fields[field] = Value {
-        numberValue = value.toDouble()
-    }
+fun MutableStruct.field(
+    field: String,
+    value: Number,
+) {
+    this.fields[field] =
+        Value {
+            numberValue = value.toDouble()
+        }
 }
 
-fun MutableStruct.field(field: String, value: String) {
-    this.fields[field] = Value {
-        stringValue = value
-    }
+fun MutableStruct.field(
+    field: String,
+    value: String,
+) {
+    this.fields[field] =
+        Value {
+            stringValue = value
+        }
 }
 
-fun MutableStruct.field(field: String, value: Value) {
+fun MutableStruct.field(
+    field: String,
+    value: Value,
+) {
     this.fields[field] = value
 }
 
-fun MutableStruct.field(field: String, value: List<*>) {
-    this.fields[field] = Value {
-        listValue = ListValue {
-            values += value.map { wrapValue(it) }
+fun MutableStruct.field(
+    field: String,
+    value: List<*>,
+) {
+    this.fields[field] =
+        Value {
+            listValue =
+                ListValue {
+                    values += value.map { wrapValue(it) }
+                }
         }
-    }
 }
 
-fun MutableStruct.field(field: String, value: Struct) {
-    this.fields[field] = Value {
-        structValue = value
-    }
+fun MutableStruct.field(
+    field: String,
+    value: Struct,
+) {
+    this.fields[field] =
+        Value {
+            structValue = value
+        }
 }
 
-fun MutableStruct.struct(field: String, block: MutableStruct.() -> Unit) {
-    this.fields[field] = Value {
-        structValue = Struct {
-            block()
+fun MutableStruct.struct(
+    field: String,
+    block: MutableStruct.() -> Unit,
+) {
+    this.fields[field] =
+        Value {
+            structValue =
+                Struct {
+                    block()
+                }
         }
-    }
 }
 
-fun MutableStruct.list(field: String, block: MutableListValue.() -> Unit) {
-    this.fields[field] = Value {
-        listValue = ListValue {
-            block()
+fun MutableStruct.list(
+    field: String,
+    block: MutableListValue.() -> Unit,
+) {
+    this.fields[field] =
+        Value {
+            listValue =
+                ListValue {
+                    block()
+                }
         }
-    }
 }
 
 fun MutableListValue.value(value: Number) {
-    this.values += Value {
-        numberValue = value.toDouble()
-    }
+    this.values +=
+        Value {
+            numberValue = value.toDouble()
+        }
 }
 
 fun MutableListValue.value(value: String) {
-    this.values += Value {
-        stringValue = value
-    }
+    this.values +=
+        Value {
+            stringValue = value
+        }
 }
 
 fun MutableListValue.value(value: Value) {
@@ -145,33 +179,40 @@ fun MutableListValue.value(value: Value) {
 }
 
 fun MutableListValue.value(value: List<*>) {
-    this.values += Value {
-        listValue = ListValue {
-            values += value.map { wrapValue(it) }
+    this.values +=
+        Value {
+            listValue =
+                ListValue {
+                    values += value.map { wrapValue(it) }
+                }
         }
-    }
 }
 
 fun MutableListValue.value(value: Struct) {
-    this.values += Value {
-        structValue = value
-    }
+    this.values +=
+        Value {
+            structValue = value
+        }
 }
 
 fun MutableListValue.struct(block: MutableStruct.() -> Unit) {
-    this.values += Value {
-        structValue = Struct {
-            block()
+    this.values +=
+        Value {
+            structValue =
+                Struct {
+                    block()
+                }
         }
-    }
 }
 
 fun MutableListValue.list(block: MutableListValue.() -> Unit) {
-    this.values += Value {
-        listValue = ListValue {
-            block()
+    this.values +=
+        Value {
+            listValue =
+                ListValue {
+                    block()
+                }
         }
-    }
 }
 
 fun Struct.unwrapToMap(): Map<String, kotlin.Any?> {
@@ -219,11 +260,12 @@ private fun Message<*, *>.asStruct(): Struct {
     val result = mutableListOf<Pair<String, kotlin.Any?>>()
 
     for ((field, value) in this) {
-        val item = if (this.has(field.number)) {
-            field.name to value
-        } else {
-            null
-        }
+        val item =
+            if (this.has(field.number)) {
+                field.name to value
+            } else {
+                null
+            }
 
         if (item != null) {
             result.add(item)

@@ -16,7 +16,10 @@ suspend fun <T> StatefulRedisConnection<String, String>.lock(action: suspend () 
     return lock(action.javaClass.toString(), action)
 }
 
-suspend fun <T> StatefulRedisConnection<String, String>.lock(key: String, action: suspend () -> T): T {
+suspend fun <T> StatefulRedisConnection<String, String>.lock(
+    key: String,
+    action: suspend () -> T,
+): T {
     return lock(key, 60, 30, TimeUnit.SECONDS, action)
 }
 
@@ -24,7 +27,7 @@ suspend fun <T> StatefulRedisConnection<String, String>.lock(
     waitTime: Long,
     leaseTime: Long,
     timeUnit: TimeUnit,
-    action: suspend () -> T
+    action: suspend () -> T,
 ): T {
     return lock(action.javaClass.toString(), waitTime, leaseTime, timeUnit, action)
 }
@@ -34,7 +37,7 @@ suspend fun <T> StatefulRedisConnection<String, String>.lock(
     waitTime: Long,
     leaseTime: Long,
     timeUnit: TimeUnit,
-    action: suspend () -> T
+    action: suspend () -> T,
 ): T {
     val distributedLock = DistributedLock(key, this)
     return if (distributedLock.lock(waitTime, leaseTime, timeUnit)) {
@@ -52,14 +55,17 @@ suspend fun <T> StatefulRedisConnection<String, String>.tryLock(action: suspend 
     return tryLock(action.javaClass.toString(), action)
 }
 
-suspend fun <T> StatefulRedisConnection<String, String>.tryLock(key: String, action: suspend () -> T): T {
+suspend fun <T> StatefulRedisConnection<String, String>.tryLock(
+    key: String,
+    action: suspend () -> T,
+): T {
     return tryLock(key, 30, TimeUnit.SECONDS, action)
 }
 
 suspend fun <T> StatefulRedisConnection<String, String>.tryLock(
     leaseTime: Long,
     timeUnit: TimeUnit,
-    action: suspend () -> T
+    action: suspend () -> T,
 ): T {
     return tryLock(action.javaClass.toString(), leaseTime, timeUnit, action)
 }
@@ -68,7 +74,7 @@ suspend fun <T> StatefulRedisConnection<String, String>.tryLock(
     key: String,
     leaseTime: Long,
     timeUnit: TimeUnit,
-    action: suspend () -> T
+    action: suspend () -> T,
 ): T {
     val distributedLock = DistributedLock(key, this)
     return if (distributedLock.lock(leaseTime, timeUnit)) {
@@ -87,7 +93,11 @@ private class DistributedLock(private var key: String, private val redis: Statef
     private var job: Job? = null
     private var value: String? = null
 
-    suspend fun lock(waitTime: Long, leaseTime: Long, timeUnit: TimeUnit): Boolean {
+    suspend fun lock(
+        waitTime: Long,
+        leaseTime: Long,
+        timeUnit: TimeUnit,
+    ): Boolean {
         val endTime = System.currentTimeMillis() + timeUnit.toMillis(waitTime)
         while (System.currentTimeMillis() < endTime) {
             if (lock(leaseTime, timeUnit)) {
@@ -98,34 +108,41 @@ private class DistributedLock(private var key: String, private val redis: Statef
         return false
     }
 
-    suspend fun lock(leaseTime: Long, timeUnit: TimeUnit): Boolean {
+    suspend fun lock(
+        leaseTime: Long,
+        timeUnit: TimeUnit,
+    ): Boolean {
         value = UUID.randomUUID().toString()
         return (
             redis.async().set(key, value, SetArgs().nx().ex(timeUnit.toSeconds(leaseTime)))
                 .await() != null
-            ).also {
+        ).also {
             if (it) {
                 renewExpiration(leaseTime, timeUnit)
             }
         }
     }
 
-    private fun renewExpiration(leaseTime: Long, timeUnit: TimeUnit) {
-        job = GlobalScope.launch(Dispatchers.IO) {
-            delay(timeUnit.toMillis(leaseTime * 2 / 3))
-            while (!released) {
-                redis.sync().eval<Long>(
-                    "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('expire', KEYS[1],ARGV[2]) else return 0 end",
-                    ScriptOutputType.INTEGER,
-                    arrayOf(key),
-                    value,
-                    leaseTime.toString()
-                ).takeIf { it == 1L } ?: kotlin.run {
-                    released = true
-                }
+    private fun renewExpiration(
+        leaseTime: Long,
+        timeUnit: TimeUnit,
+    ) {
+        job =
+            GlobalScope.launch(Dispatchers.IO) {
                 delay(timeUnit.toMillis(leaseTime * 2 / 3))
+                while (!released) {
+                    redis.sync().eval<Long>(
+                        "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('expire', KEYS[1],ARGV[2]) else return 0 end",
+                        ScriptOutputType.INTEGER,
+                        arrayOf(key),
+                        value,
+                        leaseTime.toString(),
+                    ).takeIf { it == 1L } ?: kotlin.run {
+                        released = true
+                    }
+                    delay(timeUnit.toMillis(leaseTime * 2 / 3))
+                }
             }
-        }
     }
 
     suspend fun unlock() {
@@ -133,7 +150,7 @@ private class DistributedLock(private var key: String, private val redis: Statef
             "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end",
             ScriptOutputType.INTEGER,
             arrayOf(key),
-            value
+            value,
         ).await().takeIf { it == 1L }?.let {
             cancelRenewExpiration()
         }

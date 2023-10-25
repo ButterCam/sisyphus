@@ -11,6 +11,6 @@ interface KafkaLogger {
         consumer: KafkaConsumer<*, *>,
         message: ConsumerRecord<*, *>,
         costNanoTime: Long,
-        exception: Exception?
+        exception: Exception?,
     )
 }
