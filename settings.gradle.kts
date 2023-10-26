@@ -14,7 +14,6 @@ include("lib:sisyphus-grpc-rxjava")
 include("lib:sisyphus-test")
 
 include("tools:sisyphus-protoc")
-include("tools:sisyphus-k8s-gradle-plugin")
 include("tools:sisyphus-protoc-runner")
 
 include("middleware:sisyphus-configuration-artifact")
