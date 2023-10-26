@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.type.TypeFactory
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.Connection
+import org.apache.hadoop.hbase.client.Delete
 import org.apache.hadoop.hbase.client.Get
 import org.apache.hadoop.hbase.client.Put
 
@@ -110,7 +111,7 @@ class HTemplateFactory<TKey, TValue> constructor(
                     (
                         keyMap[it.row.hashWrapper()]
                             ?: throw RuntimeException("Key value not found.")
-                    ) to tableModelConverter.convert(it)
+                        ) to tableModelConverter.convert(it)
                 }
             }
         }
@@ -137,6 +138,13 @@ class HTemplateFactory<TKey, TValue> constructor(
 
         override fun setMap(vararg values: Pair<TKey, TValue>) {
             return setMap(values.toMap())
+        }
+
+        override fun delete(vararg keys: TKey) {
+            connection.getTable(TableName.valueOf(table)).use {
+                val deleteRequests = keys.map { Delete(rowKeyConverter.convert(it)) }
+                it.delete(deleteRequests)
+            }
         }
     }
 }

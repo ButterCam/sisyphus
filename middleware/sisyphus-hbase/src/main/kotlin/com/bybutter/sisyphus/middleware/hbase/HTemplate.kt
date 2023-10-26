@@ -20,4 +20,6 @@ interface HTemplate<TKey, TValue> {
     fun getMap(vararg keys: TKey): Map<TKey, TValue>
 
     fun setMap(vararg values: Pair<TKey, TValue>)
+
+    fun delete(vararg keys: TKey)
 }

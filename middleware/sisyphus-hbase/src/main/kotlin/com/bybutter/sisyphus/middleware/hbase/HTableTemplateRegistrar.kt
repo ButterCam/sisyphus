@@ -38,7 +38,7 @@ class HTableTemplateRegistrar : BeanDefinitionRegistryPostProcessor, Environment
         for ((name, property) in properties) {
             val beanName = "$BEAN_NAME_PREFIX:$name"
             val beanDefinition =
-                BeanDefinitionBuilder.genericBeanDefinition(HTableTemplate::class.java) {
+                BeanDefinitionBuilder.genericBeanDefinition(property.template as Class<HTableTemplate<*, *>>) {
                     val factory = beanFactory.getBean(HBaseTemplateFactory::class.java)
                     factory.createTemplate(property)
                 }.beanDefinition
