@@ -23,7 +23,6 @@ dependencies {
     implementation(libs.gradle.spring)
     implementation(libs.gradle.kotlin)
     implementation(libs.gradle.kotlin.allopen)
-    implementation(libs.gradle.plugin.publish)
 }
 
 tasks.withType<KotlinCompile> {
