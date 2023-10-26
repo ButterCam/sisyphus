@@ -27,3 +27,8 @@ tasks.compileKotlin.get().dependsOn(tasks.generateGrammarSource)
 tasks.compileJava.get().dependsOn(tasks.generateGrammarSource)
 tasks.formatKotlinMain.get().dependsOn(tasks.generateGrammarSource)
 tasks.lintKotlinMain.get().dependsOn(tasks.generateGrammarSource)
+
+tasks.compileTestKotlin.get().dependsOn(tasks.generateTestGrammarSource)
+tasks.compileTestJava.get().dependsOn(tasks.generateTestGrammarSource)
+tasks.formatKotlinTest.get().dependsOn(tasks.generateTestGrammarSource)
+tasks.lintKotlinTest.get().dependsOn(tasks.generateTestGrammarSource)
