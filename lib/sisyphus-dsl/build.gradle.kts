@@ -23,3 +23,7 @@ configurations {
 
 tasks.kotlinSourcesJar.get().dependsOn(tasks.generateGrammarSource)
 tasks.sourcesJar.get().dependsOn(tasks.generateGrammarSource)
+tasks.compileKotlin.get().dependsOn(tasks.generateGrammarSource)
+tasks.compileJava.get().dependsOn(tasks.generateGrammarSource)
+tasks.formatKotlinMain.get().dependsOn(tasks.generateGrammarSource)
+tasks.lintKotlinMain.get().dependsOn(tasks.generateGrammarSource)

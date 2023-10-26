@@ -111,7 +111,7 @@ class HTemplateFactory<TKey, TValue> constructor(
                     (
                         keyMap[it.row.hashWrapper()]
                             ?: throw RuntimeException("Key value not found.")
-                        ) to tableModelConverter.convert(it)
+                    ) to tableModelConverter.convert(it)
                 }
             }
         }
