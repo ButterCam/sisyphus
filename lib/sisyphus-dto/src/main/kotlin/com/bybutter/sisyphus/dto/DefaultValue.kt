@@ -32,5 +32,5 @@ annotation class DefaultValue(
      * - Double: [String.toDouble]
      * - String: [String.toString]
      */
-    val valueProvider: KClass<out DefaultValueProvider<*>> = DefaultValueProvider::class
+    val valueProvider: KClass<out DefaultValueProvider<*>> = DefaultValueProvider::class,
 )

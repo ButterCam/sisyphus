@@ -12,9 +12,9 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.sign
 
-private const val nanosPerSecond = 1000000000L
+private const val NANOS_PER_SECOND = 1000000000L
 
-private val nanosPerSecondBigInteger = nanosPerSecond.toBigInteger()
+private val nanosPerSecondBigInteger = NANOS_PER_SECOND.toBigInteger()
 
 private val useJvm7 = !Reflect.classExist("java.time.ZonedDateTime")
 
@@ -50,7 +50,10 @@ fun Timestamp.Companion.tryParse(value: String): Timestamp? {
     }
 }
 
-internal fun Timestamp.Companion.string(seconds: Long, nanos: Int): String {
+internal fun Timestamp.Companion.string(
+    seconds: Long,
+    nanos: Int,
+): String {
     return if (useJvm7) {
         stringJvm7(seconds, nanos)
     } else {
@@ -66,7 +69,10 @@ internal fun Timestamp.Companion.parsePayload(value: String): Pair<Long, Int> {
     }
 }
 
-operator fun Timestamp.Companion.invoke(seconds: Long, nanos: Int = 0): Timestamp {
+operator fun Timestamp.Companion.invoke(
+    seconds: Long,
+    nanos: Int = 0,
+): Timestamp {
     return Timestamp {
         this.seconds = seconds
         this.nanos = nanos
@@ -77,7 +83,7 @@ operator fun Timestamp.Companion.invoke(seconds: Long, nanos: Int = 0): Timestam
 operator fun Timestamp.Companion.invoke(seconds: Double): Timestamp {
     return Timestamp {
         this.seconds = seconds.toLong()
-        this.nanos = ((seconds - seconds.toLong()) * seconds.sign * nanosPerSecond).toInt()
+        this.nanos = ((seconds - seconds.toLong()) * seconds.sign * NANOS_PER_SECOND).toInt()
     }
 }
 
@@ -89,6 +95,7 @@ operator fun Timestamp.Companion.invoke(nanos: BigInteger): Timestamp {
 }
 
 private val durationRegex = """^(-)?([0-9]+)(?:\.([0-9]+))?s$""".toRegex()
+
 operator fun Duration.Companion.invoke(value: String): Duration {
     return tryParse(value) ?: throw IllegalArgumentException("Illegal duration value '$value'.")
 }
@@ -108,7 +115,10 @@ internal fun Duration.Companion.tryParsePayload(value: String): Pair<Long, Int>?
     return seconds to nanos
 }
 
-operator fun Duration.Companion.invoke(seconds: Long, nanos: Int = 0): Duration {
+operator fun Duration.Companion.invoke(
+    seconds: Long,
+    nanos: Int = 0,
+): Duration {
     return Duration {
         this.seconds = seconds
         this.nanos = nanos
@@ -120,12 +130,15 @@ operator fun Duration.Companion.invoke(seconds: Double): Duration {
     return invoke(seconds, TimeUnit.SECONDS)
 }
 
-operator fun Duration.Companion.invoke(time: Double, unit: TimeUnit): Duration {
+operator fun Duration.Companion.invoke(
+    time: Double,
+    unit: TimeUnit,
+): Duration {
     val nanos = (unit.toNanos(1) * time).toLong()
 
     return Duration {
-        this.seconds = nanos / nanosPerSecond
-        this.nanos = (nanos % nanosPerSecond).toInt()
+        this.seconds = nanos / NANOS_PER_SECOND
+        this.nanos = (nanos % NANOS_PER_SECOND).toInt()
     }
 }
 
@@ -136,18 +149,23 @@ operator fun Duration.Companion.invoke(nanos: BigInteger): Duration {
     }
 }
 
-operator fun Duration.Companion.invoke(hours: Long, minutes: Long, seconds: Long, nanos: Int = 0): Duration {
+operator fun Duration.Companion.invoke(
+    hours: Long,
+    minutes: Long,
+    seconds: Long,
+    nanos: Int = 0,
+): Duration {
     val totalSeconds =
         TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(minutes) + TimeUnit.SECONDS.toSeconds(seconds)
     return Duration(totalSeconds, nanos)
 }
 
 fun Timestamp.toBigInteger(): BigInteger {
-    return BigInteger.valueOf(this.seconds) * BigInteger.valueOf(nanosPerSecond) + BigInteger.valueOf(this.nanos.toLong())
+    return BigInteger.valueOf(this.seconds) * BigInteger.valueOf(NANOS_PER_SECOND) + BigInteger.valueOf(this.nanos.toLong())
 }
 
 fun Timestamp.toTime(unit: TimeUnit): Long {
-    val nanos = seconds * nanosPerSecond + nanos
+    val nanos = seconds * NANOS_PER_SECOND + nanos
     return unit.convert(nanos, TimeUnit.NANOSECONDS)
 }
 
@@ -156,11 +174,11 @@ fun Timestamp.toSeconds(): Long {
 }
 
 fun Duration.toBigInteger(): BigInteger {
-    return BigInteger.valueOf(this.seconds) * BigInteger.valueOf(nanosPerSecond) + BigInteger.valueOf(this.nanos.toLong())
+    return BigInteger.valueOf(this.seconds) * BigInteger.valueOf(NANOS_PER_SECOND) + BigInteger.valueOf(this.nanos.toLong())
 }
 
 fun Duration.toTime(unit: TimeUnit): Long {
-    val nanos = seconds * nanosPerSecond + nanos
+    val nanos = seconds * NANOS_PER_SECOND + nanos
     return unit.convert(nanos, TimeUnit.NANOSECONDS)
 }
 
@@ -232,18 +250,23 @@ operator fun Duration.compareTo(other: Duration): Int {
     return this.nanos.compareTo(other.nanos)
 }
 
-fun Duration.string(): String = buildString {
-    return Duration.string(seconds, nanos)
-}
-
-internal fun Duration.Companion.string(seconds: Long, nanos: Int): String = buildString {
-    append(seconds)
-    if (nanos != 0) {
-        append('.')
-        append(abs(nanos).toString().leftPadding(9, '0').trimEnd('0'))
+fun Duration.string(): String =
+    buildString {
+        return Duration.string(seconds, nanos)
     }
-    append('s')
-}
+
+internal fun Duration.Companion.string(
+    seconds: Long,
+    nanos: Int,
+): String =
+    buildString {
+        append(seconds)
+        if (nanos != 0) {
+            append('.')
+            append(abs(nanos).toString().leftPadding(9, '0').trimEnd('0'))
+        }
+        append('s')
+    }
 
 fun abs(duration: Duration): Duration {
     return duration {
@@ -260,12 +283,12 @@ private fun MutableTimestamp.normalized() {
 
     if (seconds.sign != nanos.sign) {
         seconds += nanos.sign
-        nanos = ((nanosPerSecond - abs(nanos)) * seconds.sign).toInt()
+        nanos = ((NANOS_PER_SECOND - abs(nanos)) * seconds.sign).toInt()
     }
 
-    if (nanos >= nanosPerSecond) {
-        seconds += nanos / nanosPerSecond
-        nanos %= nanosPerSecond.toInt()
+    if (nanos >= NANOS_PER_SECOND) {
+        seconds += nanos / NANOS_PER_SECOND
+        nanos %= NANOS_PER_SECOND.toInt()
     }
 }
 
@@ -276,11 +299,11 @@ private fun MutableDuration.normalized() {
 
     if (seconds.sign != nanos.sign) {
         seconds += nanos.sign
-        nanos = ((nanosPerSecond - abs(nanos)) * seconds.sign).toInt()
+        nanos = ((NANOS_PER_SECOND - abs(nanos)) * seconds.sign).toInt()
     }
 
-    if (nanos >= nanosPerSecond) {
-        seconds += nanos / nanosPerSecond
-        nanos %= nanosPerSecond.toInt()
+    if (nanos >= NANOS_PER_SECOND) {
+        seconds += nanos / NANOS_PER_SECOND
+        nanos %= NANOS_PER_SECOND.toInt()
     }
 }

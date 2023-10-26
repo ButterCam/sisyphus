@@ -40,7 +40,10 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
         }
     }
 
-    private fun KFunction<*>.macroCompatibleWith(th: Any?, arguments: List<CelParser.ExprContext>): Boolean {
+    private fun KFunction<*>.macroCompatibleWith(
+        th: Any?,
+        arguments: List<CelParser.ExprContext>,
+    ): Boolean {
         val thType = this.extensionReceiverParameter?.type?.classifier as? KClass<*>
         if (th == null && thType == null) return macroCompatibleWith(arguments)
         if (th == null || thType == null) return false
@@ -80,12 +83,15 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
         return false
     }
 
-    private fun KFunction<*>.compatibleWith(th: Any?, arguments: List<Any?>): Boolean {
+    private fun KFunction<*>.compatibleWith(
+        th: Any?,
+        arguments: List<Any?>,
+    ): Boolean {
         val thType = this.extensionReceiverParameter?.type?.classifier as? KClass<*>
         if (th == null && thType == null) {
             return compatibleWith(
                 listOfNotNull(this.extensionReceiverParameter) + this.valueParameters,
-                arguments
+                arguments,
             )
         }
         if (th == null || thType == null) return false
@@ -97,7 +103,10 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
         return compatibleWith(listOfNotNull(this.extensionReceiverParameter) + this.valueParameters, arguments)
     }
 
-    private fun KFunction<*>.compatibleWith(parameters: List<KParameter>, arguments: List<Any?>): Boolean {
+    private fun KFunction<*>.compatibleWith(
+        parameters: List<KParameter>,
+        arguments: List<Any?>,
+    ): Boolean {
         if (parameters.size != arguments.size) return false
         for ((index, parameter) in parameters.withIndex()) {
             val type = arguments[index]?.javaClass
@@ -109,7 +118,10 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
         return true
     }
 
-    fun getGlobalField(key: String, global: Map<String, Any?>): Any? {
+    fun getGlobalField(
+        key: String,
+        global: Map<String, Any?>,
+    ): Any? {
         return when (key) {
             "int" -> "int"
             "uint" -> "uint"
@@ -129,30 +141,47 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
         }
     }
 
-    fun invoke(th: Any?, function: String, vararg arguments: Any?): Any? {
+    fun invoke(
+        th: Any?,
+        function: String,
+        vararg arguments: Any?,
+    ): Any? {
         return invoke(th, function, arguments.toList())
     }
 
-    fun invoke(th: Any?, function: String, arguments: List<Any?>): Any? {
+    fun invoke(
+        th: Any?,
+        function: String,
+        arguments: List<Any?>,
+    ): Any? {
         return if (th == null) {
-            val func = memberFunctions[function]?.firstOrNull {
-                it.compatibleWith(arguments)
-            } ?: throw NoSuchMethodException(
-                "Can't find method '$function(${arguments.joinToString(", ") { it?.javaClass?.canonicalName ?: "null" }})' in CEL standard library."
-            )
+            val func =
+                memberFunctions[function]?.firstOrNull {
+                    it.compatibleWith(arguments)
+                } ?: throw NoSuchMethodException(
+                    "Can't find method '$function(${arguments.joinToString(", ") {
+                        it?.javaClass?.canonicalName ?: "null"
+                    }})' in CEL standard library.",
+                )
             func.call(std, *arguments.toTypedArray())
         } else {
-            val func = memberFunctions[function]?.firstOrNull {
-                it.compatibleWith(th, arguments)
-            } ?: throw NoSuchMethodException(
-                "Can't find method '${th.javaClass.canonicalName}.$function(${arguments.joinToString(", ") { it?.javaClass?.canonicalName ?: "null" }})' in CEL standard library."
-            )
+            val func =
+                memberFunctions[function]?.firstOrNull {
+                    it.compatibleWith(th, arguments)
+                } ?: throw NoSuchMethodException(
+                    "Can't find method '${th.javaClass.canonicalName}.$function(${arguments.joinToString(", ") {
+                        it?.javaClass?.canonicalName ?: "null"
+                    }})' in CEL standard library.",
+                )
             func.call(std, th, *arguments.toTypedArray())
         }
     }
 
     @OptIn(InternalProtoApi::class)
-    fun createMessage(type: String, initializer: Map<String, Any?>): Any {
+    fun createMessage(
+        type: String,
+        initializer: Map<String, Any?>,
+    ): Any {
         val messageSupport = ProtoTypes.findMessageSupport(type)
         return messageSupport.newMutable().apply {
             for ((key, value) in initializer) {
@@ -162,7 +191,11 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
         }
     }
 
-    fun findMarcoFunction(th: Any?, function: String?, arguments: List<CelParser.ExprContext>): KFunction<*>? {
+    fun findMarcoFunction(
+        th: Any?,
+        function: String?,
+        arguments: List<CelParser.ExprContext>,
+    ): KFunction<*>? {
         return if (th == null) {
             macroFunctions[function]?.firstOrNull {
                 it.macroCompatibleWith(arguments)
@@ -179,14 +212,15 @@ open class CelRuntime(val macro: CelMacro = CelMacro(), val std: CelStandardLibr
         th: Any?,
         function: String?,
         arguments: List<CelParser.ExprContext>,
-        block: (Any?) -> Unit
+        block: (Any?) -> Unit,
     ) {
         val function = findMarcoFunction(th, function, arguments) ?: return
-        val result = if (th == null) {
-            function.call(macro, context, *arguments.toTypedArray())
-        } else {
-            function.call(macro, th, context, *arguments.toTypedArray())
-        }
+        val result =
+            if (th == null) {
+                function.call(macro, context, *arguments.toTypedArray())
+            } else {
+                function.call(macro, th, context, *arguments.toTypedArray())
+            }
         block(result)
     }
 

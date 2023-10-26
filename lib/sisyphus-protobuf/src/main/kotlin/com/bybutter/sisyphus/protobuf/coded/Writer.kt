@@ -5,7 +5,10 @@ import com.bybutter.sisyphus.protobuf.ProtoEnum
 
 @OptIn(ExperimentalUnsignedTypes::class)
 interface Writer {
-    fun tag(filedNumber: Int, wireType: WireType): Writer
+    fun tag(
+        filedNumber: Int,
+        wireType: WireType,
+    ): Writer
 
     fun tag(value: Int): Writer
 

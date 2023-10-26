@@ -90,7 +90,11 @@ class UnknownFields {
         }
     }
 
-    fun readFrom(reader: Reader, number: Int, wireType: Int) {
+    fun readFrom(
+        reader: Reader,
+        number: Int,
+        wireType: Int,
+    ) {
         when (wireType) {
             WireType.VARINT.ordinal -> {
                 _fields.add(Varint(number, reader.int64()))

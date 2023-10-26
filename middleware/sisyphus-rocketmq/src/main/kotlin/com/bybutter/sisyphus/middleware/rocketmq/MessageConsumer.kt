@@ -12,9 +12,10 @@ annotation class MessageConsumer(
     val groupId: String = "",
     val filter: String = "*",
     val filterType: String = ExpressionType.TAG,
-    val converter: KClass<out MessageConverter<*>> = MessageConverter.Companion::class
+    val converter: KClass<out MessageConverter<*>> = MessageConverter.Companion::class,
 )
 
 enum class ConsumerType {
-    ORDERLY, CONCURRENTLY
+    ORDERLY,
+    CONCURRENTLY,
 }

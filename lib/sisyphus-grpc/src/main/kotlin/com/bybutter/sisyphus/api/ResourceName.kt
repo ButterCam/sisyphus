@@ -19,7 +19,7 @@ interface ResourceName : CustomProtoType<String> {
 }
 
 abstract class AbstractResourceName(
-    private val data: Map<String, String>
+    private val data: Map<String, String>,
 ) : ResourceName {
     override fun toMap(): Map<String, String> {
         return data

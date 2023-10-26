@@ -53,7 +53,11 @@ class SpringJooqConfigurationAdapter : JooqConfigInterceptor {
 
     override val qualifier: Class<*>? = null
 
-    override fun intercept(datasource: DataSource, dialect: SQLDialect, configuration: Configuration): Configuration {
+    override fun intercept(
+        datasource: DataSource,
+        dialect: SQLDialect,
+        configuration: Configuration,
+    ): Configuration {
         transactionProvider.ifAvailable { configuration.set(it) }
         recordMapperProvider.ifAvailable { configuration.set(it) }
         recordUnmapperProvider.ifAvailable { configuration.set(it) }

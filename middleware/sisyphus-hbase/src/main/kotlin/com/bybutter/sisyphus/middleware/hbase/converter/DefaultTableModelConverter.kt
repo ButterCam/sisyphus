@@ -40,29 +40,33 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
         instance: Any,
         pre: List<ByteArray>,
         property: BeanPropertyDefinition,
-        map: NavigableMap<ByteArray, NavigableMap<ByteArray, NavigableMap<Long, ByteArray>>>
+        map: NavigableMap<ByteArray, NavigableMap<ByteArray, NavigableMap<Long, ByteArray>>>,
     ) {
         val returnType = property.getter.type
         val propertyColumnInfo = property.getter?.getAnnotation(HColumn::class.java)
         val classColumnInfo = returnType.rawClass.annotations.firstOrNull { it is HColumn } as? HColumn
 
-        val name = (propertyColumnInfo?.byteName)?.let { return@let if (it.isEmpty()) null else it }
-            ?: (propertyColumnInfo?.name?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
-            ?: (classColumnInfo?.byteName)?.let { return@let if (it.isEmpty()) null else it }
-            ?: (classColumnInfo?.name?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
-            ?: property.name.toByteArray()
-        val qualifier = (propertyColumnInfo?.byteQualifier)?.let { return@let if (it.isEmpty()) null else it }
-            ?: (propertyColumnInfo?.qualifier?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
-        val converterType = (propertyColumnInfo?.converter ?: classColumnInfo?.converter)?.let {
-            return@let if (it.java.isInterface) {
-                null
-            } else {
-                it
+        val name =
+            (propertyColumnInfo?.byteName)?.let { return@let if (it.isEmpty()) null else it }
+                ?: (propertyColumnInfo?.name?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
+                ?: (classColumnInfo?.byteName)?.let { return@let if (it.isEmpty()) null else it }
+                ?: (classColumnInfo?.name?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
+                ?: property.name.toByteArray()
+        val qualifier =
+            (propertyColumnInfo?.byteQualifier)?.let { return@let if (it.isEmpty()) null else it }
+                ?: (propertyColumnInfo?.qualifier?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
+        val converterType =
+            (propertyColumnInfo?.converter ?: classColumnInfo?.converter)?.let {
+                return@let if (it.java.isInterface) {
+                    null
+                } else {
+                    it
+                }
             }
-        }
-        val converter: ValueConverter<Any>? = (
-            converterType?.instance()
-                ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>
+        val converter: ValueConverter<Any>? =
+            (
+                converterType?.instance()
+                    ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>
             ) as? ValueConverter<Any>
 
         if (qualifier != null && pre.isNotEmpty()) {
@@ -76,7 +80,7 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
             converter ?: throw IllegalArgumentException("Can't convert byte array to type '${returnType.typeName}'.")
             property.setter.callOnWith(
                 instance,
-                map[name]?.get(qualifier)?.firstEntry()?.value?.takeIf { it.isNotEmpty() }?.let { converter.convertBack(it) }
+                map[name]?.get(qualifier)?.firstEntry()?.value?.takeIf { it.isNotEmpty() }?.let { converter.convertBack(it) },
             )
             return
         }
@@ -85,7 +89,7 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
             converter ?: throw IllegalArgumentException("Can't convert byte array to type '${returnType.typeName}'.")
             property.setter.callOnWith(
                 instance,
-                map[pre[0]]?.get(name)?.firstEntry()?.value?.takeIf { it.isNotEmpty() }?.let { converter.convertBack(it) }
+                map[pre[0]]?.get(name)?.firstEntry()?.value?.takeIf { it.isNotEmpty() }?.let { converter.convertBack(it) },
             )
             return
         }
@@ -96,7 +100,7 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
                 for (it in returnType.beanDescription.findProperties()) {
                     readStructValue(this, pre + name, it, map)
                 }
-            }
+            },
         )
     }
 
@@ -104,29 +108,33 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
         instance: Any,
         pre: List<ByteArray>,
         property: BeanPropertyDefinition,
-        map: MutableMap<ByteArrayHashingWrapper, MutableMap<ByteArrayHashingWrapper, ByteArray?>>
+        map: MutableMap<ByteArrayHashingWrapper, MutableMap<ByteArrayHashingWrapper, ByteArray?>>,
     ) {
         val returnType = property.getter.type
         val propertyColumnInfo = property.getter?.getAnnotation(HColumn::class.java)
         val classColumnInfo = returnType.rawClass.annotations.firstOrNull { it is HColumn } as? HColumn
 
-        val name = (propertyColumnInfo?.byteName)?.let { return@let if (it.isEmpty()) null else it }
-            ?: (propertyColumnInfo?.name?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
-            ?: (classColumnInfo?.byteName)?.let { return@let if (it.isEmpty()) null else it }
-            ?: (classColumnInfo?.name?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
-            ?: property.name.toByteArray()
-        val qualifier = (propertyColumnInfo?.byteQualifier)?.let { return@let if (it.isEmpty()) null else it }
-            ?: (propertyColumnInfo?.qualifier?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
-        val converterType = (propertyColumnInfo?.converter ?: classColumnInfo?.converter)?.let {
-            return@let if (it.java.isInterface) {
-                null
-            } else {
-                it
+        val name =
+            (propertyColumnInfo?.byteName)?.let { return@let if (it.isEmpty()) null else it }
+                ?: (propertyColumnInfo?.name?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
+                ?: (classColumnInfo?.byteName)?.let { return@let if (it.isEmpty()) null else it }
+                ?: (classColumnInfo?.name?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
+                ?: property.name.toByteArray()
+        val qualifier =
+            (propertyColumnInfo?.byteQualifier)?.let { return@let if (it.isEmpty()) null else it }
+                ?: (propertyColumnInfo?.qualifier?.toByteArray())?.let { return@let if (it.isEmpty()) null else it }
+        val converterType =
+            (propertyColumnInfo?.converter ?: classColumnInfo?.converter)?.let {
+                return@let if (it.java.isInterface) {
+                    null
+                } else {
+                    it
+                }
             }
-        }
-        val converter: ValueConverter<Any?>? = (
-            converterType?.instance()
-                ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>
+        val converter: ValueConverter<Any?>? =
+            (
+                converterType?.instance()
+                    ?: getDefaultValueConverter<T>(returnType) as? ValueConverter<*>
             ) as? ValueConverter<Any?>
 
         if (qualifier != null && pre.isNotEmpty()) {
@@ -153,7 +161,11 @@ class DefaultTableModelConverter<T>(private val type: JavaType) : TableModelConv
         }
     }
 
-    private fun <T1, T2, T3> MutableMap<T1, MutableMap<T2, T3>>.trySet(key1: T1, key2: T2, value: T3) {
+    private fun <T1, T2, T3> MutableMap<T1, MutableMap<T2, T3>>.trySet(
+        key1: T1,
+        key2: T2,
+        value: T3,
+    ) {
         if (this.containsKey(key1)) {
             this[key1]?.set(key2, value)
         } else {

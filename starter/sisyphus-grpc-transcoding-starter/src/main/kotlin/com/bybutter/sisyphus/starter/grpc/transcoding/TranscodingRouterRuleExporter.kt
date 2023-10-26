@@ -17,7 +17,7 @@ interface TranscodingRouterRuleExporter {
     fun export(
         server: Server,
         enableServices: Set<String>,
-        rules: MutableList<TranscodingRouterRule>
+        rules: MutableList<TranscodingRouterRule>,
     )
 }
 
@@ -27,7 +27,7 @@ class HttpTranscodingRouterRuleExporter : TranscodingRouterRuleExporter {
     override fun export(
         server: Server,
         enableServices: Set<String>,
-        rules: MutableList<TranscodingRouterRule>
+        rules: MutableList<TranscodingRouterRule>,
     ) {
         for (service in server.services) {
             if (enableServices.isEmpty() || enableServices.contains(service.serviceDescriptor.name)) {
@@ -36,15 +36,19 @@ class HttpTranscodingRouterRuleExporter : TranscodingRouterRuleExporter {
         }
     }
 
-    private fun exportServices(service: ServerServiceDefinition, rules: MutableList<TranscodingRouterRule>) {
+    private fun exportServices(
+        service: ServerServiceDefinition,
+        rules: MutableList<TranscodingRouterRule>,
+    ) {
         val serviceProto = ProtoTypes.findServiceSupport(".${service.serviceDescriptor.name}").descriptor
         for (method in service.methods) {
             // Just support non-client-streaming method.
             if (!method.methodDescriptor.type.clientSendsOneMessage()) continue
             // Ensure method proto registered.
-            val methodProto = serviceProto.method.firstOrNull {
-                it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
-            } ?: continue
+            val methodProto =
+                serviceProto.method.firstOrNull {
+                    it.name == method.methodDescriptor.fullMethodName.substringAfter('/')
+                } ?: continue
             // Ensure http rule existed.
             val rule = methodProto.options?.http ?: continue
 
@@ -58,5 +62,5 @@ data class TranscodingRouterRule(
     val method: ServerMethodDefinition<*, *>,
     val serviceProto: ServiceDescriptorProto,
     val methodProto: MethodDescriptorProto,
-    val http: HttpRule
+    val http: HttpRule,
 )

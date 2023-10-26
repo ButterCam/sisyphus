@@ -9,10 +9,10 @@ data class ElasticProperty(
     val port: Int,
     val userName: String? = null,
     val password: String? = null,
-    val extensions: Map<String, Any> = mapOf()
+    val extensions: Map<String, Any> = mapOf(),
 )
 
 data class ElasticProperties(
     @NestedConfigurationProperty
-    val elastic: Map<String, ElasticProperty>
+    val elastic: Map<String, ElasticProperty>,
 )

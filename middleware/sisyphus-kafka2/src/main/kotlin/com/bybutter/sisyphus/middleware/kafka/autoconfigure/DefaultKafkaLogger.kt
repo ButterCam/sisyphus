@@ -20,16 +20,20 @@ class DefaultKafkaLogger : KafkaLogger {
         consumer: KafkaConsumer<*, *>,
         message: ConsumerRecord<*, *>,
         costNanoTime: Long,
-        exception: Exception?
+        exception: Exception?,
     ) {
         if (exception == null) {
             logger.info(
-                "[COMPLETED] ${consumer.groupMetadata().memberId()} <- ${message.topic()}/${message.partition()}/${message.offset()} +${getCostString(costNanoTime)}"
+                "[COMPLETED] ${consumer.groupMetadata().memberId()} <- ${
+                    message.topic()
+                }/${message.partition()}/${message.offset()} +${getCostString(costNanoTime)}",
             )
         } else {
             logger.error(
-                "[ERROR] ${consumer.groupMetadata().memberId()} <- ${message.topic()}/${message.partition()}/${message.offset()} +${getCostString(costNanoTime)}",
-                exception
+                "[ERROR] ${consumer.groupMetadata().memberId()} <- ${
+                    message.topic()
+                }/${message.partition()}/${message.offset()} +${getCostString(costNanoTime)}",
+                exception,
             )
         }
     }

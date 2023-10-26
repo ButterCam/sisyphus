@@ -15,9 +15,8 @@ class KafkaConsumerLifecycle(
     private val consumer: KafkaConsumer<*, *>,
     private val listener: KafkaListener<Any, Any>,
     private val kafkaLoggers: List<KafkaLogger>,
-    private val exceptionHandler: KafkaExceptionHandler
+    private val exceptionHandler: KafkaExceptionHandler,
 ) : SmartLifecycle {
-
     private var working = false
 
     private var running = false
@@ -31,56 +30,58 @@ class KafkaConsumerLifecycle(
     }
 
     private fun MutableMap<TopicPartition, OffsetAndMetadata>.commit(record: ConsumerRecord<*, *>) {
-        this[TopicPartition(record.topic(), record.partition())] = OffsetAndMetadata(
-            record.offset() + 1,
-            record.leaderEpoch(),
-            ""
-        )
+        this[TopicPartition(record.topic(), record.partition())] =
+            OffsetAndMetadata(
+                record.offset() + 1,
+                record.leaderEpoch(),
+                "",
+            )
     }
 
     override fun start() {
         working = true
 
-        worker = thread(name = consumer.groupMetadata().groupId()) {
-            runBlocking {
-                running = true
-                while (working) {
-                    try {
-                        val offsets = mutableMapOf<TopicPartition, OffsetAndMetadata>()
-                        val records = consumer.poll(Duration.ofMinutes(1))
+        worker =
+            thread(name = consumer.groupMetadata().groupId()) {
+                runBlocking {
+                    running = true
+                    while (working) {
+                        try {
+                            val offsets = mutableMapOf<TopicPartition, OffsetAndMetadata>()
+                            val records = consumer.poll(Duration.ofMinutes(1))
 
-                        for (it in records) {
-                            try {
-                                handleRecord(it)
-                            } catch (e: Exception) {
-                                when (exceptionHandler.onException(it, e)) {
-                                    KafkaExceptionPolicy.RETRY -> break
-                                    KafkaExceptionPolicy.SKIP -> {}
-                                    KafkaExceptionPolicy.STOP -> {
-                                        logger.info("Starting to stop kafka due to exception policy.", e)
-                                        working = false
-                                        break
+                            for (it in records) {
+                                try {
+                                    handleRecord(it)
+                                } catch (e: Exception) {
+                                    when (exceptionHandler.onException(it, e)) {
+                                        KafkaExceptionPolicy.RETRY -> break
+                                        KafkaExceptionPolicy.SKIP -> {}
+                                        KafkaExceptionPolicy.STOP -> {
+                                            logger.info("Starting to stop kafka due to exception policy.", e)
+                                            working = false
+                                            break
+                                        }
                                     }
                                 }
+                                offsets.commit(it)
                             }
-                            offsets.commit(it)
-                        }
 
-                        if (offsets.isNotEmpty()) {
-                            consumer.commitSync(offsets)
+                            if (offsets.isNotEmpty()) {
+                                consumer.commitSync(offsets)
+                            }
+                        } catch (e: Exception) {
+                            logger.error("Error occurred when handle kafka messages.", e)
                         }
-                    } catch (e: Exception) {
-                        logger.error("Error occurred when handle kafka messages.", e)
                     }
+                    running = false
+
+                    listener.shutdown()
+                    consumer.close()
+
+                    logger.info("Kafka consumer stopped.")
                 }
-                running = false
-
-                listener.shutdown()
-                consumer.close()
-
-                logger.info("Kafka consumer stopped.")
             }
-        }
     }
 
     private suspend fun handleRecord(record: ConsumerRecord<*, *>) {

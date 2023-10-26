@@ -13,7 +13,10 @@ import javax.sql.DataSource
 
 abstract class AbstractDslContextFactory(private val configInterceptors: List<JooqConfigInterceptor>) :
     DslContextFactory {
-    final override fun createContext(qualifier: Class<*>, property: JdbcDatabaseProperty): DSLContext {
+    final override fun createContext(
+        qualifier: Class<*>,
+        property: JdbcDatabaseProperty,
+    ): DSLContext {
         val url = buildJdbcUrl(property)
         val datasource = createDatasource(url, property)
         return DSL.using(createConfiguration(qualifier, datasource, property.dialect ?: JDBCUtils.dialect(url), configInterceptors))
@@ -23,7 +26,10 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         return property.url
     }
 
-    protected open fun createDatasource(url: String, property: JdbcDatabaseProperty): DataSource {
+    protected open fun createDatasource(
+        url: String,
+        property: JdbcDatabaseProperty,
+    ): DataSource {
         return HikariDataSource(
             HikariConfig().apply {
                 this.jdbcUrl = url
@@ -57,7 +63,7 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
                 if (property.poolConfig?.connectionTestQuery != null) {
                     this.connectionTestQuery = property.poolConfig.connectionTestQuery
                 }
-            }
+            },
         )
     }
 
@@ -65,12 +71,13 @@ abstract class AbstractDslContextFactory(private val configInterceptors: List<Jo
         qualifier: Class<*>,
         datasource: DataSource,
         dialect: SQLDialect,
-        interceptors: List<JooqConfigInterceptor>
+        interceptors: List<JooqConfigInterceptor>,
     ): Configuration {
-        val config: Configuration = DefaultConfiguration().apply {
-            set(dialect)
-            set(TransactionDelegatingDataSource(datasource))
-        }
+        val config: Configuration =
+            DefaultConfiguration().apply {
+                set(dialect)
+                set(TransactionDelegatingDataSource(datasource))
+            }
         return interceptors.fold(config) { c, h ->
             if (h.qualifier == null || h.qualifier == qualifier) {
                 h.intercept(datasource, dialect, c)

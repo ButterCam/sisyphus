@@ -28,9 +28,13 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
         this.environment = environment
     }
 
-    override fun registerBeanDefinitions(importingClassMetadata: AnnotationMetadata, registry: BeanDefinitionRegistry) {
-        val enableAnnotation = importingClassMetadata.getAnnotationAttributes(EnableRetrofitClients::class.java.name)
-            ?: return
+    override fun registerBeanDefinitions(
+        importingClassMetadata: AnnotationMetadata,
+        registry: BeanDefinitionRegistry,
+    ) {
+        val enableAnnotation =
+            importingClassMetadata.getAnnotationAttributes(EnableRetrofitClients::class.java.name)
+                ?: return
 
         // Get the value of basePackageNames from the annotation.
         val basePackageNames =
@@ -45,10 +49,11 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
         basePackageNames.add(Class.forName(importingClassMetadata.className).packageName)
 
         // Obtain the class with RetrofitClient annotation under the specified path through reflection.
-        val classes = basePackageNames.fold(mutableSetOf<Class<*>>()) { acc, s ->
-            acc.addAll(Reflections(ConfigurationBuilder().forPackages(s)).getTypesAnnotatedWith(RetrofitClient::class.java))
-            acc
-        }
+        val classes =
+            basePackageNames.fold(mutableSetOf<Class<*>>()) { acc, s ->
+                acc.addAll(Reflections(ConfigurationBuilder().forPackages(s)).getTypesAnnotatedWith(RetrofitClient::class.java))
+                acc
+            }
 
         // Get the value of clientClassNames from the annotation. Reflect class through className，add to classes.
         (enableAnnotation[EnableRetrofitClients::clientClassNames.name] as? Array<String>)?.asList()?.map {
@@ -74,12 +79,16 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
         registerClients(registry, classes)
     }
 
-    private fun registerClients(registry: BeanDefinitionRegistry, classes: Set<Class<*>>) {
+    private fun registerClients(
+        registry: BeanDefinitionRegistry,
+        classes: Set<Class<*>>,
+    ) {
         val beanFactory = registry as ConfigurableListableBeanFactory
         val properties = beanFactory.getBeansOfType<RetrofitProperty>().toMutableMap()
-        val retrofitProperties = Binder.get(environment)
-            .bind("sisyphus", RetrofitProperties::class.java)
-            .orElse(null)?.retrofit ?: mapOf()
+        val retrofitProperties =
+            Binder.get(environment)
+                .bind("sisyphus", RetrofitProperties::class.java)
+                .orElse(null)?.retrofit ?: mapOf()
 
         properties += retrofitProperties
 
@@ -98,7 +107,10 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
         }
     }
 
-    private fun createOkHttpClient(property: RetrofitProperty, propertyPrefix: String): OkHttpClient {
+    private fun createOkHttpClient(
+        property: RetrofitProperty,
+        propertyPrefix: String,
+    ): OkHttpClient {
         val clientBuilder = OkHttpClient.Builder()
         if (property.connectTimeout != null) {
             clientBuilder.connectTimeout(property.connectTimeout, TimeUnit.MILLISECONDS)
@@ -112,7 +124,7 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
         property: RetrofitProperty,
         propertyPrefix: String,
         clientClass: Class<*>,
-        client: OkHttpClient
+        client: OkHttpClient,
     ): Any {
         val baseUrl = property.url ?: throw IllegalStateException("Retrofit client must have 'url'.")
         val retrofitBuilder = Retrofit.Builder().baseUrl(baseUrl).client(client)
@@ -124,14 +136,18 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
             retrofitBuilder.addCallAdapterFactory(CircuitBreakerCallAdapter.of(buildCircuitBreaker(property)))
         }
 
-        val retrofit = property.builderInterceptors?.fold(retrofitBuilder) { builder, it ->
-            it.instance().intercept(builder, property, environment, propertyPrefix)
-        }?.build() ?: retrofitBuilder.build()
+        val retrofit =
+            property.builderInterceptors?.fold(retrofitBuilder) { builder, it ->
+                it.instance().intercept(builder, property, environment, propertyPrefix)
+            }?.build() ?: retrofitBuilder.build()
 
         return retrofit.create(clientClass)
     }
 
-    private fun buildRetrofitProperty(retrofitClient: RetrofitClient, property: RetrofitProperty?): RetrofitProperty {
+    private fun buildRetrofitProperty(
+        retrofitClient: RetrofitClient,
+        property: RetrofitProperty?,
+    ): RetrofitProperty {
         return RetrofitProperty(
             property?.name
                 ?: retrofitClient.name,
@@ -141,13 +157,14 @@ class RetrofitClientsRegistrar : ImportBeanDefinitionRegistrar, EnvironmentAware
             property?.builderInterceptors ?: retrofitClient.builderInterceptors.map { it.java },
             property?.clientBuilderInterceptors ?: retrofitClient.clientBuilderInterceptors.map { it.java },
             property?.enableCircuitBreaker ?: retrofitClient.enableCircuitBreaker,
-            property?.circuitBreakerProperty
+            property?.circuitBreakerProperty,
         )
     }
 
     private fun buildCircuitBreaker(property: RetrofitProperty): CircuitBreaker {
-        val configBuilder = CircuitBreakerConfig.custom()
-            .enableAutomaticTransitionFromOpenToHalfOpen()
+        val configBuilder =
+            CircuitBreakerConfig.custom()
+                .enableAutomaticTransitionFromOpenToHalfOpen()
 
         if (property.circuitBreakerProperty != null) {
             property.circuitBreakerProperty.failureRateThreshold?.let {

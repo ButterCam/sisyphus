@@ -14,9 +14,8 @@ class ApiDocRouterFunction private constructor(
     private val services: List<ServerServiceDefinition>,
     private val apiDocProperty: ApiDocProperty,
     private val requestInterceptors: List<ApiDocRequestInterceptor>,
-    private val interceptors: List<ApiDocInterceptor>
+    private val interceptors: List<ApiDocInterceptor>,
 ) : RouterFunction<ServerResponse>, HandlerFunction<ServerResponse> {
-
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
         return if (request.path() != apiDocProperty.path) {
             Mono.empty()
@@ -29,26 +28,28 @@ class ApiDocRouterFunction private constructor(
         requestInterceptors.forEach {
             it.intercept(request)
         }
-        val openApi = openApi {
-            for (service in services) {
-                addService(service)
+        val openApi =
+            openApi {
+                for (service in services) {
+                    addService(service)
+                }
+            }.apply {
+                interceptors.forEach {
+                    it.intercept(request, this)
+                }
             }
-        }.apply {
-            interceptors.forEach {
-                it.intercept(request, this)
-            }
-        }
         return ServerResponse.ok().bodyValue(Json.mapper().writeValueAsString(openApi))
     }
 
     companion object {
         const val COMPONENTS_SCHEMAS_PREFIX = "#/components/schemas/"
+
         operator fun invoke(
             server: Server,
             enableServices: Collection<String> = listOf(),
             apiDocProperty: ApiDocProperty,
             requestInterceptors: List<ApiDocRequestInterceptor>,
-            interceptors: List<ApiDocInterceptor>
+            interceptors: List<ApiDocInterceptor>,
         ): RouterFunction<ServerResponse> {
             val enableServicesSet = enableServices.toSet()
             val enableServicesDefinition = mutableListOf<ServerServiceDefinition>()

@@ -38,13 +38,14 @@ class KubernetesCluster(val name: String, val extension: KubernetesExtension) {
             }
             throw IllegalStateException("No kubernetes config found.")
         } else {
-            val kube = Files.newReader(File(config), Charsets.UTF_8).use {
-                KubeConfig.loadKubeConfig(it).apply {
-                    if (contextName != null) {
-                        this.setContext(contextName)
+            val kube =
+                Files.newReader(File(config), Charsets.UTF_8).use {
+                    KubeConfig.loadKubeConfig(it).apply {
+                        if (contextName != null) {
+                            this.setContext(contextName)
+                        }
                     }
                 }
-            }
             return ClientBuilder.kubeconfig(kube).build()
         }
     }
@@ -58,11 +59,16 @@ class KubernetesCluster(val name: String, val extension: KubernetesExtension) {
         }
     }
 
-    fun <T : KubernetesObject> resource(kind: String, name: String, block: KubernetesResource<T>.() -> Unit) {
+    fun <T : KubernetesObject> resource(
+        kind: String,
+        name: String,
+        block: KubernetesResource<T>.() -> Unit,
+    ) {
         val (namespace, resourceName) = resourceInfo(name)
-        val current = resources.getOrPut("$kind:$name") {
-            KubernetesResource<T>(this, KubernetesResourceSupport.fromKind(kind).kind, namespace, resourceName)
-        }
+        val current =
+            resources.getOrPut("$kind:$name") {
+                KubernetesResource<T>(this, KubernetesResourceSupport.fromKind(kind).kind, namespace, resourceName)
+            }
 
         if (current.kind != kind) {
             throw IllegalArgumentException("Resource $name is already defined as ${current.kind}")
@@ -71,15 +77,24 @@ class KubernetesCluster(val name: String, val extension: KubernetesExtension) {
         block(current as KubernetesResource<T>)
     }
 
-    fun deployment(name: String, block: KubernetesResource<V1Deployment>.() -> Unit) {
+    fun deployment(
+        name: String,
+        block: KubernetesResource<V1Deployment>.() -> Unit,
+    ) {
         resource("Deployment", name, block)
     }
 
-    fun statefulSet(name: String, block: KubernetesResource<V1StatefulSet>.() -> Unit) {
+    fun statefulSet(
+        name: String,
+        block: KubernetesResource<V1StatefulSet>.() -> Unit,
+    ) {
         resource("StatefulSet", name, block)
     }
 
-    fun deamonSet(name: String, block: KubernetesResource<V1DaemonSet>.() -> Unit) {
+    fun deamonSet(
+        name: String,
+        block: KubernetesResource<V1DaemonSet>.() -> Unit,
+    ) {
         resource("DaemonSet", name, block)
     }
 }

@@ -14,13 +14,15 @@ class CorsConfigurationSourceRegistrar : BeanDefinitionRegistryPostProcessor {
     }
 
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
-        val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(WebFilter::class.java) {
-            val corsConfigSource = BeanUtils.getSortedBeans(
-                registry as ConfigurableListableBeanFactory,
-                CorsConfigurationSource::class.java
-            ).values
-            CorsWebFilter(DelegatingCorsConfigurationSource(corsConfigSource))
-        }
+        val definitionBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(WebFilter::class.java) {
+                val corsConfigSource =
+                    BeanUtils.getSortedBeans(
+                        registry as ConfigurableListableBeanFactory,
+                        CorsConfigurationSource::class.java,
+                    ).values
+                CorsWebFilter(DelegatingCorsConfigurationSource(corsConfigSource))
+            }
         registry.registerBeanDefinition("corsConfiguration", definitionBuilder.beanDefinition)
     }
 }

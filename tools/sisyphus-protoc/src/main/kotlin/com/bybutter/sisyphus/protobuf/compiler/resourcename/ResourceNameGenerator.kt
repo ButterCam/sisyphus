@@ -34,7 +34,7 @@ class ResourceNameGenerator : GroupedGenerator<ApiFileGeneratingState> {
             state.target.addType(
                 kInterface(resource.name()) {
                     ResourceNameGeneratingState(state, resource, this).advance()
-                }
+                },
             )
         }
         return true
@@ -47,7 +47,7 @@ class MessageResourceNameGenerator : GroupedGenerator<MessageInterfaceGenerating
             state.target.addType(
                 kInterface(it.name()) {
                     ResourceNameGeneratingState(state, it, this).advance()
-                }
+                },
             )
         }
         return true
@@ -59,9 +59,10 @@ class ResourceNameBasicGenerator : GroupedGenerator<ResourceNameGeneratingState>
         state.target.apply {
             this implements RuntimeTypes.RESOURCE_NAME
 
-            val templates = state.descriptor.descriptor.patternList.map {
-                PathTemplate.create(it)
-            }
+            val templates =
+                state.descriptor.descriptor.patternList.map {
+                    PathTemplate.create(it)
+                }
 
             val commonFields = templates.firstOrNull()?.vars()?.toMutableSet() ?: mutableSetOf()
             for (template in templates) {
@@ -123,7 +124,7 @@ class ResourceNameImplementationGenerator : GroupedGenerator<ResourceNameGenerat
                             }
                         }
                     }
-                }
+                },
             )
         }
         return true
@@ -155,9 +156,9 @@ class ResourceNameCompanionBasicGenerator : GroupedGenerator<ResourceNameCompani
                                     }
                                     add("%T.create(%S)", PathTemplate::class, template)
                                 }
-                            }
+                            },
                         )
-                    }
+                    },
                 )
             }
 
@@ -192,7 +193,7 @@ class ResourceNameCompanionBasicGenerator : GroupedGenerator<ResourceNameCompani
                             }
                         }
                         addStatement("return null")
-                    }
+                    },
                 )
             }
 
@@ -208,9 +209,9 @@ class ResourceNameCompanionBasicGenerator : GroupedGenerator<ResourceNameCompani
                                 this extends RuntimeTypes.UNKNOWN_RESOURCE_NAME.parameterizedBy(state.descriptor.className())
                                 this implements state.descriptor.className()
                                 addSuperclassConstructorParameter("name")
-                            }.build()
+                            }.build(),
                         )
-                    }
+                    },
                 )
             }
         }
@@ -223,11 +224,12 @@ class ResourceNameCompanionInvokeGenerator : GroupedGenerator<ResourceNameCompan
         state.target.apply {
             for (template in state.descriptor.templates) {
                 val uniqueFields = template.vars() - state.descriptor.commonFields
-                val functionName = if (uniqueFields.isEmpty()) {
-                    "of"
-                } else {
-                    "of${template.vars().joinToString("And") { it.toPascalCase() }}"
-                }
+                val functionName =
+                    if (uniqueFields.isEmpty()) {
+                        "of"
+                    } else {
+                        "of${template.vars().joinToString("And") { it.toPascalCase() }}"
+                    }
 
                 function(functionName) {
                     returns(state.descriptor.className())
@@ -246,7 +248,7 @@ class ResourceNameCompanionInvokeGenerator : GroupedGenerator<ResourceNameCompan
                                 add("%S to %N", field, field)
                             }
                             add("))")
-                        }
+                        },
                     )
                 }
             }

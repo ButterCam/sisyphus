@@ -4,11 +4,17 @@ import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.MongoClients
 
 interface MongoClientFactory {
-    fun createClient(qualifier: Class<*>, property: MongoDatabaseProperty): MongoClient
+    fun createClient(
+        qualifier: Class<*>,
+        property: MongoDatabaseProperty,
+    ): MongoClient
 }
 
 class DefaultMongoClientFactory : MongoClientFactory {
-    override fun createClient(qualifier: Class<*>, property: MongoDatabaseProperty): MongoClient {
+    override fun createClient(
+        qualifier: Class<*>,
+        property: MongoDatabaseProperty,
+    ): MongoClient {
         return MongoClients.create(property.url)
     }
 }

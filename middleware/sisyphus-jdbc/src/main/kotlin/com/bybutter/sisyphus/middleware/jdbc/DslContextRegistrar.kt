@@ -27,9 +27,10 @@ class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwar
         val beanFactory = registry as ConfigurableListableBeanFactory
 
         val properties = beanFactory.getBeansOfType<JdbcDatabaseProperty>().toMutableMap()
-        val jdbcProperties = Binder.get(environment)
-            .bind("sisyphus", JdbcDatabaseProperties::class.java)
-            .orElse(null)?.jdbc ?: mapOf()
+        val jdbcProperties =
+            Binder.get(environment)
+                .bind("sisyphus", JdbcDatabaseProperties::class.java)
+                .orElse(null)?.jdbc ?: mapOf()
 
         properties += jdbcProperties
 
@@ -37,10 +38,11 @@ class DslContextRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwar
 
         for ((name, property) in properties) {
             val beanName = "$BEAN_NAME_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DSLContext::class.java) {
-                val factory = beanFactory.getBean(DslContextFactory::class.java)
-                factory.createContext(property.qualifier, property)
-            }.beanDefinition
+            val beanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(DSLContext::class.java) {
+                    val factory = beanFactory.getBean(DslContextFactory::class.java)
+                    factory.createContext(property.qualifier, property)
+                }.beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
         }

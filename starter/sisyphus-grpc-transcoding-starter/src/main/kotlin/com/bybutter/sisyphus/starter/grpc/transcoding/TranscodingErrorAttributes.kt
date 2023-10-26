@@ -20,7 +20,10 @@ class TranscodingErrorAttributes : ErrorAttributes {
         val GRPC_STATUS_ATTRIBUTE = "grpcStatus"
     }
 
-    override fun storeErrorInformation(error: Throwable, exchange: ServerWebExchange) {
+    override fun storeErrorInformation(
+        error: Throwable,
+        exchange: ServerWebExchange,
+    ) {
         exchange.attributes[ERROR_ATTRIBUTE] = error
     }
 
@@ -29,20 +32,24 @@ class TranscodingErrorAttributes : ErrorAttributes {
             ?: throw IllegalStateException("Missing exception attribute in ServerWebExchange")
     }
 
-    override fun getErrorAttributes(request: ServerRequest, options: ErrorAttributeOptions?): MutableMap<String, Any> {
+    override fun getErrorAttributes(
+        request: ServerRequest,
+        options: ErrorAttributeOptions?,
+    ): MutableMap<String, Any> {
         val error = getError(request)
-        val status = if (error is TranscodingNotSupportException) {
-            Status {
-                code = Code.NOT_FOUND.number
-                message = "No handlers matched for '${request.methodName()} ${request.path()}'"
+        val status =
+            if (error is TranscodingNotSupportException) {
+                Status {
+                    code = Code.NOT_FOUND.number
+                    message = "No handlers matched for '${request.methodName()} ${request.path()}'"
+                }
+            } else {
+                Status(error)
             }
-        } else {
-            Status(error)
-        }
 
         return mutableMapOf(
             // Store gRPC status
-            GRPC_STATUS_ATTRIBUTE to status
+            GRPC_STATUS_ATTRIBUTE to status,
         )
     }
 }

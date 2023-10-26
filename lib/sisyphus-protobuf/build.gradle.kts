@@ -8,7 +8,7 @@ description = "Sisyphus customized Protobuf runtime for Kotlin"
 dependencies {
     api(projects.lib.sisyphusCommon)
 
-    proto(libs.protobuf.javaLegacy)
+    proto(libs.protobuf.java)
 
     testImplementation(libs.junit.jupiter)
     testImplementation(projects.lib.sisyphusGrpc)

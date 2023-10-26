@@ -14,51 +14,87 @@ import java.lang.reflect.Type
 abstract class JacksonFormatSupport {
     abstract val mapper: ObjectMapper
 
-    fun <T> deserialize(json: String, type: JavaType): T {
+    fun <T> deserialize(
+        json: String,
+        type: JavaType,
+    ): T {
         return mapper.readValue(json, type)
     }
 
-    fun <T> deserialize(json: String, type: Type): T {
+    fun <T> deserialize(
+        json: String,
+        type: Type,
+    ): T {
         return deserialize(json, mapper.constructType(type))
     }
 
-    fun <T> deserialize(json: String, type: Class<out T>): T {
+    fun <T> deserialize(
+        json: String,
+        type: Class<out T>,
+    ): T {
         return deserialize(json, TypeFactory.defaultInstance().constructType(type))
     }
 
-    fun <T> deserialize(json: String, type: TypeReference<T>): T {
+    fun <T> deserialize(
+        json: String,
+        type: TypeReference<T>,
+    ): T {
         return deserialize(json, TypeFactory.defaultInstance().constructType(type))
     }
 
-    fun <T> deserialize(jsonReader: Reader, type: JavaType): T {
+    fun <T> deserialize(
+        jsonReader: Reader,
+        type: JavaType,
+    ): T {
         return mapper.readValue(jsonReader, type)
     }
 
-    fun <T> deserialize(jsonReader: Reader, type: Type): T {
+    fun <T> deserialize(
+        jsonReader: Reader,
+        type: Type,
+    ): T {
         return deserialize(jsonReader, mapper.constructType(type))
     }
 
-    fun <T> deserialize(jsonReader: Reader, type: Class<out T>): T {
+    fun <T> deserialize(
+        jsonReader: Reader,
+        type: Class<out T>,
+    ): T {
         return deserialize(jsonReader, TypeFactory.defaultInstance().constructType(type))
     }
 
-    fun <T> deserialize(jsonReader: Reader, type: TypeReference<T>): T {
+    fun <T> deserialize(
+        jsonReader: Reader,
+        type: TypeReference<T>,
+    ): T {
         return deserialize(jsonReader, TypeFactory.defaultInstance().constructType(type))
     }
 
-    fun <T> deserialize(stream: InputStream, type: JavaType): T {
+    fun <T> deserialize(
+        stream: InputStream,
+        type: JavaType,
+    ): T {
         return mapper.readValue(stream, type)
     }
 
-    fun <T> deserialize(stream: InputStream, type: Type): T {
+    fun <T> deserialize(
+        stream: InputStream,
+        type: Type,
+    ): T {
         return deserialize(stream, mapper.constructType(type))
     }
 
-    fun <T> deserialize(stream: InputStream, type: Class<out T>): T {
+    fun <T> deserialize(
+        stream: InputStream,
+        type: Class<out T>,
+    ): T {
         return deserialize(stream, TypeFactory.defaultInstance().constructType(type))
     }
 
-    fun <T> deserialize(stream: InputStream, type: TypeReference<T>): T {
+    fun <T> deserialize(
+        stream: InputStream,
+        type: TypeReference<T>,
+    ): T {
         return deserialize(stream, TypeFactory.defaultInstance().constructType(type))
     }
 
@@ -82,7 +118,10 @@ abstract class JacksonFormatSupport {
         return mapper.writeValueAsString(`object`)
     }
 
-    fun <T> into(node: TreeNode, type: JavaType): T {
+    fun <T> into(
+        node: TreeNode,
+        type: JavaType,
+    ): T {
         return mapper.readValue(mapper.treeAsTokens(node), type)
     }
 }

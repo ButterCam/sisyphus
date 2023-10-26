@@ -8,6 +8,6 @@ interface OkHttpClientBuilderInterceptor {
         builder: OkHttpClient.Builder,
         property: RetrofitProperty,
         environment: Environment,
-        propertyPrefix: String
+        propertyPrefix: String,
     ): OkHttpClient.Builder
 }

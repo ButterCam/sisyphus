@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     idea
     `java-library`
@@ -24,39 +26,11 @@ dependencies {
     implementation(libs.gradle.plugin.publish)
 }
 
-gradlePlugin {
-    plugins {
-        create("sisyphus-java") {
-            id = "sisyphus.java"
-            implementationClass = "JavaProjectPlugin"
-        }
-        create("sisyphus-kotlin") {
-            id = "sisyphus.kotlin"
-            implementationClass = "KotlinProjectPlugin"
-        }
-        create("sisyphus-library") {
-            id = "sisyphus.library"
-            implementationClass = "LibraryProjectPlugin"
-        }
-        create("sisyphus-middleware") {
-            id = "sisyphus.middleware"
-            implementationClass = "MiddlewareProjectPlugin"
-        }
-        create("sisyphus-starter") {
-            id = "sisyphus.starter"
-            implementationClass = "StarterProjectPlugin"
-        }
-        create("sisyphus-tools") {
-            id = "sisyphus.tools"
-            implementationClass = "ToolProjectPlugin"
-        }
-        create("sisyphus-plugin") {
-            id = "sisyphus.plugin"
-            implementationClass = "GradlePluginProjectPlugin"
-        }
-        create("sisyphus-bom") {
-            id = "sisyphus.bom"
-            implementationClass = "BomProjectPlugin"
-        }
-    }
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "17"
+}
+
+tasks.withType<JavaCompile> {
+    sourceCompatibility = JavaVersion.VERSION_17.majorVersion
+    targetCompatibility = JavaVersion.VERSION_17.majorVersion
 }

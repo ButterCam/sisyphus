@@ -11,9 +11,8 @@ import kotlinx.coroutines.flow.Flow
 abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
     channel: Channel,
     optionsInterceptors: Iterable<CallOptionsInterceptor>,
-    options: CallOptions
+    options: CallOptions,
 ) : io.grpc.kotlin.AbstractCoroutineStub<T>(channel, options) {
-
     private val _optionsInterceptors: MutableList<CallOptionsInterceptor> = optionsInterceptors.toMutableList()
 
     val optionsInterceptors: List<CallOptionsInterceptor> get() = _optionsInterceptors
@@ -28,14 +27,17 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
         return build(channel, optionsInterceptors + interceptors, callOptions)
     }
 
-    override fun build(channel: Channel, callOptions: CallOptions): T {
+    override fun build(
+        channel: Channel,
+        callOptions: CallOptions,
+    ): T {
         return build(channel, optionsInterceptors, callOptions)
     }
 
     abstract fun build(
         channel: Channel,
         optionsInterceptors: Iterable<CallOptionsInterceptor>,
-        callOptions: CallOptions
+        callOptions: CallOptions,
     ): T
 
     protected fun buildOption(method: MethodDescriptor<*, *>): CallOptions {
@@ -47,7 +49,7 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
     protected suspend fun <TReq, TRes> unaryCall(
         method: MethodDescriptor<TReq, TRes>,
         input: TReq,
-        metadata: Metadata
+        metadata: Metadata,
     ): TRes {
         return ClientCalls.unaryRpc(channel, method, input, buildOption(method), metadata)
     }
@@ -55,7 +57,7 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
     protected fun <TReq, TRes> serverStreaming(
         method: MethodDescriptor<TReq, TRes>,
         input: TReq,
-        metadata: Metadata
+        metadata: Metadata,
     ): Flow<TRes> {
         return ClientCalls.serverStreamingRpc(channel, method, input, buildOption(method), metadata)
     }
@@ -63,7 +65,7 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
     protected suspend fun <TReq, TRes> clientStreaming(
         method: MethodDescriptor<TReq, TRes>,
         input: Flow<TReq>,
-        metadata: Metadata
+        metadata: Metadata,
     ): TRes {
         return ClientCalls.clientStreamingRpc(channel, method, input, buildOption(method), metadata)
     }
@@ -71,7 +73,7 @@ abstract class AbstractCoroutineStub<T : AbstractCoroutineStub<T>>(
     protected fun <TReq, TRes> bidiStreaming(
         method: MethodDescriptor<TReq, TRes>,
         input: Flow<TReq>,
-        metadata: Metadata
+        metadata: Metadata,
     ): Flow<TRes> {
         return ClientCalls.bidiStreamingRpc(channel, method, input, buildOption(method), metadata)
     }

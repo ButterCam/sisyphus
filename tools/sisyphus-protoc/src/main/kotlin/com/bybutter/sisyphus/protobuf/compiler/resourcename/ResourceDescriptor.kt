@@ -14,49 +14,53 @@ import com.squareup.kotlinpoet.ClassName
 
 class ResourceDescriptor(
     override val parent: DescriptorNode<*>,
-    override val descriptor: ResourceDescriptor
+    override val descriptor: ResourceDescriptor,
 ) : DescriptorNode<ResourceDescriptor>() {
     init {
         fileSet().registerLookup(descriptor.type, this)
     }
 
-    val templates = descriptor.patternList.map {
-        PathTemplate.create(it)
-    }
+    val templates =
+        descriptor.patternList.map {
+            PathTemplate.create(it)
+        }
 
-    val commonFields = run {
-        val commonFields = templates.firstOrNull()?.vars()?.toMutableSet() ?: mutableSetOf()
-        for (template in templates) {
-            commonFields.removeIf {
-                !template.vars().contains(it)
+    val commonFields =
+        run {
+            val commonFields = templates.firstOrNull()?.vars()?.toMutableSet() ?: mutableSetOf()
+            for (template in templates) {
+                commonFields.removeIf {
+                    !template.vars().contains(it)
+                }
             }
-        }
-        commonFields
-    }
-
-    val singular = run {
-        if (this.descriptor.singular.isNotEmpty()) {
-            return@run this.descriptor.singular
+            commonFields
         }
 
-        if (this.descriptor.plural.isNotEmpty()) {
-            return@run this.descriptor.plural.singular()
+    val singular =
+        run {
+            if (this.descriptor.singular.isNotEmpty()) {
+                return@run this.descriptor.singular
+            }
+
+            if (this.descriptor.plural.isNotEmpty()) {
+                return@run this.descriptor.plural.singular()
+            }
+
+            resource().toCamelCase().singular()
         }
 
-        resource().toCamelCase().singular()
-    }
+    val plural =
+        run {
+            if (this.descriptor.plural.isNotEmpty()) {
+                return@run this.descriptor.plural
+            }
 
-    val plural = run {
-        if (this.descriptor.plural.isNotEmpty()) {
-            return@run this.descriptor.plural
+            if (this.descriptor.singular.isNotEmpty()) {
+                return@run this.descriptor.singular.plural()
+            }
+
+            resource().toCamelCase().plural()
         }
-
-        if (this.descriptor.singular.isNotEmpty()) {
-            return@run this.descriptor.singular.plural()
-        }
-
-        resource().toCamelCase().plural()
-    }
 
     fun templateName(template: PathTemplate): String {
         val uniqueFields = template.vars() - commonFields

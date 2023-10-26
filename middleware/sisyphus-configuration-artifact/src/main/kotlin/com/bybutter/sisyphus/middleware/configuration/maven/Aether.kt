@@ -67,18 +67,24 @@ class Aether {
         return registerRepository("https://maven.google.com/")
     }
 
-    fun registerRepository(url: String, user: String? = null, password: String? = null): RemoteRepository {
-        val authentication = if (user != null && password != null) {
-            AuthenticationBuilder().addUsername(user).addPassword(password).build()
-        } else {
-            null
-        }
-
-        val result = RemoteRepository.Builder("", "default", url).apply {
-            if (authentication != null) {
-                setAuthentication(authentication)
+    fun registerRepository(
+        url: String,
+        user: String? = null,
+        password: String? = null,
+    ): RemoteRepository {
+        val authentication =
+            if (user != null && password != null) {
+                AuthenticationBuilder().addUsername(user).addPassword(password).build()
+            } else {
+                null
             }
-        }.build()
+
+        val result =
+            RemoteRepository.Builder("", "default", url).apply {
+                if (authentication != null) {
+                    setAuthentication(authentication)
+                }
+            }.build()
 
         repositories.add(result)
         return result
@@ -92,24 +98,26 @@ class Aether {
             artifact = artifact.setVersion(result.highestVersion.toString())
         }
 
-        val artifactRequest = ArtifactRequest().apply {
-            setArtifact(artifact)
-            for (repository in this@Aether.repositories) {
-                addRepository(repository)
+        val artifactRequest =
+            ArtifactRequest().apply {
+                setArtifact(artifact)
+                for (repository in this@Aether.repositories) {
+                    addRepository(repository)
+                }
             }
-        }
 
         return system.resolveArtifact(session, artifactRequest)
     }
 
     fun resolveVersionRange(name: String): VersionRangeResult {
         val artifact: Artifact = DefaultArtifact(name)
-        val versionRangeRequest = VersionRangeRequest().apply {
-            setArtifact(artifact)
-            for (repository in this@Aether.repositories) {
-                addRepository(repository)
+        val versionRangeRequest =
+            VersionRangeRequest().apply {
+                setArtifact(artifact)
+                for (repository in this@Aether.repositories) {
+                    addRepository(repository)
+                }
             }
-        }
 
         return system.resolveVersionRange(session, versionRangeRequest)
     }
@@ -123,17 +131,19 @@ class Aether {
         }
 
         val dependency = Dependency(artifact, "compile")
-        val collectRequest = CollectRequest().apply {
-            root = dependency
-            for (repository in this@Aether.repositories) {
-                addRepository(repository)
+        val collectRequest =
+            CollectRequest().apply {
+                root = dependency
+                for (repository in this@Aether.repositories) {
+                    addRepository(repository)
+                }
             }
-        }
         val collectResult = system.collectDependencies(session, collectRequest)
 
-        val dependencyRequest = DependencyRequest().apply {
-            root = collectResult.root
-        }
+        val dependencyRequest =
+            DependencyRequest().apply {
+                root = collectResult.root
+            }
         return system.resolveDependencies(session, dependencyRequest)
     }
 

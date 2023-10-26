@@ -13,10 +13,10 @@ data class MessageQueueProperty(
     val exchange: String?,
     val queue: String?,
     val confirmType: CachingConnectionFactory.ConfirmType?,
-    val extensions: Map<String, Any> = mapOf()
+    val extensions: Map<String, Any> = mapOf(),
 )
 
 data class MessageQueueProperties(
     @NestedConfigurationProperty
-    val amqp: Map<String, MessageQueueProperty>
+    val amqp: Map<String, MessageQueueProperty>,
 )

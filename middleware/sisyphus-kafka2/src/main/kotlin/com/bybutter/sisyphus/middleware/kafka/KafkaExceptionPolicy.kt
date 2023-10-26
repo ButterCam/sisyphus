@@ -14,5 +14,5 @@ enum class KafkaExceptionPolicy {
     /**
      * Don't commit the offset, stop the consumer.
      */
-    STOP
+    STOP,
 }

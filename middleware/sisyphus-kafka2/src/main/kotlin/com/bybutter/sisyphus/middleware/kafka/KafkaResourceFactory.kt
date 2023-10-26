@@ -10,6 +10,6 @@ interface KafkaResourceFactory {
         consumerProperty: KafkaConsumerProperty,
         metadata: com.bybutter.sisyphus.middleware.kafka.KafkaConsumer,
         listener: KafkaListener<*, *>,
-        loggers: List<KafkaLogger>
+        loggers: List<KafkaLogger>,
     ): KafkaConsumer<*, *>
 }

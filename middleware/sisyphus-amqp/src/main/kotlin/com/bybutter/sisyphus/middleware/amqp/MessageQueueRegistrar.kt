@@ -31,24 +31,27 @@ class MessageQueueRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAw
         val beanFactory = registry as ConfigurableListableBeanFactory
 
         val properties = beanFactory.getBeansOfType<MessageQueueProperty>().toMutableMap()
-        val amqpProperties = Binder.get(environment)
-            .bind("sisyphus", MessageQueueProperties::class.java)
-            .orElse(null)?.amqp ?: mapOf()
+        val amqpProperties =
+            Binder.get(environment)
+                .bind("sisyphus", MessageQueueProperties::class.java)
+                .orElse(null)?.amqp ?: mapOf()
 
         properties += amqpProperties
 
         if (properties.isEmpty()) return
 
-        val listeners = registry.getBeanNamesForType(MessageListener::class.java).mapNotNull {
-            it to beanFactory.getBeanDefinition(it) as? AnnotatedBeanDefinition
-        }
+        val listeners =
+            registry.getBeanNamesForType(MessageListener::class.java).mapNotNull {
+                it to beanFactory.getBeanDefinition(it) as? AnnotatedBeanDefinition
+            }
 
         for ((name, property) in properties) {
             val beanName = "$BEAN_NAME_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(AmqpTemplate::class.java) {
-                val factory = beanFactory.getBean(AmqpTemplateFactory::class.java)
-                factory.createTemplate(property)
-            }.beanDefinition
+            val beanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(AmqpTemplate::class.java) {
+                    val factory = beanFactory.getBean(AmqpTemplateFactory::class.java)
+                    factory.createTemplate(property)
+                }.beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
 
@@ -57,13 +60,14 @@ class MessageQueueRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAw
                 if (!listenerDefinition.metadata.annotationTypes.contains(property.qualifier.name)) continue
 
                 val containerBeanName = "$listenerName:container"
-                val containerBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(MessageListenerContainer::class.java) {
-                    val factory = beanFactory.getBean(AmqpTemplateFactory::class.java)
-                    val listener = beanFactory.getBean(listenerName) as MessageListener
-                    factory.createListenerContainer(property).apply {
-                        this.setMessageListener(listener)
-                    }
-                }.beanDefinition
+                val containerBeanDefinition =
+                    BeanDefinitionBuilder.genericBeanDefinition(MessageListenerContainer::class.java) {
+                        val factory = beanFactory.getBean(AmqpTemplateFactory::class.java)
+                        val listener = beanFactory.getBean(listenerName) as MessageListener
+                        factory.createListenerContainer(property).apply {
+                            this.setMessageListener(listener)
+                        }
+                    }.beanDefinition
                 registry.registerBeanDefinition(containerBeanName, containerBeanDefinition)
             }
         }

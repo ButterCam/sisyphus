@@ -54,7 +54,10 @@ interface DtoModel {
         /**
          * Create DTO instance with shallow copy and init body.
          */
-        inline operator fun <reified T : DtoModel> invoke(model: DtoModel, block: T.() -> Unit): T {
+        inline operator fun <reified T : DtoModel> invoke(
+            model: DtoModel,
+            block: T.() -> Unit,
+        ): T {
             return invoke {
                 val map = HashMap((model as DtoMeta).`$modelMap`)
                 (this as DtoMeta).`$modelMap` = map
@@ -66,17 +69,21 @@ interface DtoModel {
             return invoke(typeReference.type.jvm as SimpleType)
         }
 
-        inline operator fun <T : DtoModel> invoke(typeReference: TypeReference<T>, block: T.() -> Unit): T {
+        inline operator fun <T : DtoModel> invoke(
+            typeReference: TypeReference<T>,
+            block: T.() -> Unit,
+        ): T {
             return invoke(typeReference.type.jvm as SimpleType, block)
         }
 
         operator fun <T : DtoModel> invoke(type: SimpleType): T {
-            val value = (
-                proxyCache[type]?.instance() ?: Proxy.newProxyInstance(
-                    type.raw.classLoader,
-                    arrayOf(type.raw, DtoMeta::class.java),
-                    ModelProxy(type)
-                )
+            val value =
+                (
+                    proxyCache[type]?.instance() ?: Proxy.newProxyInstance(
+                        type.raw.classLoader,
+                        arrayOf(type.raw, DtoMeta::class.java),
+                        ModelProxy(type),
+                    )
                 ).uncheckedCast<T>()
             value.verify()
             return value
@@ -84,14 +91,15 @@ interface DtoModel {
 
         inline operator fun <T : DtoModel> invoke(
             type: SimpleType,
-            block: T.() -> Unit
+            block: T.() -> Unit,
         ): T {
-            val value = (
-                proxyCache[type]?.instance() ?: Proxy.newProxyInstance(
-                    type.raw.classLoader,
-                    arrayOf(type.raw, DtoMeta::class.java),
-                    ModelProxy(type)
-                )
+            val value =
+                (
+                    proxyCache[type]?.instance() ?: Proxy.newProxyInstance(
+                        type.raw.classLoader,
+                        arrayOf(type.raw, DtoMeta::class.java),
+                        ModelProxy(type),
+                    )
                 ).uncheckedCast<T>()
             value.apply(block)
             value.verify()
@@ -125,7 +133,10 @@ inline fun <reified T : DtoModel> DtoModel.cast(noinline apply: T.() -> Unit = {
  *
  * **Attention! The result of [this method][cast] is not the origin object, but origin object and result object will share the structure of content.**
  */
-fun <T : DtoModel> DtoModel.castTo(clazz: Class<T>, apply: T.() -> Unit = {}): T {
+fun <T : DtoModel> DtoModel.castTo(
+    clazz: Class<T>,
+    apply: T.() -> Unit = {},
+): T {
     return DtoModel(clazz.jvm) {
         this.uncheckedCast<DtoMeta>().`$modelMap` = this@castTo.uncheckedCast<DtoMeta>().`$modelMap`
         apply(this)

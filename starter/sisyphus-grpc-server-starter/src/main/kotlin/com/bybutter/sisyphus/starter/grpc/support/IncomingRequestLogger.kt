@@ -4,5 +4,8 @@ import io.grpc.Metadata
 import io.grpc.ServerCall
 
 interface IncomingRequestLogger : RequestLogger {
-    fun log(call: ServerCall<*, *>, inputHeader: Metadata)
+    fun log(
+        call: ServerCall<*, *>,
+        inputHeader: Metadata,
+    )
 }

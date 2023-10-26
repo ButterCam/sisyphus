@@ -111,9 +111,18 @@ inline operator fun <T : Message<T, TM>, TM : MutableMessage<T, TM>> Message<T, 
 }
 
 interface MutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Message<T, TM> {
-    operator fun <T> set(fieldName: String, value: T)
-    operator fun <T> set(fieldNumber: Int, value: T)
+    operator fun <T> set(
+        fieldName: String,
+        value: T,
+    )
+
+    operator fun <T> set(
+        fieldNumber: Int,
+        value: T,
+    )
+
     fun clear(fieldName: String): Any?
+
     fun clear(fieldNumber: Int): Any?
 
     /**
@@ -140,7 +149,10 @@ interface MutableMessage<T : Message<T, TM>, TM : MutableMessage<T, TM>> : Messa
      * */
     fun fillFrom(message: Message<*, *>)
 
-    fun readFrom(reader: Reader, size: Int)
+    fun readFrom(
+        reader: Reader,
+        size: Int,
+    )
 
     fun readFrom(reader: Reader)
 

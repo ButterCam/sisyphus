@@ -33,14 +33,18 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
         this.environment = environment
     }
 
-    override fun registerBeanDefinitions(importingClassMetadata: AnnotationMetadata, registry: BeanDefinitionRegistry) {
+    override fun registerBeanDefinitions(
+        importingClassMetadata: AnnotationMetadata,
+        registry: BeanDefinitionRegistry,
+    ) {
         // Find the [EnableHttpToGrpcTranscoding] annotation.
         val enableAnnotation =
             importingClassMetadata.getAnnotationAttributes(EnableHttpToGrpcTranscoding::class.java.name)
                 ?: return
         // Get the enabled transcoding service in [EnableHttpToGrpcTranscoding] annotation.
-        val enableServices = (enableAnnotation[EnableHttpToGrpcTranscoding::services.name] as? Array<String>)?.asList()
-            ?: listOf()
+        val enableServices =
+            (enableAnnotation[EnableHttpToGrpcTranscoding::services.name] as? Array<String>)?.asList()
+                ?: listOf()
         registerRouterFunction(registry, enableServices)
         registerTranscodingCorsConfigSource(registry, enableServices)
     }
@@ -52,26 +56,33 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
      * @param enableServices Collection<String> the name of services which need to enable gRPC transcoding.
      * Empty list for all supported services.
      */
-    private fun registerRouterFunction(registry: BeanDefinitionRegistry, enableServices: Collection<String>) {
-        val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(RouterFunction::class.java) {
-            val server =
-                (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
+    private fun registerRouterFunction(
+        registry: BeanDefinitionRegistry,
+        enableServices: Collection<String>,
+    ) {
+        val definitionBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(RouterFunction::class.java) {
+                val server =
+                    (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
 
-            val channel =
-                (registry as ConfigurableListableBeanFactory).getBean(LocalClientRepository.QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL) as Channel
+                val channel =
+                    (registry as ConfigurableListableBeanFactory).getBean(
+                        LocalClientRepository.QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL,
+                    ) as Channel
 
-            val rules = exportTranscodingRules(
-                BeanUtils.getSortedBeans(registry, TranscodingRouterRuleExporter::class.java).values,
-                server,
-                enableServices
-            )
+                val rules =
+                    exportTranscodingRules(
+                        BeanUtils.getSortedBeans(registry, TranscodingRouterRuleExporter::class.java).values,
+                        server,
+                        enableServices,
+                    )
 
-            TranscodingRouterFunction(rules, channel)
-        }
+                TranscodingRouterFunction(rules, channel)
+            }
         definitionBuilder.addDependsOn(LocalClientRepository.QUALIFIER_AUTO_CONFIGURED_GRPC_IN_PROCESS_CHANNEL)
         registry.registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_TRANSCODING_ROUTER_FUNCTION,
-            definitionBuilder.beanDefinition
+            definitionBuilder.beanDefinition,
         )
     }
 
@@ -83,35 +94,37 @@ class GrpcTranscodingConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
      */
     private fun registerTranscodingCorsConfigSource(
         registry: BeanDefinitionRegistry,
-        enableServices: Collection<String>
+        enableServices: Collection<String>,
     ) {
-        val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(CorsConfigurationSource::class.java) {
-            val server =
-                (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
+        val definitionBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(CorsConfigurationSource::class.java) {
+                val server =
+                    (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
 
-            val rules = exportTranscodingRules(
-                BeanUtils.getSortedBeans(registry, TranscodingRouterRuleExporter::class.java).values,
-                server,
-                enableServices
-            )
+                val rules =
+                    exportTranscodingRules(
+                        BeanUtils.getSortedBeans(registry, TranscodingRouterRuleExporter::class.java).values,
+                        server,
+                        enableServices,
+                    )
 
-            // Create CORS config source for transcoding.
-            TranscodingCorsConfigurationSource(
-                rules,
-                // Try to get the default transcoding cors configuration factory form spring application context
-                BeanUtils.getSortedBeans(registry, TranscodingCorsConfigurationInterceptor::class.java).values
-            )
-        }
+                // Create CORS config source for transcoding.
+                TranscodingCorsConfigurationSource(
+                    rules,
+                    // Try to get the default transcoding cors configuration factory form spring application context
+                    BeanUtils.getSortedBeans(registry, TranscodingCorsConfigurationInterceptor::class.java).values,
+                )
+            }
         registry.registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_TRANSCODING_CORS_CONFIG,
-            definitionBuilder.beanDefinition
+            definitionBuilder.beanDefinition,
         )
     }
 
     private fun exportTranscodingRules(
         exporters: Collection<TranscodingRouterRuleExporter>,
         server: Server,
-        enableServices: Collection<String>
+        enableServices: Collection<String>,
     ): List<TranscodingRouterRule> {
         val enableServices = enableServices.toSet()
         val rules = mutableListOf<TranscodingRouterRule>()

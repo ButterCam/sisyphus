@@ -15,7 +15,7 @@ class MicrometerKafkaLogger(private val registry: MeterRegistry) : KafkaLogger {
         consumer: KafkaConsumer<*, *>,
         message: ConsumerRecord<*, *>,
         costNanoTime: Long,
-        exception: Exception?
+        exception: Exception?,
     ) {
         registry.timer(
             "sisyphus_kafka_consumer",
@@ -24,7 +24,7 @@ class MicrometerKafkaLogger(private val registry: MeterRegistry) : KafkaLogger {
             "groupId", consumer.groupMetadata().groupId(),
             "memberId", consumer.groupMetadata().memberId(),
             "listener", listener.javaClass.canonicalName,
-            "exception", exception?.javaClass?.canonicalName ?: "None"
+            "exception", exception?.javaClass?.canonicalName ?: "None",
         ).record(Duration.ofNanos(costNanoTime))
     }
 }

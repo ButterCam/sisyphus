@@ -1,16 +1,18 @@
 package com.bybutter.sisyphus.string.case
 
 object TitleCaseFormatter : BaseCaseFormatter() {
-    private val lowerCaseWord: Set<String> = hashSetOf(
-        "a", "an", "the",
+    private val lowerCaseWord: Set<String> =
+        hashSetOf(
+            "a", "an", "the",
+            "and", "but", "or",
+            "on", "in", "with", "at", "by",
+            "of", "from", "for", "to",
+        )
 
-        "and", "but", "or",
-
-        "on", "in", "with", "at", "by",
-        "of", "from", "for", "to"
-    )
-
-    override fun formatWord(index: Int, word: CharSequence): CharSequence {
+    override fun formatWord(
+        index: Int,
+        word: CharSequence,
+    ): CharSequence {
         val lowerCase = word.toString().lowercase()
 
         return if (lowerCaseWord.contains(lowerCase)) {

@@ -14,7 +14,10 @@ import java.util.Properties
  * Inject all fields in 'gradle.properties' into Spring runtime environment.
  */
 class GradlePropertiesProvider : EnvironmentPostProcessor {
-    override fun postProcessEnvironment(environment: ConfigurableEnvironment, application: SpringApplication) {
+    override fun postProcessEnvironment(
+        environment: ConfigurableEnvironment,
+        application: SpringApplication,
+    ) {
         registerRootGradleProperties(environment)
         registerWorkspaceGradleProperties(environment)
     }
@@ -23,7 +26,7 @@ class GradlePropertiesProvider : EnvironmentPostProcessor {
         registerProperties(
             "rootGradleProperties",
             Paths.get(System.getProperty("user.home"), ".gradle", GRADLE_PROPERTIES),
-            environment
+            environment,
         )
     }
 
@@ -31,22 +34,27 @@ class GradlePropertiesProvider : EnvironmentPostProcessor {
         registerProperties(
             "rootGradleProperties",
             Paths.get(System.getProperty("user.dir"), GRADLE_PROPERTIES),
-            environment
+            environment,
         )
     }
 
-    private fun registerProperties(name: String, path: Path, environment: ConfigurableEnvironment) {
+    private fun registerProperties(
+        name: String,
+        path: Path,
+        environment: ConfigurableEnvironment,
+    ) {
         if (!Files.exists(path)) {
             return
         }
 
         logger.debug("Properties injected via gradle properties at '$path'.")
 
-        val properties = Files.newInputStream(path).use {
-            Properties().apply {
-                this.load(it)
+        val properties =
+            Files.newInputStream(path).use {
+                Properties().apply {
+                    this.load(it)
+                }
             }
-        }
 
         environment.propertySources.addFirst(PropertiesPropertySource(name, properties))
     }

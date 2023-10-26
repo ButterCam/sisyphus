@@ -41,12 +41,18 @@ class JdbcURIBuilder internal constructor(uri: URI) {
         }
     val query get() = builder.query
 
-    fun appendQueryPart(key: String, vararg value: String): JdbcURIBuilder {
+    fun appendQueryPart(
+        key: String,
+        vararg value: String,
+    ): JdbcURIBuilder {
         builder.appendQueryPart(key, *value)
         return this
     }
 
-    fun appendQueryPart(key: String, value: Iterable<String>): JdbcURIBuilder {
+    fun appendQueryPart(
+        key: String,
+        value: Iterable<String>,
+    ): JdbcURIBuilder {
         builder.appendQueryPart(key, value)
         return this
     }
@@ -66,14 +72,15 @@ class JdbcURIBuilder internal constructor(uri: URI) {
     }
 
     fun build(): URI {
-        val ssp = buildString {
-            for (scheme in schemePart.subList(1, schemePart.size)) {
-                append(scheme)
-                append(":")
+        val ssp =
+            buildString {
+                for (scheme in schemePart.subList(1, schemePart.size)) {
+                    append(scheme)
+                    append(":")
+                }
+                append("//")
+                append(builder)
             }
-            append("//")
-            append(builder)
-        }
         return URI(scheme.first(), ssp, null)
     }
 

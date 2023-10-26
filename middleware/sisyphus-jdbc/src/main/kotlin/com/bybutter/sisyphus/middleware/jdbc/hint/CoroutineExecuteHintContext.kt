@@ -9,7 +9,6 @@ import kotlin.coroutines.CoroutineContext
 class CoroutineExecuteHintContext :
     AbstractCoroutineContextElement(CoroutineTransactionContext),
     ThreadContextElement<CoroutineExecuteHintContext?> {
-
     private var hints = Stack<ExecuteHint>()
 
     fun hint(hint: ExecuteHint): CoroutineExecuteHintContext {
@@ -38,7 +37,10 @@ class CoroutineExecuteHintContext :
         }
     }
 
-    override fun restoreThreadContext(context: CoroutineContext, oldState: CoroutineExecuteHintContext?) {
+    override fun restoreThreadContext(
+        context: CoroutineContext,
+        oldState: CoroutineExecuteHintContext?,
+    ) {
         threadContext.set(oldState)
     }
 

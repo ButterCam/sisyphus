@@ -7,11 +7,11 @@ import com.squareup.kotlinpoet.TypeName
 class FileParentGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: FileDescriptor,
-    override val target: MutableList<TypeName>
+    override val target: MutableList<TypeName>,
 ) : ChildGeneratingState<FileDescriptor, MutableList<TypeName>>
 
 class MessageParentGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: MessageDescriptor,
-    override val target: MutableList<TypeName>
+    override val target: MutableList<TypeName>,
 ) : ChildGeneratingState<MessageDescriptor, MutableList<TypeName>>

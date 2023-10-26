@@ -11,7 +11,7 @@ object CelErrorListener : BaseErrorListener() {
         line: Int,
         charPositionInLine: Int,
         msg: String?,
-        e: RecognitionException?
+        e: RecognitionException?,
     ) {
         throw CelSyntaxException(line, charPositionInLine, msg, e)
     }

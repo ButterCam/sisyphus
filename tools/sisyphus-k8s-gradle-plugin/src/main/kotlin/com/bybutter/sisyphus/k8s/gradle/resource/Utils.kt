@@ -6,6 +6,6 @@ import java.time.LocalDateTime
 internal fun patchRestartMetadata(metadata: V1ObjectMeta?) {
     metadata?.putAnnotationsItem(
         "kubectl.kubernetes.io/restartedAt",
-        LocalDateTime.now().toString()
+        LocalDateTime.now().toString(),
     )
 }

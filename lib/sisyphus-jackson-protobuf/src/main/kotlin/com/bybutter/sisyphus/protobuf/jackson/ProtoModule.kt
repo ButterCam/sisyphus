@@ -12,30 +12,34 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier
 
 class ProtoModule : SimpleModule() {
     override fun setupModule(context: SetupContext) {
-        context.addBeanSerializerModifier(object : BeanSerializerModifier() {
-            override fun modifySerializer(
-                config: SerializationConfig?,
-                beanDesc: BeanDescription,
-                serializer: JsonSerializer<*>
-            ): JsonSerializer<*> {
-                if (Message::class.java.isAssignableFrom(beanDesc.beanClass)) {
-                    return ProtoSerializer<Message<*, *>>(beanDesc.type)
+        context.addBeanSerializerModifier(
+            object : BeanSerializerModifier() {
+                override fun modifySerializer(
+                    config: SerializationConfig?,
+                    beanDesc: BeanDescription,
+                    serializer: JsonSerializer<*>,
+                ): JsonSerializer<*> {
+                    if (Message::class.java.isAssignableFrom(beanDesc.beanClass)) {
+                        return ProtoSerializer<Message<*, *>>(beanDesc.type)
+                    }
+                    return super.modifySerializer(config, beanDesc, serializer)
                 }
-                return super.modifySerializer(config, beanDesc, serializer)
-            }
-        })
+            },
+        )
 
-        context.addBeanDeserializerModifier(object : BeanDeserializerModifier() {
-            override fun modifyDeserializer(
-                config: DeserializationConfig,
-                beanDesc: BeanDescription,
-                deserializer: JsonDeserializer<*>
-            ): JsonDeserializer<*> {
-                if (Message::class.java.isAssignableFrom(beanDesc.beanClass)) {
-                    return ProtoDeserializer<Message<*, *>>(beanDesc.type)
+        context.addBeanDeserializerModifier(
+            object : BeanDeserializerModifier() {
+                override fun modifyDeserializer(
+                    config: DeserializationConfig,
+                    beanDesc: BeanDescription,
+                    deserializer: JsonDeserializer<*>,
+                ): JsonDeserializer<*> {
+                    if (Message::class.java.isAssignableFrom(beanDesc.beanClass)) {
+                        return ProtoDeserializer<Message<*, *>>(beanDesc.type)
+                    }
+                    return super.modifyDeserializer(config, beanDesc, deserializer)
                 }
-                return super.modifyDeserializer(config, beanDesc, deserializer)
-            }
-        })
+            },
+        )
     }
 }

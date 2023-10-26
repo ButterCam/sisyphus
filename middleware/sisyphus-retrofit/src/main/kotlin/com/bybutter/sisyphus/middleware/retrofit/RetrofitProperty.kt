@@ -17,7 +17,7 @@ data class RetrofitProperty(
     val enableCircuitBreaker: Boolean? = null,
     @NestedConfigurationProperty
     val circuitBreakerProperty: CircuitBreakerProperty? = null,
-    val extensions: Map<String, Any> = mapOf()
+    val extensions: Map<String, Any> = mapOf(),
 )
 
 /**
@@ -32,10 +32,10 @@ data class CircuitBreakerProperty(
     val permittedNumberOfCallsInHalfOpenState: Int?,
     val minimumNumberOfCalls: Int?,
     val waitDurationInOpenState: Long?,
-    val automaticTransitionFromOpenToHalfOpenEnabled: Boolean?
+    val automaticTransitionFromOpenToHalfOpenEnabled: Boolean?,
 )
 
 data class RetrofitProperties(
     @NestedConfigurationProperty
-    val retrofit: Map<String, RetrofitProperty>
+    val retrofit: Map<String, RetrofitProperty>,
 )

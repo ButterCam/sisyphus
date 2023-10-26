@@ -14,16 +14,17 @@ open class DefaultElasticClientFactory : ElasticClientFactory {
     protected open fun createElasticClient(
         host: String,
         port: Int,
-        property: ElasticProperty
+        property: ElasticProperty,
     ): RestClient {
-        val credentialsProvider = property.userName?.let {
-            BasicCredentialsProvider().apply {
-                setCredentials(AuthScope.ANY, UsernamePasswordCredentials(property.userName, property.password))
+        val credentialsProvider =
+            property.userName?.let {
+                BasicCredentialsProvider().apply {
+                    setCredentials(AuthScope.ANY, UsernamePasswordCredentials(property.userName, property.password))
+                }
             }
-        }
 
         return RestClient.builder(
-            HttpHost(host, port, property.protocol)
+            HttpHost(host, port, property.protocol),
         ).setHttpClientConfigCallback {
             if (credentialsProvider != null) {
                 it.setDefaultCredentialsProvider(credentialsProvider)

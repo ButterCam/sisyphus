@@ -6,17 +6,17 @@ import com.squareup.kotlinpoet.TypeSpec
 class EnumGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: EnumDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<EnumDescriptor, TypeSpec.Builder>
 
 class EnumSupportGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: EnumDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<EnumDescriptor, TypeSpec.Builder>
 
 class EnumCompanionGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: EnumDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<EnumDescriptor, TypeSpec.Builder>

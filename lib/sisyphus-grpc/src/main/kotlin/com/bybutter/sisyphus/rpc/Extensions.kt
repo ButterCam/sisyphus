@@ -63,32 +63,39 @@ operator fun Status.Companion.invoke(status: io.grpc.Status): Status {
 
 operator fun Status.Companion.invoke(exception: Throwable): Status {
     return when (exception) {
-        is StatusException -> Status {
-            code = exception.status.code.value()
-            exception.status.description?.let { message = it }
-        }
+        is StatusException ->
+            Status {
+                code = exception.status.code.value()
+                exception.status.description?.let { message = it }
+            }
 
-        is StatusRuntimeException -> Status {
-            code = exception.status.code.value()
-            exception.status.description?.let { message = it }
-        }
+        is StatusRuntimeException ->
+            Status {
+                code = exception.status.code.value()
+                exception.status.description?.let { message = it }
+            }
 
-        is com.bybutter.sisyphus.rpc.StatusException -> Status {
-            code = exception.code
-            exception.message?.let { message = it }
-        }
+        is com.bybutter.sisyphus.rpc.StatusException ->
+            Status {
+                code = exception.code
+                exception.message?.let { message = it }
+            }
 
         is ClientStatusException -> exception.status
-        else -> Status {
-            code = Code.INTERNAL.number
-            exception.message?.let { message = it }
-        }
+        else ->
+            Status {
+                code = Code.INTERNAL.number
+                exception.message?.let { message = it }
+            }
     }
 }
 
 val STATUS_META_KEY = Metadata.Key.of("grpc-status-bin", Status.marshaller())
 
-operator fun LocalizedMessage.Companion.invoke(locale: String, message: String): LocalizedMessage {
+operator fun LocalizedMessage.Companion.invoke(
+    locale: String,
+    message: String,
+): LocalizedMessage {
     return LocalizedMessage {
         this.locale = "zh-CN"
         this.message = message
@@ -112,7 +119,7 @@ operator fun ResourceInfo.Companion.invoke(
     resourceType: String,
     resourceName: String,
     description: String,
-    owner: String = ""
+    owner: String = "",
 ): ResourceInfo {
     return ResourceInfo {
         this.resourceType = resourceType
@@ -122,7 +129,10 @@ operator fun ResourceInfo.Companion.invoke(
     }
 }
 
-operator fun RequestInfo.Companion.invoke(requestId: String, servingData: String = ""): RequestInfo {
+operator fun RequestInfo.Companion.invoke(
+    requestId: String,
+    servingData: String = "",
+): RequestInfo {
     return RequestInfo {
         this.requestId = requestId
         this.servingData = servingData
@@ -153,12 +163,16 @@ operator fun RetryInfo.Companion.invoke(retryDelay: Duration): RetryInfo {
     }
 }
 
-operator fun RetryInfo.Companion.invoke(number: Long, unit: TimeUnit = TimeUnit.SECONDS): RetryInfo {
+operator fun RetryInfo.Companion.invoke(
+    number: Long,
+    unit: TimeUnit = TimeUnit.SECONDS,
+): RetryInfo {
     return RetryInfo {
-        this.retryDelay = Duration {
-            seconds = unit.toSeconds(number)
-            nanos = (unit.toNanos(number) - TimeUnit.SECONDS.toNanos(seconds)).toInt()
-        }
+        this.retryDelay =
+            Duration {
+                seconds = unit.toSeconds(number)
+                nanos = (unit.toNanos(number) - TimeUnit.SECONDS.toNanos(seconds)).toInt()
+            }
     }
 }
 

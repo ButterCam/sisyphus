@@ -16,5 +16,5 @@ annotation class EnableRetrofitClients(
     val basePackageNames: Array<String> = [],
     val basePackageClasses: Array<KClass<*>> = [],
     val clientClassNames: Array<String> = [],
-    val clientClasses: Array<KClass<*>> = []
+    val clientClasses: Array<KClass<*>> = [],
 )

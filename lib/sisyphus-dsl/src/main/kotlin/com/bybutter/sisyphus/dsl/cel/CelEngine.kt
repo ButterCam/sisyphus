@@ -12,7 +12,10 @@ class CelEngine(global: Map<String, Any?> = mapOf(), val runtime: CelRuntime = C
         return context.visit(parse(cel))
     }
 
-    fun eval(cel: String, global: Map<String, Any?>): Any? {
+    fun eval(
+        cel: String,
+        global: Map<String, Any?>,
+    ): Any? {
         val context = context.fork()
         context.global += global
         return context.visit(parse(cel))

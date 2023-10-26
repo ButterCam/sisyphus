@@ -9,7 +9,10 @@ class DefaultExceptionHandler(private val retryTimes: Int) : KafkaExceptionHandl
 
     constructor() : this(20)
 
-    override fun onException(record: ConsumerRecord<*, *>, exception: Exception): KafkaExceptionPolicy {
+    override fun onException(
+        record: ConsumerRecord<*, *>,
+        exception: Exception,
+    ): KafkaExceptionPolicy {
         val key = "${record.topic()}/${record.partition()}/${record.offset()}"
 
         val errorCount = retryCount.getOrPut(key) { AtomicInteger(0) }.incrementAndGet()

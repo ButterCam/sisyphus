@@ -54,11 +54,12 @@ abstract class MessageSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>> : 
                 if (target.descriptor.options?.mapEntry == true) {
                     val mapField = fieldPart.poll() ?: break
                     result = target.fieldInfo("value") ?: return null
-                    target = if (result.type != FieldDescriptorProto.Type.MESSAGE) {
-                        null
-                    } else {
-                        ProtoTypes.findSupport(result.typeName) as MessageSupport<*, *>
-                    }
+                    target =
+                        if (result.type != FieldDescriptorProto.Type.MESSAGE) {
+                            null
+                        } else {
+                            ProtoTypes.findSupport(result.typeName) as MessageSupport<*, *>
+                        }
                 }
             }
         }
@@ -70,21 +71,35 @@ abstract class MessageSupport<T : Message<T, TM>, TM : MutableMessage<T, TM>> : 
         return fieldDescriptors.firstOrNull { it.number == number }
     }
 
-    fun parse(input: InputStream, size: Int): T {
+    fun parse(
+        input: InputStream,
+        size: Int,
+    ): T {
         return parse(Reader(input), size)
     }
 
-    fun parse(data: ByteArray, from: Int = 0, to: Int = data.size): T {
+    fun parse(
+        data: ByteArray,
+        from: Int = 0,
+        to: Int = data.size,
+    ): T {
         return parse(Reader(data.inputStream(from, to - from)), to - from)
     }
 
     @OptIn(InternalProtoApi::class)
-    fun parse(reader: Reader, size: Int): T {
+    fun parse(
+        reader: Reader,
+        size: Int,
+    ): T {
         return newMutable().apply { readFrom(reader, size) } as T
     }
 
     @OptIn(InternalProtoApi::class)
-    inline fun parse(reader: Reader, size: Int, block: TM.() -> Unit): T {
+    inline fun parse(
+        reader: Reader,
+        size: Int,
+        block: TM.() -> Unit,
+    ): T {
         return newMutable().apply {
             readFrom(reader, size)
             block()

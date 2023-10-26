@@ -99,7 +99,10 @@ fun DslPattern.hasParent(pattern: DslPattern): DslPattern {
     }
 }
 
-fun <T : ParseTree> DslPattern.hasSuperParent(level: Int, clazz: Class<T>): DslPattern {
+fun <T : ParseTree> DslPattern.hasSuperParent(
+    level: Int,
+    clazz: Class<T>,
+): DslPattern {
     return hasSuperParent(level, DslPattern.isInstance(clazz))
 }
 
@@ -107,7 +110,10 @@ inline fun <reified T : ParseTree> DslPattern.hasSuperParent(level: Int): DslPat
     return hasSuperParent(level, T::class.java)
 }
 
-fun DslPattern.hasSuperParent(level: Int, pattern: DslPattern): DslPattern {
+fun DslPattern.hasSuperParent(
+    level: Int,
+    pattern: DslPattern,
+): DslPattern {
     return and {
         pattern.accept(it.superParent(level) ?: return@and false)
     }

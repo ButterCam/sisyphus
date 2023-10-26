@@ -8,11 +8,12 @@ import com.bybutter.sisyphus.protobuf.primitives.EnumDescriptorProto
 
 class DynamicEnumSupport(
     override val parent: ProtoSupport<*>,
-    override val descriptor: EnumDescriptorProto
+    override val descriptor: EnumDescriptorProto,
 ) : EnumSupport<DynamicEnum>() {
-    private val values = descriptor.value.map {
-        DynamicEnum(it.number, it.name, this)
-    }.toTypedArray()
+    private val values =
+        descriptor.value.map {
+            DynamicEnum(it.number, it.name, this)
+        }.toTypedArray()
 
     override val name: String by lazy {
         when (parent) {

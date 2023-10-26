@@ -8,16 +8,17 @@ import com.squareup.kotlinpoet.ClassName
 
 class EnumDescriptor(
     override val parent: DescriptorNode<*>,
-    override val descriptor: DescriptorProtos.EnumDescriptorProto
+    override val descriptor: DescriptorProtos.EnumDescriptorProto,
 ) : DescriptorNode<DescriptorProtos.EnumDescriptorProto>() {
     init {
         fileSet().registerLookup(fullProtoName(), this)
     }
 
     override fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
-        children += descriptor.valueList.map {
-            EnumValueDescriptor(this, it)
-        }
+        children +=
+            descriptor.valueList.map {
+                EnumValueDescriptor(this, it)
+            }
         super.resolveChildren(children)
     }
 
@@ -84,7 +85,7 @@ class EnumDescriptor(
         return escapeDoc(
             file().descriptor.sourceCodeInfo?.locationList?.firstOrNull {
                 it.pathList.contentEquals(path())
-            }?.leadingComments ?: ""
+            }?.leadingComments ?: "",
         )
     }
 }

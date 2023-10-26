@@ -12,20 +12,17 @@ data class JdbcDatabaseProperty(
     val poolConfig: ConnectionPoolProperty? = null,
     val qualifier: Class<*>,
     val dialect: SQLDialect? = null,
-    val extensions: Map<String, Any> = mapOf()
+    val extensions: Map<String, Any> = mapOf(),
 )
 
 data class ConnectionPoolProperty(
     val poolName: String?,
-
     val minIdle: Int?,
     val maxPoolSize: Int?,
-
     val maxLifetime: Long?,
     val connectionTimeout: Long?,
     val idleTimeout: Long?,
     val validationTimeout: Long?,
-
     val connectionInitSql: String?,
-    val connectionTestQuery: String?
+    val connectionTestQuery: String?,
 )

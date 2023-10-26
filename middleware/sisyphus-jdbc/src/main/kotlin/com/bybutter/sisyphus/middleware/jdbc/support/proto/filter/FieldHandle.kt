@@ -8,7 +8,10 @@ interface FieldHandle {
     fun valueConverter(): (Any?) -> Any?
 
     companion object {
-        fun wrap(field: Field<*>, converter: ((Any?) -> Any?)?): Any {
+        fun wrap(
+            field: Field<*>,
+            converter: ((Any?) -> Any?)?,
+        ): Any {
             return converter?.let {
                 Default(field, it)
             } ?: field

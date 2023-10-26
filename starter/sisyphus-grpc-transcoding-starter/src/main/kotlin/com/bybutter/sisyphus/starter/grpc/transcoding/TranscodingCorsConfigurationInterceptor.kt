@@ -9,6 +9,6 @@ interface TranscodingCorsConfigurationInterceptor {
         config: CorsConfiguration,
         method: ServerMethodDefinition<*, *>,
         pattern: HttpRule.Pattern<*>,
-        path: String
+        path: String,
     ): CorsConfiguration
 }

@@ -4,5 +4,8 @@ import io.grpc.Metadata
 import org.springframework.web.reactive.function.server.ServerRequest
 
 interface TranscodingHeaderExporter {
-    fun export(request: ServerRequest, metadata: Metadata)
+    fun export(
+        request: ServerRequest,
+        metadata: Metadata,
+    )
 }

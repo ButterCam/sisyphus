@@ -8,11 +8,10 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.core.env.Environment
 
 @AutoConfiguration(
-    before = [SisyphusGrpcClientAutoConfiguration::class]
+    before = [SisyphusGrpcClientAutoConfiguration::class],
 )
 @ComponentScan(basePackageClasses = [SisyphusGrpcServerAutoConfiguration::class])
 class SisyphusGrpcServerAutoConfiguration : EnvironmentAware {
-
     private lateinit var environment: Environment
 
     @Bean

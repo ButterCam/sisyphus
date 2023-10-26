@@ -13,7 +13,11 @@ interface KubernetesResourceSupport<T> {
     val alias: Set<String>
     val resourceClass: Class<T>
 
-    fun deploy(resource: KubernetesResource<T>, task: Task, patcher: T.() -> Unit) {
+    fun deploy(
+        resource: KubernetesResource<T>,
+        task: Task,
+        patcher: T.() -> Unit,
+    ) {
         val k8sResource = getResource(resource)
         updateMetadata(resource, k8sResource)
         patcher(k8sResource)
@@ -25,18 +29,22 @@ interface KubernetesResourceSupport<T> {
                 patchResourceCall(resource, patch)
             },
             V1Patch.PATCH_FORMAT_STRATEGIC_MERGE_PATCH,
-            resource.cluster.api
+            resource.cluster.api,
         )
     }
 
-    fun waitForReady(resource: KubernetesResource<T>, task: Task) {
-        val result = Wait.poll(Duration.ofSeconds(3), Duration.ofSeconds(300)) {
-            try {
-                getResource(resource)?.let { checkReady(resource, task, it) } ?: false
-            } catch (e: Exception) {
-                false
+    fun waitForReady(
+        resource: KubernetesResource<T>,
+        task: Task,
+    ) {
+        val result =
+            Wait.poll(Duration.ofSeconds(3), Duration.ofSeconds(300)) {
+                try {
+                    getResource(resource)?.let { checkReady(resource, task, it) } ?: false
+                } catch (e: Exception) {
+                    false
+                }
             }
-        }
         if (!result) {
             task.logger.lifecycle("$kind ${resource.namespace}/${resource.name} startup timeout.")
         }
@@ -44,11 +52,21 @@ interface KubernetesResourceSupport<T> {
 
     fun getResource(resource: KubernetesResource<T>): T
 
-    fun updateMetadata(resource: KubernetesResource<T>, k8sResource: T)
+    fun updateMetadata(
+        resource: KubernetesResource<T>,
+        k8sResource: T,
+    )
 
-    fun patchResourceCall(resource: KubernetesResource<T>, patch: V1Patch): Call
+    fun patchResourceCall(
+        resource: KubernetesResource<T>,
+        patch: V1Patch,
+    ): Call
 
-    fun checkReady(resource: KubernetesResource<T>, task: Task, k8sResource: T): Boolean
+    fun checkReady(
+        resource: KubernetesResource<T>,
+        task: Task,
+        k8sResource: T,
+    ): Boolean
 
     companion object {
         fun fromKind(kind: String): KubernetesResourceSupport<*> {

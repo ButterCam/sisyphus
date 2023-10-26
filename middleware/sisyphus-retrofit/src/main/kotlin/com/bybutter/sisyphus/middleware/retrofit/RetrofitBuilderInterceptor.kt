@@ -8,6 +8,6 @@ interface RetrofitBuilderInterceptor {
         builder: Retrofit.Builder,
         property: RetrofitProperty,
         environment: Environment,
-        propertyPrefix: String
+        propertyPrefix: String,
     ): Retrofit.Builder
 }

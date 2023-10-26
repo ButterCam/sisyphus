@@ -7,12 +7,13 @@ import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.type.TypeFactory
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.Connection
+import org.apache.hadoop.hbase.client.Delete
 import org.apache.hadoop.hbase.client.Get
 import org.apache.hadoop.hbase.client.Put
 
 class HTemplateFactory<TKey, TValue> constructor(
     private val keyType: JavaType,
-    private val valueType: JavaType
+    private val valueType: JavaType,
 ) where TKey : Any, TValue : DtoModel {
     private var connection: Connection? = null
     private var valueConverter: ValueConverter<TKey>? = null
@@ -48,10 +49,12 @@ class HTemplateFactory<TKey, TValue> constructor(
         val connection = connection ?: throw IllegalArgumentException("Not set connection for HTemplate.")
         val table = table ?: throw IllegalArgumentException("Not set table for HTemplate.")
 
-        val keyConverter = valueConverter ?: getDefaultValueConverter<TKey>(keyType)
-            ?: throw IllegalArgumentException("No convert for type '${keyType.typeName}'.")
-        val valueConverter = tableModelConverter ?: getDefaultTableModelConverter<TValue>(valueType)
-            ?: throw IllegalArgumentException("No convert for type '${valueType.typeName}'.")
+        val keyConverter =
+            valueConverter ?: getDefaultValueConverter<TKey>(keyType)
+                ?: throw IllegalArgumentException("No convert for type '${keyType.typeName}'.")
+        val valueConverter =
+            tableModelConverter ?: getDefaultTableModelConverter<TValue>(valueType)
+                ?: throw IllegalArgumentException("No convert for type '${valueType.typeName}'.")
 
         return DefaultTemplate(connection, table, keyConverter, valueConverter)
     }
@@ -60,7 +63,7 @@ class HTemplateFactory<TKey, TValue> constructor(
         inline operator fun <reified TKey, reified TValue> invoke(): HTemplateFactory<TKey, TValue> where TKey : Any, TValue : DtoModel {
             return HTemplateFactory(
                 TypeFactory.defaultInstance().constructType(object : TypeReference<TKey>() {}),
-                TypeFactory.defaultInstance().constructType(object : TypeReference<TValue>() {})
+                TypeFactory.defaultInstance().constructType(object : TypeReference<TValue>() {}),
             )
         }
     }
@@ -69,9 +72,8 @@ class HTemplateFactory<TKey, TValue> constructor(
         override val connection: Connection,
         override val table: ByteArray,
         val rowKeyConverter: ValueConverter<TKey>,
-        val tableModelConverter: TableModelConverter<TValue>
+        val tableModelConverter: TableModelConverter<TValue>,
     ) : HTemplate<TKey, TValue> where TKey : Any, TValue : Any {
-
         override fun get(key: TKey): TValue? {
             connection.getTable(TableName.valueOf(table)).use {
                 val get = Get(rowKeyConverter.convert(key))
@@ -85,7 +87,10 @@ class HTemplateFactory<TKey, TValue> constructor(
             }
         }
 
-        override fun set(key: TKey, value: TValue) {
+        override fun set(
+            key: TKey,
+            value: TValue,
+        ) {
             connection.getTable(TableName.valueOf(table)).use {
                 val put = Put(rowKeyConverter.convert(key))
                 val values = tableModelConverter.convertBack(value)
@@ -106,22 +111,23 @@ class HTemplateFactory<TKey, TValue> constructor(
                     (
                         keyMap[it.row.hashWrapper()]
                             ?: throw RuntimeException("Key value not found.")
-                        ) to tableModelConverter.convert(it)
+                    ) to tableModelConverter.convert(it)
                 }
             }
         }
 
         override fun setMap(values: Map<TKey, TValue>) {
             connection.getTable(TableName.valueOf(table)).use {
-                val putRequests = values.map {
-                    val put = Put(rowKeyConverter.convert(it.key))
-                    tableModelConverter.convertBack(it.value).forEach { (key, value) ->
-                        value.forEach { (q, v) ->
-                            put.addColumn(key, q, v)
+                val putRequests =
+                    values.map {
+                        val put = Put(rowKeyConverter.convert(it.key))
+                        tableModelConverter.convertBack(it.value).forEach { (key, value) ->
+                            value.forEach { (q, v) ->
+                                put.addColumn(key, q, v)
+                            }
                         }
+                        put
                     }
-                    put
-                }
                 return it.put(putRequests)
             }
         }
@@ -132,6 +138,13 @@ class HTemplateFactory<TKey, TValue> constructor(
 
         override fun setMap(vararg values: Pair<TKey, TValue>) {
             return setMap(values.toMap())
+        }
+
+        override fun delete(vararg keys: TKey) {
+            connection.getTable(TableName.valueOf(table)).use {
+                val deleteRequests = keys.map { Delete(rowKeyConverter.convert(it)) }
+                it.delete(deleteRequests)
+            }
         }
     }
 }

@@ -14,13 +14,20 @@ class SpringExtension : BeforeTest, AfterTest, SelectorResolver {
     private var application: Class<*>? = null
     private var context: ApplicationContext? = null
 
-    override fun beforeTest(context: SisyphusTestEngineContext, descriptor: SisyphusTestDescriptor) {
-        this.context = application?.let {
-            SpringApplication.run(it)
-        }
+    override fun beforeTest(
+        context: SisyphusTestEngineContext,
+        descriptor: SisyphusTestDescriptor,
+    ) {
+        this.context =
+            application?.let {
+                SpringApplication.run(it)
+            }
     }
 
-    override fun afterTest(context: SisyphusTestEngineContext, descriptor: SisyphusTestDescriptor) {
+    override fun afterTest(
+        context: SisyphusTestEngineContext,
+        descriptor: SisyphusTestDescriptor,
+    ) {
         this.context?.let {
             SpringApplication.exit(it)
         }
@@ -28,7 +35,7 @@ class SpringExtension : BeforeTest, AfterTest, SelectorResolver {
 
     override fun resolve(
         selector: ClassSelector,
-        context: org.junit.platform.engine.support.discovery.SelectorResolver.Context
+        context: org.junit.platform.engine.support.discovery.SelectorResolver.Context,
     ): org.junit.platform.engine.support.discovery.SelectorResolver.Resolution {
         val clazz = Class.forName(selector.className)
         if (clazz.getAnnotationsByType(SpringBootApplication::class.java).isNotEmpty()) {

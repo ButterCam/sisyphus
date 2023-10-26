@@ -26,7 +26,7 @@ class ProtobufEncoder(vararg mimeTypes: MimeType) :
         bufferFactory: DataBufferFactory,
         elementType: ResolvableType,
         mimeType: MimeType?,
-        hints: Map<String, Any>?
+        hints: Map<String, Any>?,
     ): Flux<DataBuffer> {
         return Flux.from(inputStream).map<DataBuffer> {
             encodeValue(it, bufferFactory, inputStream !is Mono<*>)
@@ -38,12 +38,16 @@ class ProtobufEncoder(vararg mimeTypes: MimeType) :
         bufferFactory: DataBufferFactory,
         valueType: ResolvableType,
         mimeType: MimeType?,
-        hints: MutableMap<String, Any>?
+        hints: MutableMap<String, Any>?,
     ): DataBuffer {
         return encodeValue(value, bufferFactory, false)
     }
 
-    private fun encodeValue(message: Message<*, *>, bufferFactory: DataBufferFactory, delimited: Boolean): DataBuffer {
+    private fun encodeValue(
+        message: Message<*, *>,
+        bufferFactory: DataBufferFactory,
+        delimited: Boolean,
+    ): DataBuffer {
         val buffer = bufferFactory.allocateBuffer()
         var release = true
         return try {

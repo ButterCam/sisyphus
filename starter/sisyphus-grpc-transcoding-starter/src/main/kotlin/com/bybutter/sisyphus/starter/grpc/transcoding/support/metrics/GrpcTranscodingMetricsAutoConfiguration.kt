@@ -6,11 +6,14 @@ import org.springframework.context.annotation.Bean
 import org.springframework.http.server.reactive.observation.ServerRequestObservationConvention
 
 @AutoConfiguration(
-    afterName = ["org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration", "org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration"],
-    beforeName = ["org.springframework.boot.actuate.autoconfigure.metrics.web.reactive.WebFluxMetricsAutoConfiguration"]
+    afterName = [
+        "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.export.simple.SimpleMetricsExportAutoConfiguration",
+    ],
+    beforeName = ["org.springframework.boot.actuate.autoconfigure.metrics.web.reactive.WebFluxMetricsAutoConfiguration"],
 )
 @ConditionalOnClass(
-    name = ["org.springframework.boot.actuate.metrics.web.reactive.server.WebFluxTagsContributor"]
+    name = ["org.springframework.boot.actuate.metrics.web.reactive.server.WebFluxTagsContributor"],
 )
 class GrpcTranscodingMetricsAutoConfiguration {
     @Bean

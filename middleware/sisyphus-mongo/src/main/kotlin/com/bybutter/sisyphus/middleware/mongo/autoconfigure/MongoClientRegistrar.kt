@@ -30,9 +30,10 @@ class MongoClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwa
         val beanFactory = registry as ConfigurableListableBeanFactory
 
         val properties = beanFactory.getBeansOfType<MongoDatabaseProperty>().toMutableMap()
-        val mongoProperties = Binder.get(environment)
-            .bind("sisyphus", MongoDatabaseProperties::class.java)
-            .orElse(null)?.mongo ?: mapOf()
+        val mongoProperties =
+            Binder.get(environment)
+                .bind("sisyphus", MongoDatabaseProperties::class.java)
+                .orElse(null)?.mongo ?: mapOf()
 
         properties += mongoProperties
 
@@ -40,10 +41,11 @@ class MongoClientRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAwa
 
         for ((name, property) in properties) {
             val beanName = "$BEAN_NAME_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(MongoClient::class.java) {
-                val factory = beanFactory.getBean(MongoClientFactory::class.java)
-                factory.createClient(property.qualifier, property)
-            }.beanDefinition
+            val beanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(MongoClient::class.java) {
+                    val factory = beanFactory.getBean(MongoClientFactory::class.java)
+                    factory.createClient(property.qualifier, property)
+                }.beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
         }

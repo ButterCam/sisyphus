@@ -19,7 +19,10 @@ class CoroutineTransactionContext(transactionActive: Boolean = true) :
 
     private val connectionHandle = ConcurrentHashMap<DataSource, ConnectionHandle>()
 
-    fun getConnection(dataSource: DataSource, init: (Connection).() -> Unit = {}): Connection {
+    fun getConnection(
+        dataSource: DataSource,
+        init: (Connection).() -> Unit = {},
+    ): Connection {
         if (!transactionActive) return dataSource.connection
 
         return connectionHandle.getOrPut(dataSource) {
@@ -45,7 +48,7 @@ class CoroutineTransactionContext(transactionActive: Boolean = true) :
     override fun nest(): TransactionContext {
         return TransactionSavePointContext(
             this,
-            connectionHandle.values.associateWith { it.setSavepoint("Savepoint${savePointCounter.incrementAndGet()}") }
+            connectionHandle.values.associateWith { it.setSavepoint("Savepoint${savePointCounter.incrementAndGet()}") },
         )
     }
 
@@ -63,7 +66,10 @@ class CoroutineTransactionContext(transactionActive: Boolean = true) :
         }
     }
 
-    override fun restoreThreadContext(context: CoroutineContext, oldState: CoroutineTransactionContext?) {
+    override fun restoreThreadContext(
+        context: CoroutineContext,
+        oldState: CoroutineTransactionContext?,
+    ) {
         threadContext.set(oldState)
     }
 

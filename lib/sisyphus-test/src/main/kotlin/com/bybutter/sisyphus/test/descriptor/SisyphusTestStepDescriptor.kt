@@ -39,12 +39,13 @@ import kotlin.reflect.full.memberProperties
 
 class SisyphusTestStepDescriptor(id: UniqueId, private val step: TestStep) :
     EngineDescriptor(id, step.name), Node<SisyphusTestEngineContext> {
-
     override fun shouldBeSkipped(context: SisyphusTestEngineContext): Node.SkipResult {
         val engine = context.cel().fork(context.results())
         for (precondition in step.precondition) {
             if (engine.eval(precondition) == false) {
-                return Node.SkipResult.skip("Due to precondition '$precondition' failed, skip step '$displayName' in case '${parent.get().displayName}'")
+                return Node.SkipResult.skip(
+                    "Due to precondition '$precondition' failed, skip step '$displayName' in case '${parent.get().displayName}'",
+                )
             }
         }
         return Node.SkipResult.doNotSkip()
@@ -58,31 +59,52 @@ class SisyphusTestStepDescriptor(id: UniqueId, private val step: TestStep) :
         val serviceName = step.method.substringBefore('/')
         val methodName = step.method.substringAfter('/')
         val serviceSupport = ProtoTypes.findServiceSupport(".$serviceName")
-        val descriptor = serviceSupport.javaClass.kotlin.memberProperties.first {
-            it.name == "serviceDescriptor"
-        }.get(serviceSupport) as ServiceDescriptor
-        val methodDescriptor = descriptor.methods.firstOrNull { it.bareMethodName == methodName }
-            ?: throw IllegalStateException("Method '${step.method}' not found in test'${parent.displayName}.$displayName'.")
-        val method = serviceSupport.descriptor.method.firstOrNull { it.name == methodName }
-            ?: throw IllegalStateException("Method '${step.method}' not found in test'${parent.displayName}.$displayName'.")
+        val descriptor =
+            serviceSupport.javaClass.kotlin.memberProperties.first {
+                it.name == "serviceDescriptor"
+            }.get(serviceSupport) as ServiceDescriptor
+        val methodDescriptor =
+            descriptor.methods.firstOrNull { it.bareMethodName == methodName }
+                ?: throw IllegalStateException("Method '${step.method}' not found in test'${parent.displayName}.$displayName'.")
+        val method =
+            serviceSupport.descriptor.method.firstOrNull { it.name == methodName }
+                ?: throw IllegalStateException("Method '${step.method}' not found in test'${parent.displayName}.$displayName'.")
 
         val metadata = parent.case.metadata.toMutableMap()
         metadata += step.metadata
         for (script in step.metadataScript) {
-            val result = engine.eval(script) as? Map<*, *>
-                ?: throw IllegalStateException("Metadata cel script '$script' must return a map value in test '${parent.displayName}.$displayName'.")
+            val result =
+                engine.eval(script) as? Map<*, *>
+                    ?: throw IllegalStateException(
+                        "Metadata cel script '$script' must return a map value in test '${
+                            parent.displayName
+                        }.$displayName'.",
+                    )
             metadata += result.map { it.key.toString() to it.value.toString() }
         }
 
         var input: MutableMessage<*, *>? = step.input?.cloneMutable()
         if (input != null && method.inputType != input.type()) {
-            throw IllegalStateException("Method '${step.method}' need '${method.inputType}' as input, but '${input.type()}' provided in test '${parent.displayName}.$displayName'.")
+            throw IllegalStateException(
+                "Method '${step.method}' need '${method.inputType}' as input, but '${
+                    input.type()
+                }' provided in test '${parent.displayName}.$displayName'.",
+            )
         }
         for (script in step.inputScript) {
-            val result = engine.eval(script) as? Message<*, *>
-                ?: throw IllegalStateException("Input cel script '$script' must return a message in test '${parent.displayName}.$displayName'.")
+            val result =
+                engine.eval(script) as? Message<*, *>
+                    ?: throw IllegalStateException(
+                        "Input cel script '$script' must return a message in test '${
+                            parent.displayName
+                        }.$displayName'.",
+                    )
             if (result.type() != method.inputType) {
-                throw IllegalStateException("Method '${step.method}' need '${method.inputType}' as input, but '${result.type()}' provided in input script of test '${parent.displayName}.$displayName'.")
+                throw IllegalStateException(
+                    "Method '${step.method}' need '${method.inputType}' as input, but '${
+                        result.type()
+                    }' provided in input script of test '${parent.displayName}.$displayName'.",
+                )
             }
             if (input != null) {
                 input.copyFrom(result)
@@ -91,9 +113,10 @@ class SisyphusTestStepDescriptor(id: UniqueId, private val step: TestStep) :
             }
         }
 
-        val options = step.timeout?.let {
-            CallOptions.DEFAULT.withDeadlineAfter(it.toTime(TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS)
-        } ?: CallOptions.DEFAULT
+        val options =
+            step.timeout?.let {
+                CallOptions.DEFAULT.withDeadlineAfter(it.toTime(TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS)
+            } ?: CallOptions.DEFAULT
 
         return (context as SisyphusTestCaseContext).forStep(
             CallContext(
@@ -102,8 +125,8 @@ class SisyphusTestStepDescriptor(id: UniqueId, private val step: TestStep) :
                 options,
                 methodDescriptor.uncheckedCast(),
                 Metadata().mergeFrom(metadata),
-                input as Message<*, *>
-            )
+                input as Message<*, *>,
+            ),
         )
     }
 
@@ -115,7 +138,7 @@ class SisyphusTestStepDescriptor(id: UniqueId, private val step: TestStep) :
     @OptIn(InternalProtoApi::class)
     override fun execute(
         context: SisyphusTestEngineContext,
-        dynamicTestExecutor: Node.DynamicTestExecutor
+        dynamicTestExecutor: Node.DynamicTestExecutor,
     ): SisyphusTestEngineContext {
         val stepContext = context as SisyphusTestStepContext
         val engine = context.cel().fork(context.results())
@@ -153,7 +176,7 @@ class SisyphusTestStepDescriptor(id: UniqueId, private val step: TestStep) :
                 ClientInterceptors.interceptForward(channel, CallContextInterceptor(context.callContext)),
                 context.callContext.method,
                 context.callContext.options,
-                context.callContext.input
+                context.callContext.input,
             )
         } catch (e: StatusException) {
             if (!step.insensitive) {
@@ -168,7 +191,7 @@ class SisyphusTestStepDescriptor(id: UniqueId, private val step: TestStep) :
                 throw AssertionFailedError(
                     "Assertion '$assert' failed in test '${parent.get().displayName}.$displayName'.",
                     true,
-                    result
+                    result,
                 )
             }
         }
@@ -191,14 +214,17 @@ class CallContextInterceptor(private val context: CallContext) : ClientIntercept
     override fun <ReqT : Any, RespT : Any> interceptCall(
         method: MethodDescriptor<ReqT, RespT>,
         callOptions: CallOptions,
-        next: Channel
+        next: Channel,
     ): ClientCall<ReqT, RespT> {
         return CallWithHeader(next.newCall(method, callOptions), context)
     }
 
     class CallWithHeader<T1, T2>(delegate: ClientCall<T1, T2>, private val context: CallContext) :
         ForwardingClientCall.SimpleForwardingClientCall<T1, T2>(delegate) {
-        override fun start(responseListener: Listener<T2>, headers: Metadata) {
+        override fun start(
+            responseListener: Listener<T2>,
+            headers: Metadata,
+        ) {
             headers.merge(context.headers)
             super.start(StatusListener(responseListener, context), headers)
         }
@@ -206,7 +232,10 @@ class CallContextInterceptor(private val context: CallContext) : ClientIntercept
 
     class StatusListener<T>(delegate: ClientCall.Listener<T>, private val context: CallContext) :
         ForwardingClientCallListener.SimpleForwardingClientCallListener<T>(delegate) {
-        override fun onClose(status: Status, trailers: Metadata) {
+        override fun onClose(
+            status: Status,
+            trailers: Metadata,
+        ) {
             context.status = status
             context.trailers = trailers
             super.onClose(status, trailers)

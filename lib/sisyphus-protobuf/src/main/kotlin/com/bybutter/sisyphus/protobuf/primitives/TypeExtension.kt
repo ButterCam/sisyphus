@@ -5,7 +5,10 @@ import com.bybutter.sisyphus.protobuf.Message
 import com.bybutter.sisyphus.protobuf.ProtoReflection
 import com.bybutter.sisyphus.protobuf.findMessageSupport
 
-fun DescriptorProto.toType(typeName: String, reflection: ProtoReflection): Type {
+fun DescriptorProto.toType(
+    typeName: String,
+    reflection: ProtoReflection,
+): Type {
     return Type {
         val support = reflection.findMessageSupport(typeName)
         this.name = this@toType.name
@@ -16,13 +19,15 @@ fun DescriptorProto.toType(typeName: String, reflection: ProtoReflection): Type 
         this@toType.options?.let {
             this.options += it.toOptions()
         }
-        this.sourceContext = SourceContext {
-            this.fileName = support.file().name
-        }
-        this.syntax = when (support.file().descriptor.syntax) {
-            "proto3" -> Syntax.PROTO3
-            else -> Syntax.PROTO2
-        }
+        this.sourceContext =
+            SourceContext {
+                this.fileName = support.file().name
+            }
+        this.syntax =
+            when (support.file().descriptor.syntax) {
+                "proto3" -> Syntax.PROTO3
+                else -> Syntax.PROTO2
+            }
     }
 }
 
@@ -34,7 +39,8 @@ fun FieldDescriptorProto.toField(): Field {
         this.name = this@toField.name
         when (this.kind) {
             Field.Kind.TYPE_MESSAGE,
-            Field.Kind.TYPE_ENUM -> {
+            Field.Kind.TYPE_ENUM,
+            -> {
                 this.typeUrl = "types.bybutter.com/${this@toField.typeName.substring(1)}"
             }
             else -> {
@@ -56,7 +62,10 @@ fun FieldDescriptorProto.toField(): Field {
     }
 }
 
-fun EnumDescriptorProto.toEnum(typeName: String, reflection: ProtoReflection): Enum {
+fun EnumDescriptorProto.toEnum(
+    typeName: String,
+    reflection: ProtoReflection,
+): Enum {
     return Enum {
         val support = reflection.findSupport(typeName) as EnumSupport<*>
         this.name = this@toEnum.name
@@ -64,13 +73,15 @@ fun EnumDescriptorProto.toEnum(typeName: String, reflection: ProtoReflection): E
         this@toEnum.options?.let {
             this.options += it.toOptions()
         }
-        this.sourceContext = SourceContext {
-            this.fileName = support.file().name
-        }
-        this.syntax = when (support.file().descriptor.syntax) {
-            "proto3" -> Syntax.PROTO3
-            else -> Syntax.PROTO2
-        }
+        this.sourceContext =
+            SourceContext {
+                this.fileName = support.file().name
+            }
+        this.syntax =
+            when (support.file().descriptor.syntax) {
+                "proto3" -> Syntax.PROTO3
+                else -> Syntax.PROTO2
+            }
     }
 }
 
@@ -92,19 +103,21 @@ private fun Message<*, *>.toOptions(): List<Option> {
             is List<*> -> {
                 for (v in value) {
                     val protoValue = v.wrapToProtoValue() ?: continue
-                    result += Option {
-                        this.name = field.name
-                        this.value = protoValue
-                    }
+                    result +=
+                        Option {
+                            this.name = field.name
+                            this.value = protoValue
+                        }
                 }
             }
             is Map<*, *> -> continue@loop
             else -> {
                 val protoValue = value.wrapToProtoValue() ?: continue@loop
-                result += Option {
-                    this.name = field.name
-                    this.value = protoValue
-                }
+                result +=
+                    Option {
+                        this.name = field.name
+                        this.value = protoValue
+                    }
             }
         }
     }

@@ -12,7 +12,7 @@ class Jackson2JsonCodecCustomizer : CodecCustomizer {
         configurer.defaultCodecs().jackson2JsonDecoder(
             Jackson2JsonDecoder(Json.mapper).apply {
                 this.maxInMemorySize = 4 * 1024 * 1024
-            }
+            },
         )
     }
 }

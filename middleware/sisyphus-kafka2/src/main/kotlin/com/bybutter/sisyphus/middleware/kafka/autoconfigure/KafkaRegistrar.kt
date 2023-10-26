@@ -40,24 +40,28 @@ class KafkaRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
         val beanFactory = registry as ConfigurableListableBeanFactory
 
-        val kafkaProperties = Binder.get(environment)
-            .bind("sisyphus.kafka", KafkaProperties::class.java)
-            .orElse(null)
-        val producerProperties = (
-            kafkaProperties?.producers
-                ?: mapOf()
+        val kafkaProperties =
+            Binder.get(environment)
+                .bind("sisyphus.kafka", KafkaProperties::class.java)
+                .orElse(null)
+        val producerProperties =
+            (
+                kafkaProperties?.producers
+                    ?: mapOf()
             ) + beanFactory.getBeansOfType<KafkaProducerProperty>()
-        val consumerProperties = (
-            kafkaProperties?.consumers
-                ?: mapOf()
+        val consumerProperties =
+            (
+                kafkaProperties?.consumers
+                    ?: mapOf()
             ) + beanFactory.getBeansOfType<KafkaConsumerProperty>()
 
         for ((name, property) in producerProperties) {
             val producerName = "$BEAN_NAME_PREFIX:${name}Producer"
-            val producerDefinition = BeanDefinitionBuilder.genericBeanDefinition(KafkaProducer::class.java) {
-                val factory = beanFactory.getBean(KafkaResourceFactory::class.java)
-                factory.createProducer(property)
-            }.beanDefinition
+            val producerDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(KafkaProducer::class.java) {
+                    val factory = beanFactory.getBean(KafkaResourceFactory::class.java)
+                    factory.createProducer(property)
+                }.beanDefinition
             producerDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             producerDefinition.destroyMethodName = CLOSE_METHOD
             registry.registerBeanDefinition(producerName, producerDefinition)
@@ -70,43 +74,50 @@ class KafkaRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware {
             if (definition !is AnnotatedBeanDefinition) continue
             val annotation = definition.metadata.annotations[KafkaConsumer::class.java].synthesize()
 
-            val selectedConsumers = definition.metadata.annotationTypes.mapNotNull {
-                consumers[it]
-            }
+            val selectedConsumers =
+                definition.metadata.annotationTypes.mapNotNull {
+                    consumers[it]
+                }
             if (selectedConsumers.isEmpty()) {
                 logger.warn("Listener '$listener(${definition.beanClassName})' don't has been annotated with consumer qualifiers, skip it.")
                 continue
             }
             if (selectedConsumers.size > 2) {
-                throw IllegalStateException("Listener '$listener(${definition.beanClassName})' has multi consumer qualifiers [${selectedConsumers.joinToString { it.qualifier.name }}]")
+                throw IllegalStateException(
+                    "Listener '$listener(${definition.beanClassName})' has multi consumer qualifiers [${
+                        selectedConsumers.joinToString { it.qualifier.name }
+                    }]",
+                )
             }
             val consumer = selectedConsumers.first()
 
             val consumerName = "$BEAN_NAME_PREFIX:${listener}Consumer"
-            val consumerDefinition = BeanDefinitionBuilder.genericBeanDefinition(SmartLifecycle::class.java) {
-                val addedLogger = mutableSetOf<String>()
-                val loggers = BeanUtils.getSortedBeans(beanFactory, KafkaLogger::class.java).values.mapNotNull {
-                    if (it.id.isNotEmpty() && addedLogger.contains(it.id)) return@mapNotNull null
-                    addedLogger += it.id
-                    it
-                }
-                val kafkaListener = beanFactory.getBean(listener) as KafkaListener<*, *>
-                KafkaConsumerLifecycle(
-                    beanFactory.getBean(KafkaResourceFactory::class.java)
-                        .createConsumer(consumer, annotation, kafkaListener, loggers)
-                        .also {
-                            logger.info(
-                                "Kafka listener (${it.groupMetadata().groupId()}) registered on topics '${
-                                annotation.topics.joinToString()
-                                    .takeIf { it.isNotEmpty() } ?: annotation.topicPattern
-                                }'."
-                            )
-                        },
-                    kafkaListener.uncheckedCast(),
-                    loggers,
-                    annotation.errorHandler.instance()
-                )
-            }.beanDefinition
+            val consumerDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(SmartLifecycle::class.java) {
+                    val addedLogger = mutableSetOf<String>()
+                    val loggers =
+                        BeanUtils.getSortedBeans(beanFactory, KafkaLogger::class.java).values.mapNotNull {
+                            if (it.id.isNotEmpty() && addedLogger.contains(it.id)) return@mapNotNull null
+                            addedLogger += it.id
+                            it
+                        }
+                    val kafkaListener = beanFactory.getBean(listener) as KafkaListener<*, *>
+                    KafkaConsumerLifecycle(
+                        beanFactory.getBean(KafkaResourceFactory::class.java)
+                            .createConsumer(consumer, annotation, kafkaListener, loggers)
+                            .also {
+                                logger.info(
+                                    "Kafka listener (${it.groupMetadata().groupId()}) registered on topics '${
+                                        annotation.topics.joinToString()
+                                            .takeIf { it.isNotEmpty() } ?: annotation.topicPattern
+                                    }'.",
+                                )
+                            },
+                        kafkaListener.uncheckedCast(),
+                        loggers,
+                        annotation.errorHandler.instance(),
+                    )
+                }.beanDefinition
             consumerDefinition.addQualifier(AutowireCandidateQualifier(consumer.qualifier))
             registry.registerBeanDefinition(consumerName, consumerDefinition)
         }

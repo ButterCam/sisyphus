@@ -7,11 +7,11 @@ import com.squareup.kotlinpoet.TypeSpec
 class ExtensionGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: ExtensionDescriptor,
-    override val target: Taggable.Builder<*>
+    override val target: Taggable.Builder<*>,
 ) : ChildGeneratingState<ExtensionDescriptor, Taggable.Builder<*>>
 
 class ExtensionSupportGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: ExtensionDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<ExtensionDescriptor, TypeSpec.Builder>

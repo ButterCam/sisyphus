@@ -32,7 +32,6 @@ inline fun <reified T> String?.parseYamlOrDefault(value: T): T {
     return this.parseYamlOrNull<T>() ?: value
 }
 
-inline fun <reified T> String.parseYaml(): T =
-    Yaml.deserialize(this, object : TypeReference<T>() {})
+inline fun <reified T> String.parseYaml(): T = Yaml.deserialize(this, object : TypeReference<T>() {})
 
 fun Any.toYaml(): String = Yaml.serialize(this)

@@ -12,18 +12,21 @@ interface DtoMeta {
      * The dto object real type.
      */
     @get:MetaProperty
+    @Suppress("ktlint:standard:property-naming")
     val `$type`: Type
 
     /**
      * The map which used for store all properties for dto.
      */
     @get:MetaProperty
+    @Suppress("ktlint:standard:property-naming")
     var `$modelMap`: MutableMap<String, Any?>
 
     /**
      * If current dot object should contain type info in json or other data format.
      */
     @get:MetaProperty
+    @Suppress("ktlint:standard:property-naming")
     var `$outputType`: Boolean
 
     /**
@@ -34,7 +37,10 @@ interface DtoMeta {
     /**
      * Set the properties value for dto object, no hooks.
      */
-    operator fun <T> set(name: String, value: T?)
+    operator fun <T> set(
+        name: String,
+        value: T?,
+    )
 }
 
 fun DtoModel.hasProperty(name: String): Boolean {
@@ -42,7 +48,8 @@ fun DtoModel.hasProperty(name: String): Boolean {
 }
 
 fun DtoMeta.hasProperty(name: String): Boolean {
-    return this.`$modelMap`.containsKey(name) && (Proxy.getInvocationHandler(this) as ModelProxy).properties.containsKey(
-        name
-    )
+    return this.`$modelMap`.containsKey(name) &&
+        (Proxy.getInvocationHandler(this) as ModelProxy).properties.containsKey(
+            name,
+        )
 }

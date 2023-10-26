@@ -11,7 +11,10 @@ import reactor.core.publisher.Mono
 @Component
 @Order(-1)
 class TranscodingNotSupportExceptionMapper : WebExceptionHandler {
-    override fun handle(exchange: ServerWebExchange, ex: Throwable): Mono<Void> {
+    override fun handle(
+        exchange: ServerWebExchange,
+        ex: Throwable,
+    ): Mono<Void> {
         // org.springframework.web.reactive.DispatcherHandler will throw ResponseStatusException with reason 'No matching handler'
         // org.springframework.web.reactive.resource.ResourceWebHandler will throw ResponseStatusException with no reason
         // We map those ResponseStatusException to TranscodingNotSupportException

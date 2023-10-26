@@ -9,7 +9,7 @@ import com.bybutter.sisyphus.protobuf.coded.Writer
 import com.bybutter.sisyphus.protobuf.primitives.FieldDescriptorProto
 
 class DynamicMessage(
-    private val support: DynamicMessageSupport
+    private val support: DynamicMessageSupport,
 ) : AbstractMutableMessage<DynamicMessage, DynamicMessage>() {
     private val fields = mutableMapOf<Int, DynamicField<*>>()
 
@@ -63,20 +63,30 @@ class DynamicMessage(
     }
 
     @InternalProtoApi
-    override fun readField(reader: Reader, field: Int, wire: Int): Boolean {
+    override fun readField(
+        reader: Reader,
+        field: Int,
+        wire: Int,
+    ): Boolean {
         support().fieldInfo(field) ?: return false
         ensure<Any?>(field).read(reader, field, wire)
         return true
     }
 
-    override fun <T> setFieldInCurrent(fieldName: String, value: T) {
+    override fun <T> setFieldInCurrent(
+        fieldName: String,
+        value: T,
+    ) {
         ensure<T>(fieldName).apply {
             clearOneof(this.descriptor())
             set(value)
         }
     }
 
-    override fun <T> setFieldInCurrent(fieldNumber: Int, value: T) {
+    override fun <T> setFieldInCurrent(
+        fieldNumber: Int,
+        value: T,
+    ) {
         ensure<T>(fieldNumber).apply {
             clearOneof(this.descriptor())
             set(value)

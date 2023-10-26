@@ -20,9 +20,7 @@ import java.util.Properties
 open class DefaultKafkaResourceFactory : KafkaResourceFactory {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun createProducer(
-        producerProperty: KafkaProducerProperty
-    ): KafkaProducer<*, *> {
+    override fun createProducer(producerProperty: KafkaProducerProperty): KafkaProducer<*, *> {
         val properties = Properties().configServerProperties(producerProperty)
         producerProperty.acks?.let {
             properties[ProducerConfig.ACKS_CONFIG] = it
@@ -40,7 +38,7 @@ open class DefaultKafkaResourceFactory : KafkaResourceFactory {
             properties,
             producerProperty.keySerializer.instance().apply { configure(producerProperty.keySerializerConfig, true) },
             producerProperty.valueSerializer.instance()
-                .apply { configure(producerProperty.valueSerializerConfig, false) }
+                .apply { configure(producerProperty.valueSerializerConfig, false) },
         )
     }
 
@@ -48,7 +46,7 @@ open class DefaultKafkaResourceFactory : KafkaResourceFactory {
         consumerProperty: KafkaConsumerProperty,
         metadata: com.bybutter.sisyphus.middleware.kafka.KafkaConsumer,
         listener: KafkaListener<*, *>,
-        loggers: List<KafkaLogger>
+        loggers: List<KafkaLogger>,
     ): KafkaConsumer<*, *> {
         val properties = Properties().configServerProperties(consumerProperty)
 
@@ -64,20 +62,21 @@ open class DefaultKafkaResourceFactory : KafkaResourceFactory {
 
         properties[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
 
-        val config = buildMap<String, Any?> {
-            put(LISTENER_CONFIG, listener)
-            listener.javaClass.getTypeArgument(KafkaListener::class.java, 0).let {
-                put(LISTENER_KEY_TYPE, it)
+        val config =
+            buildMap<String, Any?> {
+                put(LISTENER_CONFIG, listener)
+                listener.javaClass.getTypeArgument(KafkaListener::class.java, 0).let {
+                    put(LISTENER_KEY_TYPE, it)
+                }
+                listener.javaClass.getTypeArgument(KafkaListener::class.java, 1).let {
+                    put(LISTENER_VALUE_TYPE, it)
+                }
             }
-            listener.javaClass.getTypeArgument(KafkaListener::class.java, 1).let {
-                put(LISTENER_VALUE_TYPE, it)
-            }
-        }
 
         return KafkaConsumer(
             properties,
             metadata.keyDeserializer.instance().apply { configure(config, true) },
-            metadata.valueDeserializer.instance().apply { configure(config, false) }
+            metadata.valueDeserializer.instance().apply { configure(config, false) },
         ).also {
             if (metadata.topics.isNotEmpty()) {
                 it.subscribe(metadata.topics.toList())
@@ -89,9 +88,7 @@ open class DefaultKafkaResourceFactory : KafkaResourceFactory {
         }
     }
 
-    private fun Properties.configServerProperties(
-        property: KafkaServerProperty
-    ): Properties {
+    private fun Properties.configServerProperties(property: KafkaServerProperty): Properties {
         this[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = property.bootstrapServers
         this[CommonClientConfigs.SECURITY_PROTOCOL_CONFIG] = property.protocol
         if (property.protocol?.startsWith("SASL_") == true) {
@@ -100,10 +97,11 @@ open class DefaultKafkaResourceFactory : KafkaResourceFactory {
         }
         if (property.protocol?.contains("SSL") == true) {
             property.sslTruststore?.base64Decode()?.let {
-                val file = Files.createTempFile("kafka-truststore", ".jks").toFile().apply {
-                    writeBytes(it)
-                    deleteOnExit()
-                }
+                val file =
+                    Files.createTempFile("kafka-truststore", ".jks").toFile().apply {
+                        writeBytes(it)
+                        deleteOnExit()
+                    }
                 this[SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG] = file.absolutePath
             }
             property.sslTruststorePassword?.let {

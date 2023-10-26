@@ -18,19 +18,23 @@ class TranscodingStreamingCallListener(private val clientCall: ClientCall<*, *>)
     private val eventSink = Sinks.many().unicast().onBackpressureBuffer<ServerSentEvent<Any>>()
     private val response = Sinks.one<Mono<ServerResponse>>()
 
-    override fun onClose(status: Status, trailers: Metadata) {
+    override fun onClose(
+        status: Status,
+        trailers: Metadata,
+    ) {
         try {
-            val statusMessage = trailers[STATUS_META_KEY] ?: com.bybutter.sisyphus.rpc.Status {
-                this.code = status.code.value()
-                status.description?.let {
-                    this.message = it
+            val statusMessage =
+                trailers[STATUS_META_KEY] ?: com.bybutter.sisyphus.rpc.Status {
+                    this.code = status.code.value()
+                    status.description?.let {
+                        this.message = it
+                    }
                 }
-            }
             eventSink.tryEmitNext(
-                ServerSentEvent.builder<Any>().event("status").data(statusMessage).build()
+                ServerSentEvent.builder<Any>().event("status").data(statusMessage).build(),
             )
             eventSink.tryEmitNext(
-                ServerSentEvent.builder<Any>().event("trailers").data(trailers.toMap()).build()
+                ServerSentEvent.builder<Any>().event("trailers").data(trailers.toMap()).build(),
             )
             eventSink.tryEmitComplete()
         } catch (e: Exception) {
@@ -41,13 +45,13 @@ class TranscodingStreamingCallListener(private val clientCall: ClientCall<*, *>)
     override fun onHeaders(headers: Metadata) {
         response.tryEmitValue(
             ServerResponse.status(HttpStatus.OK).setHeaderFromMetadata(headers)
-                .body(BodyInserters.fromServerSentEvents(eventSink.asFlux()))
+                .body(BodyInserters.fromServerSentEvents(eventSink.asFlux())),
         )
     }
 
     override fun onMessage(message: Message<*, *>) {
         eventSink.tryEmitNext(
-            ServerSentEvent.builder<Any>().event("message").data(message).build()
+            ServerSentEvent.builder<Any>().event("message").data(message).build(),
         )
         clientCall.request(1)
     }

@@ -48,6 +48,9 @@ internal fun Timestamp.stringJvm7(): String {
     return timestampFormatWithMillisecond.format(toDate())
 }
 
-internal fun Timestamp.Companion.stringJvm7(seconds: Long, nanos: Int): String {
+internal fun Timestamp.Companion.stringJvm7(
+    seconds: Long,
+    nanos: Int,
+): String {
     return timestampFormatWithMillisecond.format(Date((seconds * 1000) + (nanos / 1000000)))
 }

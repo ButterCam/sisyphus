@@ -30,7 +30,10 @@ class ApiDocConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
         Binder.get(environment).bind("openapi", ApiDocProperty::class.java).orElse(null) ?: ApiDocProperty()
     }
 
-    override fun registerBeanDefinitions(importingClassMetadata: AnnotationMetadata, registry: BeanDefinitionRegistry) {
+    override fun registerBeanDefinitions(
+        importingClassMetadata: AnnotationMetadata,
+        registry: BeanDefinitionRegistry,
+    ) {
         // Find the [EnableHttpToGrpcTranscoding] annotation.
         val enableAnnotation =
             importingClassMetadata.getAnnotationAttributes(EnableHttpToGrpcTranscoding::class.java.name) ?: return
@@ -44,21 +47,25 @@ class ApiDocConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
     /**
      * Register swagger router function bean definition to spring context.
      */
-    private fun registerSwaggerRouterFunction(registry: BeanDefinitionRegistry, enableServices: Collection<String>) {
-        val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(RouterFunction::class.java) {
-            val server =
-                (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
-            ApiDocRouterFunction(
-                server,
-                enableServices,
-                swaggerProperty,
-                (registry as ConfigurableListableBeanFactory).getBeansOfType(ApiDocRequestInterceptor::class.java).values.toList(),
-                (registry as ConfigurableListableBeanFactory).getBeansOfType(ApiDocInterceptor::class.java).values.toList()
-            )
-        }
+    private fun registerSwaggerRouterFunction(
+        registry: BeanDefinitionRegistry,
+        enableServices: Collection<String>,
+    ) {
+        val definitionBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(RouterFunction::class.java) {
+                val server =
+                    (registry as ConfigurableListableBeanFactory).getBean(ServiceRegistrar.QUALIFIER_AUTO_CONFIGURED_GRPC_SERVER) as Server
+                ApiDocRouterFunction(
+                    server,
+                    enableServices,
+                    swaggerProperty,
+                    (registry as ConfigurableListableBeanFactory).getBeansOfType(ApiDocRequestInterceptor::class.java).values.toList(),
+                    (registry as ConfigurableListableBeanFactory).getBeansOfType(ApiDocInterceptor::class.java).values.toList(),
+                )
+            }
         registry.registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_OPENAPI_ROUTER_FUNCTION,
-            definitionBuilder.beanDefinition
+            definitionBuilder.beanDefinition,
         )
     }
 
@@ -66,23 +73,24 @@ class ApiDocConfig : ImportBeanDefinitionRegistrar, EnvironmentAware {
      * Register gRPC swagger CORS config source bean definition to spring context.
      */
     private fun registerSwaggerCorsConfigSource(registry: BeanDefinitionRegistry) {
-        val definitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(CorsConfigurationSource::class.java) {
-            UrlBasedCorsConfigurationSource().apply {
-                registerCorsConfiguration(
-                    swaggerProperty.path,
-                    CorsConfiguration().apply {
-                        addAllowedHeader(CorsConfiguration.ALL)
-                        addAllowedOrigin(CorsConfiguration.ALL)
-                        addAllowedMethod(HttpMethod.OPTIONS)
-                        addAllowedMethod(HttpMethod.HEAD)
-                        addAllowedMethod(HttpMethod.GET)
-                    }
-                )
+        val definitionBuilder =
+            BeanDefinitionBuilder.genericBeanDefinition(CorsConfigurationSource::class.java) {
+                UrlBasedCorsConfigurationSource().apply {
+                    registerCorsConfiguration(
+                        swaggerProperty.path,
+                        CorsConfiguration().apply {
+                            addAllowedHeader(CorsConfiguration.ALL)
+                            addAllowedOrigin(CorsConfiguration.ALL)
+                            addAllowedMethod(HttpMethod.OPTIONS)
+                            addAllowedMethod(HttpMethod.HEAD)
+                            addAllowedMethod(HttpMethod.GET)
+                        },
+                    )
+                }
             }
-        }
         registry.registerBeanDefinition(
             QUALIFIER_AUTO_CONFIGURED_GRPC_OPENAPI_CORS_CONFIG,
-            definitionBuilder.beanDefinition
+            definitionBuilder.beanDefinition,
         )
     }
 

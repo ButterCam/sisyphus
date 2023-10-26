@@ -88,7 +88,10 @@ fun <T, R> Iterable<T>.firstNotNull(block: (T) -> R?): R? {
     return null
 }
 
-fun <T, R> Iterable<T>.firstNotNullOrDefault(default: R, block: (T) -> R?): R {
+fun <T, R> Iterable<T>.firstNotNullOrDefault(
+    default: R,
+    block: (T) -> R?,
+): R {
     for (value in this) {
         return block(value) ?: continue
     }

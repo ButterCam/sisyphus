@@ -39,24 +39,28 @@ class RocketMqRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
     override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
         val beanFactory = registry as ConfigurableListableBeanFactory
 
-        val rocketMqProperties = Binder.get(environment)
-            .bind("sisyphus.rocketmq", RocketMqProperties::class.java)
-            .orElse(null)
-        val producerProperties = (
-            rocketMqProperties?.producers
-                ?: mapOf()
+        val rocketMqProperties =
+            Binder.get(environment)
+                .bind("sisyphus.rocketmq", RocketMqProperties::class.java)
+                .orElse(null)
+        val producerProperties =
+            (
+                rocketMqProperties?.producers
+                    ?: mapOf()
             ) + beanFactory.getBeansOfType<RocketMqProducerProperty>()
-        val consumerProperties = (
-            rocketMqProperties?.consumers
-                ?: mapOf()
+        val consumerProperties =
+            (
+                rocketMqProperties?.consumers
+                    ?: mapOf()
             ) + beanFactory.getBeansOfType<RocketMqConsumerProperty>()
 
         for ((name, property) in producerProperties) {
             val producerName = "$BEAN_NAME_PREFIX:${name}Producer"
-            val producerDefinition = BeanDefinitionBuilder.genericBeanDefinition(MQProducer::class.java) {
-                val factory = beanFactory.getBean(RocketMqResourceFactory::class.java)
-                factory.createProducer(property)
-            }.beanDefinition
+            val producerDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(MQProducer::class.java) {
+                    val factory = beanFactory.getBean(RocketMqResourceFactory::class.java)
+                    factory.createProducer(property)
+                }.beanDefinition
             producerDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             producerDefinition.initMethodName = INIT_METHOD
             producerDefinition.destroyMethodName = DESTROY_METHOD
@@ -70,36 +74,47 @@ class RocketMqRegistrar : BeanDefinitionRegistryPostProcessor, EnvironmentAware 
             if (definition !is AnnotatedBeanDefinition) continue
             val annotation = definition.metadata.annotations[MessageConsumer::class.java].synthesize()
 
-            val selectedConsumers = definition.metadata.annotationTypes.mapNotNull {
-                consumers[it]
-            }
+            val selectedConsumers =
+                definition.metadata.annotationTypes.mapNotNull {
+                    consumers[it]
+                }
             if (selectedConsumers.isEmpty()) {
                 logger.warn("Listener '$listener(${definition.beanClassName})' don't has been annotated with consumer qualifiers, skip it.")
                 continue
             }
             if (selectedConsumers.size > 2) {
-                throw IllegalStateException("Listener '$listener(${definition.beanClassName})' has multi consumer qualifiers [${selectedConsumers.joinToString { it.qualifier.name }}]")
+                throw IllegalStateException(
+                    "Listener '$listener(${definition.beanClassName})' has multi consumer qualifiers [${
+                        selectedConsumers.joinToString { it.qualifier.name }
+                    }]",
+                )
             }
             val consumer = selectedConsumers.first()
 
             val consumerName = "$BEAN_NAME_PREFIX:${listener}Consumer"
-            val consumerDefinition = BeanDefinitionBuilder.genericBeanDefinition(SmartLifecycle::class.java) {
-                val addedLogger = mutableSetOf<String>()
-                val loggers = BeanUtils.getSortedBeans(beanFactory, RocketMqLogger::class.java).values.mapNotNull {
-                    if (it.id.isNotEmpty() && addedLogger.contains(it.id)) return@mapNotNull null
-                    addedLogger += it.id
-                    it
-                }
-                val listener = beanFactory.getBean<MessageListener<*>>(listener)
-                ConsumerLifecycle(
-                    beanFactory.getBean(RocketMqResourceFactory::class.java)
-                        .createConsumer(consumer, annotation, listener, loggers)
-                        .also {
-                            logger.info("RocketMQ listener (${annotation.groupId}) registered on topic '${annotation.topic}(${annotation.filter})'.")
-                        },
-                    listener
-                )
-            }.beanDefinition
+            val consumerDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(SmartLifecycle::class.java) {
+                    val addedLogger = mutableSetOf<String>()
+                    val loggers =
+                        BeanUtils.getSortedBeans(beanFactory, RocketMqLogger::class.java).values.mapNotNull {
+                            if (it.id.isNotEmpty() && addedLogger.contains(it.id)) return@mapNotNull null
+                            addedLogger += it.id
+                            it
+                        }
+                    val listener = beanFactory.getBean<MessageListener<*>>(listener)
+                    ConsumerLifecycle(
+                        beanFactory.getBean(RocketMqResourceFactory::class.java)
+                            .createConsumer(consumer, annotation, listener, loggers)
+                            .also {
+                                logger.info(
+                                    "RocketMQ listener (${annotation.groupId}) registered on topic '${
+                                        annotation.topic
+                                    }(${annotation.filter})'.",
+                                )
+                            },
+                        listener,
+                    )
+                }.beanDefinition
             consumerDefinition.addQualifier(AutowireCandidateQualifier(consumer.qualifier))
             registry.registerBeanDefinition(consumerName, consumerDefinition)
         }

@@ -8,15 +8,19 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar
 import org.springframework.core.type.AnnotationMetadata
 
 class JacksonAutoRegister : ImportBeanDefinitionRegistrar {
-    override fun registerBeanDefinitions(importingClassMetadata: AnnotationMetadata, registry: BeanDefinitionRegistry) {
+    override fun registerBeanDefinitions(
+        importingClassMetadata: AnnotationMetadata,
+        registry: BeanDefinitionRegistry,
+    ) {
         for (module in ObjectMapper.findModules()) {
-            val beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(Module::class.java) {
-                module
-            }
+            val beanDefinitionBuilder =
+                BeanDefinitionBuilder.genericBeanDefinition(Module::class.java) {
+                    module
+                }
 
             registry.registerBeanDefinition(
                 "jackson:spi:module:${module.moduleName}",
-                beanDefinitionBuilder.beanDefinition
+                beanDefinitionBuilder.beanDefinition,
             )
         }
     }

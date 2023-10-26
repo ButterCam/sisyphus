@@ -11,7 +11,7 @@ data class RocketMqConsumerProperty(
     val enableTrace: Boolean = false,
     val traceTopic: String? = null,
     val accessChannel: AccessChannel? = null,
-    val extensions: Map<String, Any> = mapOf()
+    val extensions: Map<String, Any> = mapOf(),
 )
 
 data class RocketMqProducerProperty(
@@ -23,12 +23,12 @@ data class RocketMqProducerProperty(
     val enableTrace: Boolean = false,
     val traceTopic: String? = null,
     val accessChannel: AccessChannel? = null,
-    val extensions: Map<String, Any> = mapOf()
+    val extensions: Map<String, Any> = mapOf(),
 )
 
 data class RocketMqProperties(
     @NestedConfigurationProperty
     val consumers: Map<String, RocketMqConsumerProperty>,
     @NestedConfigurationProperty
-    val producers: Map<String, RocketMqProducerProperty>
+    val producers: Map<String, RocketMqProducerProperty>,
 )

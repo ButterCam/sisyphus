@@ -29,39 +29,46 @@ class ValueNode : PatcherNode {
     }
 
     override fun asField(field: FieldDescriptorProto): Any? {
-        var result = when (field.type) {
-            FieldDescriptorProto.Type.DOUBLE -> values.map { it.toDouble() }
-            FieldDescriptorProto.Type.FLOAT -> values.map { it.toFloat() }
-            FieldDescriptorProto.Type.SINT64,
-            FieldDescriptorProto.Type.SFIXED64,
-            FieldDescriptorProto.Type.INT64 -> values.map { it.toLong() }
-            FieldDescriptorProto.Type.FIXED64,
-            FieldDescriptorProto.Type.UINT64 -> values.map { it.toULong() }
-            FieldDescriptorProto.Type.SFIXED32,
-            FieldDescriptorProto.Type.SINT32,
-            FieldDescriptorProto.Type.INT32 -> values.map { it.toInt() }
-            FieldDescriptorProto.Type.UINT32,
-            FieldDescriptorProto.Type.FIXED32 -> values.map { it.toUInt() }
-            FieldDescriptorProto.Type.BOOL -> values.map { it.toBoolean() }
-            FieldDescriptorProto.Type.STRING -> values
-            FieldDescriptorProto.Type.BYTES -> values.map { it.base64Decode() }
-            FieldDescriptorProto.Type.ENUM -> values.map {
-                (ProtoTypes.findSupport(field.typeName) as EnumSupport<*>).invoke(it)
-            }
-            FieldDescriptorProto.Type.MESSAGE -> {
-                when (field.typeName) {
-                    FieldMask.name -> values.map {
-                        FieldMask {
-                            this.paths += it.split(",").map { it.trim() }
-                        }
+        var result =
+            when (field.type) {
+                FieldDescriptorProto.Type.DOUBLE -> values.map { it.toDouble() }
+                FieldDescriptorProto.Type.FLOAT -> values.map { it.toFloat() }
+                FieldDescriptorProto.Type.SINT64,
+                FieldDescriptorProto.Type.SFIXED64,
+                FieldDescriptorProto.Type.INT64,
+                -> values.map { it.toLong() }
+                FieldDescriptorProto.Type.FIXED64,
+                FieldDescriptorProto.Type.UINT64,
+                -> values.map { it.toULong() }
+                FieldDescriptorProto.Type.SFIXED32,
+                FieldDescriptorProto.Type.SINT32,
+                FieldDescriptorProto.Type.INT32,
+                -> values.map { it.toInt() }
+                FieldDescriptorProto.Type.UINT32,
+                FieldDescriptorProto.Type.FIXED32,
+                -> values.map { it.toUInt() }
+                FieldDescriptorProto.Type.BOOL -> values.map { it.toBoolean() }
+                FieldDescriptorProto.Type.STRING -> values
+                FieldDescriptorProto.Type.BYTES -> values.map { it.base64Decode() }
+                FieldDescriptorProto.Type.ENUM ->
+                    values.map {
+                        (ProtoTypes.findSupport(field.typeName) as EnumSupport<*>).invoke(it)
                     }
-                    Timestamp.name -> values.map { Timestamp(it) }
-                    Duration.name -> values.map { Duration(it) }
-                    else -> throw IllegalStateException()
+                FieldDescriptorProto.Type.MESSAGE -> {
+                    when (field.typeName) {
+                        FieldMask.name ->
+                            values.map {
+                                FieldMask {
+                                    this.paths += it.split(",").map { it.trim() }
+                                }
+                            }
+                        Timestamp.name -> values.map { Timestamp(it) }
+                        Duration.name -> values.map { Duration(it) }
+                        else -> throw IllegalStateException()
+                    }
                 }
+                else -> throw IllegalStateException()
             }
-            else -> throw IllegalStateException()
-        }
 
         return when (field.label) {
             FieldDescriptorProto.Label.OPTIONAL -> result.lastOrNull()
@@ -73,17 +80,21 @@ class ValueNode : PatcherNode {
 
     override fun asValue(): Value {
         return when (values.size) {
-            0 -> Value {
-                listValue = ListValue()
-            }
-            1 -> Value {
-                stringValue = values[0]
-            }
-            else -> Value {
-                listValue = ListValue {
-                    values += this@ValueNode.values.map { Value { stringValue = it } }
+            0 ->
+                Value {
+                    listValue = ListValue()
                 }
-            }
+            1 ->
+                Value {
+                    stringValue = values[0]
+                }
+            else ->
+                Value {
+                    listValue =
+                        ListValue {
+                            values += this@ValueNode.values.map { Value { stringValue = it } }
+                        }
+                }
         }
     }
 }
@@ -91,11 +102,17 @@ class ValueNode : PatcherNode {
 class MessagePatcher : PatcherNode {
     private val nodes = mutableMapOf<String, PatcherNode>()
 
-    fun add(field: String, value: String) {
+    fun add(
+        field: String,
+        value: String,
+    ) {
         add(0, field.split('.'), value)
     }
 
-    fun addList(field: String, value: List<String>) {
+    fun addList(
+        field: String,
+        value: List<String>,
+    ) {
         addList(0, field.split('.'), value)
     }
 
@@ -111,34 +128,46 @@ class MessagePatcher : PatcherNode {
         }
     }
 
-    private fun add(index: Int, field: List<String>, value: String) {
+    private fun add(
+        index: Int,
+        field: List<String>,
+        value: String,
+    ) {
         if (index == field.size - 1) {
-            val valueNode = nodes.getOrPut(field[index]) {
-                ValueNode()
-            } as? ValueNode ?: throw IllegalStateException()
+            val valueNode =
+                nodes.getOrPut(field[index]) {
+                    ValueNode()
+                } as? ValueNode ?: throw IllegalStateException()
             valueNode.add(value)
             return
         }
 
-        val patcherNode = nodes.getOrPut(field[index]) {
-            MessagePatcher()
-        } as? MessagePatcher ?: throw IllegalStateException()
+        val patcherNode =
+            nodes.getOrPut(field[index]) {
+                MessagePatcher()
+            } as? MessagePatcher ?: throw IllegalStateException()
 
         patcherNode.add(index + 1, field, value)
     }
 
-    private fun addList(index: Int, field: List<String>, value: List<String>) {
+    private fun addList(
+        index: Int,
+        field: List<String>,
+        value: List<String>,
+    ) {
         if (index == field.size - 1) {
-            val valueNode = nodes.getOrPut(field[index]) {
-                ValueNode()
-            } as? ValueNode ?: throw IllegalStateException()
+            val valueNode =
+                nodes.getOrPut(field[index]) {
+                    ValueNode()
+                } as? ValueNode ?: throw IllegalStateException()
             valueNode.addAll(value)
             return
         }
 
-        val patcherNode = nodes.getOrPut(field[index]) {
-            MessagePatcher()
-        } as? MessagePatcher ?: throw IllegalStateException()
+        val patcherNode =
+            nodes.getOrPut(field[index]) {
+                MessagePatcher()
+            } as? MessagePatcher ?: throw IllegalStateException()
 
         patcherNode.addList(index + 1, field, value)
     }

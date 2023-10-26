@@ -20,18 +20,28 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
         }
     }
 
-    fun invoke(function: String, arguments: List<Any?>): Any? {
+    fun invoke(
+        function: String,
+        arguments: List<Any?>,
+    ): Any? {
         return invokeOrDefault(function, arguments) {
             throw NoSuchMethodException(
-                "Can't find function '$function(${arguments.joinToString(", ") { it?.javaClass?.canonicalName ?: "null" }})' in filter standard library."
+                "Can't find function '$function(${arguments.joinToString(
+                    ", ",
+                ) { it?.javaClass?.canonicalName ?: "null" }})' in filter standard library.",
             )
         }
     }
 
-    fun invokeOrDefault(function: String, arguments: List<Any?>, block: () -> Any?): Any? {
-        val func = memberFunctions[function]?.firstOrNull {
-            it.compatibleWith(arguments)
-        } ?: return block()
+    fun invokeOrDefault(
+        function: String,
+        arguments: List<Any?>,
+        block: () -> Any?,
+    ): Any? {
+        val func =
+            memberFunctions[function]?.firstOrNull {
+                it.compatibleWith(arguments)
+            } ?: return block()
         return try {
             if (func.instanceParameter == null) {
                 func.call(*arguments.toTypedArray())
@@ -48,11 +58,14 @@ open class FilterRuntime(private val std: FilterStandardLibrary = FilterStandard
     private fun KFunction<*>.compatibleWith(arguments: List<Any?>): Boolean {
         return compatibleWith(
             listOfNotNull(this.extensionReceiverParameter) + this.valueParameters,
-            arguments
+            arguments,
         )
     }
 
-    private fun KFunction<*>.compatibleWith(parameters: List<KParameter>, arguments: List<Any?>): Boolean {
+    private fun KFunction<*>.compatibleWith(
+        parameters: List<KParameter>,
+        arguments: List<Any?>,
+    ): Boolean {
         if (parameters.size != arguments.size) return false
         for ((index, parameter) in parameters.withIndex()) {
             val type = arguments[index]?.javaClass

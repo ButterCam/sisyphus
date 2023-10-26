@@ -12,7 +12,7 @@ interface MutableBiMap<K, V> : BiMap<K, V>, MutableMap<K, V> {
 
 abstract class AbstractBiMap<K, V> protected constructor(
     private val direct: MutableMap<K, V>,
-    private val reverse: MutableMap<V, K>
+    private val reverse: MutableMap<V, K>,
 ) : MutableBiMap<K, V> {
     override val size: Int
         get() = direct.size
@@ -33,7 +33,10 @@ abstract class AbstractBiMap<K, V> protected constructor(
     override val values: MutableSet<V>
         get() = inverse.keys
 
-    override fun put(key: K, value: V): V? {
+    override fun put(
+        key: K,
+        value: V,
+    ): V? {
         val oldValue = direct.put(key, value)
         oldValue?.let { reverse.remove(it) }
         val oldKey = reverse.put(value, key)
@@ -75,7 +78,7 @@ abstract class AbstractBiMap<K, V> protected constructor(
     private inner class BiMapSet<T>(
         private val elements: MutableSet<T>,
         private val keyGetter: (T) -> K,
-        private val elementWrapper: (T) -> T
+        private val elementWrapper: (T) -> T,
     ) : MutableSet<T> by elements {
         override fun remove(element: T): Boolean {
             if (element !in this) {
@@ -107,7 +110,7 @@ abstract class AbstractBiMap<K, V> protected constructor(
     private inner class BiMapSetIterator<T>(
         private val iterator: MutableIterator<T>,
         private val keyGetter: (T) -> K,
-        private val elementWrapper: (T) -> T
+        private val elementWrapper: (T) -> T,
     ) : MutableIterator<T> {
         private var last: T? = null
 
@@ -116,9 +119,10 @@ abstract class AbstractBiMap<K, V> protected constructor(
         }
 
         override fun next(): T {
-            val element = iterator.next().apply {
-                last = this
-            }
+            val element =
+                iterator.next().apply {
+                    last = this
+                }
             return elementWrapper(element)
         }
 
@@ -141,7 +145,7 @@ abstract class AbstractBiMap<K, V> protected constructor(
     }
 
     private inner class BiMapEntry(
-        private val entry: MutableMap.MutableEntry<K, V>
+        private val entry: MutableMap.MutableEntry<K, V>,
     ) : MutableMap.MutableEntry<K, V> by entry {
         override fun setValue(newValue: V): V {
             if (entry.value == newValue) {

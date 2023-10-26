@@ -18,12 +18,18 @@ class StringEnumDeserializer : JsonDeserializer<StringEnum>, ContextualDeseriali
         this.targetClass = targetClass
     }
 
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): StringEnum? {
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): StringEnum? {
         val clazz = targetClass ?: throw RuntimeException("Target class is null.")
         return StringEnum.valueOf(p.valueAsString, clazz)
     }
 
-    override fun createContextual(ctxt: DeserializationContext, property: BeanProperty?): JsonDeserializer<*> {
+    override fun createContextual(
+        ctxt: DeserializationContext,
+        property: BeanProperty?,
+    ): JsonDeserializer<*> {
         return StringEnumDeserializer(ctxt.contextualType)
     }
 }

@@ -9,15 +9,24 @@ interface IntEnum {
     val number: Int
 
     companion object {
-        fun <T> valueOf(value: Int, type: Class<T>): T? where T : IntEnum {
+        fun <T> valueOf(
+            value: Int,
+            type: Class<T>,
+        ): T? where T : IntEnum {
             return valueOf(value, TypeFactory.defaultInstance().constructType(type))
         }
 
-        fun <T> valueOf(value: Int, type: TypeReference<T>): T? where T : IntEnum {
+        fun <T> valueOf(
+            value: Int,
+            type: TypeReference<T>,
+        ): T? where T : IntEnum {
             return valueOf(value, TypeFactory.defaultInstance().constructType(type))
         }
 
-        fun <T> valueOf(value: Int, type: JavaType): T? where T : IntEnum {
+        fun <T> valueOf(
+            value: Int,
+            type: JavaType,
+        ): T? where T : IntEnum {
             val values = type.rawClass.enumConstants.map { it.uncheckedCast<T>() }
             return values.firstOrNull { it.number == value } ?: {
                 type.rawClass.declaredFields.filter { it.isEnumConstant && it.getDeclaredAnnotation(UnknownValue::class.java) != null }
@@ -34,7 +43,10 @@ interface IntEnum {
                 ?: throw IllegalArgumentException("Can't found value($value) for int enum(${T::class.java.name}).")
         }
 
-        operator fun <T> invoke(value: Int, type: Class<T>): T where T : IntEnum {
+        operator fun <T> invoke(
+            value: Int,
+            type: Class<T>,
+        ): T where T : IntEnum {
             return valueOf(value, type)
                 ?: throw IllegalArgumentException("Can't found value($value) for int enum(${type.name}).")
         }

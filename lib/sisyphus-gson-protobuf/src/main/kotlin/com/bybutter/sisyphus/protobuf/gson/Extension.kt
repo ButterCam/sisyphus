@@ -12,6 +12,9 @@ inline fun <reified T> Gson.fromJson(struct: Struct): T {
     return fromJson(struct, T::class.java)
 }
 
-fun <T> Gson.fromJson(struct: Struct, clazz: Class<T>): T {
+fun <T> Gson.fromJson(
+    struct: Struct,
+    clazz: Class<T>,
+): T {
     return fromJson(this.toJsonTree(struct), clazz)
 }

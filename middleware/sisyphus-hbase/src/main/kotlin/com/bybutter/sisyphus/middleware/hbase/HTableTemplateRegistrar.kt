@@ -26,9 +26,10 @@ class HTableTemplateRegistrar : BeanDefinitionRegistryPostProcessor, Environment
         val beanFactory = registry as ConfigurableListableBeanFactory
 
         val properties = beanFactory.getBeansOfType<HBaseTableProperty>().toMutableMap()
-        val hbaseProperties = Binder.get(environment)
-            .bind("sisyphus", HBaseTableProperties::class.java)
-            .orElse(null)?.hbase ?: mapOf()
+        val hbaseProperties =
+            Binder.get(environment)
+                .bind("sisyphus", HBaseTableProperties::class.java)
+                .orElse(null)?.hbase ?: mapOf()
 
         properties += hbaseProperties
 
@@ -36,10 +37,11 @@ class HTableTemplateRegistrar : BeanDefinitionRegistryPostProcessor, Environment
 
         for ((name, property) in properties) {
             val beanName = "$BEAN_NAME_PREFIX:$name"
-            val beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(HTableTemplate::class.java) {
-                val factory = beanFactory.getBean(HBaseTemplateFactory::class.java)
-                factory.createTemplate(property)
-            }.beanDefinition
+            val beanDefinition =
+                BeanDefinitionBuilder.genericBeanDefinition(property.template as Class<HTableTemplate<*, *>>) {
+                    val factory = beanFactory.getBean(HBaseTemplateFactory::class.java)
+                    factory.createTemplate(property)
+                }.beanDefinition
             beanDefinition.addQualifier(AutowireCandidateQualifier(property.qualifier))
             registry.registerBeanDefinition(beanName, beanDefinition)
         }

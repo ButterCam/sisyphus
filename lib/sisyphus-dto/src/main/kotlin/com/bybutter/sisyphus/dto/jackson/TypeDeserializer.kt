@@ -10,13 +10,20 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import java.lang.reflect.Type
 
 internal class TypeDeserializer : JsonDeserializer<Type>() {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Type {
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): Type {
         return p.text.toType()
     }
 }
 
 internal class TypeSerializer : JsonSerializer<Type>() {
-    override fun serialize(value: Type?, gen: JsonGenerator, serializers: SerializerProvider) {
+    override fun serialize(
+        value: Type?,
+        gen: JsonGenerator,
+        serializers: SerializerProvider,
+    ) {
         gen.writeString(value?.typeName)
     }
 }

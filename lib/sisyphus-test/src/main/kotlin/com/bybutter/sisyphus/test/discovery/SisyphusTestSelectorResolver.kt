@@ -27,7 +27,7 @@ import java.util.Optional
 class SisyphusTestSelectorResolver : SelectorResolver {
     override fun resolve(
         selector: ClasspathResourceSelector,
-        context: SelectorResolver.Context
+        context: SelectorResolver.Context,
     ): SelectorResolver.Resolution {
         return SelectorResolver.Resolution.matches(
             SisyphusTestEngine::class.java.classLoader.getResources(selector.classpathResourceName).asSequence()
@@ -36,19 +36,26 @@ class SisyphusTestSelectorResolver : SelectorResolver {
                     context.addToParent { parent ->
                         Optional.of(createTestCaseDescriptor(parent, case, it.file))
                     }.toMatch().orElse(null)
-                }.toSet()
+                }.toSet(),
         )
     }
 
-    override fun resolve(selector: FileSelector, context: SelectorResolver.Context): SelectorResolver.Resolution {
-        val case = deserializeTestCase(selector.file.name, selector.file.inputStream())
-            ?: return SelectorResolver.Resolution.unresolved()
+    override fun resolve(
+        selector: FileSelector,
+        context: SelectorResolver.Context,
+    ): SelectorResolver.Resolution {
+        val case =
+            deserializeTestCase(selector.file.name, selector.file.inputStream())
+                ?: return SelectorResolver.Resolution.unresolved()
         return context.addToParent { parent ->
             Optional.of(createTestCaseDescriptor(parent, case, selector.file.name))
         }.toResolution()
     }
 
-    override fun resolve(selector: DirectorySelector, context: SelectorResolver.Context): SelectorResolver.Resolution {
+    override fun resolve(
+        selector: DirectorySelector,
+        context: SelectorResolver.Context,
+    ): SelectorResolver.Resolution {
         return SelectorResolver.Resolution.matches(
             selector.directory.walk().mapNotNull {
                 if (!it.name.endsWith("_test.yaml", true) &&
@@ -61,19 +68,25 @@ class SisyphusTestSelectorResolver : SelectorResolver {
                 context.addToParent { parent ->
                     Optional.of(createTestCaseDescriptor(parent, case, it.name))
                 }.toMatch().orElse(null)
-            }.toSet()
+            }.toSet(),
         )
     }
 
-    override fun resolve(selector: PackageSelector, context: SelectorResolver.Context): SelectorResolver.Resolution {
+    override fun resolve(
+        selector: PackageSelector,
+        context: SelectorResolver.Context,
+    ): SelectorResolver.Resolution {
         return SelectorResolver.Resolution.selectors(
             Reflections(ConfigurationBuilder().forPackages(selector.packageName).addScanners(Scanners.Resources))
                 .getResources(""".*_test\.(yml|yaml|json)""".toPattern())
-                .map { DiscoverySelectors.selectClasspathResource(it) }.toSet()
+                .map { DiscoverySelectors.selectClasspathResource(it) }.toSet(),
         )
     }
 
-    override fun resolve(selector: DiscoverySelector, context: SelectorResolver.Context): SelectorResolver.Resolution {
+    override fun resolve(
+        selector: DiscoverySelector,
+        context: SelectorResolver.Context,
+    ): SelectorResolver.Resolution {
         return when (selector) {
             is TestStepSelector -> {
                 context.addToParent { parent ->
@@ -102,7 +115,10 @@ class SisyphusTestSelectorResolver : SelectorResolver {
         }.orElse(SelectorResolver.Resolution.unresolved())
     }
 
-    private fun deserializeTestCase(filename: String, inputStream: InputStream): TestCase? {
+    private fun deserializeTestCase(
+        filename: String,
+        inputStream: InputStream,
+    ): TestCase? {
         try {
             return when (filename.substringAfterLast('.').lowercase()) {
                 "json" -> Json.deserialize(inputStream, TestCase::class.java)
@@ -119,33 +135,42 @@ class SisyphusTestSelectorResolver : SelectorResolver {
         return null
     }
 
-    private fun createTestCaseDescriptor(parent: TestDescriptor, case: TestCase, name: String): TestDescriptor {
+    private fun createTestCaseDescriptor(
+        parent: TestDescriptor,
+        case: TestCase,
+        name: String,
+    ): TestDescriptor {
         val file = File(name)
         val id = file.nameWithoutExtension
-        val case = case {
-            this.name = this.name.takeIf { it.isNotBlank() } ?: id
-        }
+        val case =
+            case {
+                this.name = this.name.takeIf { it.isNotBlank() } ?: id
+            }
         return SisyphusTestCaseDescriptor(
             parent.uniqueId.append(SisyphusTestCaseDescriptor.SEGMENT_TYPE, id),
             case,
-            file
+            file,
         )
     }
 
-    private fun createTestStepDescriptor(parent: TestDescriptor, step: TestStep): TestDescriptor {
+    private fun createTestStepDescriptor(
+        parent: TestDescriptor,
+        step: TestStep,
+    ): TestDescriptor {
         parent as SisyphusTestCaseDescriptor
         val index = parent.case.steps.indexOf(step)
         val id = "${parent.uniqueId.lastSegment.value}#$index"
 
-        val step = step {
-            this.name = this.name.takeIf { it.isNotBlank() } ?: this.id.takeIf { it.isNotBlank() }
-                ?: "${parent.displayName} Step$index"
-            this.authority = this.authority.takeIf { it.isNotBlank() } ?: "localhost:9090"
-        }
+        val step =
+            step {
+                this.name = this.name.takeIf { it.isNotBlank() } ?: this.id.takeIf { it.isNotBlank() }
+                    ?: "${parent.displayName} Step$index"
+                this.authority = this.authority.takeIf { it.isNotBlank() } ?: "localhost:9090"
+            }
 
         return SisyphusTestStepDescriptor(
             parent.uniqueId.append(SisyphusTestStepDescriptor.SEGMENT_TYPE, id),
-            step
+            step,
         )
     }
 

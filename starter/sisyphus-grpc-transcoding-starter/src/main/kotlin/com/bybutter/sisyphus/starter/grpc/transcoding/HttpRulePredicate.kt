@@ -20,7 +20,7 @@ class HttpRulePredicate(private val rule: HttpRule) : RequestPredicate {
                 it.pattern?.let {
                     HttpPatternPredicate(it)
                 }
-            }
+            },
         )
     }
 

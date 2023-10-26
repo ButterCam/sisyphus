@@ -15,14 +15,16 @@ class ProtobufCodecCustomizer : CodecCustomizer {
         /**
          * The supported mime-types, `application/x-protobuf` and `application/octet-stream` are supported.
          */
-        val MIME_TYPES = arrayOf(
-            MimeType("application", "x-protobuf"),
-            MimeType("application", "octet-stream")
-        )
+        val MIME_TYPES =
+            arrayOf(
+                MimeType("application", "x-protobuf"),
+                MimeType("application", "octet-stream"),
+            )
 
-        val STREAM_MIME_TYPES = MIME_TYPES.map {
-            MediaType(it.type, it.subtype, mapOf("delimited" to "true"))
-        }
+        val STREAM_MIME_TYPES =
+            MIME_TYPES.map {
+                MediaType(it.type, it.subtype, mapOf("delimited" to "true"))
+            }
     }
 
     override fun customize(configurer: CodecConfigurer) {

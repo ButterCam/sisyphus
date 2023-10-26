@@ -9,7 +9,10 @@ abstract class RequestContextProvider<T> {
 }
 
 interface MutableRequestContextMerger<T> {
-    fun merge(old: T, new: T)
+    fun merge(
+        old: T,
+        new: T,
+    )
 }
 
 open class RequestContext<T>(name: String) {

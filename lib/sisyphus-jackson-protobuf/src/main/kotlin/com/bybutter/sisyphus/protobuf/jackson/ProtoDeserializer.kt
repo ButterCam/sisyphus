@@ -14,12 +14,14 @@ import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 
 open class ProtoDeserializer<T : Message<*, *>> : StdDeserializer<T> {
-
     constructor(type: Class<T>) : super(type)
 
     constructor(type: JavaType) : super(type)
 
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T? {
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): T? {
         val rawClass = handledType().javaType.rawClass
         return when (rawClass) {
             Any::class.java -> {

@@ -48,26 +48,28 @@ class CelEngineTest {
 
     @Test
     fun `test byteArray cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "left" to byteArrayOf(1, 2),
-                "right" to byteArrayOf(3),
-                "value" to byteArrayOf()
+        val engine =
+            CelEngine(
+                mapOf(
+                    "left" to byteArrayOf(1, 2),
+                    "right" to byteArrayOf(3),
+                    "value" to byteArrayOf(),
+                ),
             )
-        )
         engine.assertEvalResult("""left + right""", byteArrayOf(1, 2, 3))
         engine.assertEvalResult("""left + value""", byteArrayOf(1, 2))
     }
 
     @Test
     fun `test list cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "left" to listOf<Long>(1L, 2L),
-                "right" to listOf<Long>(3L),
-                "value" to listOf<Long>()
+        val engine =
+            CelEngine(
+                mapOf(
+                    "left" to listOf<Long>(1L, 2L),
+                    "right" to listOf<Long>(3L),
+                    "value" to listOf<Long>(),
+                ),
             )
-        )
         engine.assertEvalResult("""left + right""", listOf(1L, 2L, 3L))
         engine.assertEvalResult("""left + value""", listOf(1L, 2L))
     }
@@ -77,20 +79,20 @@ class CelEngineTest {
         val engine = CelEngine(mapOf())
         engine.assertEvalResult(
             """timestamp('2020-01-01T08:00:00.000Z') + duration('100.0s')""",
-            Timestamp(2020, 1, 1, 8, 1, 40, zoneId = ZoneId.of("UTC"))
+            Timestamp(2020, 1, 1, 8, 1, 40, zoneId = ZoneId.of("UTC")),
         )
         engine.assertEvalResult(
             """duration('100.0s') + timestamp('2020-01-01T08:00:00.000Z')""",
-            Timestamp(2020, 1, 1, 8, 1, 40, zoneId = ZoneId.of("UTC"))
+            Timestamp(2020, 1, 1, 8, 1, 40, zoneId = ZoneId.of("UTC")),
         )
         engine.assertEvalResult(
             """timestamp('2020-01-01T08:00:00.000Z') - duration('100.0s')""",
-            Timestamp(2020, 1, 1, 7, 58, 20, zoneId = ZoneId.of("UTC"))
+            Timestamp(2020, 1, 1, 7, 58, 20, zoneId = ZoneId.of("UTC")),
         )
         engine.assertEvalResult("""duration('100.0s') + duration('100.0s')""", Duration(200.0, TimeUnit.SECONDS))
         engine.assertEvalResult(
             """timestamp('2020-01-01T08:00:00.000Z') - timestamp('2020-01-01T07:00:00.000Z')""",
-            Duration(3600.0, TimeUnit.SECONDS)
+            Duration(3600.0, TimeUnit.SECONDS),
         )
         engine.assertEvalResult("""duration('100.0s') - duration('100.0s')""", Duration(0.0, TimeUnit.SECONDS))
     }
@@ -118,36 +120,38 @@ class CelEngineTest {
         engine.assertEvalResult(""" 'abc' == 'abcd'""", false) //
         engine.assertEvalResult(
             """timestamp('2020-01-01T08:00:00.000Z') > timestamp('2020-01-02T08:00:00.000Z') """,
-            false
+            false,
         )
         engine.assertEvalResult(
             """timestamp('2020-01-01T08:00:00.000Z') == timestamp('2020-01-01T08:00:00.000Z') """,
-            true
+            true,
         )
         engine.assertEvalResult(
             """timestamp('2020-01-01T08:00:00.000Z') < timestamp('2020-01-02T08:00:00.000Z') """,
-            true
+            true,
         )
         engine.assertEvalResult("""duration('100.0s') == duration('100.0s')""", true)
         engine.assertEvalResult("""duration('200.0s') > duration('100.0s')""", true)
         engine.assertEvalResult("""duration('200.0s') < duration('100.0s')""", false)
-        val result = engine.eval(
-            """ .sisyphus.api.cel.test.ConditionalTest {
+        val result =
+            engine.eval(
+                """ .sisyphus.api.cel.test.ConditionalTest {
             | condition: true
             |} 
-            """.trimMargin()
-        )
+                """.trimMargin(),
+            )
         result
     }
 
     @Test
     fun `test byteArray compare to equal cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "left" to byteArrayOf(1, 2),
-                "right" to byteArrayOf(1, 2)
+        val engine =
+            CelEngine(
+                mapOf(
+                    "left" to byteArrayOf(1, 2),
+                    "right" to byteArrayOf(1, 2),
+                ),
             )
-        )
         engine.assertEvalResult("""left == right""", false)
         engine.assertEvalResult("""left > right""", false)
         engine.assertEvalResult("""type(left)""", "bytes")
@@ -157,12 +161,13 @@ class CelEngineTest {
 
     @Test
     fun `test byteArray compare to greater cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "left" to byteArrayOf(1, 2, 3),
-                "right" to byteArrayOf(1, 2)
+        val engine =
+            CelEngine(
+                mapOf(
+                    "left" to byteArrayOf(1, 2, 3),
+                    "right" to byteArrayOf(1, 2),
+                ),
             )
-        )
         engine.assertEvalResult("""left == right""", false)
         engine.assertEvalResult("""left > right""", true)
         engine.assertEvalResult("""left < right""", false)
@@ -170,110 +175,123 @@ class CelEngineTest {
 
     @Test
     fun `test conditional cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "value" to true,
-                "value1" to 1L,
-                "value2" to 3L
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value" to true,
+                    "value1" to 1L,
+                    "value2" to 3L,
+                ),
             )
-        )
         engine.assertEvalResult("""value? value1 : value2""", 1L)
 
-        val engine2 = CelEngine(
-            mapOf(
-                "value" to false,
-                "value1" to 1L,
-                "value2" to 3L
+        val engine2 =
+            CelEngine(
+                mapOf(
+                    "value" to false,
+                    "value1" to 1L,
+                    "value2" to 3L,
+                ),
             )
-        )
         engine2.assertEvalResult("""value? value1 : value2""", 3L)
 
-        val engine3 = CelEngine(
-            mapOf(
-                "value" to false,
-                "value2" to 3L
+        val engine3 =
+            CelEngine(
+                mapOf(
+                    "value" to false,
+                    "value2" to 3L,
+                ),
             )
-        )
         engine3.assertEvalResult("""value? value1 : value2""", 3L)
     }
 
     @Test
     fun `test list index cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "value1" to listOf(1, 2),
-                "value2" to 1L
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value1" to listOf(1, 2),
+                    "value2" to 1L,
+                ),
             )
-        )
         engine.assertEvalResult("""value1[value2]""", 2)
         engine.assertEvalResult("""size(value1)""", 2L)
     }
 
     @Test
     fun `test map index cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "value1" to mapOf(
-                    "a" to 2L,
-                    "b" to 10L
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value1" to
+                        mapOf(
+                            "a" to 2L,
+                            "b" to 10L,
+                        ),
+                    "value2" to 10,
                 ),
-                "value2" to 10
             )
-        )
         engine.assertEvalResult("""value1['a']""", 2L)
         engine.assertEvalResult("""size(value1)""", 2L)
     }
 
     @Test
     fun `test access cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "value1" to mapOf(
-                    "a" to 1,
-                    "b" to 3
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value1" to
+                        mapOf(
+                            "a" to 1,
+                            "b" to 3,
+                        ),
+                    "value2" to 1,
                 ),
-                "value2" to 1
             )
-        )
         engine.assertEvalResult("""value1.a""", 1)
     }
 
     @Test
     fun `test map key membership and type conversion `() {
-        val engine = CelEngine(
-            mapOf(
-                "value1" to mapOf(
-                    "a" to 1,
-                    "b" to 2
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value1" to
+                        mapOf(
+                            "a" to 1,
+                            "b" to 2,
+                        ),
+                    "value2" to "a",
                 ),
-                "value2" to "a"
             )
-        )
         engine.assertEvalResult("""value2 in value1""", true)
         engine.assertEvalResult("""type(value1)""", "map")
     }
 
     @Test
     fun `test map not contains cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "map" to mapOf(
-                    "a" to 1,
-                    "b" to 2
+        val engine =
+            CelEngine(
+                mapOf(
+                    "map" to
+                        mapOf(
+                            "a" to 1,
+                            "b" to 2,
+                        ),
+                    "key" to "c",
                 ),
-                "key" to "c"
             )
-        )
         engine.assertEvalResult("""key in map""", false)
     }
 
     @Test
     fun `test list contains cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "value1" to listOf(1L, 2L, 3L)
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value1" to listOf(1L, 2L, 3L),
+                ),
             )
-        )
         engine.assertEvalResult("""type(value1)""", "list")
         engine.assertEvalResult("""1 in value1""", true)
         engine.assertEvalResult("""4 in value1""", false)
@@ -281,11 +299,12 @@ class CelEngineTest {
 
     @Test
     fun `test string contains cel eval`() {
-        val engine = CelEngine(
-            mapOf(
-                "other" to "abc"
+        val engine =
+            CelEngine(
+                mapOf(
+                    "other" to "abc",
+                ),
             )
-        )
         engine.assertEvalResult("""'abcd'.contains(other)""", true)
     }
 
@@ -329,13 +348,14 @@ class CelEngineTest {
 
     @Test
     fun `test get time from the date`() {
-        val engine = CelEngine(
-            mapOf(
-                "value" to Timestamp(2020, 1, 1, 8, 1, 1, 999, zoneId = ZoneId.of("UTC")),
-                "value2" to Duration(3600.0, TimeUnit.SECONDS),
-                "zone" to "Z"
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value" to Timestamp(2020, 1, 1, 8, 1, 1, 999, zoneId = ZoneId.of("UTC")),
+                    "value2" to Duration(3600.0, TimeUnit.SECONDS),
+                    "zone" to "Z",
+                ),
             )
-        )
         engine.assertEvalResult("""value.getDayOfMonth()""", 0L)
         engine.assertEvalResult("""value.getDayOfMonth(zone)""", 0L)
         engine.assertEvalResult("""value.getDayOfWeek()""", 3L)
@@ -392,13 +412,14 @@ class CelEngineTest {
     @Test
     fun `test cel with global`() {
         val engine = CelEngine(mapOf(), CelRuntime(std = CustomCelStandardLibrary()))
-        val global = mapOf<String, Any?>(
-            "a" to 1,
-            "b" to 1.0,
-            "c" to 1L,
-            "d" to 1u,
-            "e" to "xyz"
-        )
+        val global =
+            mapOf<String, Any?>(
+                "a" to 1,
+                "b" to 1.0,
+                "c" to 1L,
+                "d" to 1u,
+                "e" to "xyz",
+            )
         val result1 = engine.eval("""'a'""", global)
         val result2 = engine.eval("""type('a')""", global)
         Assertions.assertEquals(result1, "a")
@@ -407,14 +428,16 @@ class CelEngineTest {
 
     @Test
     fun `test cel left and right eval2`() {
-        val engine = CelEngine(
-            mapOf(
-                "raw" to CellTest {
-                    left = 1uL
-                    right = 2uL
-                }
+        val engine =
+            CelEngine(
+                mapOf(
+                    "raw" to
+                        CellTest {
+                            left = 1uL
+                            right = 2uL
+                        },
+                ),
             )
-        )
         engine.assertEvalResult("""raw.left + raw.right""", 3uL)
     }
 
@@ -427,12 +450,13 @@ class CelEngineTest {
 
     @Test
     fun `test List CelRuntime with macro`() {
-        val engine = CelEngine(
-            mapOf(
-                "value" to listOf(1L, 3L)
-            ),
-            CelRuntime(macro = CustomCelMacro())
-        )
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value" to listOf(1L, 3L),
+                ),
+                CelRuntime(macro = CustomCelMacro()),
+            )
         val result = engine.eval("""value.all(x, x % 2 == 1)""")
         val result2 = engine.eval("""value.all(x, x == 1)""")
         val result3 = engine.eval("""value.exists(x,x >= 1)""")
@@ -457,46 +481,57 @@ class CelEngineTest {
 
     @Test
     fun `test map CelRuntime with macro`() {
-        val engine = CelEngine(
-            mapOf(
-                "value" to HasMessageTest {
-                    this.startValue = 1
-                    this.messageMapValue += mapOf(
-                        "foo" to HasMessageTest.HasMessage {
-                            this.int32Value = 1
+        val engine =
+            CelEngine(
+                mapOf(
+                    "value" to
+                        HasMessageTest {
+                            this.startValue = 1
+                            this.messageMapValue +=
+                                mapOf(
+                                    "foo" to
+                                        HasMessageTest.HasMessage {
+                                            this.int32Value = 1
+                                        },
+                                    "bar" to
+                                        HasMessageTest.HasMessage {
+                                            this.int32Value = 2
+                                        },
+                                    "a" to
+                                        HasMessageTest.HasMessage {
+                                            this.int32Value = 3
+                                        },
+                                    "b" to
+                                        HasMessageTest.HasMessage {
+                                            this.int32Value = 4
+                                        },
+                                )
+                            this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
+                            this.endValue = 2
+                            this.anyMapValue +=
+                                mapOf(
+                                    "foo" to
+                                        HasMessageTest.HasMessage {
+                                            this.int32Value = 1
+                                        },
+                                    "bar" to
+                                        PackedTest {
+                                            this.values += listOf(1, 2, 3, 4, 5, 6)
+                                        },
+                                )
+                            this.anyListValue +=
+                                listOf(
+                                    HasMessageTest.HasMessage {
+                                        this.int32Value = 1
+                                    },
+                                    PackedTest {
+                                        this.values += listOf(1, 2, 3, 4, 5, 6)
+                                    },
+                                )
                         },
-                        "bar" to HasMessageTest.HasMessage {
-                            this.int32Value = 2
-                        },
-                        "a" to HasMessageTest.HasMessage {
-                            this.int32Value = 3
-                        },
-                        "b" to HasMessageTest.HasMessage {
-                            this.int32Value = 4
-                        }
-                    )
-                    this.baseTypeMapValue += mapOf(1 to true, 2 to false, 3 to true)
-                    this.endValue = 2
-                    this.anyMapValue += mapOf(
-                        "foo" to HasMessageTest.HasMessage {
-                            this.int32Value = 1
-                        },
-                        "bar" to PackedTest {
-                            this.values += listOf(1, 2, 3, 4, 5, 6)
-                        }
-                    )
-                    this.anyListValue += listOf(
-                        HasMessageTest.HasMessage {
-                            this.int32Value = 1
-                        },
-                        PackedTest {
-                            this.values += listOf(1, 2, 3, 4, 5, 6)
-                        }
-                    )
-                }
-            ),
-            CelRuntime(macro = CustomCelMacro())
-        )
+                ),
+                CelRuntime(macro = CustomCelMacro()),
+            )
         val result = engine.eval("""value.anyMapValue.all(x,x == 1)""")
         val result2 = engine.eval("""value.anyMapValue.all(x,x != 3)""")
         val result3 = engine.eval("""has(value.messageMapValue.foo)""")
@@ -522,12 +557,18 @@ class CelEngineTest {
             return 1L
         }
 
-        override fun plus(left: Long, right: Long): Long {
+        override fun plus(
+            left: Long,
+            right: Long,
+        ): Long {
             return left
         }
     }
 
-    private fun CelEngine.assertEvalResult(script: String, result: Any?) {
+    private fun CelEngine.assertEvalResult(
+        script: String,
+        result: Any?,
+    ) {
         val out = eval(script)
         if (out?.javaClass?.isArray == true && result?.javaClass == out.javaClass) {
             when (out) {

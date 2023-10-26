@@ -119,5 +119,5 @@ enum class JsonToken {
     STRING,
     NUMBER,
     BOOL,
-    NULL
+    NULL,
 }

@@ -22,39 +22,51 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 
 class TranscodingHttpRouterFunction constructor(
-    private val rule: TranscodingRouterRule
+    private val rule: TranscodingRouterRule,
 ) : RouterFunction<ServerResponse>, HandlerFunction<ServerResponse> {
     private val requestPredicate = HttpRulePredicate(rule.http)
     private val inputSupport: MessageSupport<*, *> = ProtoTypes.findMessageSupport(rule.methodProto.inputType)
     private val bodyClass: Class<*>?
 
     init {
-        bodyClass = when (rule.http.body) {
-            "" -> null
-            "*" -> ProtoTypes.findMessageSupport(rule.methodProto.inputType).messageClass.java
-            else -> {
-                val field = inputSupport.fieldDescriptors.firstOrNull { it.name == rule.http.body }
-                    ?: throw IllegalStateException("Wrong http rule options, input message not contains body field '${rule.http.body}'.")
-                when (field.type) {
-                    FieldDescriptorProto.Type.DOUBLE -> Double::class.java
-                    FieldDescriptorProto.Type.FLOAT -> Float::class.java
-                    FieldDescriptorProto.Type.SINT64, FieldDescriptorProto.Type.SFIXED64, FieldDescriptorProto.Type.INT64 -> Long::class.java
+        bodyClass =
+            when (rule.http.body) {
+                "" -> null
+                "*" -> ProtoTypes.findMessageSupport(rule.methodProto.inputType).messageClass.java
+                else -> {
+                    val field =
+                        inputSupport.fieldDescriptors.firstOrNull { it.name == rule.http.body }
+                            ?: throw IllegalStateException(
+                                "Wrong http rule options, input message not contains body field '${rule.http.body}'.",
+                            )
+                    when (field.type) {
+                        FieldDescriptorProto.Type.DOUBLE -> Double::class.java
+                        FieldDescriptorProto.Type.FLOAT -> Float::class.java
+                        FieldDescriptorProto.Type.SINT64,
+                        FieldDescriptorProto.Type.SFIXED64,
+                        FieldDescriptorProto.Type.INT64,
+                        -> Long::class.java
 
-                    FieldDescriptorProto.Type.UINT64 -> ULong::class.java
-                    FieldDescriptorProto.Type.SINT32, FieldDescriptorProto.Type.SFIXED32, FieldDescriptorProto.Type.INT32 -> Int::class.java
+                        FieldDescriptorProto.Type.UINT64 -> ULong::class.java
+                        FieldDescriptorProto.Type.SINT32,
+                        FieldDescriptorProto.Type.SFIXED32,
+                        FieldDescriptorProto.Type.INT32,
+                        -> Int::class.java
 
-                    FieldDescriptorProto.Type.FIXED64 -> ULong::class.java
-                    FieldDescriptorProto.Type.UINT32, FieldDescriptorProto.Type.FIXED32 -> UInt::class.java
+                        FieldDescriptorProto.Type.FIXED64 -> ULong::class.java
+                        FieldDescriptorProto.Type.UINT32,
+                        FieldDescriptorProto.Type.FIXED32,
+                        -> UInt::class.java
 
-                    FieldDescriptorProto.Type.BOOL -> Boolean::class.java
-                    FieldDescriptorProto.Type.STRING -> String::class.java
-                    FieldDescriptorProto.Type.BYTES -> ByteArray::class.java
-                    FieldDescriptorProto.Type.ENUM -> ProtoTypes.findEnumSupport(field.typeName).enumClass.java
-                    FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.findMessageSupport(field.typeName).messageClass.java
-                    else -> TODO()
+                        FieldDescriptorProto.Type.BOOL -> Boolean::class.java
+                        FieldDescriptorProto.Type.STRING -> String::class.java
+                        FieldDescriptorProto.Type.BYTES -> ByteArray::class.java
+                        FieldDescriptorProto.Type.ENUM -> ProtoTypes.findEnumSupport(field.typeName).enumClass.java
+                        FieldDescriptorProto.Type.MESSAGE -> ProtoTypes.findMessageSupport(field.typeName).messageClass.java
+                        else -> TODO()
+                    }
                 }
             }
-        }
     }
 
     override fun route(request: ServerRequest): Mono<HandlerFunction<ServerResponse>> {
@@ -76,16 +88,18 @@ class TranscodingHttpRouterFunction constructor(
     @OptIn(InternalProtoApi::class)
     override fun handle(request: ServerRequest): Mono<ServerResponse> {
         val channel = request.attributes()[TranscodingFunctions.GRPC_PROXY_CHANNEL_ATTRIBUTE] as Channel
-        val call = channel.newCall(rule.method.methodDescriptor, CallOptions.DEFAULT)
-            .uncheckedCast<ClientCall<Message<*, *>, Message<*, *>>>()
+        val call =
+            channel.newCall(rule.method.methodDescriptor, CallOptions.DEFAULT)
+                .uncheckedCast<ClientCall<Message<*, *>, Message<*, *>>>()
         val header = prepareHeader(request)
 
         val isServerStreaming = !rule.method.methodDescriptor.type.serverSendsOneMessage()
-        val listener = if (isServerStreaming) {
-            TranscodingStreamingCallListener(call)
-        } else {
-            TranscodingUnaryCallListener(rule.http.responseBody)
-        }
+        val listener =
+            if (isServerStreaming) {
+                TranscodingStreamingCallListener(call)
+            } else {
+                TranscodingUnaryCallListener(rule.http.responseBody)
+            }
 
         call.start(listener, header)
 

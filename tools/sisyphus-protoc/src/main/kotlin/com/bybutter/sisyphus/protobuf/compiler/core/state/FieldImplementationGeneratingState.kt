@@ -6,17 +6,17 @@ import com.squareup.kotlinpoet.TypeSpec
 class FieldInterfaceGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: MessageFieldDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<MessageFieldDescriptor, TypeSpec.Builder>
 
 class FieldMutableInterafaceGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: MessageFieldDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<MessageFieldDescriptor, TypeSpec.Builder>
 
 class FieldImplementationGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: MessageFieldDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<MessageFieldDescriptor, TypeSpec.Builder>

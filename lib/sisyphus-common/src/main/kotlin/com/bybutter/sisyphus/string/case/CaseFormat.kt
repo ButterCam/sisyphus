@@ -11,7 +11,8 @@ enum class CaseFormat(val formatter: CaseFormatter, val splitter: WordSplitter =
     SPACE_CASE(SpaceCaseFormatter),
     TITLE_CASE_CASE(TitleCaseFormatter),
     UPPER_DOT_CASE(UpperDotCaseFormatter),
-    DOT_CASE(DotCaseFormatter);
+    DOT_CASE(DotCaseFormatter),
+    ;
 
     fun format(words: String): String {
         return formatter.format(splitter.split(words))

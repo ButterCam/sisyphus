@@ -4,15 +4,15 @@ import com.google.protobuf.DescriptorProtos
 
 class FileDescriptorSet(
     override val descriptor: DescriptorProtos.FileDescriptorSet,
-    private val packageShading: Map<String, String>
+    private val packageShading: Map<String, String>,
 ) : DescriptorNode<DescriptorProtos.FileDescriptorSet>() {
-
     private val lookupTable: MutableMap<String, DescriptorNode<*>> = mutableMapOf()
 
     override fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
-        children += descriptor.fileList.map {
-            FileDescriptor(this, it)
-        }
+        children +=
+            descriptor.fileList.map {
+                FileDescriptor(this, it)
+            }
         super.resolveChildren(children)
     }
 
@@ -44,7 +44,10 @@ class FileDescriptorSet(
         return lookupTable[name]
     }
 
-    fun registerLookup(name: String, node: DescriptorNode<*>) {
+    fun registerLookup(
+        name: String,
+        node: DescriptorNode<*>,
+    ) {
         lookupTable[name] = node
     }
 }

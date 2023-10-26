@@ -52,13 +52,17 @@ fun MessageSupport<*, *>.resolveMask(mask: FieldMask?): FieldMask {
     }
 
     return FieldMask {
-        paths += mask.paths.mapNotNull {
-            this@resolveMask.fieldInfo(it)?.name
-        }.toSet()
+        paths +=
+            mask.paths.mapNotNull {
+                this@resolveMask.fieldInfo(it)?.name
+            }.toSet()
     }
 }
 
-inline fun Message<*, *>.forEach(mask: FieldMask?, block: (FieldDescriptorProto, kotlin.Any?) -> Unit) {
+inline fun Message<*, *>.forEach(
+    mask: FieldMask?,
+    block: (FieldDescriptorProto, kotlin.Any?) -> Unit,
+) {
     if (mask == null) {
         for ((field, value) in this) {
             block(field, value)
@@ -77,7 +81,10 @@ operator fun FieldMask?.rangeTo(message: Message<*, *>): Iterable<String> {
     return message.resolveMask(this).paths
 }
 
-inline fun FieldMask?.forEach(message: Message<*, *>, block: (String) -> Unit) {
+inline fun FieldMask?.forEach(
+    message: Message<*, *>,
+    block: (String) -> Unit,
+) {
     message.resolveMask(this).paths.forEach(block)
 }
 
@@ -152,7 +159,10 @@ class FieldMaskTree {
         return result
     }
 
-    private fun getPaths(prefix: String, result: MutableList<String>) {
+    private fun getPaths(
+        prefix: String,
+        result: MutableList<String>,
+    ) {
         if (children.isEmpty()) {
             result.add(prefix)
             return
@@ -163,7 +173,10 @@ class FieldMaskTree {
         }
     }
 
-    private fun addPath(pathParts: List<String>, index: Int = 0) {
+    private fun addPath(
+        pathParts: List<String>,
+        index: Int = 0,
+    ) {
         if (index == pathParts.size) {
             return
         }
@@ -174,7 +187,10 @@ class FieldMaskTree {
         }.addPath(pathParts, index + 1)
     }
 
-    private fun removePath(pathParts: List<String>, index: Int = 0) {
+    private fun removePath(
+        pathParts: List<String>,
+        index: Int = 0,
+    ) {
         if (index == pathParts.size - 1) {
             children.remove(pathParts[index])
         }

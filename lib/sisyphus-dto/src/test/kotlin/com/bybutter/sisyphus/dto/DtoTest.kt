@@ -56,17 +56,19 @@ class DtoTest {
 
     @Test
     fun `dto cast`() {
-        val dto = DtoModel<NormalDtoWithNullableProperty> {
-            stringValue = "test"
-        }
+        val dto =
+            DtoModel<NormalDtoWithNullableProperty> {
+                stringValue = "test"
+            }
 
         assertCauseThrows<NullPointerException> {
             dto.cast<NormalDto>()
         }
 
-        val newDto = dto.cast<NormalDto> {
-            numberValue = 123.456f
-        }
+        val newDto =
+            dto.cast<NormalDto> {
+                numberValue = 123.456f
+            }
 
         Assertions.assertEquals(newDto.numberValue, dto.numberValue)
         Assertions.assertEquals(newDto.uncheckedCast<DtoMeta>().`$modelMap`, dto.uncheckedCast<DtoMeta>().`$modelMap`)
@@ -78,7 +80,7 @@ class DtoTest {
                 proxy: ModelProxy,
                 value: Float,
                 params: Array<out String>,
-                property: KProperty<Float?>
+                property: KProperty<Float?>,
             ): Exception? {
                 return if (value <= params[0].toFloat()) {
                     IllegalArgumentException("$property must be bigger than '${params[0]}'")
@@ -120,7 +122,10 @@ class DtoTest {
     @DtoValidation(NormalDtoWithDtoValidation.MaxMustBiggerThanMin::class)
     interface NormalDtoWithDtoValidation : DtoModel {
         class MaxMustBiggerThanMin : DtoValidator<NormalDtoWithDtoValidation> {
-            override fun verify(value: NormalDtoWithDtoValidation, params: Array<out String>): Exception? {
+            override fun verify(
+                value: NormalDtoWithDtoValidation,
+                params: Array<out String>,
+            ): Exception? {
                 if (value.min >= value.max) {
                     return IllegalArgumentException("max must be bigger than min.")
                 }
@@ -155,7 +160,7 @@ class DtoTest {
                 target: Any,
                 value: String,
                 params: Array<out String>,
-                property: KProperty<String?>
+                property: KProperty<String?>,
             ): String {
                 return value.toFloat().roundToInt().toString()
             }
@@ -170,10 +175,11 @@ class DtoTest {
 
     @Test
     fun `dto hook`() {
-        val dto = DtoModel<NormalDtoWithHook> {
-            numberWithRounding = "1.4"
-            numberWithRounding2 = "2.5"
-        }
+        val dto =
+            DtoModel<NormalDtoWithHook> {
+                numberWithRounding = "1.4"
+                numberWithRounding2 = "2.5"
+            }
 
         Assertions.assertEquals("1", dto.numberWithRounding)
         Assertions.assertEquals("3", dto.numberWithRounding2)
@@ -218,7 +224,10 @@ inline fun <reified T : Exception> assertCauseThrows(block: () -> Unit) {
     }
 }
 
-inline fun <reified T : Exception> assertCauseThrows(message: String, block: () -> Unit) {
+inline fun <reified T : Exception> assertCauseThrows(
+    message: String,
+    block: () -> Unit,
+) {
     try {
         block()
     } catch (e: Exception) {

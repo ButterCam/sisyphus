@@ -7,28 +7,33 @@ import com.squareup.kotlinpoet.ClassName
 
 class MessageDescriptor(
     override val parent: DescriptorNode<*>,
-    override val descriptor: DescriptorProtos.DescriptorProto
+    override val descriptor: DescriptorProtos.DescriptorProto,
 ) : DescriptorNode<DescriptorProtos.DescriptorProto>() {
     init {
         fileSet().registerLookup(fullProtoName(), this)
     }
 
     override fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
-        children += descriptor.fieldList.map {
-            MessageFieldDescriptor(this, it)
-        }
-        children += descriptor.nestedTypeList.map {
-            MessageDescriptor(this, it)
-        }
-        children += descriptor.enumTypeList.map {
-            EnumDescriptor(this, it)
-        }
-        children += descriptor.extensionList.map {
-            ExtensionDescriptor(this, it)
-        }
-        children += descriptor.oneofDeclList.map {
-            OneofFieldDescriptor(this, it)
-        }
+        children +=
+            descriptor.fieldList.map {
+                MessageFieldDescriptor(this, it)
+            }
+        children +=
+            descriptor.nestedTypeList.map {
+                MessageDescriptor(this, it)
+            }
+        children +=
+            descriptor.enumTypeList.map {
+                EnumDescriptor(this, it)
+            }
+        children +=
+            descriptor.extensionList.map {
+                ExtensionDescriptor(this, it)
+            }
+        children +=
+            descriptor.oneofDeclList.map {
+                OneofFieldDescriptor(this, it)
+            }
         super.resolveChildren(children)
     }
 
@@ -138,7 +143,7 @@ class MessageDescriptor(
         return escapeDoc(
             file().descriptor.sourceCodeInfo?.locationList?.firstOrNull {
                 it.pathList.contentEquals(path())
-            }?.leadingComments ?: ""
+            }?.leadingComments ?: "",
         )
     }
 

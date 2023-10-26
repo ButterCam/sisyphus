@@ -26,13 +26,16 @@ fun String.toPlatformPath(): String {
                 when (ch) {
                     '\\', '/' -> File.separatorChar
                     else -> ch
-                }
+                },
             )
         }
     }
 }
 
-fun String.replaceExtensionName(old: String, new: String): String {
+fun String.replaceExtensionName(
+    old: String,
+    new: String,
+): String {
     val extension = ".$old"
     if (!this.endsWith(extension)) return this
     return this.substring(0, this.length - old.length - 1) + ".$new"

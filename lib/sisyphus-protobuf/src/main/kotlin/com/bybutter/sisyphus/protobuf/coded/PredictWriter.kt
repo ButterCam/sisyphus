@@ -20,7 +20,7 @@ class PredictWriter : Writer {
         ops.addFirst(
             op.also {
                 length += it.length
-            }
+            },
         )
         return this
     }
@@ -35,7 +35,10 @@ class PredictWriter : Writer {
         return this
     }
 
-    override fun tag(filedNumber: Int, wireType: WireType): PredictWriter {
+    override fun tag(
+        filedNumber: Int,
+        wireType: WireType,
+    ): PredictWriter {
         return tag(WireType.tagOf(filedNumber, wireType))
     }
 

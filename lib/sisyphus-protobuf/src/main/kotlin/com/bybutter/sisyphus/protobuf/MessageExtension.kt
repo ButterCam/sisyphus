@@ -44,13 +44,15 @@ class MessageExtensionImpl<T>(override val value: T, private val support: Extens
         result = result * 37 + number()
 
         when (value) {
-            is Map<*, *> -> value.forEach {
-                result = result * 31 + it.key.hashCode()
-                result = result * 31 + it.value.hashCode()
-            }
-            is List<*> -> value.forEach {
-                result = result * 31 + it.hashCode()
-            }
+            is Map<*, *> ->
+                value.forEach {
+                    result = result * 31 + it.key.hashCode()
+                    result = result * 31 + it.value.hashCode()
+                }
+            is List<*> ->
+                value.forEach {
+                    result = result * 31 + it.hashCode()
+                }
             else -> result = result * 31 + value.hashCode()
         }
         return super.hashCode()

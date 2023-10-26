@@ -10,11 +10,11 @@ import com.squareup.kotlinpoet.TypeSpec
 class ClientGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: ServiceDescriptor,
-    override val target: TypeSpec.Builder
+    override val target: TypeSpec.Builder,
 ) : ChildGeneratingState<ServiceDescriptor, TypeSpec.Builder>
 
 class ClientApiFileGeneratingState(
     override val parent: GeneratingState<*, *>,
     override val descriptor: FileDescriptor,
-    override val target: FileSpec.Builder
+    override val target: FileSpec.Builder,
 ) : ChildGeneratingState<FileDescriptor, FileSpec.Builder>

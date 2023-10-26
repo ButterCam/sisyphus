@@ -16,7 +16,12 @@ import java.time.Duration
 class MicrometerRequestLogger(private val registry: MeterRegistry) : IncomingRequestLogger {
     override val id: String = MicrometerRequestLogger::class.java.typeName
 
-    override fun log(call: ServerCall<*, *>, requestInfo: RequestInfo, status: Status, cost: Long) {
+    override fun log(
+        call: ServerCall<*, *>,
+        requestInfo: RequestInfo,
+        status: Status,
+        cost: Long,
+    ) {
         val host = requestInfo.inputHeader.get(HOST_METADATA_KEY)?.toString()
         val costDuration = Duration.ofNanos(cost)
 
@@ -29,17 +34,20 @@ class MicrometerRequestLogger(private val registry: MeterRegistry) : IncomingReq
             "status",
             status.code.name,
             "exception",
-            status.cause?.javaClass?.name ?: "None"
+            status.cause?.javaClass?.name ?: "None",
         ).record(costDuration)
     }
 
-    override fun log(call: ServerCall<*, *>, inputHeader: Metadata) {
+    override fun log(
+        call: ServerCall<*, *>,
+        inputHeader: Metadata,
+    ) {
         registry.counter(
             "sisyphus_incoming_grpc_requests",
             "service",
             call.methodDescriptor.serviceName,
             "method",
-            call.methodDescriptor.fullMethodName
+            call.methodDescriptor.fullMethodName,
         )
     }
 

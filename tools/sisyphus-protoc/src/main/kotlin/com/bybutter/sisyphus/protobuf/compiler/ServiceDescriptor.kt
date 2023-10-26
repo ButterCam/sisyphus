@@ -7,12 +7,13 @@ import com.squareup.kotlinpoet.ClassName
 
 class ServiceDescriptor(
     override val parent: FileDescriptor,
-    override val descriptor: DescriptorProtos.ServiceDescriptorProto
+    override val descriptor: DescriptorProtos.ServiceDescriptorProto,
 ) : DescriptorNode<DescriptorProtos.ServiceDescriptorProto>() {
     override fun resolveChildren(children: MutableList<DescriptorNode<*>>) {
-        children += descriptor.methodList.map {
-            MethodDescriptor(this, it)
-        }
+        children +=
+            descriptor.methodList.map {
+                MethodDescriptor(this, it)
+            }
         super.resolveChildren(children)
     }
 
@@ -41,7 +42,7 @@ class ServiceDescriptor(
     fun path(): List<Int> {
         return listOf(
             DescriptorProtos.FileDescriptorProto.SERVICE_FIELD_NUMBER,
-            file().descriptor.serviceList.indexOf(descriptor)
+            file().descriptor.serviceList.indexOf(descriptor),
         )
     }
 
@@ -49,7 +50,7 @@ class ServiceDescriptor(
         return escapeDoc(
             file().descriptor.sourceCodeInfo?.locationList?.firstOrNull {
                 it.pathList.contentEquals(path())
-            }?.leadingComments ?: ""
+            }?.leadingComments ?: "",
         )
     }
 }

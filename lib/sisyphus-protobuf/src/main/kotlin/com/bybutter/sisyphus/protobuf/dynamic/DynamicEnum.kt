@@ -6,7 +6,7 @@ import com.bybutter.sisyphus.protobuf.ProtoEnum
 class DynamicEnum(
     override val number: Int,
     override val proto: String,
-    private val support: DynamicEnumSupport
+    private val support: DynamicEnumSupport,
 ) : ProtoEnum<DynamicEnum> {
     override fun support(): EnumSupport<DynamicEnum> {
         return support

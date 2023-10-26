@@ -9,5 +9,5 @@ annotation class HColumn(
     val byteName: ByteArray = [],
     val qualifier: String = "",
     val byteQualifier: ByteArray = [],
-    val converter: KClass<*> = ValueConverter::class
+    val converter: KClass<*> = ValueConverter::class,
 )

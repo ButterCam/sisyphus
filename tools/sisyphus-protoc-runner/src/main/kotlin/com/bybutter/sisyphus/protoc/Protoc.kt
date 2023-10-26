@@ -12,25 +12,33 @@ object Protoc {
     private const val DEFAULT_PROTOC_VERSION = "3.17.3"
 
     fun runProtoc(args: Array<String>) {
-        val cmd = try {
-            extractProtoc(DEFAULT_PROTOC_VERSION)
-        } catch (unsupportedException: UnsupportedOperationException) {
-            val localVersion = try {
-                ProcessBuilder(arrayListOf("protoc", "--version")).redirectErrorStream(true).start().text()
-            } catch (e: IOException) {
-                throw UnsupportedOperationException("${unsupportedException.message}, and local protoc can not be found.")
+        val cmd =
+            try {
+                extractProtoc(DEFAULT_PROTOC_VERSION)
+            } catch (unsupportedException: UnsupportedOperationException) {
+                val localVersion =
+                    try {
+                        ProcessBuilder(arrayListOf("protoc", "--version")).redirectErrorStream(true).start().text()
+                    } catch (e: IOException) {
+                        throw UnsupportedOperationException("${unsupportedException.message}, and local protoc can not be found.")
+                    }
+                println("Due to ${unsupportedException.message}, version $localVersion is used.")
+                "protoc"
             }
-            println("Due to ${unsupportedException.message}, version $localVersion is used.")
-            "protoc"
-        }
         runProtoc(cmd, args)
     }
 
-    fun runProtoc(cmd: String, args: Array<String>) {
+    fun runProtoc(
+        cmd: String,
+        args: Array<String>,
+    ) {
         executeCmd(cmd, args)
     }
 
-    private fun executeCmd(cmd: String, args: Array<String>) {
+    private fun executeCmd(
+        cmd: String,
+        args: Array<String>,
+    ) {
         val protocCmd = arrayListOf(cmd, *args)
         println("protoc executing: $protocCmd")
         val process = ProcessBuilder(protocCmd).redirectErrorStream(true).start()
@@ -48,8 +56,9 @@ object Protoc {
         println("detected platform: $platform")
         val srcFilePath =
             Paths.get(version, "protoc-$version-${platform.osClassifier}.exe").toString()
-        val srcFile = this.javaClass.classLoader.getResource(srcFilePath.replace(File.separatorChar, '/'))
-            ?: throw UnsupportedOperationException("Unsupported protoc version $version for platform ${platform.osClassifier}")
+        val srcFile =
+            this.javaClass.classLoader.getResource(srcFilePath.replace(File.separatorChar, '/'))
+                ?: throw UnsupportedOperationException("Unsupported protoc version $version for platform ${platform.osClassifier}")
         val executable = createTempBinDir().resolve("protoc.exe")
         srcFile.openStream().use {
             Files.copy(it, executable)
