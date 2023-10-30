@@ -7,6 +7,7 @@ import com.bybutter.sisyphus.middleware.hbase.annotation.HTable
 import com.bybutter.sisyphus.reflect.uncheckedCast
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.Connection
+import org.apache.hadoop.hbase.client.Delete
 import org.apache.hadoop.hbase.client.Get
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.client.Scan
@@ -111,5 +112,15 @@ abstract class HTableTemplate<TKey : Any, TValue : Any> : HTemplate<TKey, TValue
 
     override fun setMap(vararg values: Pair<TKey, TValue>) {
         return setMap(values.toMap())
+    }
+
+    override fun delete(vararg keys: TKey) {
+        connection.getTable(TableName.valueOf(table)).use {
+            val deleteRequests =
+                keys.map {
+                    Delete(rowKeyConverter.convert(it))
+                }
+            it.delete(deleteRequests)
+        }
     }
 }
