@@ -79,7 +79,7 @@ abstract class HTableTemplate<TKey : Any, TValue : Any> : HTemplate<TKey, TValue
                 (
                     keyMap[it.row.hashWrapper()]
                         ?: throw RuntimeException("Key value not found.")
-                    ) to tableModelConverter.convert(it)
+                ) to tableModelConverter.convert(it)
             }
         }
     }
