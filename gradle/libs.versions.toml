@@ -43,7 +43,7 @@ sisyphus-project-plugin = "2.1.0"
 sisyphus-protobuf-plugin = "2.1.0"
 spring-boot = "3.2.0"
 spring-rabbit = "3.1.0"
-swagger = "2.2.19"
+swagger = "2.2.20"
 
 [libraries]
 antlr4 = { module = "org.antlr:antlr4", version.ref = "antlr4" }
