@@ -1,6 +1,6 @@
 [versions]
 antlr4 = "4.13.1"
-elastic = "8.11.3"
+elastic = "8.13.0"
 google-apiCommon = "2.22.0"
 google-commonProtos = "2.30.0"
 gradle-docker = "9.3.4"
